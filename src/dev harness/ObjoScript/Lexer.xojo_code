@@ -1,5 +1,27 @@
 #tag Class
 Protected Class Lexer
+	#tag Method, Flags = &h21, Description = 4372656174657320616E642072657475726E73206120746F6B656E20726570726573656E74696E6720656974686572206120737461746963206F7220696E7374616E6365206669656C64206964656E7469666965722E
+		Private Sub AddFieldIdentifier(isStatic As Boolean)
+		  /// Creates and adds a token representing either a static or instance field identifier.
+		  ///
+		  /// Assumes that `mCurrent` points to the character immediately following the last `_` **and** 
+		  /// that this character is a letter.
+		  /// Field identifiers start with a single underscore, e.g: `_width`.
+		  /// Static field identifiers start with two underscores, e.g: `__version`
+		  /// Identifiers can contain any combination of letters, underscores or numbers.
+		  
+		  Var lexeme() As String = Array("_")
+		  If isStatic Then lexeme.Add("_")
+		  
+		  While Peek.IsASCIILetterOrDigitOrUnderscore
+		    lexeme.Add(Advance)
+		  Wend
+		  
+		  mTokens.Add(MakeToken(ObjoScript.TokenTypes.FieldIdentifier, String.FromArray(lexeme, "")))
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 417474656D70747320746F2061646420612068657861646563696D616C206C69746572616C20746F6B656E20626567696E6E696E67206174207468652063757272656E7420706F736974696F6E2E2052657475726E732054727565206966207375636365737366756C2E
 		Private Function AddHexLiteralToken() As Boolean
 		  /// Attempts to add a hex literal token beginning at the current position.
@@ -36,17 +58,167 @@ Protected Class Lexer
 		    Return False
 		  End If
 		  
-		  // Compute the lexeme. +2 accounts for the "0x" prefix.
+		  // Compute the value. +2 accounts for the "0x" prefix.
 		  Var lexeme As String = _
 		  mSource.Middle(mTokenStart + 2, mCurrent - mTokenStart - 1)
 		  
-		  // Create and add this token.
-		  mTokens.Add(New ObjoScript.Token(ObjoScript.TokenTypes.HexLiteral, mTokenStart, _
-		  mLineNumber, lexeme, mScriptID))
+		  // Create and add this number token.
+		  mTokens.Add(New ObjoScript.NumberToken(mTokenStart, _
+		  mLineNumber, Integer.FromHex(lexeme), True, mScriptID))
 		  
 		  Return True
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 41646473206569746865722061207661726961626C65206964656E7469666965722C206B6579776F72642C20626F6F6C65616E206F7220746865206E756C6C20746F6B656E2E
+		Private Sub AddIdentifierOrReservedWord()
+		  /// Adds either a variable identifier, keyword, boolean or the null token.
+		  ///
+		  /// Assumes we've already consumed the first character:
+		  ///
+		  /// ```
+		  /// name
+		  ///  ^
+		  /// ```
+		  
+		  Var lexeme() As String = Array(Previous)
+		  
+		  // Consume all alphanumeric characters and underscores.
+		  While Peek.IsASCIILetterOrDigitOrUnderscore
+		    lexeme.Add(Advance)
+		  Wend
+		  
+		  // Use ObjoScript's dictionary of reserved words to determine this token's type.
+		  Var type As ObjoScript.TokenTypes = ReservedWords.Lookup(lexeme, ObjoScript.TokenTypes.Identifier)
+		  If type = ObjoScript.TokenTypes.Identifier Then
+		    mTokens.Add(MakeToken(type, String.FromArray(lexeme, "")))
+		  Else
+		    mTokens.Add(MakeToken(type))
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 436F6E73756D657320616E6420616464732061206E756D62657220746F6B656E207374617274696E6720617420606D43757272656E74602E
+		Private Sub AddNumberToken()
+		  /// Consumes and adds a number token starting at `mCurrent`.
+		  ///
+		  /// Assumes that we have just consumed the first (possibly only) digit:
+		  ///
+		  /// ```
+		  /// 100
+		  ///  ^
+		  /// ```
+		  /// We allow the use of `_` as a digit separator.
+		  
+		  Var lexeme() As String = Array(Previous)
+		  Var char As String
+		  
+		  While Peek.IsDigitOrUnderscore
+		    char = Advance
+		    If char <> "_" Then lexeme.Add(char)
+		  Wend
+		  
+		  // Edge case 1: Prohibit a trailing underscore.
+		  If Previous = "_" Then
+		    Error("Unexpected character. " + _
+		    "Underscores can separate digits within a number but a number cannot end with one.")
+		  End If
+		  
+		  // Is this a double?
+		  Var isInteger As Boolean = True
+		  If Peek = "." And Peek(1).IsDigit Then
+		    isInteger = False
+		    
+		    // Consume the dot.
+		    lexeme.Add(Advance)
+		    
+		    While Peek.IsDigitOrUnderscore
+		      char = Advance
+		      If char <> "_" Then lexeme.Add(char)
+		    Wend
+		    
+		    // Edge case 2: Prohibit a trailing underscore within a double.
+		    If Previous = "_" Then
+		      Error("Unexpected character. " + _
+		      "Underscores can separate digits within a number but a number cannot end with one.")
+		    End If
+		  End If
+		  
+		  // Is there an exponent?
+		  If Peek = "e" Then
+		    Var nextChar As String = Peek(1)
+		    If nextChar = "-" Or nextChar = "+" Then
+		      If nextChar = "-" Then isInteger = False
+		      // Advance twice to consume the e/E and sign character.
+		      lexeme.Add(Advance)
+		      lexeme.Add(Advance)
+		      While Peek.IsDigit
+		        lexeme.Add(Advance)
+		      Wend
+		      
+		    ElseIf nextChar.IsDigit Then
+		      // Consume the e/E character.
+		      lexeme.Add(Advance)
+		      
+		      While Peek.IsDigit
+		        lexeme.Add(Advance)
+		      Wend
+		    End If
+		  End If
+		  
+		  // Add this token.
+		  mTokens.Add(New ObjoScript.NumberToken(mTokenStart, mLineNumber, _
+		  Double.FromString(String.FromArray(lexeme, "")), isInteger, mScriptID))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 417474656D70747320746F20616464206120737472696E67206C69746572616C20746F6B656E2E
+		Private Sub AddStringToken()
+		  /// Attempts to add a string literal token.
+		  ///
+		  /// String literals begin and end with a double quote ("). 
+		  /// They may contain >= 0 escaped double quotes ("").
+		  /// This method assumes that the current character being evaluated is 
+		  /// immediately after the opening double quote:
+		  /// ```
+		  /// "Hello"
+		  ///  ^
+		  /// ```
+		  
+		  Var lexeme() As String
+		  
+		  // Keep consuming characters until we hit a `"`.
+		  Var terminated As Boolean = False
+		  Var c As String
+		  While Not AtEnd
+		    c = Advance
+		    If c = """" Then
+		      // If the next character is a `"` then this is an escaped quote.
+		      If Match("""") Then
+		        lexeme.Add(c)
+		        Continue
+		      Else
+		        terminated = True
+		        Exit
+		      End If
+		    ElseIf c = EndOfLine.UNIX Then
+		      Exit
+		    End If
+		    lexeme.Add(c)
+		  Wend
+		  
+		  // Make sure the literal was terminated.
+		  If Not terminated Then
+		    Error("Unterminated string literal. Expected a closing double quote.")
+		  End If
+		  
+		  mTokens.Add(New ObjoScript.Token(ObjoScript.TokenTypes.String_, _
+		  mTokenStart, mLineNumber, String.FromArray(lexeme, "")))
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 41646473207468652070617373656420746F6B656E20746F2074686520696E7465726E616C20606D546F6B656E73602061727261792E
@@ -163,6 +335,29 @@ Protected Class Lexer
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 43616C6C6564207768656E20776520656E636F756E74657220616E20756E64657273636F72652061742074686520656E64206F662061206C696E652E
+		Private Sub HandleLineContinuation()
+		  /// Called when we encounter an underscore at the end of a line.
+		  ///
+		  /// Assumes that the subsequent newline character has already been consumed.
+		  /// We need to advance past any spaces or tabs until we hit a non-whitespace character.
+		  /// If we hit a newline or the end of the source code before we find a non-whitespace 
+		  /// character then we raise an error.
+		  
+		  // Increment the line number.
+		  mLineNumber = mLineNumber + 1
+		  
+		  While MatchSpaceOrTab
+		  Wend
+		  
+		  If AtEnd Then
+		    Error("Unexpected end of source code. Expected a non-whitespace character following " + _
+		    "the line continuation operator.")
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060636020697320636F6E7369646572656420616C7068616E756D657269632E
 		Private Function IsAlpha(c As String) As Boolean
 		  /// Returns True if `c` is considered alphanumeric.
@@ -174,12 +369,59 @@ Protected Class Lexer
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52657475726E732061206E657720746F6B656E206F66207468652073706563696669656420747970652E205573656420666F7220746F6B656E7320776974686F7574206C6578656D65732E
-		Private Function MakeToken(type As ObjoScript.TokenTypes) As ObjoScript.Token
+	#tag Method, Flags = &h21, Description = 52657475726E732061206E657720746F6B656E206F66207468652073706563696669656420747970652E
+		Private Function MakeToken(type As ObjoScript.TokenTypes, lexeme As String = "") As ObjoScript.Token
 		  /// Returns a new token of the specified type. 
-		  /// Used for tokens without lexemes.
 		  
-		  Return New ObjoScript.Token(type, mTokenStart, mLineNumber, "", mScriptID)
+		  Return New ObjoScript.Token(type, mTokenStart, mLineNumber, lexeme, mScriptID)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 496620746865206E65787420636861726163746572206D61746368657320606360207468656E206974277320636F6E73756D656420616E6420547275652069732072657475726E65642E204F7468657277697365206974206C6561766573207468652063686172616374657220616C6F6E6520616E642072657475726E732046616C73652E
+		Private Function Match(c As String) As Boolean
+		  /// If the next character matches `c` then it's consumed and True is returned. 
+		  /// Otherwise it leaves the character alone and returns False.
+		  
+		  If Peek = c Then
+		    Call Advance
+		    Return True
+		  Else
+		    Return False
+		  End If
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 496620746865206E65787420636861726163746572206D61746368657320616E79206F6620606368617261637465727360207468656E20697420636F6E73756D657320746865206E6578742063686172616374657220627920616476616E63696E6720616E642072657475726E696E6720547275652E204F74686572776973652C2069742072657475726E732046616C73652E
+		Private Function MatchAny(ParamArray characters As String) As Boolean
+		  /// If the next character matches any of `characters` then it
+		  /// consumes the next character by advancing and returning True. Otherwise, it returns False.
+		  
+		  For Each c As String In characters
+		    If Peek = c Then
+		      Call Advance
+		      Return True
+		    End If
+		  Next c
+		  
+		  Return False
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 496620746865206E657874206368617261637465722069732061207370616365206F72206120686F72697A6F6E74616C20746162207468656E20776520636F6E73756D6520697420616E642072657475726E20547275652E204F7468657277697365207765206C65617665207468652063686172616374657220616C6F6E6520616E642072657475726E2046616C73652E
+		Private Function MatchSpaceOrTab() As Boolean
+		  /// If the next character is a space or a horizontal tab then we consume it and return True. 
+		  /// Otherwise we leave the character alone and return False.
+		  
+		  Var peekCache As String = Peek
+		  If peekCache = " " Or peekCache = &u0009 Then
+		    Call Advance
+		    Return True
+		  Else
+		    Return False
+		  End If
 		  
 		End Function
 	#tag EndMethod
@@ -206,7 +448,7 @@ Protected Class Lexer
 		  Var c As String = Advance
 		  
 		  // ====================================================================
-		  // NUMBERS
+		  // Numbers.
 		  // ====================================================================
 		  If c.IsDigit Then
 		    If c = "0" And Peek(1) = "x" Then
@@ -216,6 +458,214 @@ Protected Class Lexer
 		      AddNumberToken
 		      Return
 		    End If
+		  End If
+		  
+		  // ====================================================================
+		  // Single character tokens.
+		  // ====================================================================
+		  Select Case c
+		  Case "("
+		    AddToken(MakeToken(ObjoScript.TokenTypes.LParen))
+		    mUnclosedParenCount = mUnclosedParenCount + 1
+		    Return
+		    
+		  Case ")"
+		    AddToken(MakeToken(ObjoScript.TokenTypes.RParen))
+		    mUnclosedParenCount = mUnclosedParenCount - 1
+		    If mUnclosedParenCount < 0 Then Error("Syntax error. Unmatched closing parenthesis.")
+		    Return
+		    
+		  Case "{"
+		    AddToken(MakeToken(ObjoScript.TokenTypes.LCurly))
+		    mUnclosedCurlyCount = mUnclosedCurlyCount + 1
+		    Return
+		    
+		  Case "}"
+		    AddToken(MakeToken(ObjoScript.TokenTypes.RCurly))
+		    mUnclosedCurlyCount = mUnclosedCurlyCount - 1
+		    If mUnclosedCurlyCount < 0 Then Error("Syntax error. Unmatched closing curly bracket.")
+		    Return
+		    
+		  Case "["
+		    AddToken(MakeToken(ObjoScript.TokenTypes.LSquare))
+		    mUnclosedSquareCount = mUnclosedSquareCount + 1
+		    Return
+		    
+		  Case "]"
+		    AddToken(MakeToken(ObjoScript.TokenTypes.RSquare))
+		    mUnclosedSquareCount = mUnclosedSquareCount - 1
+		    If mUnclosedSquareCount < 0 Then Error("Syntax error. Unmatched closing square bracket.")
+		    Return
+		    
+		  Case ","
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Comma))
+		    Return
+		    
+		  Case ":"
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Colon))
+		    Return
+		    
+		  Case "?"
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Query))
+		    Return
+		  End Select
+		  
+		  // ====================================================================
+		  // Single OR multiple character tokens.
+		  // `c` is a character that can occur on its own or can occur in 
+		  // combination with one or more characters.
+		  // ====================================================================
+		  Select Case c
+		  Case "="
+		    If Match("=") Then
+		      AddToken(MakeToken(ObjoScript.TokenTypes.EqualEqual))
+		      Return
+		    Else
+		      AddToken(MakeToken(ObjoScript.TokenTypes.Equal))
+		      Return
+		    End If
+		    
+		  Case "."
+		    If Match(".") Then
+		      If Match(".") Then
+		        AddToken(MakeToken(ObjoScript.TokenTypes.DotDotDot)) // ...
+		        Return
+		      Else
+		        AddToken(MakeToken(ObjoScript.TokenTypes.DotDot)) // ..
+		        Return
+		      End If
+		    Else
+		      AddToken(MakeToken(ObjoScript.TokenTypes.Dot))
+		      Return
+		    End If
+		    
+		  Case "+"
+		    If Match("=") Then
+		      AddToken(MakeToken(ObjoScript.TokenTypes.PlusEqual))
+		      Return
+		    ElseIf Match("+") Then
+		      AddToken(MakeToken(ObjoScript.TokenTypes.PlusPlus))
+		      Return
+		    Else
+		      AddToken(MakeToken(ObjoScript.TokenTypes.Plus))
+		      Return
+		    End If
+		    
+		  Case "-"
+		    If Match("=") Then
+		      AddToken(MakeToken(ObjoScript.TokenTypes.MinusEqual))
+		      Return
+		    Else
+		      AddToken(MakeToken(ObjoScript.TokenTypes.Minus))
+		      Return
+		    End If
+		    
+		  Case "*"
+		    If Match("=") Then
+		      AddToken(MakeToken(ObjoScript.TokenTypes.StarEqual))
+		      Return
+		    Else
+		      AddToken(MakeToken(ObjoScript.TokenTypes.Star))
+		      Return
+		    End If
+		    
+		  Case "/"
+		    If Match("=") Then
+		      AddToken(MakeToken(ObjoScript.TokenTypes.ForwardSlashEqual))
+		      Return
+		    Else
+		      AddToken(MakeToken(ObjoScript.TokenTypes.ForwardSlash))
+		      Return
+		    End If
+		    
+		  Case "%"
+		    If Match("=") Then
+		      AddToken(MakeToken(ObjoScript.TokenTypes.PercentEqual))
+		      Return
+		    Else
+		      AddToken(MakeToken(ObjoScript.TokenTypes.Percent))
+		      Return
+		    End If
+		    
+		  Case "<"
+		    If Match("=") Then
+		      AddToken(MakeToken(ObjoScript.TokenTypes.LessEqual))
+		      Return
+		    ElseIf Match("<") Then
+		      AddToken(MakeToken(ObjoScript.TokenTypes.LessLess))
+		      Return
+		    Else
+		      AddToken(MakeToken(ObjoScript.TokenTypes.Less))
+		      Return
+		    End If
+		    
+		  Case ">"
+		    If Match("=") Then
+		      AddToken(MakeToken(ObjoScript.TokenTypes.GreaterEqual))
+		      Return
+		    ElseIf Match(">") Then
+		      AddToken(MakeToken(ObjoScript.TokenTypes.GreaterGreater))
+		      Return
+		    Else
+		      AddToken(MakeToken(ObjoScript.TokenTypes.Greater))
+		      Return
+		    End If
+		    
+		  Case "!"
+		    If Match("=") Then
+		      AddToken(MakeToken(ObjoScript.TokenTypes.BangEqual))
+		      Return
+		    Else
+		      AddToken(MakeToken(ObjoScript.TokenTypes.Bang))
+		      Return
+		    End If
+		  End Select
+		  
+		  // ====================================================================
+		  // Strings.
+		  // ====================================================================
+		  If c = """" Then
+		    AddStringToken
+		    Return
+		  End If
+		  
+		  // ====================================================================
+		  // The underscore.
+		  // Underscores represent the line continuation marker if they are 
+		  // immediately followed by a newline or they can indicate the 
+		  // beginning of an identifier.
+		  // ====================================================================
+		  If c = "_" Then
+		    If Match("_") Then
+		      If Peek.IsASCIILetter Then // A static field identifier (e.g: `__version`).
+		        AddFieldIdentifier(True)
+		        Return
+		      Else
+		        Error("Unexpected character following `__`. Should be a letter.")
+		      End If
+		    ElseIf Peek.IsASCIILetter Then // A class field identifier (e.g: `_width`).
+		      AddFieldIdentifier(False)
+		      Return
+		    Else
+		      // Could be the line continuation marker.
+		      // Edge case: Discard trailing whitespace between the underscore and the newline character.
+		      While MatchSpaceOrTab
+		      Wend
+		      If Match(EndOfLine.UNIX) Then // Line continuation marker.
+		        HandleLineContinuation
+		        Return
+		      Else
+		        Error("Unexpected character following `_`. Should be a letter or a newline.")
+		      End If
+		    End If
+		  End If
+		  
+		  // =================================================================
+		  // Identifiers, keywords, booleans and null.
+		  // =================================================================
+		  If c.IsASCIILetter Then
+		    AddIdentifierOrReservedWord
+		    Return
 		  End If
 		  
 		  // ====================================================================
@@ -232,6 +682,20 @@ Protected Class Lexer
 		  /// If we've reached the end it returns "".
 		  
 		  Return If(mCurrent + distance <= mChars.LastIndex, mChars(mCurrent + distance), "")
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E73207468652070726576696F75736C7920636F6E73756D6564206368617261637465722E2049662077652772652063757272656E746C7920617420746865206669727374206368617261637465722069742072657475726E732022222E
+		Private Function Previous() As String
+		  /// Returns the previously consumed character.
+		  /// If we're currently at the first character it returns "".
+		  
+		  If mCurrent - 1 >= 0 Then
+		    Return mChars(mCurrent - 1)
+		  Else
+		    Return ""
+		  End If
 		  
 		End Function
 	#tag EndMethod
@@ -260,6 +724,9 @@ Protected Class Lexer
 		  mLineNumber = 1
 		  mScriptID = -1
 		  mSource = ""
+		  mUnclosedParenCount = 0
+		  mUnclosedCurlyCount = 0
+		  mUnclosedSquareCount = 0
 		End Sub
 	#tag EndMethod
 
@@ -332,6 +799,9 @@ Protected Class Lexer
 		    NextToken
 		  Loop Until ReachedEOF
 		  
+		  // Pop the EOF token off.
+		  Call mTokens.Pop
+		  
 		  Return mTokens
 		  
 		End Function
@@ -365,6 +835,35 @@ Protected Class Lexer
 	#tag Property, Flags = &h21, Description = 302D626173656420696E64657820696E20606D4368617273602074686174207468652063757272656E7420746F6B656E207374617274732061742E
 		Private mTokenStart As Integer = 0
 	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 546865206E756D626572206F6620756E636C6F736564206375726C7920627261636B6574732E
+		Private mUnclosedCurlyCount As Integer = 0
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 546865206E756D626572206F6620756E636C6F73656420706172656E7468657365732E
+		Private mUnclosedParenCount As Integer = 0
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 546865206E756D626572206F6620756E636C6F7365642073717561726520627261636B6574732E
+		Private mUnclosedSquareCount As Integer = 0
+	#tag EndProperty
+
+	#tag ComputedProperty, Flags = &h0, Description = 416C6C206F66204F626A6F5363726970742773206B6579776F72647320706C7573202274727565222C202266616C73652220616E6420226E756C6C22206D617070656420746F20746865697220746F6B656E207479706520286B6579203D206B6579776F726420737472696E672C2076616C7565203D204F626A6F5363726970742E546F6B656E5479706573292E
+		#tag Getter
+			Get
+			  /// A private dictionary of all of ObjoScript's keywords plus "true", "false" 
+			  /// and "null" mapped to their token type.
+			  /// Key = keyword string, value = ObjoScript.TokenTypes.
+			  
+			  #Pragma Warning "TODO: Add ObjoScript's reserved words"
+			  
+			  Static d As New Dictionary()
+			  
+			  Return d
+			End Get
+		#tag EndGetter
+		Shared ReservedWords As Dictionary
+	#tag EndComputedProperty
 
 
 	#tag ViewBehavior

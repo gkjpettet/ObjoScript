@@ -415,6 +415,22 @@ Protected Module StringExtensions
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 547275652069662060736020697320612073696E676C6520646967697420696E207468652072616E676520302D39206F722074686520756E64657273636F7265206368617261637465722028605F60292E
+		Function IsDigitOrUnderscore(Extends s As String) As Boolean
+		  /// True if `s` is a single digit in the range 0-9 or the underscore character (`_`).
+		  ///
+		  /// We could use `GetUnicodeCategory` but a `Select...Case` is faster.
+		  
+		  Select Case s
+		  Case "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "_"
+		    Return True
+		  Else
+		    Return False
+		  End Select
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 54727565206966206063686172602065786163746C79206D6174636865732028636173652D73656E7369746976652920616E79206F662074686520706173736564206063686172616374657273602E
 		Function IsExactly(Extends char As String, ParamArray characters() As String) As Boolean
 		  /// True if `char` exactly matches (case-sensitive) any of the passed `characters`.
