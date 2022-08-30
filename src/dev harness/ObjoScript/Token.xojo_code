@@ -14,6 +14,43 @@ Protected Class Token
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 52657475726E732061206E657720626F6F6C65616E20746F6B656E2E
+		Shared Function CreateBoolean(startPos As Integer, lineNumber As Integer, value As Boolean, scriptID As Integer = -1) As ObjoScript.Token
+		  /// Returns a new boolean token.
+		  
+		  Var t As New ObjoScript.Token(ObjoScript.TokenTypes.Boolean_, startPos, lineNumber, "", scriptID)
+		  t.BooleanValue = value
+		  
+		  Return t
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 52657475726E732061206E6577206E756D62657220746F6B656E2E
+		Shared Function CreateNumber(startPos As Integer, lineNumber As Integer, value As Double, isInteger As Boolean, scriptID As Integer = -1) As ObjoScript.Token
+		  /// Returns a new number token.
+		  
+		  Var t As New ObjoScript.Token(ObjoScript.TokenTypes.Number, startPos, lineNumber, "", scriptID)
+		  t.NumberValue = value
+		  t.IsInteger = isInteger
+		  
+		  Return t
+		  
+		End Function
+	#tag EndMethod
+
+
+	#tag Property, Flags = &h0, Description = 49662074686973206973206120626F6F6C65616E20746F6B656E2C2074686973206973207468652076616C75652E204D65616E696E676C65737320666F72206F7468657220746F6B656E2074797065732E
+		BooleanValue As Boolean = False
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 496620746869732069732061206E756D62657220746F6B656E2C20746869732069732054727565206966206974277320616E20696E74656765722E204D65616E696E676C65737320666F72206F7468657220746F6B656E2074797065732E
+		IsInteger As Boolean = False
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 547275652069662074686973206973206120737461746963206669656C64206964656E7469666965722E20
+		IsStatic As Boolean = False
+	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 5468652061637475616C2063686172616374657273206F66207468697320746F6B656E2E204E6F7420657665727920746F6B656E2070726F76696465732061206C6578656D652E
 		Lexeme As String
@@ -21,6 +58,10 @@ Protected Class Token
 
 	#tag Property, Flags = &h0, Description = 54686520312D6261736564206C696E65206E756D6265722074686174207468697320746F6B656E206F6363757273206F6E2E
 		LineNumber As Integer = 1
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 496620746869732069732061206E756D62657220746F6B656E2C2074686973206973207468652076616C75652E204D65616E696E676C65737320666F72206F7468657220746F6B656E2074797065732E
+		NumberValue As Double
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 4F7074696F6E616C204944206F662074686520736372697074207468697320746F6B656E206F63637572732077697468696E2E
@@ -83,7 +124,13 @@ Protected Class Token
 			Group="Behavior"
 			InitialValue=""
 			Type="ObjoScript.TokenTypes"
-			EditorType=""
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - EOF"
+				"1 - EOL"
+				"2 - Number"
+				"3 - Underscore"
+			#tag EndEnumValues
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Lexeme"
@@ -91,7 +138,7 @@ Protected Class Token
 			Group="Behavior"
 			InitialValue=""
 			Type="String"
-			EditorType=""
+			EditorType="MultiLineEditor"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="LineNumber"
@@ -106,6 +153,14 @@ Protected Class Token
 			Visible=false
 			Group="Behavior"
 			InitialValue="0"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="ScriptID"
+			Visible=false
+			Group="Behavior"
+			InitialValue="-1"
 			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty

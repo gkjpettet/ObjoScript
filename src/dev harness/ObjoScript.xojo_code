@@ -5,20 +5,41 @@ Protected Module ObjoScript
 		  /// Returns a string representation of this token type.
 		  
 		  Select Case t
-		  Case ObjoScript.TokenTypes.Bang
-		    Return "Bang"
+		  Case ObjoScript.TokenTypes.Ampersand
+		    Return "Ampersand"
+		    
+		  Case ObjoScript.TokenTypes.And_
+		    Return "And"
+		    
+		  Case ObjoScript.TokenTypes.As_
+		    Return "As"
+		    
+		  Case ObjoScript.TokenTypes.Assert
+		    Return "Assert"
 		    
 		  Case ObjoScript.TokenTypes.Boolean_
 		    Return "Boolean"
 		    
-		  Case ObjoScript.TokenTypes.BangEqual
-		    Return "BangEqual"
+		  Case ObjoScript.TokenTypes.Breakpoint
+		    Return "Breakpoint"
+		    
+		  Case ObjoScript.TokenTypes.Caret
+		    Return "Caret"
+		    
+		  Case ObjoScript.TokenTypes.Class_
+		    Return "Class"
 		    
 		  Case ObjoScript.TokenTypes.Colon
 		    Return "Colon"
 		    
 		  Case ObjoScript.TokenTypes.Comma
 		    Return "Comma"
+		    
+		  Case ObjoScript.TokenTypes.Continue_
+		    Return "Continue"
+		    
+		  Case ObjoScript.TokenTypes.Construct
+		    Return "Construct"
 		    
 		  Case ObjoScript.TokenTypes.Dot
 		    Return "Dot"
@@ -41,8 +62,23 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.EqualEqual
 		    Return "EqualEqual"
 		    
+		  Case ObjoScript.TokenTypes.Else_
+		    Return "Else"
+		    
+		  Case ObjoScript.TokenTypes.Exit_
+		    Return "Exit"
+		    
+		  Case ObjoScript.TokenTypes.Export
+		    Return "Export"
+		    
 		  Case ObjoScript.TokenTypes.FieldIdentifier
 		    Return "Field Identifier"
+		    
+		  Case ObjoScript.TokenTypes.For_
+		    Return "For"
+		    
+		  Case ObjoScript.TokenTypes.Foreign
+		    Return "Foreign"
 		    
 		  Case ObjoScript.TokenTypes.ForwardSlash
 		    Return "ForwardSlash"
@@ -61,6 +97,18 @@ Protected Module ObjoScript
 		    
 		  Case ObjoScript.TokenTypes.Identifier
 		    Return "Identifier"
+		    
+		  Case ObjoScript.TokenTypes.If_
+		    Return "If"
+		    
+		  Case ObjoScript.TokenTypes.Import
+		    Return "Import"
+		    
+		  Case ObjoScript.TokenTypes.In_
+		    Return "In"
+		    
+		  Case ObjoScript.TokenTypes.Is_
+		    Return "Is"
 		    
 		  Case ObjoScript.TokenTypes.LCurly
 		    Return "LCurly"
@@ -86,17 +134,29 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.MinusEqual
 		    Return "MinusEqual"
 		    
+		  Case ObjoScript.TokenTypes.Not_
+		    Return "Not"
+		    
+		  Case ObjoScript.TokenTypes.NotEqual
+		    Return "NotEqual"
+		    
+		  Case ObjoScript.TokenTypes.Nothing
+		    Return "Nothing"
+		    
 		  Case ObjoScript.TokenTypes.Null
 		    Return "Null"
 		    
 		  Case ObjoScript.TokenTypes.Number
 		    Return "Number"
 		    
+		  Case ObjoScript.TokenTypes.Or_
+		    Return "Or"
+		    
 		  Case ObjoScript.TokenTypes.Percent
 		    Return "Percent"
 		    
-		  Case ObjoScript.TokenTypes.PercentEqual
-		    Return "PercentEqual"
+		  Case ObjoScript.TokenTypes.Pipe
+		    Return "Pipe"
 		    
 		  Case ObjoScript.TokenTypes.Plus
 		    Return "Plus"
@@ -107,11 +167,17 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.PlusPlus
 		    Return "PlusPlus"
 		    
+		  Case ObjoScript.TokenTypes.Print
+		    Return "Print"
+		    
 		  Case ObjoScript.TokenTypes.Query
 		    Return "Query"
 		    
 		  Case ObjoScript.TokenTypes.RCurly
 		    Return "RCurly"
+		    
+		  Case ObjoScript.TokenTypes.Return_
+		    Return "Return"
 		    
 		  Case ObjoScript.TokenTypes.RParen
 		    Return "RParen"
@@ -125,11 +191,29 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.StarEqual
 		    Return "StarEqual"
 		    
+		  Case ObjoScript.TokenTypes.Static_
+		    Return "Static"
+		    
 		  Case ObjoScript.TokenTypes.String_
 		    Return "String"
 		    
+		  Case ObjoScript.TokenTypes.This
+		    Return "This"
+		    
+		  Case ObjoScript.TokenTypes.Tilde
+		    Return "Tilde"
+		    
 		  Case ObjoScript.TokenTypes.Underscore
 		    Return "Underscore"
+		    
+		  Case ObjoScript.TokenTypes.Var_
+		    Return "Var"
+		    
+		  Case ObjoScript.TokenTypes.While_
+		    Return "While"
+		    
+		  Case ObjoScript.TokenTypes.Xor_
+		    Return "Xor"
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown token type.")
@@ -191,25 +275,41 @@ Protected Module ObjoScript
 
 
 	#tag Enum, Name = TokenTypes, Type = Integer, Flags = &h1
-		Bang
-		  BangEqual
+		Ampersand
+		  And_
+		  As_
+		  Assert
 		  Boolean_
+		  Breakpoint
+		  Caret
+		  Class_
 		  Colon
 		  Comma
+		  Construct
+		  Continue_
 		  Dot
 		  DotDot
 		  DotDotDot
+		  Else_
 		  EOF
 		  EOL
 		  Equal
 		  EqualEqual
+		  Exit_
+		  Export
 		  FieldIdentifier
+		  For_
+		  Foreign
 		  ForwardSlash
 		  ForwardSlashEqual
 		  Greater
 		  GreaterEqual
 		  GreaterGreater
 		  Identifier
+		  If_
+		  Import
+		  In_
+		  Is_
 		  LCurly
 		  Less
 		  LessEqual
@@ -218,21 +318,33 @@ Protected Module ObjoScript
 		  LSquare
 		  Minus
 		  MinusEqual
+		  Not_
+		  NotEqual
+		  Nothing
 		  Null
 		  Number
+		  Or_
 		  Percent
-		  PercentEqual
+		  Pipe
 		  Plus
 		  PlusEqual
 		  PlusPlus
+		  Print
 		  Query
 		  RCurly
+		  Return_
 		  RParen
 		  RSquare
 		  Star
 		  StarEqual
+		  Static_
 		  String_
-		Underscore
+		  This
+		  Tilde
+		  Underscore
+		  Var_
+		  While_
+		Xor_
 	#tag EndEnum
 
 

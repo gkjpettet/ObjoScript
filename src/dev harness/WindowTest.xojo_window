@@ -254,17 +254,17 @@ End
 		    // Compute the value and type.
 		    Select Case t.Type
 		    Case ObjoScript.TokenTypes.Number
-		      Var numToken As ObjoScript.NumberToken = ObjoScript.NumberToken(t)
-		      If numToken.IsInteger Then
-		        value = numToken.Value.ToString(Locale.Current, "#")
+		      If t.IsInteger Then
+		        value = t.NumberValue.ToString(Locale.Current, "#")
 		        type = "Number (int)"
 		      Else
-		        value = numToken.Value.ToString
+		        value = t.NumberValue.ToString
 		        type = "Number (double)"
 		      End If
 		      
-		      'Case ObjoScript.TokenTypes.Bool
-		      #Pragma Warning "TODO"
+		    Case ObjoScript.TokenTypes.Boolean_
+		      value = t.BooleanValue.ToString
+		      type = t.Type.ToString
 		      
 		    Else
 		      value = t.Lexeme

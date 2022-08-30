@@ -12,7 +12,6 @@ Module=ObjoScript;ObjoScript.xojo_code;&h000000004D1497FF;&h0000000000000000;fal
 Class=Lexer;ObjoScript/Lexer.xojo_code;&h000000004F5657FF;&h000000004D1497FF;false
 Class=Token;ObjoScript/Token.xojo_code;&h000000002664F7FF;&h000000004D1497FF;false
 Class=LexerException;ObjoScript/LexerException.xojo_code;&h0000000065E8FFFF;&h000000004D1497FF;false
-Class=NumberToken;ObjoScript/NumberToken.xojo_code;&h000000003B339FFF;&h000000004D1497FF;false
 DefaultWindow=WindowTest
 AppMenuBar=MainMenuBar
 MajorVersion=1

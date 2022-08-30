@@ -17,7 +17,10 @@ Protected Class Lexer
 		    lexeme.Add(Advance)
 		  Wend
 		  
-		  mTokens.Add(MakeToken(ObjoScript.TokenTypes.FieldIdentifier, String.FromArray(lexeme, "")))
+		  Var t As ObjoScript.Token = MakeToken(ObjoScript.TokenTypes.FieldIdentifier, String.FromArray(lexeme, ""))
+		  t.IsStatic = isStatic
+		  
+		  mTokens.Add(t)
 		  
 		End Sub
 	#tag EndMethod
@@ -63,7 +66,7 @@ Protected Class Lexer
 		  mSource.Middle(mTokenStart + 2, mCurrent - mTokenStart - 1)
 		  
 		  // Create and add this number token.
-		  mTokens.Add(New ObjoScript.NumberToken(mTokenStart, _
+		  mTokens.Add(ObjoScript.Token.CreateNumber(mTokenStart, _
 		  mLineNumber, Integer.FromHex(lexeme), True, mScriptID))
 		  
 		  Return True
@@ -82,20 +85,23 @@ Protected Class Lexer
 		  ///  ^
 		  /// ```
 		  
-		  Var lexeme() As String = Array(Previous)
-		  
 		  // Consume all alphanumeric characters and underscores.
+		  Var s() As String = Array(Previous)
 		  While Peek.IsASCIILetterOrDigitOrUnderscore
-		    lexeme.Add(Advance)
+		    s.Add(Advance)
 		  Wend
+		  
+		  Var lexeme As String = String.FromArray(s, "")
 		  
 		  // Use ObjoScript's dictionary of reserved words to determine this token's type.
 		  Var type As ObjoScript.TokenTypes = ReservedWords.Lookup(lexeme, ObjoScript.TokenTypes.Identifier)
-		  If type = ObjoScript.TokenTypes.Identifier Then
-		    mTokens.Add(MakeToken(type, String.FromArray(lexeme, "")))
+		  
+		  Select Case type
+		  Case ObjoScript.TokenTypes.Identifier, ObjoScript.TokenTypes.Boolean_
+		    mTokens.Add(MakeToken(type, lexeme))
 		  Else
 		    mTokens.Add(MakeToken(type))
-		  End If
+		  End Select
 		  
 		End Sub
 	#tag EndMethod
@@ -169,7 +175,7 @@ Protected Class Lexer
 		  End If
 		  
 		  // Add this token.
-		  mTokens.Add(New ObjoScript.NumberToken(mTokenStart, mLineNumber, _
+		  mTokens.Add(ObjoScript.Token.CreateNumber(mTokenStart, mLineNumber, _
 		  Double.FromString(String.FromArray(lexeme, "")), isInteger, mScriptID))
 		  
 		End Sub
@@ -373,7 +379,11 @@ Protected Class Lexer
 		Private Function MakeToken(type As ObjoScript.TokenTypes, lexeme As String = "") As ObjoScript.Token
 		  /// Returns a new token of the specified type. 
 		  
-		  Return New ObjoScript.Token(type, mTokenStart, mLineNumber, lexeme, mScriptID)
+		  If type = ObjoScript.TokenTypes.Boolean_ Then
+		    Return ObjoScript.Token.CreateBoolean(mTokenStart, mLineNumber, If(lexeme = "true", True, False), mScriptID)
+		  Else
+		    Return New ObjoScript.Token(type, mTokenStart, mLineNumber, lexeme, mScriptID)
+		  End If
 		  
 		End Function
 	#tag EndMethod
@@ -501,12 +511,32 @@ Protected Class Lexer
 		    AddToken(MakeToken(ObjoScript.TokenTypes.Comma))
 		    Return
 		    
+		  Case "&"
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Ampersand))
+		    Return
+		    
+		  Case "|"
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Pipe))
+		    Return
+		    
+		  Case "^"
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Caret))
+		    Return
+		    
+		  Case "~"
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Tilde))
+		    Return
+		    
 		  Case ":"
 		    AddToken(MakeToken(ObjoScript.TokenTypes.Colon))
 		    Return
 		    
 		  Case "?"
 		    AddToken(MakeToken(ObjoScript.TokenTypes.Query))
+		    Return
+		    
+		  Case "%"
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Percent))
 		    Return
 		  End Select
 		  
@@ -578,17 +608,11 @@ Protected Class Lexer
 		      Return
 		    End If
 		    
-		  Case "%"
-		    If Match("=") Then
-		      AddToken(MakeToken(ObjoScript.TokenTypes.PercentEqual))
-		      Return
-		    Else
-		      AddToken(MakeToken(ObjoScript.TokenTypes.Percent))
-		      Return
-		    End If
-		    
 		  Case "<"
-		    If Match("=") Then
+		    If Match(">") Then
+		      AddToken(MakeToken(ObjoScript.TokenTypes.NotEqual))
+		      Return
+		    ElseIf Match("=") Then
 		      AddToken(MakeToken(ObjoScript.TokenTypes.LessEqual))
 		      Return
 		    ElseIf Match("<") Then
@@ -608,15 +632,6 @@ Protected Class Lexer
 		      Return
 		    Else
 		      AddToken(MakeToken(ObjoScript.TokenTypes.Greater))
-		      Return
-		    End If
-		    
-		  Case "!"
-		    If Match("=") Then
-		      AddToken(MakeToken(ObjoScript.TokenTypes.BangEqual))
-		      Return
-		    Else
-		      AddToken(MakeToken(ObjoScript.TokenTypes.Bang))
 		      Return
 		    End If
 		  End Select
@@ -852,14 +867,41 @@ Protected Class Lexer
 		#tag Getter
 			Get
 			  /// A private dictionary of all of ObjoScript's keywords plus "true", "false" 
-			  /// and "null" mapped to their token type.
+			  /// and "nothing" mapped to their token type.
 			  /// Key = keyword string, value = ObjoScript.TokenTypes.
 			  
-			  #Pragma Warning "TODO: Add ObjoScript's reserved words"
-			  
-			  Static d As New Dictionary()
-			  
-			  Return d
+			  Static d As New Dictionary(_ 
+			  "and"        : ObjoScript.TokenTypes.And_, _
+			  "as"         : ObjoScript.TokenTypes.As_, _
+			  "assert"     : ObjoScript.TokenTypes.Assert, _
+			  "breakpoint" : ObjoScript.TokenTypes.Breakpoint, _
+			  "class"      : ObjoScript.TokenTypes.Class_, _
+			    "continue"   : ObjoScript.TokenTypes.Continue_, _
+			    "construct"  : ObjoScript.TokenTypes.Construct, _
+			    "else"       : ObjoScript.TokenTypes.Else_, _
+			      "exit"       : ObjoScript.TokenTypes.Exit_, _
+			      "export"     : ObjoScript.TokenTypes.Export, _
+			      "false"      : ObjoScript.TokenTypes.Boolean_, _
+			      "for"        : ObjoScript.TokenTypes.For_, _
+			        "foreign"    : ObjoScript.TokenTypes.Foreign, _
+			        "if"         : ObjoScript.TokenTypes.If_, _
+			          "import"     : ObjoScript.TokenTypes.Import, _
+			          "in"         : ObjoScript.TokenTypes.In_, _
+			          "is"         : ObjoScript.TokenTypes.Is_, _
+			          "not"        : ObjoScript.TokenTypes.Not_, _
+			          "nothing"    : ObjoScript.TokenTypes.Nothing, _
+			          "or"         : ObjoScript.TokenTypes.Or_, _
+			          "print"      : ObjoScript.TokenTypes.Print, _
+			          "return"     : ObjoScript.TokenTypes.Return_, _
+			          "static"     : ObjoScript.TokenTypes.Static_, _
+			          "this"       : ObjoScript.TokenTypes.This, _
+			          "true"       : ObjoScript.TokenTypes.Boolean_, _
+			          "var"        : ObjoScript.TokenTypes.Var_, _
+			          "while"      : ObjoScript.TokenTypes.While_, _
+			            "xor"        : ObjoScript.TokenTypes.Xor_)
+			            
+			            Return d
+			            
 			End Get
 		#tag EndGetter
 		Shared ReservedWords As Dictionary
