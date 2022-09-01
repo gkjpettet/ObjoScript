@@ -795,9 +795,13 @@ Protected Class Lexer
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 546F6B656E6973657320756E70726F636573736564204F626A6F5363726970742060736F757263656020636F646520696E746F20616E206172726179206F6620746F6B656E732E206073637269707449446020697320616E206F7074696F6E616C20494420726570726573656E74696E6720746865207363726970742074686520736F75726365206F726967696E6174656420696E2E
-		Function Tokenise(source As String, scriptID As Integer = -1) As ObjoScript.Token()
+		Function Tokenise(source As String, includeEOFToken As Boolean = True, scriptID As Integer = -1) As ObjoScript.Token()
 		  /// Tokenises unprocessed ObjoScript `source` code into an array of tokens.
 		  /// `scriptID` is an optional ID representing the script the source originated in.
+		  ///
+		  /// By default, the lexer includes an EOF token at the end. This can optionally be omitted. This
+		  /// is useful if several files are being tokenised and concatenated together (since the parser 
+		  /// looks for the EOF token to know when it's finished).
 		  
 		  Reset
 		  
@@ -814,8 +818,8 @@ Protected Class Lexer
 		    NextToken
 		  Loop Until ReachedEOF
 		  
-		  // Pop the EOF token off.
-		  Call mTokens.Pop
+		  // Remove the EOF token if requested.
+		  If Not includeEOFToken Then Call mTokens.Pop
 		  
 		  Return mTokens
 		  
@@ -866,11 +870,11 @@ Protected Class Lexer
 	#tag ComputedProperty, Flags = &h0, Description = 416C6C206F66204F626A6F5363726970742773206B6579776F72647320706C7573202274727565222C202266616C73652220616E6420226E756C6C22206D617070656420746F20746865697220746F6B656E207479706520286B6579203D206B6579776F726420737472696E672C2076616C7565203D204F626A6F5363726970742E546F6B656E5479706573292E
 		#tag Getter
 			Get
-			  /// A private dictionary of all of ObjoScript's keywords plus "true", "false" 
+			  /// A private dictionary of all of ObjoScript's keywords plus "true", "false"
 			  /// and "nothing" mapped to their token type.
 			  /// Key = keyword string, value = ObjoScript.TokenTypes.
 			  
-			  Static d As New Dictionary(_ 
+			  Static d As New Dictionary(_
 			  "and"        : ObjoScript.TokenTypes.And_, _
 			  "as"         : ObjoScript.TokenTypes.As_, _
 			  "assert"     : ObjoScript.TokenTypes.Assert, _
@@ -884,24 +888,25 @@ Protected Class Lexer
 			      "false"      : ObjoScript.TokenTypes.Boolean_, _
 			      "for"        : ObjoScript.TokenTypes.For_, _
 			        "foreign"    : ObjoScript.TokenTypes.Foreign, _
-			        "if"         : ObjoScript.TokenTypes.If_, _
-			          "import"     : ObjoScript.TokenTypes.Import, _
-			          "in"         : ObjoScript.TokenTypes.In_, _
-			          "is"         : ObjoScript.TokenTypes.Is_, _
-			          "not"        : ObjoScript.TokenTypes.Not_, _
-			          "nothing"    : ObjoScript.TokenTypes.Nothing, _
-			          "or"         : ObjoScript.TokenTypes.Or_, _
-			          "print"      : ObjoScript.TokenTypes.Print, _
-			          "return"     : ObjoScript.TokenTypes.Return_, _
-			          "static"     : ObjoScript.TokenTypes.Static_, _
-			          "this"       : ObjoScript.TokenTypes.This, _
-			          "true"       : ObjoScript.TokenTypes.Boolean_, _
-			          "var"        : ObjoScript.TokenTypes.Var_, _
-			          "while"      : ObjoScript.TokenTypes.While_, _
-			            "xor"        : ObjoScript.TokenTypes.Xor_)
-			            
-			            Return d
-			            
+			        "function"   : ObjoScript.TokenTypes.Function_, _
+			          "if"         : ObjoScript.TokenTypes.If_, _
+			            "import"     : ObjoScript.TokenTypes.Import, _
+			            "in"         : ObjoScript.TokenTypes.In_, _
+			            "is"         : ObjoScript.TokenTypes.Is_, _
+			            "not"        : ObjoScript.TokenTypes.Not_, _
+			            "nothing"    : ObjoScript.TokenTypes.Nothing, _
+			            "or"         : ObjoScript.TokenTypes.Or_, _
+			            "print"      : ObjoScript.TokenTypes.Print, _
+			            "return"     : ObjoScript.TokenTypes.Return_, _
+			            "static"     : ObjoScript.TokenTypes.Static_, _
+			            "this"       : ObjoScript.TokenTypes.This, _
+			            "true"       : ObjoScript.TokenTypes.Boolean_, _
+			            "var"        : ObjoScript.TokenTypes.Var_, _
+			            "while"      : ObjoScript.TokenTypes.While_, _
+			              "xor"        : ObjoScript.TokenTypes.Xor_)
+			              
+			              Return d
+			              
 			End Get
 		#tag EndGetter
 		Shared ReservedWords As Dictionary

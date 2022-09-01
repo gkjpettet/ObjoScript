@@ -71,37 +71,6 @@ Begin DesktopWindow WindowTest
       Visible         =   True
       Width           =   603
    End
-   Begin DesktopButton ButtonTokenise
-      AllowAutoDeactivate=   True
-      Bold            =   False
-      Cancel          =   False
-      Caption         =   "Tokenise"
-      Default         =   False
-      Enabled         =   True
-      FontName        =   "System"
-      FontSize        =   0.0
-      FontUnit        =   0
-      Height          =   20
-      Index           =   -2147483648
-      Italic          =   False
-      Left            =   1172
-      LockBottom      =   True
-      LockedInPosition=   False
-      LockLeft        =   False
-      LockRight       =   True
-      LockTop         =   False
-      MacButtonStyle  =   0
-      Scope           =   0
-      TabIndex        =   1
-      TabPanelIndex   =   0
-      TabStop         =   True
-      Tooltip         =   ""
-      Top             =   687
-      Transparent     =   False
-      Underline       =   False
-      Visible         =   True
-      Width           =   80
-   End
    Begin DesktopButton ButtonClear
       AllowAutoDeactivate=   True
       Bold            =   False
@@ -178,6 +147,7 @@ Begin DesktopWindow WindowTest
       Underline       =   False
       Visible         =   True
       Width           =   617
+      _ScrollOffset   =   0
       _ScrollWidth    =   -1
    End
    Begin DesktopLabel Info
@@ -211,6 +181,37 @@ Begin DesktopWindow WindowTest
       Underline       =   False
       Visible         =   True
       Width           =   603
+   End
+   Begin DesktopButton ButtonParse
+      AllowAutoDeactivate=   True
+      Bold            =   False
+      Cancel          =   False
+      Caption         =   "Parse"
+      Default         =   False
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      Height          =   20
+      Index           =   -2147483648
+      Italic          =   False
+      Left            =   1172
+      LockBottom      =   True
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   False
+      MacButtonStyle  =   0
+      Scope           =   2
+      TabIndex        =   5
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   687
+      Transparent     =   False
+      Underline       =   False
+      Visible         =   True
+      Width           =   80
    End
 End
 #tag EndDesktopWindow
@@ -280,7 +281,14 @@ End
 
 #tag EndWindowCode
 
-#tag Events ButtonTokenise
+#tag Events ButtonClear
+	#tag Event
+		Sub Pressed()
+		  Reset
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ButtonParse
 	#tag Event
 		Sub Pressed()
 		  TokensListbox.RemoveAllRows
@@ -288,21 +296,21 @@ End
 		  Var tokens() As ObjoScript.Token
 		  
 		  Var lexer As New ObjoScript.Lexer
+		  Var parser As New ObjoScript.Parser
+		  Var ast() As ObjoScript.Stmt
 		  
 		  Try
 		    tokens = lexer.Tokenise(Code.Text)
 		    UpdateTokensListbox(tokens)
+		    
 		    Info.Text = "Successfully tokenised."
+		    
+		    ast = parser.Parse(tokens)
+		    
 		  Catch e As ObjoScript.LexerException
 		    DisplayLexerError(e)
 		  End Try
-		End Sub
-	#tag EndEvent
-#tag EndEvents
-#tag Events ButtonClear
-	#tag Event
-		Sub Pressed()
-		  Reset
+		  
 		End Sub
 	#tag EndEvent
 #tag EndEvents
