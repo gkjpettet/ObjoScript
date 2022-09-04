@@ -20,6 +20,14 @@ Protected Class Parser
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 436F6E76656E69656E6365206D6574686F6420666F722072657475726E696E672061206E6577206772616D6D61722072756C6520666F7220612062696E617279206F70657261746F722E
+		Private Function BinaryOperator(precedence As ObjoScript.Precedences, rightAssociative As Boolean = False) As ObjoScript.GrammarRule
+		  /// Convenience method for returning a new grammar rule for a binary operator.
+		  
+		  Return New ObjoScript.GrammarRule(Nil, New BinaryParselet(precedence, rightAssociative), precedence)
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E732074727565206966207468652063757272656E7420746F6B656E206D61746368657320616E79206F6620746865207370656369666965642074797065732E2053696D696C617220746F20604D617463682829602062757420646F6573204E4F5420636F6E73756D65207468652063757272656E7420746F6B656E2069662074686572652069732061206D617463682E
 		Private Function Check(types() As ObjoScript.TokenTypes) As Boolean
 		  /// Returns true if the current token matches any of the specified types.
@@ -159,80 +167,82 @@ Protected Class Parser
 		  
 		  #Pragma Warning "TODO"
 		  ' 1. Need to add CallParselet and elevate precedence for the `LParen` entry.
-		  ' 2. Minus binary operator and check precedence.
+		  ' 2. Add LCurly
+		  ' 3. Add Lsquare
+		  ' 4. Add Dot 
 		  
 		  mRules = New Dictionary( _
-		  ObjoScript.TokenTypes.Ampersand         : Unused, _
-		  ObjoScript.TokenTypes.And_              : Unused, _
-		  ObjoScript.TokenTypes.Assert            : Unused, _
-		  ObjoScript.TokenTypes.As_               : Unused, _
-		  ObjoScript.TokenTypes.Boolean_          : Unused, _
-		  ObjoScript.TokenTypes.Breakpoint        : Unused, _
-		  ObjoScript.TokenTypes.Caret             : Unused, _
-		  ObjoScript.TokenTypes.Class_            : Unused, _
-		  ObjoScript.TokenTypes.Colon             : Unused, _
-		  ObjoScript.TokenTypes.Comma             : Unused, _
-		  ObjoScript.TokenTypes.Construct         : Unused, _
-		  ObjoScript.TokenTypes.Continue_         : Unused, _
-		  ObjoScript.TokenTypes.Dot               : Unused, _
-		  ObjoScript.TokenTypes.DotDot            : Unused, _
-		  ObjoScript.TokenTypes.DotDotDot         : Unused, _
-		  ObjoScript.TokenTypes.Else_             : Unused, _
-		  ObjoScript.TokenTypes.EOF               : Unused, _
-		  ObjoScript.TokenTypes.EOL               : Unused, _
-		  ObjoScript.TokenTypes.Equal             : Unused, _
-		  ObjoScript.TokenTypes.EqualEqual        : Unused, _
-		  ObjoScript.TokenTypes.Exit_             : Unused, _
-		  ObjoScript.TokenTypes.Export            : Unused, _
-		  ObjoScript.TokenTypes.FieldIdentifier   : Unused, _
-		  ObjoScript.TokenTypes.Foreign           : Unused, _
-		  ObjoScript.TokenTypes.ForwardSlash      : Unused, _
-		  ObjoScript.TokenTypes.ForwardSlashEqual : Unused, _
-		  ObjoScript.TokenTypes.For_              : Unused, _
-		  ObjoScript.TokenTypes.Function_         : Unused, _
-		  ObjoScript.TokenTypes.Greater           : Unused, _
-		  ObjoScript.TokenTypes.GreaterEqual      : Unused, _
-		  ObjoScript.TokenTypes.GreaterGreater    : Unused, _
-		  ObjoScript.TokenTypes.Identifier        : Unused, _
-		  ObjoScript.TokenTypes.If_               : Unused, _
-		  ObjoScript.TokenTypes.Import            : Unused, _
-		  ObjoScript.TokenTypes.In_               : Unused, _
-		  ObjoScript.TokenTypes.Is_               : Unused, _
-		  ObjoScript.TokenTypes.LCurly            : Unused, _
-		  ObjoScript.TokenTypes.Less              : Unused, _
-		  ObjoScript.TokenTypes.LessEqual         : Unused, _
-		  ObjoScript.TokenTypes.LessLess          : Unused, _
-		  ObjoScript.TokenTypes.LParen            : NewRule(New GroupParselet,  Nil, Precedences.None), _
-		  ObjoScript.TokenTypes.LSquare           : Unused, _
-		  ObjoScript.TokenTypes.Minus             : NewRule(New UnaryParselet, Nil, Precedences.Term), _
-		  ObjoScript.TokenTypes.MinusEqual        : Unused, _
-		  ObjoScript.TokenTypes.NotEqual          : Unused, _
-		  ObjoScript.TokenTypes.Nothing           : Unused, _
-		  ObjoScript.TokenTypes.Not_              : NewRule(New UnaryParselet, Nil, Precedences.None), _
-		  ObjoScript.TokenTypes.Null              : Unused, _
-		  ObjoScript.TokenTypes.Number            : NewRule(New NumberParselet, Nil, Precedences.None), _
-		  ObjoScript.TokenTypes.Or_               : Unused, _
-		  ObjoScript.TokenTypes.Percent           : Unused, _
-		  ObjoScript.TokenTypes.Pipe              : Unused, _
-		  ObjoScript.TokenTypes.Plus              : Unused, _
-		  ObjoScript.TokenTypes.PlusEqual         : Unused, _
-		  ObjoScript.TokenTypes.PlusPlus          : Unused, _
-		  ObjoScript.TokenTypes.Print             : Unused, _
-		  ObjoScript.TokenTypes.Query             : Unused, _
-		  ObjoScript.TokenTypes.RCurly            : Unused, _
-		  ObjoScript.TokenTypes.Return_           : Unused, _
-		  ObjoScript.TokenTypes.RParen            : Unused, _
-		  ObjoScript.TokenTypes.RSquare           : Unused, _
-		  ObjoScript.TokenTypes.Star              : Unused, _
-		  ObjoScript.TokenTypes.StarEqual         : Unused, _
-		  ObjoScript.TokenTypes.Static_           : Unused, _
-		  ObjoScript.TokenTypes.String_           : Unused, _
-		  ObjoScript.TokenTypes.This              : Unused, _
-		  ObjoScript.TokenTypes.Tilde             : NewRule(New UnaryParselet, Nil, Precedences.None), _
-		  ObjoScript.TokenTypes.Underscore        : Unused, _
-		  ObjoScript.TokenTypes.Var_              : Unused, _
-		  ObjoScript.TokenTypes.While_            : Unused, _
-		  ObjoScript.TokenTypes.Xor_              : Unused _
+		  TokenTypes.Ampersand         : BinaryOperator(Precedences.BitwiseAnd), _
+		  TokenTypes.And_              : BinaryOperator(Precedences.LogicalAnd), _
+		  TokenTypes.Assert            : Unused, _
+		  TokenTypes.As_               : Unused, _
+		  TokenTypes.Boolean_          : Unused, _
+		  TokenTypes.Breakpoint        : Unused, _
+		  TokenTypes.Caret             : BinaryOperator(Precedences.BitwiseXor), _
+		  TokenTypes.Class_            : Unused, _
+		  TokenTypes.Colon             : Unused, _
+		  TokenTypes.Comma             : Unused, _
+		  TokenTypes.Construct         : Unused, _
+		  TokenTypes.Continue_         : Unused, _
+		  TokenTypes.Dot               : Unused, _
+		  TokenTypes.DotDot            : BinaryOperator(Precedences.Range), _
+		  TokenTypes.DotDotDot         : BinaryOperator(Precedences.Range), _
+		  TokenTypes.Else_             : Unused, _
+		  TokenTypes.EOF               : Unused, _
+		  TokenTypes.EOL               : Unused, _
+		  TokenTypes.Equal             : Unused, _
+		  TokenTypes.EqualEqual        : BinaryOperator(Precedences.Equality), _
+		  TokenTypes.Exit_             : Unused, _
+		  TokenTypes.Export            : Unused, _
+		  TokenTypes.FieldIdentifier   : Unused, _
+		  TokenTypes.Foreign           : Unused, _
+		  TokenTypes.ForwardSlash      : BinaryOperator(Precedences.Factor), _
+		  TokenTypes.ForwardSlashEqual : Unused, _
+		  TokenTypes.For_              : Unused, _
+		  TokenTypes.Function_         : Unused, _
+		  TokenTypes.Greater           : BinaryOperator(Precedences.Comparison), _
+		  TokenTypes.GreaterEqual      : BinaryOperator(Precedences.Comparison), _
+		  TokenTypes.GreaterGreater    : BinaryOperator(Precedences.BitwiseShift), _
+		  TokenTypes.Identifier        : Unused, _
+		  TokenTypes.If_               : Unused, _
+		  TokenTypes.Import            : Unused, _
+		  TokenTypes.In_               : Unused, _
+		  TokenTypes.Is_               : BinaryOperator(Precedences.Is_), _
+		  TokenTypes.LCurly            : Unused, _
+		  TokenTypes.Less              : BinaryOperator(Precedences.Comparison), _
+		  TokenTypes.LessEqual         : BinaryOperator(Precedences.Comparison), _
+		  TokenTypes.LessLess          : BinaryOperator(Precedences.BitwiseShift), _
+		  TokenTypes.LParen            : NewRule(New GroupParselet,  Nil, Precedences.None), _
+		  TokenTypes.LSquare           : Unused, _
+		  TokenTypes.Minus             : Operator, _
+		  TokenTypes.MinusEqual        : Unused, _
+		  TokenTypes.NotEqual          : BinaryOperator(Precedences.Equality), _
+		  TokenTypes.Nothing           : Unused, _
+		  TokenTypes.Not_              : Prefix(New UnaryParselet), _
+		  TokenTypes.Null              : Unused, _
+		  TokenTypes.Number            : Prefix(New NumberParselet), _
+		  TokenTypes.Or_               : BinaryOperator(Precedences.LogicalOr), _
+		  TokenTypes.Percent           : BinaryOperator(Precedences.Factor), _
+		  TokenTypes.Pipe              : BinaryOperator(Precedences.BitwiseOr), _
+		  TokenTypes.Plus              : BinaryOperator(Precedences.Term), _
+		  TokenTypes.PlusEqual         : Unused, _
+		  TokenTypes.PlusPlus          : Unused, _
+		  TokenTypes.Print             : Unused, _
+		  TokenTypes.Query             : Unused, _
+		  TokenTypes.RCurly            : Unused, _
+		  TokenTypes.Return_           : Unused, _
+		  TokenTypes.RParen            : Unused, _
+		  TokenTypes.RSquare           : Unused, _
+		  TokenTypes.Star              : BinaryOperator(Precedences.Factor), _
+		  TokenTypes.StarEqual         : Unused, _
+		  TokenTypes.Static_           : Unused, _
+		  TokenTypes.String_           : Unused, _
+		  TokenTypes.This              : Unused, _
+		  TokenTypes.Tilde             : NewRule(New UnaryParselet, Nil, Precedences.None), _
+		  TokenTypes.Underscore        : Unused, _
+		  TokenTypes.Var_              : Unused, _
+		  TokenTypes.While_            : Unused, _
+		  TokenTypes.Xor_              : BinaryOperator(Precedences.LogicalXor) _
 		  )
 		  
 		End Sub
@@ -254,10 +264,19 @@ Protected Class Parser
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 436F6E76656E69656E6365206D6574686F6420666F72206372656174696E672061206E6577204772616D6D617252756C652077697468206120736C696768746C792073686F727465722073796E7461782E
-		Private Function NewRule(prefix As ObjoScript.PrefixParselet, infix As ObjoScript.InfixParselet, precedence As ObjoScript.Parser.Precedences) As ObjoScript.GrammarRule
+		Private Function NewRule(prefix As ObjoScript.PrefixParselet, infix As ObjoScript.InfixParselet, precedence As ObjoScript.Precedences) As ObjoScript.GrammarRule
 		  /// Convenience method for creating a new GrammarRule with a slightly shorter syntax.
 		  
 		  Return New ObjoScript.GrammarRule(prefix, infix, precedence)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 436F6E76656E69656E6365206D6574686F6420666F722072657475726E696E672061206E6577206772616D6D61722072756C6520666F72206120756E61727920616E642062696E617279206F70657261746F722E
+		Private Function Operator(rightAssociative As Boolean = False, precedence As ObjoScript.Precedences = ObjoScript.Precedences.Term) As ObjoScript.GrammarRule
+		  /// Convenience method for returning a new grammar rule for a unary and binary operator.
+		  
+		  Return New ObjoScript.GrammarRule(New UnaryParselet, New BinaryParselet(precedence, rightAssociative), precedence)
 		  
 		End Function
 	#tag EndMethod
@@ -307,7 +326,7 @@ Protected Class Parser
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 50617273657320616E642072657475726E7320616E2065787072657373696F6E2061742074686520676976656E20707265636564656E6365206C6576656C206F72206869676865722E
-		Function ParsePrecedence(precedence As ObjoScript.Parser.Precedences) As ObjoScript.Expr
+		Function ParsePrecedence(precedence As ObjoScript.Precedences) As ObjoScript.Expr
 		  /// Parses and returns an expression at the given precedence level or higher.
 		  ///
 		  /// This is the main entry point for the top-down operator precedence parser.
@@ -347,6 +366,15 @@ Protected Class Parser
 		  End If
 		  
 		  Return left
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 436F6E76656E69656E6365206D6574686F6420666F722072657475726E696E672061206E6577206772616D6D61722072756C6520666F72206120707265666978206F70657261746F722E
+		Private Function Prefix(prefixParselet As ObjoScript.PrefixParselet, precedence As ObjoScript.Precedences = ObjoScript.Precedences.None) As ObjoScript.GrammarRule
+		  /// Convenience method for returning a new grammar rule for a prefix operator.
+		  
+		  Return New ObjoScript.GrammarRule(prefixParselet, Nil, precedence)
 		  
 		End Function
 	#tag EndMethod
@@ -472,29 +500,6 @@ Protected Class Parser
 	#tag Property, Flags = &h0, Description = 5468652070726576696F75736C79206576616C756174656420746F6B656E202877696C6C206265204E696C207768656E207468652070617273657220626567696E73292E
 		Previous As ObjoScript.Token
 	#tag EndProperty
-
-
-	#tag Enum, Name = Precedences, Type = Integer, Flags = &h0
-		None
-		  Lowest
-		  Assignment
-		  Conditional
-		  LogicalOr
-		  LogicalAnd
-		  Equality
-		  Is_
-		  Comparison
-		  BitwiseOr
-		  BitwiseXor
-		  BitwiseAnd
-		  BitwiseShift
-		  Range
-		  Term
-		  Factor
-		  Unary
-		  Call_
-		Primary
-	#tag EndEnum
 
 
 	#tag ViewBehavior

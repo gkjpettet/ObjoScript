@@ -12,7 +12,7 @@ Implements ObjoScript.PrefixParselet
 		  Var token As ObjoScript.Token = parser.Previous
 		  
 		  // Parse the operand.
-		  Var right As ObjoScript.Expr = parser.ParsePrecedence(ObjoScript.Parser.Precedences.Unary)
+		  Var right As ObjoScript.Expr = parser.ParsePrecedence(ObjoScript.Precedences.Unary)
 		  
 		  Select Case token.Type
 		  Case ObjoScript.TokenTypes.Minus, ObjoScript.TokenTypes.Tilde // -, ~

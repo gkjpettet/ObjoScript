@@ -277,6 +277,29 @@ Protected Module ObjoScript
 	#tag EndComputedProperty
 
 
+	#tag Enum, Name = Precedences, Type = Integer, Flags = &h1
+		None
+		  Lowest
+		  Assignment
+		  Conditional
+		  LogicalOr
+		  LogicalXor
+		  LogicalAnd
+		  Equality
+		  Is_
+		  Comparison
+		  BitwiseOr
+		  BitwiseXor
+		  BitwiseAnd
+		  BitwiseShift
+		  Range
+		  Term
+		  Factor
+		  Unary
+		  Call_
+		Primary
+	#tag EndEnum
+
 	#tag Enum, Name = TokenTypes, Type = Integer, Flags = &h1
 		Ampersand
 		  And_
