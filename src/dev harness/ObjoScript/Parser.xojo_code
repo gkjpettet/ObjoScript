@@ -20,6 +20,34 @@ Protected Class Parser
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 52657475726E732074727565206966207468652063757272656E7420746F6B656E206D61746368657320616E79206F6620746865207370656369666965642074797065732E2053696D696C617220746F20604D617463682829602062757420646F6573204E4F5420636F6E73756D65207468652063757272656E7420746F6B656E2069662074686572652069732061206D617463682E
+		Private Function Check(types() As ObjoScript.TokenTypes) As Boolean
+		  /// Returns true if the current token matches any of the specified types.
+		  /// Similar to `Match()` but does NOT consume the current token if there is a match.
+		  
+		  For Each type As ObjoScript.TokenTypes In types
+		    If Current.Type = type Then Return True
+		  Next type
+		  
+		  Return False
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E732074727565206966207468652063757272656E7420746F6B656E206D61746368657320616E79206F6620746865207370656369666965642074797065732E2053696D696C617220746F20604D617463682829602062757420646F6573204E4F5420636F6E73756D65207468652063757272656E7420746F6B656E2069662074686572652069732061206D617463682E
+		Private Function Check(ParamArray types As ObjoScript.TokenTypes) As Boolean
+		  /// Returns true if the current token matches any of the specified types.
+		  /// Similar to `Match()` but does NOT consume the current token if there is a match.
+		  
+		  For Each type As ObjoScript.TokenTypes In types
+		    If Current.Type = type Then Return True
+		  Next type
+		  
+		  Return False
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Sub Constructor()
 		  InitialiseGrammar
@@ -71,6 +99,18 @@ Protected Class Parser
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 526169736573206120506172736572457863657074696F6E206174207468652063757272656E74206C6F636174696F6E2E20496620746865206572726F72206973206E6F74206174207468652063757272656E74206C6F636174696F6E2C20606C6F636174696F6E60206D61792062652070617373656420696E73746561642E
+		Sub Error(message As String, location As ObjoScript.Token = Nil)
+		  /// Raises a ParserException at the current location. If the error is not at the current location,
+		  /// `location` may be passed instead.
+		  
+		  If location = Nil Then location = Current
+		  
+		  Raise New ObjoScript.ParserException(message, location)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 50617273657320616E2065787072657373696F6E2E
 		Function Expression() As ObjoScript.Expr
 		  /// Parses an expression.
@@ -99,12 +139,27 @@ Protected Class Parser
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 52657475726E7320746865206772616D6D61722072756C6520666F7220746865207370656369666965642060746F6B656E602E
+		Private Function GetRule(token As ObjoScript.TokenTypes) As ObjoScript.GrammarRule
+		  /// Returns the grammar rule for the specified `token`.
+		  
+		  #Pragma BreakOnExceptions False
+		  
+		  Return mRules.Value(token)
+		  
+		  Exception e As KeyNotFoundException
+		    Error("There is no grammar rule for the `" + token.ToString + "` token.")
+		    
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 496E697469616C6973657320746865207061727365722773206772616D6D61722072756C65732E
 		Private Sub InitialiseGrammar()
 		  /// Initialises the parser's grammar rules.
 		  
 		  #Pragma Warning "TODO"
 		  ' 1. Need to add CallParselet and elevate precedence for the `LParen` entry.
+		  ' 2. Minus binary operator and check precedence.
 		  
 		  mRules = New Dictionary( _
 		  ObjoScript.TokenTypes.Ampersand         : Unused, _
@@ -147,15 +202,15 @@ Protected Class Parser
 		  ObjoScript.TokenTypes.Less              : Unused, _
 		  ObjoScript.TokenTypes.LessEqual         : Unused, _
 		  ObjoScript.TokenTypes.LessLess          : Unused, _
-		  ObjoScript.TokenTypes.LParen            : Rule(New GroupParselet,  Nil, Precedences.None), _
+		  ObjoScript.TokenTypes.LParen            : NewRule(New GroupParselet,  Nil, Precedences.None), _
 		  ObjoScript.TokenTypes.LSquare           : Unused, _
-		  ObjoScript.TokenTypes.Minus             : Unused, _
+		  ObjoScript.TokenTypes.Minus             : NewRule(New UnaryParselet, Nil, Precedences.Term), _
 		  ObjoScript.TokenTypes.MinusEqual        : Unused, _
 		  ObjoScript.TokenTypes.NotEqual          : Unused, _
 		  ObjoScript.TokenTypes.Nothing           : Unused, _
-		  ObjoScript.TokenTypes.Not_              : Unused, _
+		  ObjoScript.TokenTypes.Not_              : NewRule(New UnaryParselet, Nil, Precedences.None), _
 		  ObjoScript.TokenTypes.Null              : Unused, _
-		  ObjoScript.TokenTypes.Number            : Rule(New NumberParselet, Nil, Precedences.None), _
+		  ObjoScript.TokenTypes.Number            : NewRule(New NumberParselet, Nil, Precedences.None), _
 		  ObjoScript.TokenTypes.Or_               : Unused, _
 		  ObjoScript.TokenTypes.Percent           : Unused, _
 		  ObjoScript.TokenTypes.Pipe              : Unused, _
@@ -173,7 +228,7 @@ Protected Class Parser
 		  ObjoScript.TokenTypes.Static_           : Unused, _
 		  ObjoScript.TokenTypes.String_           : Unused, _
 		  ObjoScript.TokenTypes.This              : Unused, _
-		  ObjoScript.TokenTypes.Tilde             : Unused, _
+		  ObjoScript.TokenTypes.Tilde             : NewRule(New UnaryParselet, Nil, Precedences.None), _
 		  ObjoScript.TokenTypes.Underscore        : Unused, _
 		  ObjoScript.TokenTypes.Var_              : Unused, _
 		  ObjoScript.TokenTypes.While_            : Unused, _
@@ -181,6 +236,30 @@ Protected Class Parser
 		  )
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 4966207468652063757272656E7420746F6B656E206D61746368657320616E79206F66207468652073706563696669656420747970657320697420697320636F6E73756D656420616E64207468652066756E6374696F6E2072657475726E7320547275652E204F7468657277697365206974206A7573742072657475726E732046616C73652E
+		Private Function Match(ParamArray types As ObjoScript.TokenTypes) As Boolean
+		  /// If the current token matches any of the specified types it is consumed and 
+		  /// the function returns True. Otherwise it just returns False.
+		  
+		  If Check(types) Then
+		    Advance
+		    Return True
+		  End If
+		  
+		  Return False
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 436F6E76656E69656E6365206D6574686F6420666F72206372656174696E672061206E6577204772616D6D617252756C652077697468206120736C696768746C792073686F727465722073796E7461782E
+		Private Function NewRule(prefix As ObjoScript.PrefixParselet, infix As ObjoScript.InfixParselet, precedence As ObjoScript.Parser.Precedences) As ObjoScript.GrammarRule
+		  /// Convenience method for creating a new GrammarRule with a slightly shorter syntax.
+		  
+		  Return New ObjoScript.GrammarRule(prefix, infix, precedence)
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 50757473207468652070617273657220696E746F2070616E6963206D6F64652E
@@ -227,13 +306,47 @@ Protected Class Parser
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 50617273657320616E642072657475726E7320616E2065787072657373696F6E2061742074686520676976656E20707265636564656E6365206C6576656C206F72206869676865722E
-		Private Function ParsePrecedence(precedence As ObjoScript.Parser.Precedences) As ObjoScript.Expr
+	#tag Method, Flags = &h0, Description = 50617273657320616E642072657475726E7320616E2065787072657373696F6E2061742074686520676976656E20707265636564656E6365206C6576656C206F72206869676865722E
+		Function ParsePrecedence(precedence As ObjoScript.Parser.Precedences) As ObjoScript.Expr
 		  /// Parses and returns an expression at the given precedence level or higher.
 		  ///
-		  /// This is the main entrypoint for the top-down operator precedence parser.
+		  /// This is the main entry point for the top-down operator precedence parser.
 		  
 		  #Pragma Warning "TODO"
+		  
+		  Advance
+		  
+		  // The prefix token will be the previously consumed one.
+		  Var rule As ObjoScript.GrammarRule = GetRule(Previous.Type)
+		  
+		  Var prefix As ObjoScript.PrefixParselet = rule.Prefix
+		  If prefix  = Nil Then
+		    Error("Expected an expression. Instead got `" + Current.Type.ToString + "`.")
+		  End If
+		  
+		  // Track if the precedence of the surrounding expression is low enough to
+		  // allow an assignment inside this one. We can't parse an assignment like
+		  // a normal expression because it requires us to handle the LHS specially
+		  // (it needs to be an lvalue, not an rvalue). 
+		  // So, for each of the kinds of expressions that are valid 
+		  /// lvalues (e.g. names, subscripts, fields, etc) we pass in whether or not 
+		  // it appears in a context loose enough to allow "=". 
+		  // If so, it will parse the "=" itself and handle it appropriately.
+		  Var canAssign As Boolean = precedence <= Precedences.Conditional
+		  
+		  Var left As ObjoScript.Expr = prefix.Parse(Self)
+		  
+		  While precedence < GetRule(Current.Type).Precedence
+		    Advance
+		    Var infix As ObjoScript.InfixParselet = GetRule(Previous.Type).Infix
+		    left = infix.Parse(Self, left, canAssign)
+		  Wend
+		  
+		  If canAssign And Match(ObjoScript.TokenTypes.Equal) Then
+		    Error("Invalid assigment token.")
+		  End If
+		  
+		  Return left
 		  
 		End Function
 	#tag EndMethod
@@ -248,15 +361,6 @@ Protected Class Parser
 		  mCurrentIndex = -1
 		  Errors.ResizeTo(-1)
 		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21, Description = 436F6E76656E69656E6365206D6574686F6420666F72206372656174696E672061206E6577204772616D6D617252756C652077697468206120736C696768746C792073686F727465722073796E7461782E
-		Private Function Rule(prefix As ObjoScript.PrefixParselet, infix As ObjoScript.InfixParselet, precedence As ObjoScript.Parser.Precedences) As ObjoScript.GrammarRule
-		  /// Convenience method for creating a new GrammarRule with a slightly shorter syntax.
-		  
-		  Return New ObjoScript.GrammarRule(prefix, infix, precedence)
-		  
-		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 50617273657320612073746174656D656E742E

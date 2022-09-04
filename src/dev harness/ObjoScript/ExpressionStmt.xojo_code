@@ -2,7 +2,7 @@
 Protected Class ExpressionStmt
 Implements ObjoScript.Stmt
 	#tag Method, Flags = &h0
-		Sub Constructor(expr As ObjoScript.Expr, location As ObjoScript.Token)
+		Sub Constructor(expression As ObjoScript.Expr, location As ObjoScript.Token)
 		  Self.Expression = Expression
 		  mLocation = location
 		End Sub

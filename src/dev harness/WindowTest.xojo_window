@@ -311,6 +311,7 @@ End
 		    DisplayLexerError(e)
 		  End Try
 		  
+		  Break
 		End Sub
 	#tag EndEvent
 #tag EndEvents
