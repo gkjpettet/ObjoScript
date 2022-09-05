@@ -40,7 +40,7 @@ Begin DesktopWindow WindowTest
       HasBorder       =   True
       HasHorizontalScrollbar=   False
       HasVerticalScrollbar=   True
-      Height          =   634
+      Height          =   655
       HideSelection   =   True
       Index           =   -2147483648
       Italic          =   False
@@ -176,7 +176,7 @@ Begin DesktopWindow WindowTest
       LockLeft        =   True
       LockRight       =   True
       LockTop         =   True
-      PanelCount      =   3
+      PanelCount      =   4
       Panels          =   ""
       Scope           =   2
       TabIndex        =   8
@@ -185,14 +185,14 @@ Begin DesktopWindow WindowTest
       Tooltip         =   ""
       Top             =   54
       Transparent     =   False
-      Value           =   2
+      Value           =   1
       Visible         =   True
       Width           =   617
       Begin DesktopListBox TokensListbox
          AllowAutoDeactivate=   True
          AllowAutoHideScrollbars=   True
          AllowExpandableRows=   False
-         AllowFocusRing  =   True
+         AllowFocusRing  =   False
          AllowResizableColumns=   False
          AllowRowDragging=   False
          AllowRowReordering=   False
@@ -214,7 +214,7 @@ Begin DesktopWindow WindowTest
          Height          =   601
          Index           =   -2147483648
          InitialParent   =   "Panel"
-         InitialValue    =   "Type	Line	Abs Pos	Value	ID"
+         InitialValue    =   "Type	Line	Abs Pos	Value	Script ID"
          Italic          =   False
          Left            =   635
          LockBottom      =   True
@@ -289,7 +289,7 @@ Begin DesktopWindow WindowTest
          TabStop         =   True
          Tooltip         =   ""
          Top             =   54
-         UseFocusRing    =   True
+         UseFocusRing    =   False
          Visible         =   True
          Width           =   617
          WinDrawTreeLines=   True
@@ -299,7 +299,7 @@ Begin DesktopWindow WindowTest
          AllowAutoDeactivate=   True
          AllowAutoHideScrollbars=   True
          AllowExpandableRows=   False
-         AllowFocusRing  =   True
+         AllowFocusRing  =   False
          AllowResizableColumns=   False
          AllowRowDragging=   False
          AllowRowReordering=   False
@@ -342,6 +342,54 @@ Begin DesktopWindow WindowTest
          Visible         =   True
          Width           =   617
          _ScrollWidth    =   -1
+      End
+      Begin SimpleTextArea Output
+         AllowAutoDeactivate=   True
+         AllowFocusRing  =   False
+         AllowSpellChecking=   False
+         AllowStyledText =   True
+         AllowTabs       =   False
+         BackgroundColor =   &cFFFFFF
+         Bold            =   False
+         Enabled         =   True
+         FontName        =   "System"
+         FontSize        =   0.0
+         FontUnit        =   0
+         Format          =   ""
+         HasBorder       =   True
+         HasHorizontalScrollbar=   False
+         HasVerticalScrollbar=   True
+         Height          =   601
+         HideSelection   =   True
+         Index           =   -2147483648
+         InitialParent   =   "Panel"
+         Italic          =   False
+         Left            =   635
+         LineHeight      =   0.0
+         LineSpacing     =   1.0
+         LockBottom      =   False
+         LockedInPosition=   False
+         LockLeft        =   True
+         LockRight       =   False
+         LockTop         =   True
+         MaximumCharactersAllowed=   0
+         Multiline       =   True
+         ReadOnly        =   True
+         Scope           =   2
+         TabIndex        =   0
+         TabPanelIndex   =   4
+         TabStop         =   True
+         Text            =   ""
+         TextAlignment   =   0
+         TextColor       =   &c000000
+         Tooltip         =   ""
+         Top             =   54
+         Transparent     =   False
+         Underline       =   False
+         UnicodeMode     =   0
+         ValidationMask  =   ""
+         Visible         =   True
+         Width           =   617
       End
    End
    Begin DesktopBevelButton ButtonAST
@@ -553,6 +601,8 @@ End
 		  
 		  ErrorsListbox.RemoveAllRows
 		  
+		  Output.Text = ""
+		  
 		  Info.Text = ""
 		  
 		End Sub
@@ -578,6 +628,12 @@ End
 		    ButtonTokens.Value = False
 		    ButtonErrors.Value = True
 		    Panel.SelectedPanelIndex = PANEL_ERRORS
+		    
+		  Case PANEL_OUTPUT
+		    ButtonAST.Value = False
+		    ButtonTokens.Value = False
+		    ButtonErrors.Value = False
+		    Panel.SelectedPanelIndex = PANEL_OUTPUT
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown panel ID.")
@@ -660,6 +716,9 @@ End
 	#tag EndConstant
 
 	#tag Constant, Name = PANEL_ERRORS, Type = Double, Dynamic = False, Default = \"2", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = PANEL_OUTPUT, Type = Double, Dynamic = False, Default = \"3", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = PANEL_TOKENS, Type = Double, Dynamic = False, Default = \"0", Scope = Private

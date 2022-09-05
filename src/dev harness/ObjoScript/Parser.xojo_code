@@ -180,7 +180,7 @@ Protected Class Parser
 		  TokenTypes.And_              : BinaryOperator(Precedences.LogicalAnd), _
 		  TokenTypes.Assert            : Unused, _
 		  TokenTypes.As_               : Unused, _
-		  TokenTypes.Boolean_          : Unused, _
+		  TokenTypes.Boolean_          : Prefix(New LiteralParselet), _
 		  TokenTypes.Breakpoint        : Unused, _
 		  TokenTypes.Caret             : BinaryOperator(Precedences.BitwiseXor), _
 		  TokenTypes.Class_            : Unused, _
@@ -223,13 +223,13 @@ Protected Class Parser
 		  TokenTypes.NotEqual          : BinaryOperator(Precedences.Equality), _
 		  TokenTypes.Nothing           : Unused, _
 		  TokenTypes.Not_              : Prefix(New UnaryParselet), _
-		  TokenTypes.Number            : Prefix(New NumberParselet), _
+		  TokenTypes.Number            : Prefix(New LiteralParselet), _
 		  TokenTypes.Or_               : BinaryOperator(Precedences.LogicalOr), _
 		  TokenTypes.Percent           : BinaryOperator(Precedences.Factor), _
 		  TokenTypes.Pipe              : BinaryOperator(Precedences.BitwiseOr), _
 		  TokenTypes.Plus              : BinaryOperator(Precedences.Term), _
 		  TokenTypes.PlusEqual         : Unused, _
-		  TokenTypes.PlusPlus          : Unused, _
+		  TokenTypes.PlusPlus          : Postfix, _
 		  TokenTypes.Print             : Unused, _
 		  TokenTypes.Query             : Unused, _
 		  TokenTypes.RCurly            : Unused, _
@@ -239,7 +239,7 @@ Protected Class Parser
 		  TokenTypes.Star              : BinaryOperator(Precedences.Factor), _
 		  TokenTypes.StarEqual         : Unused, _
 		  TokenTypes.Static_           : Unused, _
-		  TokenTypes.String_           : Unused, _
+		  TokenTypes.String_           : Prefix(New LiteralParselet), _
 		  TokenTypes.This              : Unused, _
 		  TokenTypes.Tilde             : NewRule(New UnaryParselet, Nil, Precedences.None), _
 		  TokenTypes.Underscore        : Unused, _
@@ -367,6 +367,15 @@ Protected Class Parser
 		  End If
 		  
 		  Return left
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 436F6E76656E69656E6365206D6574686F6420666F722072657475726E696E672061206E6577206772616D6D61722072756C6520666F72206120706F7374666978206F70657261746F722E
+		Private Function Postfix() As ObjoScript.GrammarRule
+		  /// Convenience method for returning a new grammar rule for a postfix operator.
+		  
+		  Return New ObjoScript.GrammarRule(Nil, New ObjoScript.PostfixParselet, ObjoScript.Precedences.Postfix)
 		  
 		End Function
 	#tag EndMethod

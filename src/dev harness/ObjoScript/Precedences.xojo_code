@@ -22,7 +22,7 @@ Protected Class Precedences
 	#tag Constant, Name = BitwiseXor, Type = Double, Dynamic = False, Default = \"11", Scope = Public
 	#tag EndConstant
 
-	#tag Constant, Name = Call_, Type = Double, Dynamic = False, Default = \"18", Scope = Public
+	#tag Constant, Name = Call_, Type = Double, Dynamic = False, Default = \"19", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = Comparison, Type = Double, Dynamic = False, Default = \"9", Scope = Public
@@ -55,7 +55,10 @@ Protected Class Precedences
 	#tag Constant, Name = None, Type = Double, Dynamic = False, Default = \"0", Scope = Public
 	#tag EndConstant
 
-	#tag Constant, Name = Primary, Type = Double, Dynamic = False, Default = \"19", Scope = Public
+	#tag Constant, Name = Postfix, Type = Double, Dynamic = False, Default = \"18", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = Primary, Type = Double, Dynamic = False, Default = \"20", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = Range, Type = Double, Dynamic = False, Default = \"14", Scope = Public

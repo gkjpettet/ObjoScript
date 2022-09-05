@@ -1,47 +1,36 @@
 #tag Class
-Protected Class NumberExpr
+Protected Class BooleanLiteral
 Implements ObjoScript.Expr
 	#tag Method, Flags = &h0
 		Function Accept(visitor As ObjoScript.ExprVisitor) As Variant
 		  /// Part of the ExprVisitor interface.
 		  
-		  Return visitor.VisitNumber(Self)
+		  Return visitor.VisitBoolean(Self)
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub Constructor(token As ObjoScript.Token)
 		  mLocation = token
-		  IsInteger = token.IsInteger
-		  Value = token.NumberValue
+		  Value = token.BooleanValue
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 546865206E756D626572206C69746572616C20746F6B656E20697473656C662E
+	#tag Method, Flags = &h0, Description = 54686520626F6F6C65616E206C69746572616C20746F6B656E20697473656C662E
 		Function Location() As ObjoScript.Token
-		  /// The number literal token itself.
+		  /// The boolean literal token itself.
 		  
 		  Return mLocation
 		End Function
 	#tag EndMethod
 
 
-	#tag Note, Name = About
-		Represents a number literal.
-		
-	#tag EndNote
-
-
-	#tag Property, Flags = &h0, Description = 54727565206966207468697320697320616E20696E7465676572206C69746572616C2E
-		IsInteger As Boolean = False
-	#tag EndProperty
-
 	#tag Property, Flags = &h21
 		Private mLocation As ObjoScript.Token
 	#tag EndProperty
 
-	#tag Property, Flags = &h0, Description = 54686973206E756D62657227732076616C75652E
-		Value As Double
+	#tag Property, Flags = &h0, Description = 5468697320626F6F6C65616E27732076616C75652E
+		Value As Boolean
 	#tag EndProperty
 
 
@@ -84,6 +73,14 @@ Implements ObjoScript.Expr
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Value"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Double"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

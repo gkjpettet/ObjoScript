@@ -23,6 +23,17 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitBoolean(expr As ObjoScript.BooleanLiteral) As Variant
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  Var node As New TreeViewNode("Boolean: " + expr.Value.ToString)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitExpressionStmt(stmt As ObjoScript.ExpressionStmt) As Variant
 		  /// Part of the ObjoScript.StmtVisitor interface.
 		  
@@ -32,7 +43,18 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function VisitNumber(expr As ObjoScript.NumberExpr) As Variant
+		Function VisitNothing(expr As ObjoScript.NothingLiteral) As Variant
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  Var node As New TreeViewNode("Nothing")
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function VisitNumber(expr As ObjoScript.NumberLiteral) As Variant
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
 		  Var value As String
@@ -43,6 +65,30 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  End If
 		  
 		  Var node As New TreeViewNode("Number: " + value)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function VisitPostfix(expr As ObjoScript.PostfixExpr) As Variant
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  Var node As New TreeViewNode("Postfix (" + expr.Operator.ToString + ")")
+		  
+		  node.AppendNode(expr.Operand.Accept(Self))
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function VisitString(expr As ObjoScript.StringLiteral) As Variant
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  Var node As New TreeViewNode("String: " + expr.Value)
 		  
 		  Return node
 		  
