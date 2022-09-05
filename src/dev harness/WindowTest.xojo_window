@@ -165,34 +165,27 @@ Begin DesktopWindow WindowTest
       Visible         =   True
       Width           =   80
    End
-   Begin DesktopTabPanel TabPanel1
+   Begin DesktopPagePanel Panel
       AllowAutoDeactivate=   True
-      Bold            =   False
       Enabled         =   True
-      FontName        =   "System"
-      FontSize        =   0.0
-      FontUnit        =   0
-      Height          =   655
+      Height          =   621
       Index           =   -2147483648
-      Italic          =   False
       Left            =   635
       LockBottom      =   True
       LockedInPosition=   False
       LockLeft        =   True
       LockRight       =   True
       LockTop         =   True
+      PanelCount      =   2
       Panels          =   ""
       Scope           =   2
-      SmallTabs       =   False
-      TabDefinition   =   "Tokens\rAST"
-      TabIndex        =   6
+      TabIndex        =   8
       TabPanelIndex   =   0
-      TabStop         =   True
+      TabStop         =   False
       Tooltip         =   ""
-      Top             =   20
+      Top             =   54
       Transparent     =   False
-      Underline       =   False
-      Value           =   0
+      Value           =   1
       Visible         =   True
       Width           =   617
       Begin DesktopListBox TokensListbox
@@ -218,9 +211,9 @@ Begin DesktopWindow WindowTest
          HasHorizontalScrollbar=   False
          HasVerticalScrollbar=   True
          HeadingIndex    =   -1
-         Height          =   617
+         Height          =   621
          Index           =   -2147483648
-         InitialParent   =   "TabPanel1"
+         InitialParent   =   "Panel"
          InitialValue    =   "Type	Line	Abs Pos	Value	ID"
          Italic          =   False
          Left            =   635
@@ -236,7 +229,7 @@ Begin DesktopWindow WindowTest
          TabPanelIndex   =   1
          TabStop         =   True
          Tooltip         =   ""
-         Top             =   58
+         Top             =   54
          Transparent     =   False
          Underline       =   False
          Visible         =   True
@@ -244,6 +237,150 @@ Begin DesktopWindow WindowTest
          _ScrollOffset   =   0
          _ScrollWidth    =   -1
       End
+      Begin DesktopTreeView ASTView
+         AutoDeactivate  =   True
+         BackColor       =   &cFFFFFF00
+         ColumnCount     =   1
+         DarkBackColor   =   &c2D2D2D00
+         DarkNodeTextColor=   &cFFFFFF00
+         DarkSelectionTextColor=   &cFFFFFF00
+         DragReceiveBehavior=   1
+         Enabled         =   True
+         FontName        =   "System"
+         FontSize        =   0.0
+         FontUnit        =   0
+         HasBackColor    =   False
+         HasBorder       =   True
+         HasHeader       =   False
+         HasInactiveSelectionColor=   False
+         HasNodeColor    =   False
+         HasNodeTextColor=   False
+         HasSelectionColor=   False
+         HasSelectionTextColor=   False
+         Height          =   621
+         InactiveSelectionColor=   &cD3D3D300
+         Index           =   -2147483648
+         InitialParent   =   "Panel"
+         Left            =   635
+         LinuxDrawTreeLines=   False
+         LinuxExpanderStyle=   0
+         LinuxHighlightFullRow=   True
+         LockBottom      =   True
+         LockedInPosition=   False
+         LockLeft        =   True
+         LockRight       =   True
+         LockTop         =   True
+         MacDrawTreeLines=   False
+         MacExpanderStyle=   0
+         MacHighlightFullRow=   True
+         MultiSelection  =   False
+         NodeEvenColor   =   &cFFFFFF00
+         NodeHeight      =   18
+         NodeOddColor    =   &cFFFFFF00
+         NodeTextColor   =   &c00000000
+         QuartzShading   =   False
+         Scope           =   2
+         SelectionColor  =   &c478A1A00
+         SelectionSeparator=   0
+         SelectionTextColor=   &cFFFFFF00
+         SystemNodeColors=   True
+         TabIndex        =   0
+         TabPanelIndex   =   2
+         TabStop         =   True
+         Tooltip         =   ""
+         Top             =   54
+         UseFocusRing    =   True
+         Visible         =   True
+         Width           =   617
+         WinDrawTreeLines=   True
+         WinHighlightFullRow=   False
+      End
+   End
+   Begin DesktopBevelButton ButtonAST
+      AllowAutoDeactivate=   True
+      AllowFocus      =   True
+      BackgroundColor =   &c00000000
+      BevelStyle      =   0
+      Bold            =   False
+      ButtonStyle     =   1
+      Caption         =   "AST"
+      CaptionAlignment=   3
+      CaptionDelta    =   0
+      CaptionPosition =   1
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      HasBackgroundColor=   False
+      Height          =   22
+      Icon            =   0
+      IconAlignment   =   0
+      IconDeltaX      =   0
+      IconDeltaY      =   0
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   1192
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   True
+      MenuStyle       =   0
+      Scope           =   2
+      TabIndex        =   9
+      TabPanelIndex   =   0
+      TextColor       =   &c00000000
+      Tooltip         =   ""
+      Top             =   20
+      Transparent     =   False
+      Underline       =   False
+      Value           =   True
+      Visible         =   True
+      Width           =   60
+   End
+   Begin DesktopBevelButton ButtonTokens
+      AllowAutoDeactivate=   True
+      AllowFocus      =   True
+      BackgroundColor =   &c00000000
+      BevelStyle      =   0
+      Bold            =   False
+      ButtonStyle     =   1
+      Caption         =   "Tokens"
+      CaptionAlignment=   3
+      CaptionDelta    =   0
+      CaptionPosition =   1
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      HasBackgroundColor=   False
+      Height          =   22
+      Icon            =   0
+      IconAlignment   =   0
+      IconDeltaX      =   0
+      IconDeltaY      =   0
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   1127
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   True
+      MenuStyle       =   0
+      Scope           =   2
+      TabIndex        =   10
+      TabPanelIndex   =   0
+      TextColor       =   &c00000000
+      Tooltip         =   ""
+      Top             =   20
+      Transparent     =   False
+      Underline       =   False
+      Value           =   False
+      Visible         =   True
+      Width           =   60
    End
 End
 #tag EndDesktopWindow
@@ -252,6 +389,7 @@ End
 	#tag Event
 		Sub Opening()
 		  Reset
+		  SwitchToPanel(PANEL_AST)
 		End Sub
 	#tag EndEvent
 
@@ -269,7 +407,27 @@ End
 		Sub Reset()
 		  Code.Text = ""
 		  TokensListbox.RemoveAllRows
+		  ASTView.RemoveAllNodes
 		  Info.Text = ""
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub SwitchToPanel(id As Integer)
+		  Select Case id
+		  Case PANEL_AST
+		    ButtonAST.Value = True
+		    ButtonTokens.Value = False
+		    Panel.SelectedPanelIndex = id
+		    
+		  Case PANEL_TOKENS
+		    ButtonAST.Value = False
+		    ButtonTokens.Value = True
+		    Panel.SelectedPanelIndex = id
+		    
+		  Else
+		    Raise New UnsupportedOperationException("Unknown panel ID.")
+		  End Select
 		End Sub
 	#tag EndMethod
 
@@ -311,6 +469,13 @@ End
 	#tag EndMethod
 
 
+	#tag Constant, Name = PANEL_AST, Type = Double, Dynamic = False, Default = \"1", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = PANEL_TOKENS, Type = Double, Dynamic = False, Default = \"0", Scope = Private
+	#tag EndConstant
+
+
 #tag EndWindowCode
 
 #tag Events ButtonClear
@@ -344,6 +509,20 @@ End
 		  End Try
 		  
 		  Break
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ButtonAST
+	#tag Event
+		Sub Pressed()
+		  SwitchToPanel(PANEL_AST)
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ButtonTokens
+	#tag Event
+		Sub Pressed()
+		  SwitchToPanel(PANEL_TOKENS)
 		End Sub
 	#tag EndEvent
 #tag EndEvents

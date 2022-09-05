@@ -14,14 +14,8 @@ Implements ObjoScript.PrefixParselet
 		  // Parse the operand.
 		  Var right As ObjoScript.Expr = parser.ParsePrecedence(ObjoScript.Precedences.Unary)
 		  
-		  Select Case token.Type
-		  Case ObjoScript.TokenTypes.Minus, ObjoScript.TokenTypes.Tilde // -, ~
-		    Return New ObjoScript.UnaryExpr(token, right)
-		    
-		  Case ObjoScript.TokenTypes.Not_
-		    Return New LogicalNegateExpr(token, right)
-		    
-		  End Select
+		  Return New ObjoScript.UnaryExpr(token, right)
+		  
 		End Function
 	#tag EndMethod
 

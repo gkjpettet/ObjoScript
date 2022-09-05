@@ -2,6 +2,14 @@
 Protected Class ExpressionStmt
 Implements ObjoScript.Stmt
 	#tag Method, Flags = &h0
+		Function Accept(visitor As ObjoScript.StmtVisitor) As Variant
+		  /// Part of the StmtVisitor interface.
+		  
+		  Return visitor.VisitExpression(Self)
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub Constructor(expression As ObjoScript.Expr, location As ObjoScript.Token)
 		  Self.Expression = Expression
 		  mLocation = location

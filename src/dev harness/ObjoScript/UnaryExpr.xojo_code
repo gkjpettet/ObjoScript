@@ -2,6 +2,14 @@
 Protected Class UnaryExpr
 Implements ObjoScript.Expr
 	#tag Method, Flags = &h0
+		Function Accept(visitor As ObjoScript.ExprVisitor) As Variant
+		  /// Part of the ExprVisitor interface.
+		  
+		  Return visitor.VisitUnary(Self)
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub Constructor(operator As ObjoScript.Token, operand As ObjoScript.Expr)
 		  /// `operator` is the operator token (e.g.`-`) and `operand` is the right hand expression.
 		  

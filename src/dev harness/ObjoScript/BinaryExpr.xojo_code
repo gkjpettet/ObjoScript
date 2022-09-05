@@ -2,6 +2,14 @@
 Protected Class BinaryExpr
 Implements ObjoScript.Expr
 	#tag Method, Flags = &h0
+		Function Accept(visitor As ObjoScript.ExprVisitor) As Variant
+		  /// Part of the ExprVisitor interface.
+		  
+		  Return visitor.VisitBinary(Self)
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub Constructor(left As ObjoScript.Expr, operator As ObjoScript.Token, right As ObjoScript.Expr)
 		  Self.Left = left
 		  mLocation = operator

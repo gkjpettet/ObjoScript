@@ -2,6 +2,14 @@
 Protected Class NumberExpr
 Implements ObjoScript.Expr
 	#tag Method, Flags = &h0
+		Function Accept(visitor As ObjoScript.ExprVisitor) As Variant
+		  /// Part of the ExprVisitor interface.
+		  
+		  Return visitor.VisitNumber(Self)
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub Constructor(token As ObjoScript.Token)
 		  mLocation = token
 		  IsInteger = token.IsInteger
