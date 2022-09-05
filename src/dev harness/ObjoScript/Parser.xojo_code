@@ -83,6 +83,8 @@ Protected Class Parser
 		  /// Asserts that the current token is an EOL. If so it is consumed. 
 		  /// Otherwise an error with the optional `message` is created.
 		  
+		  #Pragma BreakOnExceptions False
+		  
 		  If Current.Type <> ObjoScript.TokenTypes.EOL Then
 		    message = If(message = "", "Expected a new line.", message)
 		    Raise New ObjoScript.ParserException(message, Current)
@@ -111,6 +113,8 @@ Protected Class Parser
 		Sub Error(message As String, location As ObjoScript.Token = Nil)
 		  /// Raises a ParserException at the current location. If the error is not at the current location,
 		  /// `location` may be passed instead.
+		  
+		  #Pragma BreakOnExceptions False
 		  
 		  If location = Nil Then location = Current
 		  
@@ -219,7 +223,6 @@ Protected Class Parser
 		  TokenTypes.NotEqual          : BinaryOperator(Precedences.Equality), _
 		  TokenTypes.Nothing           : Unused, _
 		  TokenTypes.Not_              : Prefix(New UnaryParselet), _
-		  TokenTypes.Null              : Unused, _
 		  TokenTypes.Number            : Prefix(New NumberParselet), _
 		  TokenTypes.Or_               : BinaryOperator(Precedences.LogicalOr), _
 		  TokenTypes.Percent           : BinaryOperator(Precedences.Factor), _
@@ -478,6 +481,15 @@ Protected Class Parser
 	#tag Property, Flags = &h0, Description = 416E79206572726F72732074686174206D61792068617665206F6363757272656420647572696E67207468652070617273696E672070726F636573732E
 		Errors() As ObjoScript.ParserException
 	#tag EndProperty
+
+	#tag ComputedProperty, Flags = &h0, Description = 547275652069662074686572652061726520616E7920706172736572206572726F72732E204966207468657265206172652C2074686579206172652073746F7265642077697468696E20605061727365722E4572726F7273602E
+		#tag Getter
+			Get
+			  Return Errors.Count > 0
+			End Get
+		#tag EndGetter
+		HasError As Boolean
+	#tag EndComputedProperty
 
 	#tag Property, Flags = &h21, Description = 5468652061627374726163742073796E7461782074726565206265696E6720636F6E737472756374656420627920746865207061727365722E
 		Private mAST() As ObjoScript.Stmt

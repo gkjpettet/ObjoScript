@@ -6,7 +6,7 @@ Protected Module ObjoScript
 		  
 		  Select Case t
 		  Case ObjoScript.TokenTypes.Ampersand
-		    Return "Ampersand"
+		    Return "&"
 		    
 		  Case ObjoScript.TokenTypes.And_
 		    Return "And"
@@ -24,7 +24,7 @@ Protected Module ObjoScript
 		    Return "Breakpoint"
 		    
 		  Case ObjoScript.TokenTypes.Caret
-		    Return "Caret"
+		    Return "^"
 		    
 		  Case ObjoScript.TokenTypes.Class_
 		    Return "Class"
@@ -45,10 +45,10 @@ Protected Module ObjoScript
 		    Return "Dot"
 		    
 		  Case ObjoScript.TokenTypes.DotDot
-		    Return "DotDot"
+		    Return ".."
 		    
 		  Case ObjoScript.TokenTypes.DotDotDot
-		    Return "DotDotDot"
+		    Return "..."
 		    
 		  Case ObjoScript.TokenTypes.EOF
 		    Return "EOF"
@@ -57,10 +57,10 @@ Protected Module ObjoScript
 		    Return "EOL"
 		    
 		  Case ObjoScript.TokenTypes.Equal
-		    Return "Equal"
+		    Return "="
 		    
 		  Case ObjoScript.TokenTypes.EqualEqual
-		    Return "EqualEqual"
+		    Return "=="
 		    
 		  Case ObjoScript.TokenTypes.Else_
 		    Return "Else"
@@ -81,22 +81,22 @@ Protected Module ObjoScript
 		    Return "Foreign"
 		    
 		  Case ObjoScript.TokenTypes.ForwardSlash
-		    Return "ForwardSlash"
+		    Return "/"
 		    
 		  Case ObjoScript.TokenTypes.ForwardSlashEqual
-		    Return "ForwardSlashEqual"
+		    Return "/="
 		    
 		  Case ObjoScript.TokenTypes.Function_
 		    Return "Function"
 		    
 		  Case ObjoScript.TokenTypes.Greater
-		    Return "Greater"
+		    Return ">"
 		    
 		  Case ObjoScript.TokenTypes.GreaterEqual
-		    Return "GreaterEqual"
+		    Return ">="
 		    
 		  Case ObjoScript.TokenTypes.GreaterGreater
-		    Return "GreaterGreater"
+		    Return ">>"
 		    
 		  Case ObjoScript.TokenTypes.Identifier
 		    Return "Identifier"
@@ -117,13 +117,13 @@ Protected Module ObjoScript
 		    Return "LCurly"
 		    
 		  Case ObjoScript.TokenTypes.Less
-		    Return "Less"
+		    Return "<"
 		    
 		  Case ObjoScript.TokenTypes.LessEqual
-		    Return "LessEqual"
+		    Return "<="
 		    
 		  Case ObjoScript.TokenTypes.LessLess
-		    Return "LessLess"
+		    Return "<<"
 		    
 		  Case ObjoScript.TokenTypes.LParen
 		    Return "LParen"
@@ -132,22 +132,19 @@ Protected Module ObjoScript
 		    Return "LSquare"
 		    
 		  Case ObjoScript.TokenTypes.Minus
-		    Return "Minus"
+		    Return "-"
 		    
 		  Case ObjoScript.TokenTypes.MinusEqual
-		    Return "MinusEqual"
+		    Return "-="
 		    
 		  Case ObjoScript.TokenTypes.Not_
 		    Return "Not"
 		    
 		  Case ObjoScript.TokenTypes.NotEqual
-		    Return "NotEqual"
+		    Return "<>"
 		    
 		  Case ObjoScript.TokenTypes.Nothing
 		    Return "Nothing"
-		    
-		  Case ObjoScript.TokenTypes.Null
-		    Return "Null"
 		    
 		  Case ObjoScript.TokenTypes.Number
 		    Return "Number"
@@ -156,19 +153,19 @@ Protected Module ObjoScript
 		    Return "Or"
 		    
 		  Case ObjoScript.TokenTypes.Percent
-		    Return "Percent"
+		    Return "%"
 		    
 		  Case ObjoScript.TokenTypes.Pipe
-		    Return "Pipe"
+		    Return "|"
 		    
 		  Case ObjoScript.TokenTypes.Plus
-		    Return "Plus"
+		    Return "+"
 		    
 		  Case ObjoScript.TokenTypes.PlusEqual
-		    Return "PlusEqual"
+		    Return "+="
 		    
 		  Case ObjoScript.TokenTypes.PlusPlus
-		    Return "PlusPlus"
+		    Return "++"
 		    
 		  Case ObjoScript.TokenTypes.Print
 		    Return "Print"
@@ -189,10 +186,10 @@ Protected Module ObjoScript
 		    Return "RSquare"
 		    
 		  Case ObjoScript.TokenTypes.Star
-		    Return "Star"
+		    Return "*"
 		    
 		  Case ObjoScript.TokenTypes.StarEqual
-		    Return "StarEqual"
+		    Return "*="
 		    
 		  Case ObjoScript.TokenTypes.Static_
 		    Return "Static"
@@ -204,7 +201,7 @@ Protected Module ObjoScript
 		    Return "This"
 		    
 		  Case ObjoScript.TokenTypes.Tilde
-		    Return "Tilde"
+		    Return "~"
 		    
 		  Case ObjoScript.TokenTypes.Underscore
 		    Return "Underscore"
@@ -325,7 +322,6 @@ Protected Module ObjoScript
 		  Not_
 		  NotEqual
 		  Nothing
-		  Null
 		  Number
 		  Or_
 		  Percent

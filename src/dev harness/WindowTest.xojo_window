@@ -40,7 +40,7 @@ Begin DesktopWindow WindowTest
       HasBorder       =   True
       HasHorizontalScrollbar=   False
       HasVerticalScrollbar=   True
-      Height          =   655
+      Height          =   634
       HideSelection   =   True
       Index           =   -2147483648
       Italic          =   False
@@ -176,7 +176,7 @@ Begin DesktopWindow WindowTest
       LockLeft        =   True
       LockRight       =   True
       LockTop         =   True
-      PanelCount      =   2
+      PanelCount      =   3
       Panels          =   ""
       Scope           =   2
       TabIndex        =   8
@@ -185,7 +185,7 @@ Begin DesktopWindow WindowTest
       Tooltip         =   ""
       Top             =   54
       Transparent     =   False
-      Value           =   1
+      Value           =   2
       Visible         =   True
       Width           =   617
       Begin DesktopListBox TokensListbox
@@ -211,7 +211,7 @@ Begin DesktopWindow WindowTest
          HasHorizontalScrollbar=   False
          HasVerticalScrollbar=   True
          HeadingIndex    =   -1
-         Height          =   621
+         Height          =   601
          Index           =   -2147483648
          InitialParent   =   "Panel"
          InitialValue    =   "Type	Line	Abs Pos	Value	ID"
@@ -237,7 +237,7 @@ Begin DesktopWindow WindowTest
          _ScrollOffset   =   0
          _ScrollWidth    =   -1
       End
-      Begin DesktopTreeView ASTView
+      Begin ASTTreeView ASTView
          AutoDeactivate  =   True
          BackColor       =   &cFFFFFF00
          ColumnCount     =   1
@@ -257,7 +257,7 @@ Begin DesktopWindow WindowTest
          HasNodeTextColor=   False
          HasSelectionColor=   False
          HasSelectionTextColor=   False
-         Height          =   621
+         Height          =   601
          InactiveSelectionColor=   &cD3D3D300
          Index           =   -2147483648
          InitialParent   =   "Panel"
@@ -294,6 +294,54 @@ Begin DesktopWindow WindowTest
          Width           =   617
          WinDrawTreeLines=   True
          WinHighlightFullRow=   False
+      End
+      Begin DesktopListBox ErrorsListbox
+         AllowAutoDeactivate=   True
+         AllowAutoHideScrollbars=   True
+         AllowExpandableRows=   False
+         AllowFocusRing  =   True
+         AllowResizableColumns=   False
+         AllowRowDragging=   False
+         AllowRowReordering=   False
+         Bold            =   False
+         ColumnCount     =   4
+         ColumnWidths    =   "*, 60, 60, 60"
+         DefaultRowHeight=   -1
+         DropIndicatorVisible=   False
+         Enabled         =   True
+         FontName        =   "System"
+         FontSize        =   0.0
+         FontUnit        =   0
+         GridLineStyle   =   0
+         HasBorder       =   True
+         HasHeader       =   True
+         HasHorizontalScrollbar=   False
+         HasVerticalScrollbar=   True
+         HeadingIndex    =   -1
+         Height          =   601
+         Index           =   -2147483648
+         InitialParent   =   "Panel"
+         InitialValue    =   "Message	Line	AbsPos	Script ID"
+         Italic          =   False
+         Left            =   635
+         LockBottom      =   True
+         LockedInPosition=   False
+         LockLeft        =   True
+         LockRight       =   True
+         LockTop         =   True
+         RequiresSelection=   False
+         RowSelectionType=   0
+         Scope           =   2
+         TabIndex        =   0
+         TabPanelIndex   =   3
+         TabStop         =   True
+         Tooltip         =   ""
+         Top             =   54
+         Transparent     =   False
+         Underline       =   False
+         Visible         =   True
+         Width           =   617
+         _ScrollWidth    =   -1
       End
    End
    Begin DesktopBevelButton ButtonAST
@@ -363,7 +411,7 @@ Begin DesktopWindow WindowTest
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   1127
+      Left            =   1120
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   False
@@ -372,6 +420,49 @@ Begin DesktopWindow WindowTest
       MenuStyle       =   0
       Scope           =   2
       TabIndex        =   10
+      TabPanelIndex   =   0
+      TextColor       =   &c00000000
+      Tooltip         =   ""
+      Top             =   20
+      Transparent     =   False
+      Underline       =   False
+      Value           =   False
+      Visible         =   True
+      Width           =   60
+   End
+   Begin DesktopBevelButton ButtonErrors
+      AllowAutoDeactivate=   True
+      AllowFocus      =   True
+      BackgroundColor =   &c00000000
+      BevelStyle      =   0
+      Bold            =   False
+      ButtonStyle     =   1
+      Caption         =   "Errors"
+      CaptionAlignment=   3
+      CaptionDelta    =   0
+      CaptionPosition =   1
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      HasBackgroundColor=   False
+      Height          =   22
+      Icon            =   0
+      IconAlignment   =   0
+      IconDeltaX      =   0
+      IconDeltaY      =   0
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   1048
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   True
+      MenuStyle       =   0
+      Scope           =   2
+      TabIndex        =   11
       TabPanelIndex   =   0
       TextColor       =   &c00000000
       Tooltip         =   ""
@@ -403,12 +494,67 @@ End
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 446973706C61797320616E79206572726F72732074686174206F6363757272656420647572696E672070617273696E672E
+		Sub DisplayParserErrors()
+		  /// Displays any errors that occurred during parsing.
+		  
+		  If Parser.Errors.Count = 1 Then
+		    Info.Text = "A parsing error occurred."
+		  Else
+		    Info.Text = Parser.Errors.Count.ToString + " parsing errors occurred."
+		  End If
+		  
+		  UpdateErrorsListbox
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
-		Sub Reset()
-		  Code.Text = ""
+		Sub Parse()
+		  #Pragma BreakOnExceptions False
+		  
+		  Reset(False)
+		  
+		  SwitchToPanel(PANEL_AST)
+		  
+		  Try
+		    Tokens = Lexer.Tokenise(Code.Text)
+		    UpdateTokensListbox
+		    
+		    AST = Parser.Parse(Tokens)
+		    
+		    For Each stmt As ObjoScript.Stmt In AST
+		      Call stmt.Accept(ASTView)
+		    Next stmt
+		    
+		  Catch e As ObjoScript.LexerException
+		    DisplayLexerError(e)
+		  End Try
+		  
+		  If Parser.HasError Then
+		    DisplayParserErrors
+		  Else
+		    Info.Text = "No errors."
+		  End If
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub Reset(clearSource As Boolean = True)
+		  If clearSource Then Code.Text = ""
+		  
+		  Lexer = New ObjoScript.Lexer
+		  Tokens.ResizeTo(-1)
 		  TokensListbox.RemoveAllRows
+		  
+		  Parser = New ObjoScript.Parser
+		  AST.ResizeTo(-1)
 		  ASTView.RemoveAllNodes
+		  
+		  ErrorsListbox.RemoveAllRows
+		  
 		  Info.Text = ""
+		  
 		End Sub
 	#tag EndMethod
 
@@ -418,29 +564,53 @@ End
 		  Case PANEL_AST
 		    ButtonAST.Value = True
 		    ButtonTokens.Value = False
+		    ButtonErrors.Value = False
 		    Panel.SelectedPanelIndex = id
 		    
 		  Case PANEL_TOKENS
 		    ButtonAST.Value = False
 		    ButtonTokens.Value = True
+		    ButtonErrors.Value = False
 		    Panel.SelectedPanelIndex = id
+		    
+		  Case PANEL_ERRORS
+		    ButtonAST.Value = False
+		    ButtonTokens.Value = False
+		    ButtonErrors.Value = True
+		    Panel.SelectedPanelIndex = PANEL_ERRORS
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown panel ID.")
 		  End Select
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub UpdateErrorsListbox()
+		  ErrorsListbox.RemoveAllRows
+		  
+		  If Parser = Nil Or Not Parser.HasError Then
+		    Return
+		  End If
+		  
+		  For Each e As ObjoScript.ParserException In Parser.Errors
+		    ErrorsListbox.AddRow(e.Message, e.Location.LineNumber.ToString, e.Location.StartPosition.ToString, e.Location.ScriptID.ToString)
+		  Next e
+		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 557064617465732074686520746F6B656E73206C697374626F78207769746820746865207061737365642060746F6B656E73602E
-		Sub UpdateTokensListbox(tokens() As ObjoScript.Token)
-		  /// Updates the tokens listbox with the passed `tokens`.
+		Sub UpdateTokensListbox()
+		  /// Updates the tokens listbox with the passed.
 		  ///
 		  /// type, line, abs pos, value, script ID.
 		  
 		  TokensListbox.RemoveAllRows
 		  
 		  Var type, value As String
-		  For Each t As ObjoScript.Token In tokens
+		  For Each t As ObjoScript.Token In Tokens
 		    
 		    // Compute the value and type.
 		    Select Case t.Type
@@ -469,7 +639,27 @@ End
 	#tag EndMethod
 
 
+	#tag Property, Flags = &h0
+		AST() As ObjoScript.Stmt
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
+		Lexer As ObjoScript.Lexer
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
+		Parser As ObjoScript.Parser
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
+		Tokens() As ObjoScript.Token
+	#tag EndProperty
+
+
 	#tag Constant, Name = PANEL_AST, Type = Double, Dynamic = False, Default = \"1", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = PANEL_ERRORS, Type = Double, Dynamic = False, Default = \"2", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = PANEL_TOKENS, Type = Double, Dynamic = False, Default = \"0", Scope = Private
@@ -488,27 +678,7 @@ End
 #tag Events ButtonParse
 	#tag Event
 		Sub Pressed()
-		  TokensListbox.RemoveAllRows
-		  
-		  Var tokens() As ObjoScript.Token
-		  
-		  Var lexer As New ObjoScript.Lexer
-		  Var parser As New ObjoScript.Parser
-		  Var ast() As ObjoScript.Stmt
-		  
-		  Try
-		    tokens = lexer.Tokenise(Code.Text)
-		    UpdateTokensListbox(tokens)
-		    
-		    Info.Text = "Successfully tokenised."
-		    
-		    ast = parser.Parse(tokens)
-		    
-		  Catch e As ObjoScript.LexerException
-		    DisplayLexerError(e)
-		  End Try
-		  
-		  Break
+		  Parse
 		End Sub
 	#tag EndEvent
 #tag EndEvents
@@ -526,3 +696,256 @@ End
 		End Sub
 	#tag EndEvent
 #tag EndEvents
+#tag Events ButtonErrors
+	#tag Event
+		Sub Pressed()
+		  SwitchToPanel(PANEL_ERRORS)
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag ViewBehavior
+	#tag ViewProperty
+		Name="Name"
+		Visible=true
+		Group="ID"
+		InitialValue=""
+		Type="String"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="Interfaces"
+		Visible=true
+		Group="ID"
+		InitialValue=""
+		Type="String"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="Super"
+		Visible=true
+		Group="ID"
+		InitialValue=""
+		Type="String"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="Width"
+		Visible=true
+		Group="Size"
+		InitialValue="600"
+		Type="Integer"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="Height"
+		Visible=true
+		Group="Size"
+		InitialValue="400"
+		Type="Integer"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="MinimumWidth"
+		Visible=true
+		Group="Size"
+		InitialValue="64"
+		Type="Integer"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="MinimumHeight"
+		Visible=true
+		Group="Size"
+		InitialValue="64"
+		Type="Integer"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="MaximumWidth"
+		Visible=true
+		Group="Size"
+		InitialValue="32000"
+		Type="Integer"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="MaximumHeight"
+		Visible=true
+		Group="Size"
+		InitialValue="32000"
+		Type="Integer"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="Type"
+		Visible=true
+		Group="Frame"
+		InitialValue="0"
+		Type="Types"
+		EditorType="Enum"
+		#tag EnumValues
+			"0 - Document"
+			"1 - Movable Modal"
+			"2 - Modal Dialog"
+			"3 - Floating Window"
+			"4 - Plain Box"
+			"5 - Shadowed Box"
+			"6 - Rounded Window"
+			"7 - Global Floating Window"
+			"8 - Sheet Window"
+			"9 - Metal Window"
+			"11 - Modeless Dialog"
+		#tag EndEnumValues
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="Title"
+		Visible=true
+		Group="Frame"
+		InitialValue="Untitled"
+		Type="String"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="HasCloseButton"
+		Visible=true
+		Group="Frame"
+		InitialValue="True"
+		Type="Boolean"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="HasMaximizeButton"
+		Visible=true
+		Group="Frame"
+		InitialValue="True"
+		Type="Boolean"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="HasMinimizeButton"
+		Visible=true
+		Group="Frame"
+		InitialValue="True"
+		Type="Boolean"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="HasFullScreenButton"
+		Visible=true
+		Group="Frame"
+		InitialValue="False"
+		Type="Boolean"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="Resizeable"
+		Visible=true
+		Group="Frame"
+		InitialValue="True"
+		Type="Boolean"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="Composite"
+		Visible=false
+		Group="OS X (Carbon)"
+		InitialValue="False"
+		Type="Boolean"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="MacProcID"
+		Visible=false
+		Group="OS X (Carbon)"
+		InitialValue="0"
+		Type="Integer"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="FullScreen"
+		Visible=true
+		Group="Behavior"
+		InitialValue="False"
+		Type="Boolean"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="DefaultLocation"
+		Visible=true
+		Group="Behavior"
+		InitialValue="2"
+		Type="Locations"
+		EditorType="Enum"
+		#tag EnumValues
+			"0 - Default"
+			"1 - Parent Window"
+			"2 - Main Screen"
+			"3 - Parent Window Screen"
+			"4 - Stagger"
+		#tag EndEnumValues
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="Visible"
+		Visible=true
+		Group="Behavior"
+		InitialValue="True"
+		Type="Boolean"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="ImplicitInstance"
+		Visible=true
+		Group="Windows Behavior"
+		InitialValue="True"
+		Type="Boolean"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="HasBackgroundColor"
+		Visible=true
+		Group="Background"
+		InitialValue="False"
+		Type="Boolean"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="BackgroundColor"
+		Visible=true
+		Group="Background"
+		InitialValue="&cFFFFFF"
+		Type="ColorGroup"
+		EditorType="ColorGroup"
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="Backdrop"
+		Visible=true
+		Group="Background"
+		InitialValue=""
+		Type="Picture"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="MenuBar"
+		Visible=true
+		Group="Menus"
+		InitialValue=""
+		Type="DesktopMenuBar"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="MenuBarVisible"
+		Visible=true
+		Group="Deprecated"
+		InitialValue="False"
+		Type="Boolean"
+		EditorType=""
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="Lexer"
+		Visible=false
+		Group="Behavior"
+		InitialValue=""
+		Type="Integer"
+		EditorType=""
+	#tag EndViewProperty
+#tag EndViewBehavior

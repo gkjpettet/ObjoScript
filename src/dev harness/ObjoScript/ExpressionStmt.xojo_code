@@ -5,7 +5,7 @@ Implements ObjoScript.Stmt
 		Function Accept(visitor As ObjoScript.StmtVisitor) As Variant
 		  /// Part of the StmtVisitor interface.
 		  
-		  Return visitor.VisitExpression(Self)
+		  Return visitor.VisitExpressionStmt(Self)
 		End Function
 	#tag EndMethod
 

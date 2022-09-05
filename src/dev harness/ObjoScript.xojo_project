@@ -30,6 +30,7 @@ Class=BinaryExpr;ObjoScript/BinaryExpr.xojo_code;&h000000003EFFFFFF;&h000000004D
 Class=Precedences;ObjoScript/Precedences.xojo_code;&h00000000527E6FFF;&h000000004D1497FF;false
 Interface=ExprVisitor;ObjoScript/ExprVisitor.xojo_code;&h00000000045647FF;&h000000004D1497FF;false
 Interface=StmtVisitor;ObjoScript/StmtVisitor.xojo_code;&h0000000062B8AFFF;&h000000004D1497FF;false
+Class=ASTTreeView;ASTTreeView.xojo_code;&h00000000600617FF;&h0000000000000000;false
 DefaultWindow=WindowTest
 AppMenuBar=MainMenuBar
 MajorVersion=1
