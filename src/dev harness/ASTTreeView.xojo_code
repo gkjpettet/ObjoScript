@@ -46,6 +46,8 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		Function VisitNothing(expr As ObjoScript.NothingLiteral) As Variant
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
+		  #Pragma Unused expr
+		  
 		  Var node As New TreeViewNode("Nothing")
 		  
 		  Return node
