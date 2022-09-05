@@ -2,7 +2,7 @@
 Protected Class BinaryParselet
 Implements ObjoScript.InfixParselet
 	#tag Method, Flags = &h0
-		Sub Constructor(precedence As ObjoScript.Precedences, rightAssociative As Boolean = False)
+		Sub Constructor(precedence As Integer, rightAssociative As Boolean = False)
 		  mPrecedence = precedence
 		  Self.RightAssociative = rightAssociative
 		  
@@ -24,15 +24,8 @@ Implements ObjoScript.InfixParselet
 		  // lower precedence when parsing the right-hand side. This will let a
 		  // parselet with the same precedence appear on the right, which will then
 		  // take *this* parselet's result as its left-hand argument.
-		  Var right As ObjoScript.Expr
-		   If RightAssociative Then
-		    // The compiler is pretty dumb when it comes to enums and so we need to do some 
-		    // casting gymnastics here.
-		    Var lowerPrec As ObjoScript.Precedences = ObjoScript.Precedences(Integer(mPrecedence) - 1)
-		    right = parser.ParsePrecedence(lowerPrec)
-		  Else
-		    right = parser.ParsePrecedence(mPrecedence)
-		  End If
+		  Var right As ObjoScript.Expr = _
+		  parser.ParsePrecedence(If(RightAssociative, mPrecedence - 1, mPrecedence))
 		  
 		  Return New ObjoScript.BinaryExpr(left, operator, right)
 		  
@@ -41,7 +34,7 @@ Implements ObjoScript.InfixParselet
 
 
 	#tag Property, Flags = &h21
-		Private mPrecedence As ObjoScript.Precedences
+		Private mPrecedence As Integer
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 5472756520696620746869732070617273656C65742069732072696768742D6173736F636961746976652C2046616C7365206966206974206973206C6566742D6173736F636961746976652E

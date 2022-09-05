@@ -28,6 +28,7 @@ Class=UnaryExpr;ObjoScript/UnaryExpr.xojo_code;&h0000000007A637FF;&h000000004D14
 Class=LogicalNegateExpr;ObjoScript/LogicalNegateExpr.xojo_code;&h000000002908FFFF;&h000000004D1497FF;false
 Class=BinaryParselet;ObjoScript/BinaryParselet.xojo_code;&h00000000452E9FFF;&h000000004D1497FF;false
 Class=BinaryExpr;ObjoScript/BinaryExpr.xojo_code;&h000000003EFFFFFF;&h000000004D1497FF;false
+Class=Precedences;ObjoScript/Precedences.xojo_code;&h00000000527E6FFF;&h000000004D1497FF;false
 DefaultWindow=WindowTest
 AppMenuBar=MainMenuBar
 MajorVersion=1

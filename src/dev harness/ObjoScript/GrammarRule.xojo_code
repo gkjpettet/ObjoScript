@@ -1,7 +1,7 @@
 #tag Class
 Protected Class GrammarRule
 	#tag Method, Flags = &h0
-		Sub Constructor(prefix As ObjoScript.PrefixParselet, infix As ObjoScript.InfixParselet, precedence As ObjoScript.Precedences)
+		Sub Constructor(prefix As ObjoScript.PrefixParselet, infix As ObjoScript.InfixParselet, precedence As Integer)
 		  Self.Prefix = prefix
 		  Self.Infix = infix
 		  Self.Precedence = precedence
@@ -21,7 +21,7 @@ Protected Class GrammarRule
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 54686520707265636564656E6365206F6620616E20696E6669782065787072657373696F6E2074686174207573657320746869732072756C65277320746F6B656E20617320616E206F70657261746F722E
-		Precedence As ObjoScript.Precedences
+		Precedence As Integer
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 5468652070617273656C657420746F2075736520666F722061207072656669782065787072657373696F6E207374617274696E67207769746820746869732072756C65277320746F6B656E2E

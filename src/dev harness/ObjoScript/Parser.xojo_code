@@ -21,7 +21,7 @@ Protected Class Parser
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 436F6E76656E69656E6365206D6574686F6420666F722072657475726E696E672061206E6577206772616D6D61722072756C6520666F7220612062696E617279206F70657261746F722E
-		Private Function BinaryOperator(precedence As ObjoScript.Precedences, rightAssociative As Boolean = False) As ObjoScript.GrammarRule
+		Private Function BinaryOperator(precedence As Integer, rightAssociative As Boolean = False) As ObjoScript.GrammarRule
 		  /// Convenience method for returning a new grammar rule for a binary operator.
 		  
 		  Return New ObjoScript.GrammarRule(Nil, New BinaryParselet(precedence, rightAssociative), precedence)
@@ -264,7 +264,7 @@ Protected Class Parser
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 436F6E76656E69656E6365206D6574686F6420666F72206372656174696E672061206E6577204772616D6D617252756C652077697468206120736C696768746C792073686F727465722073796E7461782E
-		Private Function NewRule(prefix As ObjoScript.PrefixParselet, infix As ObjoScript.InfixParselet, precedence As ObjoScript.Precedences) As ObjoScript.GrammarRule
+		Private Function NewRule(prefix As ObjoScript.PrefixParselet, infix As ObjoScript.InfixParselet, precedence As Integer) As ObjoScript.GrammarRule
 		  /// Convenience method for creating a new GrammarRule with a slightly shorter syntax.
 		  
 		  Return New ObjoScript.GrammarRule(prefix, infix, precedence)
@@ -273,7 +273,7 @@ Protected Class Parser
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 436F6E76656E69656E6365206D6574686F6420666F722072657475726E696E672061206E6577206772616D6D61722072756C6520666F72206120756E61727920616E642062696E617279206F70657261746F722E
-		Private Function Operator(rightAssociative As Boolean = False, precedence As ObjoScript.Precedences = ObjoScript.Precedences.Term) As ObjoScript.GrammarRule
+		Private Function Operator(rightAssociative As Boolean = False, precedence As Integer = ObjoScript.Precedences.Term) As ObjoScript.GrammarRule
 		  /// Convenience method for returning a new grammar rule for a unary and binary operator.
 		  
 		  Return New ObjoScript.GrammarRule(New UnaryParselet, New BinaryParselet(precedence, rightAssociative), precedence)
@@ -326,12 +326,10 @@ Protected Class Parser
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 50617273657320616E642072657475726E7320616E2065787072657373696F6E2061742074686520676976656E20707265636564656E6365206C6576656C206F72206869676865722E
-		Function ParsePrecedence(precedence As ObjoScript.Precedences) As ObjoScript.Expr
+		Function ParsePrecedence(precedence As Integer) As ObjoScript.Expr
 		  /// Parses and returns an expression at the given precedence level or higher.
 		  ///
 		  /// This is the main entry point for the top-down operator precedence parser.
-		  
-		  #Pragma Warning "TODO"
 		  
 		  Advance
 		  
@@ -371,7 +369,7 @@ Protected Class Parser
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 436F6E76656E69656E6365206D6574686F6420666F722072657475726E696E672061206E6577206772616D6D61722072756C6520666F72206120707265666978206F70657261746F722E
-		Private Function Prefix(prefixParselet As ObjoScript.PrefixParselet, precedence As ObjoScript.Precedences = ObjoScript.Precedences.None) As ObjoScript.GrammarRule
+		Private Function Prefix(prefixParselet As ObjoScript.PrefixParselet, precedence As Integer = ObjoScript.Precedences.None) As ObjoScript.GrammarRule
 		  /// Convenience method for returning a new grammar rule for a prefix operator.
 		  
 		  Return New ObjoScript.GrammarRule(prefixParselet, Nil, precedence)
