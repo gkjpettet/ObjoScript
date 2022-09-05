@@ -134,6 +134,9 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.Minus
 		    Return "-"
 		    
+		  Case ObjoScript.TokenTypes.MinusMinus
+		    Return "--"
+		    
 		  Case ObjoScript.TokenTypes.MinusEqual
 		    Return "-="
 		    
@@ -319,6 +322,7 @@ Protected Module ObjoScript
 		  LSquare
 		  Minus
 		  MinusEqual
+		  MinusMinus
 		  Not_
 		  NotEqual
 		  Nothing

@@ -219,6 +219,7 @@ Protected Class Parser
 		  TokenTypes.LParen            : NewRule(New GroupParselet,  Nil, Precedences.None), _
 		  TokenTypes.LSquare           : Unused, _
 		  TokenTypes.Minus             : Operator, _
+		  TokenTypes.MinusMinus        : Postfix, _
 		  TokenTypes.MinusEqual        : Unused, _
 		  TokenTypes.NotEqual          : BinaryOperator(Precedences.Equality), _
 		  TokenTypes.Nothing           : Unused, _

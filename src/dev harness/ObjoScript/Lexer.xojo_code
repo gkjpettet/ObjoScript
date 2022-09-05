@@ -585,6 +585,9 @@ Protected Class Lexer
 		    If Match("=") Then
 		      AddToken(MakeToken(ObjoScript.TokenTypes.MinusEqual))
 		      Return
+		    ElseIf Match("-") Then
+		      AddToken(MakeToken(ObjoScript.TokenTypes.MinusMinus))
+		      Return
 		    Else
 		      AddToken(MakeToken(ObjoScript.TokenTypes.Minus))
 		      Return
