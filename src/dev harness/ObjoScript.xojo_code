@@ -277,6 +277,11 @@ Protected Module ObjoScript
 	#tag EndComputedProperty
 
 
+	#tag Enum, Name = Opcodes, Type = Integer, Flags = &h1
+		Constant
+		Return_
+	#tag EndEnum
+
 	#tag Enum, Name = TokenTypes, Type = Integer, Flags = &h1
 		Ampersand
 		  And_

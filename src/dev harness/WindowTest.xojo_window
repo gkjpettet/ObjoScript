@@ -84,7 +84,7 @@ Begin DesktopWindow WindowTest
       Height          =   20
       Index           =   -2147483648
       Italic          =   False
-      Left            =   1080
+      Left            =   635
       LockBottom      =   True
       LockedInPosition=   False
       LockLeft        =   False
@@ -179,13 +179,14 @@ Begin DesktopWindow WindowTest
       PanelCount      =   4
       Panels          =   ""
       Scope           =   2
+      SelectedPanelIndex=   0
       TabIndex        =   8
       TabPanelIndex   =   0
       TabStop         =   False
       Tooltip         =   ""
       Top             =   54
       Transparent     =   False
-      Value           =   1
+      Value           =   3
       Visible         =   True
       Width           =   617
       Begin DesktopListBox TokensListbox
@@ -341,6 +342,7 @@ Begin DesktopWindow WindowTest
          Underline       =   False
          Visible         =   True
          Width           =   617
+         _ScrollOffset   =   0
          _ScrollWidth    =   -1
       End
       Begin SimpleTextArea Output
@@ -390,9 +392,58 @@ Begin DesktopWindow WindowTest
          ValidationMask  =   ""
          Visible         =   True
          Width           =   617
+         Begin DesktopTextArea DisassemblerOutput
+            AllowAutoDeactivate=   True
+            AllowFocusRing  =   False
+            AllowSpellChecking=   True
+            AllowStyledText =   True
+            AllowTabs       =   False
+            BackgroundColor =   &cFFFFFF
+            Bold            =   False
+            Enabled         =   True
+            FontName        =   "Menlo"
+            FontSize        =   0.0
+            FontUnit        =   0
+            Format          =   ""
+            HasBorder       =   True
+            HasHorizontalScrollbar=   False
+            HasVerticalScrollbar=   True
+            Height          =   601
+            HideSelection   =   True
+            Index           =   -2147483648
+            InitialParent   =   "Output"
+            Italic          =   False
+            Left            =   635
+            LineHeight      =   0.0
+            LineSpacing     =   1.0
+            LockBottom      =   True
+            LockedInPosition=   False
+            LockLeft        =   True
+            LockRight       =   True
+            LockTop         =   True
+            MaximumCharactersAllowed=   0
+            Multiline       =   True
+            ReadOnly        =   True
+            Scope           =   0
+            TabIndex        =   0
+            TabPanelIndex   =   4
+            TabStop         =   True
+            Text            =   ""
+            TextAlignment   =   0
+            TextColor       =   &c000000
+            Tooltip         =   ""
+            Top             =   54
+            Transparent     =   False
+            Underline       =   False
+            UnicodeMode     =   1
+            ValidationMask  =   ""
+            Visible         =   True
+            Width           =   617
+         End
       End
    End
    Begin DesktopBevelButton ButtonAST
+      Active          =   False
       AllowAutoDeactivate=   True
       AllowFocus      =   True
       BackgroundColor =   &c00000000
@@ -423,9 +474,11 @@ Begin DesktopWindow WindowTest
       LockRight       =   True
       LockTop         =   True
       MenuStyle       =   0
+      PanelIndex      =   0
       Scope           =   2
       TabIndex        =   9
       TabPanelIndex   =   0
+      TabStop         =   True
       TextColor       =   &c00000000
       Tooltip         =   ""
       Top             =   20
@@ -434,8 +487,13 @@ Begin DesktopWindow WindowTest
       Value           =   True
       Visible         =   True
       Width           =   60
+      _mIndex         =   0
+      _mInitialParent =   ""
+      _mName          =   ""
+      _mPanelIndex    =   0
    End
    Begin DesktopBevelButton ButtonTokens
+      Active          =   False
       AllowAutoDeactivate=   True
       AllowFocus      =   True
       BackgroundColor =   &c00000000
@@ -466,9 +524,11 @@ Begin DesktopWindow WindowTest
       LockRight       =   True
       LockTop         =   True
       MenuStyle       =   0
+      PanelIndex      =   0
       Scope           =   2
       TabIndex        =   10
       TabPanelIndex   =   0
+      TabStop         =   True
       TextColor       =   &c00000000
       Tooltip         =   ""
       Top             =   20
@@ -477,8 +537,13 @@ Begin DesktopWindow WindowTest
       Value           =   False
       Visible         =   True
       Width           =   60
+      _mIndex         =   0
+      _mInitialParent =   ""
+      _mName          =   ""
+      _mPanelIndex    =   0
    End
    Begin DesktopBevelButton ButtonErrors
+      Active          =   False
       AllowAutoDeactivate=   True
       AllowFocus      =   True
       BackgroundColor =   &c00000000
@@ -509,9 +574,11 @@ Begin DesktopWindow WindowTest
       LockRight       =   True
       LockTop         =   True
       MenuStyle       =   0
+      PanelIndex      =   0
       Scope           =   2
       TabIndex        =   11
       TabPanelIndex   =   0
+      TabStop         =   True
       TextColor       =   &c00000000
       Tooltip         =   ""
       Top             =   20
@@ -520,6 +587,91 @@ Begin DesktopWindow WindowTest
       Value           =   False
       Visible         =   True
       Width           =   60
+      _mIndex         =   0
+      _mInitialParent =   ""
+      _mName          =   ""
+      _mPanelIndex    =   0
+   End
+   Begin DesktopButton ButtonTest
+      AllowAutoDeactivate=   True
+      Bold            =   False
+      Cancel          =   False
+      Caption         =   "Test"
+      Default         =   False
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      Height          =   20
+      Index           =   -2147483648
+      Italic          =   False
+      Left            =   1080
+      LockBottom      =   True
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   False
+      MacButtonStyle  =   0
+      Scope           =   2
+      TabIndex        =   12
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   687
+      Transparent     =   False
+      Underline       =   False
+      Visible         =   True
+      Width           =   80
+   End
+   Begin DesktopBevelButton ButtonDisassembler
+      Active          =   False
+      AllowAutoDeactivate=   True
+      AllowFocus      =   True
+      AllowTabStop    =   True
+      BackgroundColor =   &c00000000
+      BevelStyle      =   0
+      Bold            =   False
+      ButtonStyle     =   1
+      Caption         =   "Disassembler"
+      CaptionAlignment=   3
+      CaptionDelta    =   0
+      CaptionPosition =   1
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      HasBackgroundColor=   False
+      Height          =   22
+      Icon            =   0
+      IconAlignment   =   0
+      IconDeltaX      =   0
+      IconDeltaY      =   0
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   930
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   True
+      MenuStyle       =   0
+      PanelIndex      =   0
+      Scope           =   2
+      TabIndex        =   13
+      TabPanelIndex   =   0
+      TextColor       =   &c00000000
+      Tooltip         =   ""
+      Top             =   20
+      Transparent     =   False
+      Underline       =   False
+      Value           =   False
+      Visible         =   True
+      Width           =   106
+      _mIndex         =   0
+      _mInitialParent =   ""
+      _mName          =   ""
+      _mPanelIndex    =   0
    End
 End
 #tag EndDesktopWindow
@@ -532,6 +684,15 @@ End
 		End Sub
 	#tag EndEvent
 
+
+	#tag Method, Flags = &h21
+		Private Sub DisassemblerPrintDelegate(sender As ObjoScript.Disassembler, s As String)
+		  #Pragma Unused sender
+		  
+		  DisassemblerOutput.Text = DisassemblerOutput.Text + s
+		  
+		End Sub
+	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 446973706C6179732064657461696C732061626F75742061206C6578657220657863657074696F6E20696E2074686520496E666F206C6162656C2E
 		Sub DisplayLexerError(e As ObjoScript.LexerException)
@@ -605,6 +766,7 @@ End
 		  
 		  Info.Text = ""
 		  
+		  DisassemblerOutput.Text = ""
 		End Sub
 	#tag EndMethod
 
@@ -615,25 +777,29 @@ End
 		    ButtonAST.Value = True
 		    ButtonTokens.Value = False
 		    ButtonErrors.Value = False
+		    ButtonDisassembler.Value = False
 		    Panel.SelectedPanelIndex = id
 		    
 		  Case PANEL_TOKENS
 		    ButtonAST.Value = False
 		    ButtonTokens.Value = True
 		    ButtonErrors.Value = False
+		    ButtonDisassembler.Value = False
 		    Panel.SelectedPanelIndex = id
 		    
 		  Case PANEL_ERRORS
 		    ButtonAST.Value = False
 		    ButtonTokens.Value = False
 		    ButtonErrors.Value = True
+		    ButtonDisassembler.Value = False
 		    Panel.SelectedPanelIndex = PANEL_ERRORS
 		    
-		  Case PANEL_OUTPUT
+		  Case PANEL_DISASSEMBLER_OUTPUT
 		    ButtonAST.Value = False
 		    ButtonTokens.Value = False
 		    ButtonErrors.Value = False
-		    Panel.SelectedPanelIndex = PANEL_OUTPUT
+		    ButtonDisassembler.Value = True
+		    Panel.SelectedPanelIndex = PANEL_DISASSEMBLER_OUTPUT
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown panel ID.")
@@ -715,10 +881,10 @@ End
 	#tag Constant, Name = PANEL_AST, Type = Double, Dynamic = False, Default = \"1", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = PANEL_ERRORS, Type = Double, Dynamic = False, Default = \"2", Scope = Private
+	#tag Constant, Name = PANEL_DISASSEMBLER_OUTPUT, Type = Double, Dynamic = False, Default = \"3", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = PANEL_OUTPUT, Type = Double, Dynamic = False, Default = \"3", Scope = Private
+	#tag Constant, Name = PANEL_ERRORS, Type = Double, Dynamic = False, Default = \"2", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = PANEL_TOKENS, Type = Double, Dynamic = False, Default = \"0", Scope = Private
@@ -759,6 +925,39 @@ End
 	#tag Event
 		Sub Pressed()
 		  SwitchToPanel(PANEL_ERRORS)
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ButtonTest
+	#tag Event
+		Sub Pressed()
+		  // Create a chunk.
+		  
+		  SwitchToPanel(PANEL_DISASSEMBLER_OUTPUT)
+		  
+		  Var chunk As New ObjoScript.Chunk
+		  chunk.Write(ObjoScript.Opcodes.Constant, 123)
+		  chunk.Write(chunk.AddConstant(1.2), 123)
+		  chunk.Write(ObjoScript.Opcodes.Return_, 123)
+		  chunk.Write(ObjoScript.Opcodes.Constant, 124)
+		  chunk.Write(chunk.AddConstant("Hello world"), 124)
+		  chunk.Write(ObjoScript.Opcodes.Constant, 125)
+		  chunk.Write(chunk.AddConstant("Hello WORLD"), 125)
+		  chunk.Write(ObjoScript.Opcodes.Constant, 126)
+		  chunk.Write(chunk.AddConstant(1.201), 126)
+		  
+		  Var disassembler As New ObjoScript.Disassembler
+		  Addhandler disassembler.Print, AddressOf DisassemblerPrintDelegate
+		  
+		  disassembler.Disassemble(chunk, "Test Chunk")
+		  
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ButtonDisassembler
+	#tag Event
+		Sub Pressed()
+		  SwitchToPanel(PANEL_DISASSEMBLER_OUTPUT)
 		End Sub
 	#tag EndEvent
 #tag EndEvents
@@ -997,14 +1196,6 @@ End
 		Group="Deprecated"
 		InitialValue="False"
 		Type="Boolean"
-		EditorType=""
-	#tag EndViewProperty
-	#tag ViewProperty
-		Name="Lexer"
-		Visible=false
-		Group="Behavior"
-		InitialValue=""
-		Type="Integer"
 		EditorType=""
 	#tag EndViewProperty
 #tag EndViewBehavior

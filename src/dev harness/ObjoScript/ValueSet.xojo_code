@@ -1,32 +1,36 @@
 #tag Class
-Protected Class PrimitiveSet
-	#tag Method, Flags = &h0, Description = 416464732060736020746F20746865207365742E2052657475726E732074686520696E64657820696E2074686520736574207468617420607360206F636375706965732E2049662060736020697320616C726561647920696E20746865207365742C202D312069732072657475726E65642E
+Protected Class ValueSet
+	#tag Method, Flags = &h0, Description = 416464732060646020746F20746865207365742E2052657475726E732074686520696E64657820696E2074686520736574207468617420606460206F636375706965732E
 		Function Add(d As Double) As Integer
 		  /// Adds `d` to the set. Returns the index in the set that `d` occupies. 
-		  /// If `d` is already in the set, -1 is returned. 
 		  
 		  If mLookupTable.HasKey(d) Then
+		    // Already in the set. Just return the index.
 		    Return mLookupTable.Value(d)
 		  Else
+		    // Add this double.
 		    mItems.Add(d)
+		    mLookupTable.Value(d) = mitems.LastIndex
 		    Return mItems.LastIndex
 		  End If
 		  
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 416464732060736020746F20746865207365742E2052657475726E732074686520696E64657820696E2074686520736574207468617420607360206F636375706965732E2049662060736020697320616C726561647920696E20746865207365742C202D312069732072657475726E65642E
+	#tag Method, Flags = &h0, Description = 416464732060736020746F20746865207365742E2052657475726E732074686520696E64657820696E2074686520736574207468617420607360206F636375706965732E
 		Function Add(s As String) As Integer
-		  /// Adds `s` to the set. Returns the index in the set that `s` occupies. 
-		  /// If `s` is already in the set, -1 is returned. 
+		  /// Adds `s` to the set. Returns the index in the set that `s` occupies.  
 		  
-		  // Strings are always stored hex encoded.
+		  // Strings are stored in the lookup table hex encoded (for case-sensitivity).
 		  Var encoded As String = EncodeHex(s)
 		  
 		  If mLookupTable.HasKey(encoded) Then
+		    // Already in the set. Return the index.
 		    Return mLookupTable.Value(encoded)
 		  Else
-		    mItems.Add(encoded)
+		    // Add the string.
+		    mItems.Add(s)
+		    mLookupTable.Value(encoded) = mItems.LastIndex
 		    Return mItems.LastIndex
 		  End If
 		  
@@ -52,19 +56,10 @@ Protected Class PrimitiveSet
 		Function Contains(s As String) As Boolean
 		  /// Returns `True` if `s` is in this set.
 		  
-		  // Strings are stored internally as hex encoded strings.
+		  // Strings are stored internally in the lookup table hex encoded.
 		  Var encoded As String = EncodeHex(s)
 		  
 		  Return mLookupTable.HasKey(encoded)
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = 52657475726E732074686520656C656D656E742061742060696E646578602E204D617920726169736520616E20604F75744F66426F756E6473457863657074696F6E602E
-		Function ElementAt(index As Integer) As Variant
-		  /// Returns the element at `index`. May raise an `OutOfBoundsException`.
-		  
-		  Return mItems(index)
-		  
 		End Function
 	#tag EndMethod
 
@@ -97,6 +92,15 @@ Protected Class PrimitiveSet
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 52657475726E732074686520656C656D656E742061742060696E646578602E204D617920726169736520616E20604F75744F66426F756E6473457863657074696F6E602E
+		Function Operator_Subscript(index As Integer) As Variant
+		  /// Returns the element at `index`. May raise an `OutOfBoundsException`.
+		  
+		  Return mItems(index)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52656275696C647320746865206C6F6F6B7570207461626C652062792074726176657273696E672074686520656E7469726520606D4974656D73602061727261792E2054686973206973207265717569726564207768656E6576657220616E20656C656D656E742069732072656D6F7665642E
 		Private Sub RebuildLookupTable()
 		  /// Rebuilds the lookup table by traversing the entire `mItems` array.
@@ -105,8 +109,16 @@ Protected Class PrimitiveSet
 		  mLookupTable.RemoveAll
 		  
 		  Var iLimit As Integer = mItems.LastIndex
+		  
+		  Var item As Variant
 		  For i As Integer = 0 To iLimit
-		    mLookupTable.Value(mItems(i)) = i
+		    item = mItems(i)
+		    If item.Type = Variant.TypeString Then
+		      // We store strings in the lookup table as hex encoded (to preserve case sensitivity).
+		      mLookupTable.Value(EncodeHex(item)) = i
+		    Else
+		      mLookupTable.Value(item) = i
+		    End If
 		  Next i
 		  
 		End Sub
@@ -135,7 +147,7 @@ Protected Class PrimitiveSet
 		  ///
 		  /// If `s` was removed, there is a performance penalty as we have to re-index the `mItems` array for the lookup table.
 		  
-		  // Strings are stored internally hex encoded.
+		  // Strings are stored in the lookup table as hex encoded.
 		  Var encoded As String = EncodeHex(s)
 		  
 		  If Not mLookupTable.HasKey(encoded) Then
@@ -160,7 +172,7 @@ Protected Class PrimitiveSet
 
 
 	#tag Note, Name = About
-		Stores a mutable list of strings and doubles.
+		Stores a mutable list of Objo values (strings and doubles).
 		All values are guaranteed to be unique within the set.
 		Stored strings are case-sensitive (stored as hex encoded strings).
 		The index of a value within the set is stable until elements are removed.
@@ -216,14 +228,6 @@ Protected Class PrimitiveSet
 			Visible=true
 			Group="Position"
 			InitialValue="0"
-			Type="Integer"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="mLookupTable"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
 			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty
