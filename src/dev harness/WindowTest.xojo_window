@@ -689,8 +689,18 @@ End
 		Private Sub DisassemblerPrintDelegate(sender As ObjoScript.Disassembler, s As String)
 		  #Pragma Unused sender
 		  
-		  DisassemblerOutput.Text = DisassemblerOutput.Text + s
+		  mDisassemblerOutput.Add(s)
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub DisassemblerPrintLineDelegate(sender As ObjoScript.Disassembler, s As String)
+		  #Pragma Unused sender
+		  
+		  mDisassemblerOutput.Add(s)
+		  DisassemblerOutput.Text = DisassemblerOutput.Text + String.FromArray(mDisassemblerOutput) + EndOfLine
+		  mDisassemblerOutput.ResizeTo(-1)
 		End Sub
 	#tag EndMethod
 
@@ -767,6 +777,10 @@ End
 		  Info.Text = ""
 		  
 		  DisassemblerOutput.Text = ""
+		  mDisassemblerOutput.ResizeTo(-1)
+		  
+		  VM = New ObjoScript.VM
+		  
 		End Sub
 	#tag EndMethod
 
@@ -869,12 +883,20 @@ End
 		Lexer As ObjoScript.Lexer
 	#tag EndProperty
 
+	#tag Property, Flags = &h21
+		Private mDisassemblerOutput() As String
+	#tag EndProperty
+
 	#tag Property, Flags = &h0
 		Parser As ObjoScript.Parser
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
 		Tokens() As ObjoScript.Token
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
+		VM As ObjoScript.VM
 	#tag EndProperty
 
 
@@ -935,31 +957,22 @@ End
 		  
 		  SwitchToPanel(PANEL_DISASSEMBLER_OUTPUT)
 		  
-		  // Synthesise some tokens.
-		  Var tok1 As New ObjoScript.Token(ObjoScript.TokenTypes.EOL, 0, 1, "", 0)
-		  Var tok2 As New ObjoScript.Token(ObjoScript.TokenTypes.EOL, 0, 1, "", 1)
-		  Var tok3 As New ObjoScript.Token(ObjoScript.TokenTypes.EOL, 0, 2, "", 2)
-		  Var tok4 As New ObjoScript.Token(ObjoScript.TokenTypes.EOL, 0, 3, "", 3)
-		  Var tok5 As New ObjoScript.Token(ObjoScript.TokenTypes.EOL, 0, 4, "", 4)
-		  
+		  // Create a test chunk.
+		  Var tok1 As New ObjoScript.Token(ObjoScript.TokenTypes.EOL, 0, 123, "", 0)
 		  Var chunk As New ObjoScript.Chunk
-		  chunk.WriteOpcode(ObjoScript.Opcodes.Constant, tok1)
-		  chunk.WriteUInt8(chunk.AddConstant(1.2), tok1)
-		  chunk.WriteOpcode(ObjoScript.Opcodes.Return_, tok1)
-		  chunk.WriteOpcode(ObjoScript.Opcodes.Constant, tok2)
-		  chunk.WriteUInt8(chunk.AddConstant("Hello world"), tok2)
-		  chunk.WriteOpcode(ObjoScript.Opcodes.Constant, tok3)
-		  chunk.WriteUInt8(chunk.AddConstant("Hello WORLD"), tok3)
-		  chunk.WriteOpcode(ObjoScript.Opcodes.Constant, tok4)
-		  chunk.WriteUInt8(chunk.AddConstant(1.201), tok4)
+		  chunk.WriteByte(ObjoScript.VM.OP_CONSTANT, tok1)
+		  chunk.WriteByte(chunk.AddConstant(1.2), tok1)
+		  chunk.WriteByte(ObjoScript.VM.OP_RETURN, tok1)
 		  
-		  chunk.WriteOpcode(ObjoScript.Opcodes.ConstantLong, tok5)
-		  chunk.WriteUInt16(chunk.AddConstant(7), tok5)
-		  
+		  // Disassemble it.
 		  Var disassembler As New ObjoScript.Disassembler
 		  Addhandler disassembler.Print, AddressOf DisassemblerPrintDelegate
-		  
+		  Addhandler disassembler.PrintLine, AddressOf DisassemblerPrintLineDelegate
 		  disassembler.Disassemble(chunk, "Test Chunk", True)
+		  
+		  // Execute it.
+		  VM = New ObjoScript.VM
+		  VM.Interpret(chunk)
 		  
 		End Sub
 	#tag EndEvent

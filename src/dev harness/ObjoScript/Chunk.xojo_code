@@ -28,6 +28,26 @@ Protected Class Chunk
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 52657475726E7320746865206C696E65206E756D62657220666F7220746865206279746520636F646520617420606F6666736574602E
+		Function LineForOffset(offset As Integer) As UInt32
+		  /// Returns the line number for the byte code at `offset`.
+		  ///
+		  /// This is abstracted out to its own method in case I ever implement any 
+		  /// compression for how the line numbers are stored.
+		  
+		  Return Lines(offset)
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 526561647320616E20756E7369676E6564206279746520696E746567657220626567696E6E696E6720617420606F6666736574602066726F6D2074686973206368756E6B27732062797465636F64652E
+		Function ReadByte(offset As Integer) As UInt8
+		  /// Reads an unsigned byte integer beginning at `offset` from this chunk's bytecode.
+		  
+		  Return Code(offset)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 526561647320616E20756E7369676E65642031362D62697420696E746567657220626567696E6E696E6720617420606F6666736574602066726F6D2074686973206368756E6B27732062797465636F64652E
 		Function ReadUInt16(offset As Integer) As UInt16
 		  /// Reads an unsigned 16-bit integer beginning at `offset` from this chunk's bytecode.
@@ -39,22 +59,24 @@ Protected Class Chunk
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 526561647320616E20756E7369676E6564206279746520696E746567657220626567696E6E696E6720617420606F6666736574602066726F6D2074686973206368756E6B27732062797465636F64652E
-		Function ReadUInt8(offset As Integer) As UInt8
-		  /// Reads an unsigned byte integer beginning at `offset` from this chunk's bytecode.
+	#tag Method, Flags = &h0, Description = 52657475726E73207468652073637269707420494420666F7220746865206279746520636F646520617420606F6666736574602E
+		Function ScriptIDForOffset(offset As Integer) As UInt16
+		  /// Returns the script ID for the byte code at `offset`.
+		  ///
+		  /// This is abstracted out to its own method in case I ever implement any 
+		  /// compression for how the script IDs are stored.
 		  
-		  Return Code(offset)
-		  
+		  Return ScriptID(offset)
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 57726974657320616E206F70636F646520746F2074686973206368756E6B2E
-		Sub WriteOpcode(opcode As ObjoScript.Opcodes, token As ObjoScript.Token)
-		  /// Writes an opcode to this chunk.
+	#tag Method, Flags = &h0, Description = 5772697465732061206279746520746F2074686973206368756E6B2E
+		Sub WriteByte(b As UInt8, token As ObjoScript.Token)
+		  /// Writes a byte to this chunk.
 		  ///
-		  /// The opcode is cast to an Integer but is actually stored as a UInt8.
+		  /// `token` is the parser token that generated this byte of data.
 		  
-		  Code.Add(Integer(opcode))
+		  Code.Add(b)
 		  Lines.Add(token.LineNumber)
 		  ScriptID.Add(token.ScriptID)
 		End Sub
@@ -82,18 +104,6 @@ Protected Class Chunk
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 5772697465732061206279746520746F2074686973206368756E6B2E
-		Sub WriteUInt8(i8 As UInt8, token As ObjoScript.Token)
-		  /// Writes a byte to this chunk.
-		  ///
-		  /// `token` is the parser token that generated this byte of data.
-		  
-		  Code.Add(i8)
-		  Lines.Add(token.LineNumber)
-		  ScriptID.Add(token.ScriptID)
-		End Sub
-	#tag EndMethod
-
 
 	#tag Property, Flags = &h0, Description = 54686973206368756E6B2773207261772062797465636F64652E
 		Code() As UInt8
@@ -112,12 +122,12 @@ Protected Class Chunk
 		Length As Integer
 	#tag EndComputedProperty
 
-	#tag Property, Flags = &h0, Description = 53746F72657320746865206C696E65206E756D62657220666F722074686520636F72726573706F6E64696E67206279746520696E2060436F64652829602E20
-		Lines() As UInt32
+	#tag Property, Flags = &h21, Description = 53746F72657320746865206C696E65206E756D62657220666F722074686520636F72726573706F6E64696E67206279746520696E2060436F64652829602E20
+		Private Lines() As UInt32
 	#tag EndProperty
 
-	#tag Property, Flags = &h0, Description = 53746F726573207468652073637269707420494420666F722074686520636F72726573706F6E64696E67206279746520696E2060436F64652829602E2044656661756C747320746F206030602E
-		ScriptID() As UInt16
+	#tag Property, Flags = &h21, Description = 53746F726573207468652073637269707420494420666F722074686520636F72726573706F6E64696E67206279746520696E2060436F64652829602E2044656661756C747320746F206030602E
+		Private ScriptID() As UInt16
 	#tag EndProperty
 
 

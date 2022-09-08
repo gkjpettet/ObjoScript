@@ -1,7 +1,7 @@
 #tag Class
 Protected Class Disassembler
 	#tag Method, Flags = &h0, Description = 5072696E74732074686520636F6E7374616E7420696E737472756374696F6E2773206E616D652C2074686520636F6E7374616E74277320696E64657820696E2074686520636F6E7374616E7420706F6F6C20616E64206120726570726573656E746174696F6E206F66207468652076616C7565206F66207468617420636F6E7374616E742E2052657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
-		Function ConstantInstruction(opcode As ObjoScript.Opcodes, chunk As ObjoScript.Chunk, offset As Integer) As Integer
+		Function ConstantInstruction(opcode As UInt8, chunk As ObjoScript.Chunk, offset As Integer) As Integer
 		  /// Prints the constant instruction's name, the constant's index in the constant pool and a representation of the value of that constant.
 		  /// Returns the offset for the next instruction.
 		  ///
@@ -13,11 +13,11 @@ Protected Class Disassembler
 		  Var constantIndex, newOffset As Integer
 		  Var name As String
 		  Select Case opcode
-		  Case ObjoScript.Opcodes.Constant
-		    constantIndex = chunk.ReadUInt8(offset + 1)
+		  Case ObjoScript.VM.OP_CONSTANT
+		    constantIndex = chunk.ReadByte(offset + 1)
 		    newOffset = offset + 2
 		    name = "CONSTANT"
-		  Case ObjoScript.Opcodes.ConstantLong
+		  Case ObjoScript.VM.OP_CONSTANT_LONG
 		    // Two byte operand.
 		    constantIndex = chunk.ReadUInt16(offset + 1)
 		    newOffset = offset + 3
@@ -33,7 +33,7 @@ Protected Class Disassembler
 		  Print(indexCol.JustifyLeft(COL_WIDTH))
 		  
 		  // Print the constant's value.
-		  Print(chunk.Constants(constantIndex) + EndOfLine)
+		  PrintLine(chunk.Constants(constantIndex))
 		  
 		  Return newOffset
 		  
@@ -46,15 +46,15 @@ Protected Class Disassembler
 		  ///
 		  /// If `displayScriptID` is True then the scriptID stored for each byte is also displayed.
 		  
-		  Print("== " + chunkName + " ==" + EndOfLine)
+		  PrintLine("== " + chunkName + " ==")
 		  
 		  Var previousLine, previousScriptID As Integer = -1
 		  Var previousOffset, offset As Integer = 0
 		  While offset < chunk.Length
 		    previousOffset = offset
 		    offset = DisassembleInstruction(previousLine, previousScriptID, chunk, offset, displayScriptID)
-		    previousLine = chunk.Lines(previousOffset)
-		    previousScriptID = chunk.ScriptID(previousOffset)
+		    previousLine = chunk.LineForOffset(previousOffset)
+		    previousScriptID = chunk.ScriptIDForOffset(previousOffset)
 		  Wend
 		  
 		End Sub
@@ -72,8 +72,8 @@ Protected Class Disassembler
 		  
 		  // This instruction's line number. If it's the same as the previous instruction
 		  // *and* from the script then we show a "|" instead.
-		  Var line As Integer = chunk.Lines(offset)
-		  Var scriptID As Integer = chunk.ScriptID(offset)
+		  Var line As Integer = chunk.LineForOffset(offset)
+		  Var scriptID As Integer = chunk.ScriptIDForOffset(offset)
 		  Var lineCol As String
 		  If offset > 0 And line = previousLine And scriptID = previousScriptID Then
 		    lineCol = "|"
@@ -89,17 +89,16 @@ Protected Class Disassembler
 		  End If
 		  
 		  // Print the details about the instruction.
-		  Var instruction As Integer = chunk.Code(offset)
-		  Var opcode As ObjoScript.Opcodes = ObjoScript.Opcodes(instruction)
+		  Var opcode As UInt8 = chunk.Code(offset)
 		  Select Case opcode
-		  Case ObjoScript.Opcodes.Constant, ObjoScript.Opcodes.ConstantLong
+		  Case ObjoScript.VM.OP_CONSTANT, ObjoScript.VM.OP_CONSTANT_LONG
 		    Return ConstantInstruction(opcode, chunk, offset)
 		    
-		  Case ObjoScript.Opcodes.Return_
+		  Case ObjoScript.VM.OP_RETURN
 		    Return SimpleInstruction("RETURN", offset)
 		    
 		  Else
-		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + instruction.ToString + ").")
+		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
 		  
 		End Function
@@ -112,7 +111,7 @@ Protected Class Disassembler
 		  /// Format:
 		  /// OFFSET  LINE  NAME
 		  
-		  Print(instructionName.JustifyLeft(COL_WIDTH) + EndOfLine)
+		  PrintLine(instructionName.JustifyLeft(COL_WIDTH))
 		  
 		  Return offset + 1
 		  
@@ -120,8 +119,12 @@ Protected Class Disassembler
 	#tag EndMethod
 
 
-	#tag Hook, Flags = &h0, Description = 526169736564207768656E657665722074686520646973617373656D626C65722077616E747320746F207072696E74206120737472696E67206F75747075742E20496D706C656D656E74696E672074686973206576656E7420776F756C6420616C6C6F7720796F7520746F2C20666F72206578616D706C652C2072656469726563742074686520646973617373656D626C65722773206F757470757420746F2074686520646562756720636F6E736F6C65206F7220612054657874417265612E
+	#tag Hook, Flags = &h0, Description = 526169736564207768656E657665722074686520646973617373656D626C65722077616E747320746F2061646473206120737472696E6720746F20697473206F75747075742E20417373756D657320746869732077696C6C20626520636F6E636174656E61746564207769746820616E792070726576696F75732063616C6C7320746F20605072696E742829602E
 		Event Print(s As String)
+	#tag EndHook
+
+	#tag Hook, Flags = &h0, Description = 526169736564207768656E657665722074686520646973617373656D626C65722077616E747320746F2061646473206120737472696E6720746F20697473206F757470757420616E64207465726D696E61746520697420776974682061206E65776C696E652E
+		Event PrintLine(s As String)
 	#tag EndHook
 
 

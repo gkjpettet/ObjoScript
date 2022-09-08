@@ -277,12 +277,6 @@ Protected Module ObjoScript
 	#tag EndComputedProperty
 
 
-	#tag Enum, Name = Opcodes, Type = Integer, Flags = &h1, Description = 546865207669727475616C206D616368696E65277320696E737472756374696F6E207365742E
-		Constant
-		  Return_
-		ConstantLong
-	#tag EndEnum
-
 	#tag Enum, Name = TokenTypes, Type = Integer, Flags = &h1
 		Ampersand
 		  And_
