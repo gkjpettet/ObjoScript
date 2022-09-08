@@ -740,7 +740,7 @@ Protected Class Lexer
 		  mTokenStart = 0
 		  mCurrent = 0
 		  mLineNumber = 1
-		  mScriptID = -1
+		  mScriptID = 0
 		  mSource = ""
 		  mUnclosedParenCount = 0
 		  mUnclosedCurlyCount = 0
@@ -843,7 +843,7 @@ Protected Class Lexer
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 54686520286F7074696F6E616C29204944206F6620746865207363726970742063757272656E746C79206265696E67207061727365642E
-		Private mScriptID As Integer = -1
+		Private mScriptID As Integer = 0
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 546865207374616E646172646973656420736F7572636520636F6465206265696E672070726F6365737365642E

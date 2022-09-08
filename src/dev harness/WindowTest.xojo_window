@@ -627,7 +627,6 @@ Begin DesktopWindow WindowTest
       Active          =   False
       AllowAutoDeactivate=   True
       AllowFocus      =   True
-      AllowTabStop    =   True
       BackgroundColor =   &c00000000
       BevelStyle      =   0
       Bold            =   False
@@ -660,6 +659,7 @@ Begin DesktopWindow WindowTest
       Scope           =   2
       TabIndex        =   13
       TabPanelIndex   =   0
+      TabStop         =   True
       TextColor       =   &c00000000
       Tooltip         =   ""
       Top             =   20
@@ -935,21 +935,31 @@ End
 		  
 		  SwitchToPanel(PANEL_DISASSEMBLER_OUTPUT)
 		  
+		  // Synthesise some tokens.
+		  Var tok1 As New ObjoScript.Token(ObjoScript.TokenTypes.EOL, 0, 1, "", 0)
+		  Var tok2 As New ObjoScript.Token(ObjoScript.TokenTypes.EOL, 0, 1, "", 1)
+		  Var tok3 As New ObjoScript.Token(ObjoScript.TokenTypes.EOL, 0, 2, "", 2)
+		  Var tok4 As New ObjoScript.Token(ObjoScript.TokenTypes.EOL, 0, 3, "", 3)
+		  Var tok5 As New ObjoScript.Token(ObjoScript.TokenTypes.EOL, 0, 4, "", 4)
+		  
 		  Var chunk As New ObjoScript.Chunk
-		  chunk.Write(ObjoScript.Opcodes.Constant, 123)
-		  chunk.Write(chunk.AddConstant(1.2), 123)
-		  chunk.Write(ObjoScript.Opcodes.Return_, 123)
-		  chunk.Write(ObjoScript.Opcodes.Constant, 124)
-		  chunk.Write(chunk.AddConstant("Hello world"), 124)
-		  chunk.Write(ObjoScript.Opcodes.Constant, 125)
-		  chunk.Write(chunk.AddConstant("Hello WORLD"), 125)
-		  chunk.Write(ObjoScript.Opcodes.Constant, 126)
-		  chunk.Write(chunk.AddConstant(1.201), 126)
+		  chunk.WriteOpcode(ObjoScript.Opcodes.Constant, tok1)
+		  chunk.WriteUInt8(chunk.AddConstant(1.2), tok1)
+		  chunk.WriteOpcode(ObjoScript.Opcodes.Return_, tok1)
+		  chunk.WriteOpcode(ObjoScript.Opcodes.Constant, tok2)
+		  chunk.WriteUInt8(chunk.AddConstant("Hello world"), tok2)
+		  chunk.WriteOpcode(ObjoScript.Opcodes.Constant, tok3)
+		  chunk.WriteUInt8(chunk.AddConstant("Hello WORLD"), tok3)
+		  chunk.WriteOpcode(ObjoScript.Opcodes.Constant, tok4)
+		  chunk.WriteUInt8(chunk.AddConstant(1.201), tok4)
+		  
+		  chunk.WriteOpcode(ObjoScript.Opcodes.ConstantLong, tok5)
+		  chunk.WriteUInt16(chunk.AddConstant(7), tok5)
 		  
 		  Var disassembler As New ObjoScript.Disassembler
 		  Addhandler disassembler.Print, AddressOf DisassemblerPrintDelegate
 		  
-		  disassembler.Disassemble(chunk, "Test Chunk")
+		  disassembler.Disassemble(chunk, "Test Chunk", True)
 		  
 		End Sub
 	#tag EndEvent

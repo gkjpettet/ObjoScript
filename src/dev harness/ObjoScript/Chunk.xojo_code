@@ -28,27 +28,75 @@ Protected Class Chunk
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 5772697465732061206279746520746F2074686973206368756E6B2E
-		Sub Write(byte As Integer, lineNumber As Integer)
-		  /// Writes a byte to this chunk.
+	#tag Method, Flags = &h0, Description = 526561647320616E20756E7369676E65642031362D62697420696E746567657220626567696E6E696E6720617420606F6666736574602066726F6D2074686973206368756E6B27732062797465636F64652E
+		Function ReadUInt16(offset As Integer) As UInt16
+		  /// Reads an unsigned 16-bit integer beginning at `offset` from this chunk's bytecode.
+		  ///
+		  /// Data is stored in big endian format (most significant byte first).
+		  /// uint16 = (msb * 256) + lsb
 		  
-		  Code.Add(byte)
-		  Lines.Add(lineNumber)
+		  Return (Code(offset) * 256) + Code(offset + 1)
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 526561647320616E20756E7369676E6564206279746520696E746567657220626567696E6E696E6720617420606F6666736574602066726F6D2074686973206368756E6B27732062797465636F64652E
+		Function ReadUInt8(offset As Integer) As UInt8
+		  /// Reads an unsigned byte integer beginning at `offset` from this chunk's bytecode.
+		  
+		  Return Code(offset)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 57726974657320616E206F70636F646520746F2074686973206368756E6B2E
+		Sub WriteOpcode(opcode As ObjoScript.Opcodes, token As ObjoScript.Token)
+		  /// Writes an opcode to this chunk.
+		  ///
+		  /// The opcode is cast to an Integer but is actually stored as a UInt8.
+		  
+		  Code.Add(Integer(opcode))
+		  Lines.Add(token.LineNumber)
+		  ScriptID.Add(token.ScriptID)
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 57726974657320616E206F70636F64652028617320616E20696E74656765722920746F2074686973206368756E6B2E
-		Sub Write(opcode As ObjoScript.Opcodes, lineNumber As Integer)
-		  /// Writes an opcode (as an integer) to this chunk.
+	#tag Method, Flags = &h0, Description = 57726974657320616E20756E7369676E65642031362D62697420696E746567657220746F2074686973206368756E6B27732062797465636F646520617272617920617420606C696E654E756D626572602E
+		Sub WriteUInt16(i16 As UInt16, token As ObjoScript.Token)
+		  /// Writes an unsigned 16-bit integer to this chunk's bytecode array.
+		  ///
+		  /// The integer is written in big endian format (most significant byte first).
+		  /// `token` is the parser token that generated this byte of data.
+		  /// Write the high byte, then the low byte.
+		  /// Taken from: https://ifnotnil.com/t/converting-a-uint16-to-two-uint8s/278/8?u=garry
 		  
-		  Code.Add(Integer(opcode))
-		  Lines.Add(lineNumber)
+		  Var msb As UInt8 = i16 / 256
+		  Var lsb As UInt8 = i16
+		  Code.Add(msb)
+		  Code.Add(lsb)
+		  
+		  // Write twice as we're writing two bytes.
+		  Lines.Add(token.LineNumber)
+		  Lines.Add(token.LineNumber)
+		  ScriptID.Add(token.ScriptID)
+		  ScriptID.Add(token.ScriptID)
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5772697465732061206279746520746F2074686973206368756E6B2E
+		Sub WriteUInt8(i8 As UInt8, token As ObjoScript.Token)
+		  /// Writes a byte to this chunk.
+		  ///
+		  /// `token` is the parser token that generated this byte of data.
+		  
+		  Code.Add(i8)
+		  Lines.Add(token.LineNumber)
+		  ScriptID.Add(token.ScriptID)
 		End Sub
 	#tag EndMethod
 
 
 	#tag Property, Flags = &h0, Description = 54686973206368756E6B2773207261772062797465636F64652E
-		Code() As Integer
+		Code() As UInt8
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 54686973206368756E6B277320737472696E6720616E64206E756D6572696320636F6E7374616E74732E
@@ -65,7 +113,11 @@ Protected Class Chunk
 	#tag EndComputedProperty
 
 	#tag Property, Flags = &h0, Description = 53746F72657320746865206C696E65206E756D62657220666F722074686520636F72726573706F6E64696E67206279746520696E2060436F64652829602E20
-		Lines() As Integer
+		Lines() As UInt32
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 53746F726573207468652073637269707420494420666F722074686520636F72726573706F6E64696E67206279746520696E2060436F64652829602E2044656661756C747320746F206030602E
+		ScriptID() As UInt16
 	#tag EndProperty
 
 
