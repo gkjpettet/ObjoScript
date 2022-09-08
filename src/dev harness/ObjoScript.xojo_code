@@ -31,6 +31,22 @@ Protected Module ObjoScript
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 54727565206966207468697320697320616E20696E7465676572206F72206120646F75626C652E
+		Function IsNumber(Extends v As Variant) As Boolean
+		  /// True if this is an integer or a double.
+		  
+		  If v = Nil Then Return False
+		  
+		  Select Case v.Type
+		  Case Variant.TypeInteger, Variant.TypeDouble
+		    Return True
+		  Else
+		    Return False
+		  End Select
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F66207468697320746F6B656E20747970652E
 		Function ToString(Extends t As ObjoScript.TokenTypes) As String
 		  /// Returns a string representation of this token type.

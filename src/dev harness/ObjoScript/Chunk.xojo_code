@@ -1,7 +1,7 @@
 #tag Class
 Protected Class Chunk
 	#tag Method, Flags = &h0, Description = 416464732061206E756D6572696320636F6E7374616E7420746F2074686520636F6E7374616E74207461626C652E2052657475726E732074686520696E64657820696E20746865207461626C65206F6620746865206E65776C7920616464656420636F6E7374616E742E
-		Function AddConstant(v As ObjoScript.Value) As Integer
+		Function AddConstant(v As Variant) As Integer
 		  /// Adds a constant to the constant table.
 		  /// Returns the index in the table of the newly added constant.
 		  ///

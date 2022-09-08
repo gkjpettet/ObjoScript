@@ -33,7 +33,12 @@ Protected Class Disassembler
 		  Print(indexCol.JustifyLeft(COL_WIDTH))
 		  
 		  // Print the constant's value.
-		  PrintLine(chunk.Constants(constantIndex).ToString)
+		  Var constant As Variant = chunk.Constants(constantIndex)
+		  If constant IsA ObjoScript.Value Then
+		    PrintLine(ObjoScript.Value(constant).ToString)
+		  Else
+		    PrintLine(constant.StringValue)
+		  End If
 		  
 		  Return newOffset
 		  
@@ -96,6 +101,9 @@ Protected Class Disassembler
 		    
 		  Case ObjoScript.VM.OP_RETURN
 		    Return SimpleInstruction("RETURN", offset)
+		    
+		  Case ObjoScript.VM.OP_NEGATE
+		    Return SimpleInstruction("NEGATE", offset)
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")

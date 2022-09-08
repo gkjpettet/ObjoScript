@@ -1,10 +1,15 @@
 #tag Class
 Protected Class ValueSet
 	#tag Method, Flags = &h0, Description = 416464732060736020746F20746865207365742E2052657475726E732074686520696E64657820696E2074686520736574207468617420607360206F636375706965732E
-		Function Add(v As ObjoScript.Value) As Integer
+		Function Add(v As Variant) As Integer
 		  /// Adds `v` to the set. Returns the index in the set that `v` occupies.  
 		  
-		  Var hash As Integer = v.Hash
+		  Var hash As Integer
+		  If v IsA ObjoScript.Value Then
+		    hash = ObjoScript.Value(v).Hash
+		  Else
+		    hash = v.Hash
+		  End If
 		  
 		  If mLookupTable.HasKey(hash) Then
 		    // Already in the set. Return the index.
@@ -27,24 +32,33 @@ Protected Class ValueSet
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 52657475726E73206054727565602069662060766020697320696E2074686973207365742E
-		Function Contains(v As ObjoScript.Value) As Boolean
+		Function Contains(v As Variant) As Boolean
 		  /// Returns `True` if `v` is in this set.
 		  
-		  Return mLookupTable.HasKey(v.Hash)
+		  If v IsA ObjoScript.Value Then
+		    Return mLookupTable.HasKey(ObjoScript.Value(v).Hash)
+		  Else
+		    Return mLookupTable.HasKey(v.Hash)
+		  End If
+		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 52657475726E732074686520696E64657820696E2074686520736574206F6620607660206F7220602D316020696620607660206973206E6F7420696E20746865207365742E
-		Function IndexOf(v As ObjoScript.Value) As Integer
+		Function IndexOf(v As Variant) As Integer
 		  /// Returns the index in the set of `v` or `-1` if `v` is not in the set.
 		  
-		  Return mLookupTable.Lookup(v.Hash, -1)
+		  If v IsA ObjoScript.Value Then
+		    Return mLookupTable.Lookup(ObjoScript.Value(v).Hash, -1)
+		  Else
+		    Return mLookupTable.Lookup(v.Hash, -1)
+		  End If
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 52657475726E732074686520656C656D656E742061742060696E646578602E204D617920726169736520616E20604F75744F66426F756E6473457863657074696F6E602E
-		Function Operator_Subscript(index As Integer) As ObjoScript.Value
+		Function Operator_Subscript(index As Integer) As Variant
 		  /// Returns the element at `index`. May raise an `OutOfBoundsException`.
 		  
 		  Return mItems(index)
@@ -64,19 +78,28 @@ Protected Class ValueSet
 		  Var item As Variant
 		  For i As Integer = 0 To iLimit
 		    item = mItems(i)
-		    mLookupTable.Value(item.Hash) = i
+		    If item IsA ObjoScript.Value Then
+		      mLookupTable.Value(ObjoScript.Value(item).Hash) = i
+		    Else
+		      mLookupTable.Value(item.Hash) = i
+		    End If
 		  Next i
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 52656D6F766573206076602066726F6D20746865207365742E2052657475726E7320605472756560206966206076602077617320696E2074686520736574206F72206046616C73656020696620697420776173206E6F742E
-		Function Remove(v As ObjoScript.Value) As Boolean
+		Function Remove(v As Variant) As Boolean
 		  /// Removes `v` from the set. Returns `True` if `v` was in the set or `False` if it was not.
 		  ///
 		  /// If `v` was removed, there is a performance penalty as we have to re-index the `mItems` array for the lookup table.
 		  
-		  Var hash As Integer = v.Hash
+		  Var hash As Integer
+		  If v IsA ObjoScript.Value Then
+		    hash = ObjoScript.Value(v).Hash
+		  Else
+		    hash = v.Hash
+		  End If
 		  
 		  If Not mLookupTable.HasKey(hash) Then
 		    Return False
@@ -100,7 +123,7 @@ Protected Class ValueSet
 
 
 	#tag Property, Flags = &h21, Description = 546865206172726179206F662076616C7565732E
-		Private mItems() As ObjoScript.Value
+		Private mItems() As Variant
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 4B6579203D206076616C75652068617368602C2056616C7565203D20496E64657820696E20606D4974656D7360206F66206076616C7565602E
