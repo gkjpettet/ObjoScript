@@ -959,10 +959,21 @@ End
 		  SwitchToPanel(PANEL_DISASSEMBLER_OUTPUT)
 		  
 		  // Create a test chunk.
-		  Var tok1 As New ObjoScript.Token(ObjoScript.TokenTypes.EOL, 0, 123, "", 0)
+		  // -((2 + 4) / 3)
+		  Var tok1 As New ObjoScript.Token(ObjoScript.TokenTypes.EOL, 0, 1, "", 0)
 		  Var chunk As New ObjoScript.Chunk
 		  chunk.WriteByte(ObjoScript.VM.OP_CONSTANT, tok1)
-		  chunk.WriteByte(chunk.AddConstant(1.2), tok1)
+		  chunk.WriteByte(chunk.AddConstant(CType(2, Double)), tok1)
+		  chunk.WriteByte(ObjoScript.VM.OP_CONSTANT, tok1)
+		  chunk.WriteByte(chunk.AddConstant(CType(4, Double)), tok1)
+		  
+		  chunk.WriteByte(ObjoScript.VM.OP_ADD, tok1)
+		  
+		  chunk.WriteByte(ObjoScript.VM.OP_CONSTANT, tok1)
+		  chunk.WriteByte(chunk.AddConstant(CType(3, Double)), tok1)
+		  
+		  chunk.WriteByte(ObjoScript.VM.OP_DIVIDE, tok1)
+		  
 		  chunk.WriteByte(ObjoScript.VM.OP_NEGATE, tok1)
 		  chunk.WriteByte(ObjoScript.VM.OP_RETURN, tok1)
 		  

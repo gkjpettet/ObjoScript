@@ -105,6 +105,21 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_NEGATE
 		    Return SimpleInstruction("NEGATE", offset)
 		    
+		  Case ObjoScript.VM.OP_ADD
+		    Return SimpleInstruction("ADD", offset)
+		    
+		  Case ObjoScript.VM.OP_SUBTRACT
+		    Return SimpleInstruction("SUBTRACT", offset)
+		    
+		  Case ObjoScript.VM.OP_DIVIDE
+		    Return SimpleInstruction("DIVIDE", offset)
+		    
+		  Case ObjoScript.VM.OP_MULTIPLY
+		    Return SimpleInstruction("MULTIPLY", offset)
+		    
+		  Case ObjoScript.VM.OP_MODULO
+		    Return SimpleInstruction("MODULO", offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select

@@ -1,5 +1,16 @@
 #tag Class
 Protected Class VM
+	#tag Method, Flags = &h21, Description = 4173736572747320746861742060616020616E64206062602061726520626F746820646F75626C65732C206F74686572776973652072616973657320612072756E74696D65206572726F722E
+		Private Sub AssertNumbers(a As Variant, b As Variant)
+		  /// Asserts that `a` and `b` are both doubles, otherwise raises a runtime error.
+		  
+		  If a.Type <> Variant.TypeDouble Or b.Type <> Variant.TypeDouble Then
+		    RuntimeError("Both operands must be numbers.")
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Sub Constructor()
 		  Disassembler = New ObjoScript.Disassembler
@@ -38,17 +49,6 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 526169736573206120564D457863657074696F6E206174207468652063757272656E742049502028756E6C657373206F746865727769736520737065636966696564292E
-		Private Sub Error(message As String, offset As Integer = -1)
-		  /// Raises a VMException at the current IP (unless otherwise specified).
-		  
-		  // Default to the current IP if no offset is provided.
-		  offset = If(offset = -1, IP, offset)
-		  
-		  Raise New ObjoScript.VMException(message, Chunk.LineForOffset(offset), Chunk.ScriptIDForOffset(offset))
-		End Sub
-	#tag EndMethod
-
 	#tag Method, Flags = &h0
 		Sub Interpret(chunk As ObjoScript.Chunk)
 		  Self.Chunk = chunk
@@ -58,9 +58,9 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52657475726E73207468652076616C7565206064697374616E6365602066726F6D2074686520746F70206F662074686520737461636B2E20412076616C7565206F662060306020776F756C642072657475726E2074686520746F70206974656D2E
+	#tag Method, Flags = &h21, Description = 52657475726E73207468652076616C7565206064697374616E6365602066726F6D2074686520746F70206F662074686520737461636B2E204C6561766573207468652076616C7565206F6E2074686520737461636B2E20412076616C7565206F662060306020776F756C642072657475726E2074686520746F70206974656D2E
 		Private Function Peek(distance As Integer) As Variant
-		  /// Returns the value `distance` from the top of the stack. A value of `0` would return the top item.
+		  /// Returns the value `distance` from the top of the stack. Leaves the value on the stack. A value of `0` would return the top item.
 		  
 		  Return Stack(StackTop - distance - 1)
 		End Function
@@ -172,17 +172,57 @@ Protected Class VM
 		      Push(constant)
 		      
 		    Case OP_NEGATE
-		      // Pop the value, negate it and then push it back.
-		      If Not Peek(0).IsNumber Then
-		        Error("Operand must be a number.")
+		      If Peek(0).Type <> Variant.TypeDouble Then
+		        RuntimeError("Operand must be a number.")
 		      End If
-		      Push(-Pop.DoubleValue)
+		      // In this instruction, the answer replaces what's currently at the top of the stack.
+		      // Rather than pop, negate then push we'll do it in situ as it's ~6x faster.
+		      Stack(StackTop - 1) = -Stack(StackTop - 1).DoubleValue
 		      
-		    Else
-		      Error("Unknown opcode.", IP - 1)
+		    Case OP_ADD
+		      Var b As Variant = Pop
+		      Var a As Variant = Pop
+		      AssertNumbers(a, b)
+		      Push(a.DoubleValue + b.DoubleValue)
+		      
+		    Case OP_SUBTRACT
+		      Var b As Variant = Pop
+		      Var a As Variant = Pop
+		      AssertNumbers(a, b)
+		      Push(a.DoubleValue - b.DoubleValue)
+		      
+		    Case OP_DIVIDE
+		      Var b As Variant = Pop
+		      Var a As Variant = Pop
+		      AssertNumbers(a, b)
+		      Push(a.DoubleValue / b.DoubleValue)
+		      
+		    Case OP_MULTIPLY
+		      Var b As Variant = Pop
+		      Var a As Variant = Pop
+		      AssertNumbers(a, b)
+		      Push(a.DoubleValue * b.DoubleValue)
+		      
+		    Case OP_MODULO
+		      Var b As Variant = Pop
+		      Var a As Variant = Pop
+		      AssertNumbers(a, b)
+		      Push(a.DoubleValue Mod b.DoubleValue)
+		      
 		    End Select
 		  Wend
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 526169736573206120564D457863657074696F6E206174207468652063757272656E742049502028756E6C657373206F746865727769736520737065636966696564292E
+		Private Sub RuntimeError(message As String, offset As Integer = -1)
+		  /// Raises a VMException at the current IP (unless otherwise specified).
+		  
+		  // Default to the current IP if no offset is provided.
+		  offset = If(offset = -1, IP, offset)
+		  
+		  Raise New ObjoScript.VMException(message, Chunk.LineForOffset(offset), Chunk.ScriptIDForOffset(offset))
 		End Sub
 	#tag EndMethod
 
@@ -212,16 +252,31 @@ Protected Class VM
 	#tag EndProperty
 
 
+	#tag Constant, Name = OP_ADD, Type = Double, Dynamic = False, Default = \"4", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = OP_CONSTANT, Type = Double, Dynamic = False, Default = \"1", Scope = Public, Description = 5468652061646420636F6E7374616E74206F70636F64652E
 	#tag EndConstant
 
 	#tag Constant, Name = OP_CONSTANT_LONG, Type = Double, Dynamic = False, Default = \"2", Scope = Public, Description = 5468652061646420636F6E7374616E74202831362D62697429206F70636F64652E
 	#tag EndConstant
 
+	#tag Constant, Name = OP_DIVIDE, Type = Double, Dynamic = False, Default = \"6", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_MODULO, Type = Double, Dynamic = False, Default = \"8", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_MULTIPLY, Type = Double, Dynamic = False, Default = \"7", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = OP_NEGATE, Type = Double, Dynamic = False, Default = \"3", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_RETURN, Type = Double, Dynamic = False, Default = \"0", Scope = Public, Description = 5468652072657475726E206F70636F64652E
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SUBTRACT, Type = Double, Dynamic = False, Default = \"5", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = STACK_MAX, Type = Double, Dynamic = False, Default = \"255", Scope = Public, Description = 54686520757070657220626F756E6473206F662074686520737461636B2E
