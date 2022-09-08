@@ -87,8 +87,8 @@ Implements ObjoScript.InfixParselet
 			Name="RightAssociative"
 			Visible=false
 			Group="Behavior"
-			InitialValue=""
-			Type="Integer"
+			InitialValue="False"
+			Type="Boolean"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

@@ -67,7 +67,7 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 5265616473206120636F6E7374616E742066726F6D20746865206368756E6B277320636F6E7374616E7420706F6F6C207573696E6720612073696E676C652062797465206F706572616E642E20496E6372656D656E74732049502E
-		Private Function ReadConstant() As Variant
+		Private Function ReadConstant() As ObjoScript.Value
 		  /// Reads a constant from the chunk's constant pool using a single byte operand. Increments IP.
 		  
 		  // The bytecode at `IP` gives us the index in the constant pool.
@@ -78,7 +78,7 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 5265616473206120636F6E7374616E742066726F6D20746865206368756E6B277320636F6E7374616E7420706F6F6C207573696E672074776F2062797465206F706572616E64732E20496E6372656D656E74732049502E
-		Private Function ReadConstantLong() As Variant
+		Private Function ReadConstantLong() As ObjoScript.Value
 		  /// Reads a constant from the chunk's constant pool using two byte operands. Increments IP.
 		  
 		  // The bytecode at `IP` gives us the index in the constant pool.
@@ -101,6 +101,7 @@ Protected Class VM
 	#tag Method, Flags = &h21
 		Private Sub Run()
 		  While True
+		    // Disassemble each instruction if requested.
 		    #If DebugBuild And TRACE_EXECUTION
 		      Call mDisassembler.DisassembleInstruction(-1, -1, Chunk, IP)
 		    #EndIf
@@ -110,17 +111,18 @@ Protected Class VM
 		      Return
 		      
 		    Case OP_CONSTANT
-		      Var constant As Variant = ReadConstant
-		      System.DebugLog(constant.StringValue)
+		      Var constant As ObjoScript.Value = ReadConstant
+		      System.DebugLog(constant.ToString)
 		      
 		    Case OP_CONSTANT_LONG
-		      Var constant As Variant = ReadConstantLong
-		      System.DebugLog(constant.StringValue)
+		      Var constant As ObjoScript.Value = ReadConstantLong
+		      System.DebugLog(constant.ToString)
 		      
 		    Else
 		      Error("Unknown opcode.", IP - 1)
 		    End Select
 		  Wend
+		  
 		End Sub
 	#tag EndMethod
 

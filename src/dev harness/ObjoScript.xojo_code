@@ -1,5 +1,36 @@
 #tag Module
 Protected Module ObjoScript
+	#tag Method, Flags = &h0, Description = 52657475726E73207468652068617368206F66207468697320646F75626C652E
+		Function Hash(Extends d As Double) As Integer
+		  /// Returns the hash of this double.
+		  
+		  Var v As Variant = d
+		  Return v.Hash
+		  
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 52657475726E73207468652068617368206F66207468697320696E74656765722E
+		Function Hash(Extends i As Integer) As Integer
+		  /// Returns the hash of this integer.
+		  
+		  Var v As Variant = i
+		  Return v.Hash
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 52657475726E73207468652068617368206F66207468697320737472696E672E
+		Function Hash(Extends s As String) As Integer
+		  /// Returns the hash of this string.
+		  
+		  Var v As Variant = s
+		  Return v.Hash
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F66207468697320746F6B656E20747970652E
 		Function ToString(Extends t As ObjoScript.TokenTypes) As String
 		  /// Returns a string representation of this token type.

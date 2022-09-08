@@ -681,6 +681,7 @@ End
 		Sub Opening()
 		  Reset
 		  SwitchToPanel(PANEL_AST)
+		  
 		End Sub
 	#tag EndEvent
 
@@ -961,7 +962,7 @@ End
 		  Var tok1 As New ObjoScript.Token(ObjoScript.TokenTypes.EOL, 0, 123, "", 0)
 		  Var chunk As New ObjoScript.Chunk
 		  chunk.WriteByte(ObjoScript.VM.OP_CONSTANT, tok1)
-		  chunk.WriteByte(chunk.AddConstant(1.2), tok1)
+		  chunk.WriteByte(chunk.AddConstant(New ObjoScript.Value(1.2)), tok1)
 		  chunk.WriteByte(ObjoScript.VM.OP_RETURN, tok1)
 		  
 		  // Disassemble it.

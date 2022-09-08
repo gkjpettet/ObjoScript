@@ -33,7 +33,7 @@ Protected Class Disassembler
 		  Print(indexCol.JustifyLeft(COL_WIDTH))
 		  
 		  // Print the constant's value.
-		  PrintLine(chunk.Constants(constantIndex))
+		  PrintLine(chunk.Constants(constantIndex).ToString)
 		  
 		  Return newOffset
 		  

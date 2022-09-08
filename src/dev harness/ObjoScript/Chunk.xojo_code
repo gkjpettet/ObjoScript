@@ -1,24 +1,13 @@
 #tag Class
 Protected Class Chunk
 	#tag Method, Flags = &h0, Description = 416464732061206E756D6572696320636F6E7374616E7420746F2074686520636F6E7374616E74207461626C652E2052657475726E732074686520696E64657820696E20746865207461626C65206F6620746865206E65776C7920616464656420636F6E7374616E742E
-		Function AddConstant(d As Double) As Integer
-		  /// Adds a numeric constant to the constant table.
+		Function AddConstant(v As ObjoScript.Value) As Integer
+		  /// Adds a constant to the constant table.
 		  /// Returns the index in the table of the newly added constant.
 		  ///
 		  /// Note that indexes are reused if the passed-in constant already exists in the table.
 		  
-		  Return Constants.Add(d)
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = 41646473206120737472696E6720636F6E7374616E7420746F2074686520636F6E7374616E74207461626C652E2052657475726E732074686520696E64657820696E20746865207461626C65206F6620746865206E65776C7920616464656420636F6E7374616E742E
-		Function AddConstant(s As String) As Integer
-		  /// Adds a string constant to the constant table.
-		  /// Returns the index in the table of the newly added constant.
-		  ///
-		  /// Note that indexes are reused if the passed-in constant already exists in the table.
-		  
-		  Return Constants.Add(s)
+		  Return Constants.Add(v)
 		End Function
 	#tag EndMethod
 
@@ -109,7 +98,7 @@ Protected Class Chunk
 		Code() As UInt8
 	#tag EndProperty
 
-	#tag Property, Flags = &h0, Description = 54686973206368756E6B277320737472696E6720616E64206E756D6572696320636F6E7374616E74732E
+	#tag Property, Flags = &h0, Description = 54686973206368756E6B277320636F6E7374616E74732E
 		Constants As ObjoScript.ValueSet
 	#tag EndProperty
 
