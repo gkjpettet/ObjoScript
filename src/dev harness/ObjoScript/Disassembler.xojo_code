@@ -120,6 +120,27 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_MODULO
 		    Return SimpleInstruction("MODULO", offset)
 		    
+		  Case ObjoScript.VM.OP_NOT
+		    Return SimpleInstruction("NOT", offset)
+		    
+		  Case ObjoScript.VM.OP_EQUAL
+		    Return SimpleInstruction("EQUAL", offset)
+		    
+		  Case ObjoScript.VM.OP_NOT_EQUAL
+		    Return SimpleInstruction("NOT_EQUAL", offset)
+		    
+		  Case ObjoScript.VM.OP_LESS
+		    Return SimpleInstruction("LESS", offset)
+		    
+		  Case ObjoScript.VM.OP_LESS_EQUAL
+		    Return SimpleInstruction("LESS_EQUAL", offset)
+		    
+		  Case ObjoScript.VM.OP_GREATER
+		    Return SimpleInstruction("GREATER", offset)
+		    
+		  Case ObjoScript.VM.OP_GREATER_EQUAL
+		    Return SimpleInstruction("GREATER_EQUAL", offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select

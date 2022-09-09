@@ -11,6 +11,19 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 52616973657320612072756E74696D65206572726F722069662060616020616E642060626020617265206E6F74207468652073616D6520747970652E
+		Private Sub AssertSameType(a As Variant, b As Variant)
+		  /// Raises a runtime error if `a` and `b` are not the same type.
+		  ///
+		  /// Assumes neither `a` or `b` are Nil.
+		  
+		  If a.Type <> b.Type Then
+		    RuntimeError("Both operands must be the same type.")
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Sub Constructor()
 		  Disassembler = New ObjoScript.Disassembler
@@ -56,6 +69,18 @@ Protected Class VM
 		  Run
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060766020697320636F6E73696465726564202266616C736579222E
+		Private Function IsFalsey(v As Variant) As Boolean
+		  /// Returns True if `v` is considered "falsey".
+		  ///
+		  /// Objo considers the boolean value `false` and the Objo value `nothing` to
+		  /// be False, everything else is True.
+		  
+		  Return (v.Type = Variant.TypeBoolean And v = False) Or v IsA ObjoScript.Nothing
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 52657475726E73207468652076616C7565206064697374616E6365602066726F6D2074686520746F70206F662074686520737461636B2E204C6561766573207468652076616C7565206F6E2074686520737461636B2E20412076616C7565206F662060306020776F756C642072657475726E2074686520746F70206974656D2E
@@ -209,6 +234,45 @@ Protected Class VM
 		      AssertNumbers(a, b)
 		      Push(a.DoubleValue Mod b.DoubleValue)
 		      
+		    Case OP_NOT
+		      // Since unary operators don't change the stack and operate on the top of the stack, we'll 
+		      // simply do the operation in situ as it's faster than pop-pushing.
+		      Stack(StackTop - 1) = IsFalsey(Stack(StackTop - 1))
+		      
+		    Case OP_EQUAL
+		      Var b As Variant = Pop
+		      Var a As Variant = Pop
+		      Push(ValuesEqual(a, b))
+		      
+		    Case OP_NOT_EQUAL
+		      Var b As Variant = Pop
+		      Var a As Variant = Pop
+		      Push(Not ValuesEqual(a, b))
+		      
+		    Case OP_GREATER
+		      Var b As Variant
+		      Var a As Variant
+		      AssertNumbers(a, b)
+		      Push(a > b)
+		      
+		    Case OP_GREATER_EQUAL
+		      Var b As Variant
+		      Var a As Variant
+		      AssertNumbers(a, b)
+		      Push(a >= b)
+		      
+		    Case OP_LESS
+		      Var b As Variant
+		      Var a As Variant
+		      AssertNumbers(a, b)
+		      Push(a < b)
+		      
+		    Case OP_LESS_EQUAL
+		      Var b As Variant
+		      Var a As Variant
+		      AssertNumbers(a, b)
+		      Push(a <= b)
+		      
 		    End Select
 		  Wend
 		  
@@ -224,6 +288,30 @@ Protected Class VM
 		  
 		  Raise New ObjoScript.VMException(message, Chunk.LineForOffset(offset), Chunk.ScriptIDForOffset(offset))
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 547275652069662076616C7565732060616020616E64206062602061726520636F6E7369646572656420657175616C2062792074686520564D2E
+		Private Function ValuesEqual(a As Variant, b As Variant) As Boolean
+		  /// True if values `a` and `b` are considered equal by the VM.
+		  ///
+		  /// Assumes neither `a` or `b` are Nil.
+		  
+		  #Pragma Warning "TODO: Handle strings"
+		  
+		  If a.Type <> b.Type Then Return False
+		  
+		  Select Case a.Type
+		  Case Variant.TypeDouble, Variant.TypeBoolean
+		    Return a = b
+		    
+		  Else
+		    If a IsA ObjoScript.Nothing And b IsA ObjoScript.Nothing Then
+		      Return True
+		    End If
+		    
+		    RuntimeError("Unexpected value type.")
+		  End Select
+		End Function
 	#tag EndMethod
 
 
@@ -264,6 +352,21 @@ Protected Class VM
 	#tag Constant, Name = OP_DIVIDE, Type = Double, Dynamic = False, Default = \"6", Scope = Public
 	#tag EndConstant
 
+	#tag Constant, Name = OP_EQUAL, Type = Double, Dynamic = False, Default = \"10", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_GREATER, Type = Double, Dynamic = False, Default = \"11", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_GREATER_EQUAL, Type = Double, Dynamic = False, Default = \"14", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_LESS, Type = Double, Dynamic = False, Default = \"12", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_LESS_EQUAL, Type = Double, Dynamic = False, Default = \"13", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = OP_MODULO, Type = Double, Dynamic = False, Default = \"8", Scope = Public
 	#tag EndConstant
 
@@ -271,6 +374,12 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_NEGATE, Type = Double, Dynamic = False, Default = \"3", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_NOT, Type = Double, Dynamic = False, Default = \"9", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_NOT_EQUAL, Type = Double, Dynamic = False, Default = \"15", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_RETURN, Type = Double, Dynamic = False, Default = \"0", Scope = Public, Description = 5468652072657475726E206F70636F64652E

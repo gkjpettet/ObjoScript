@@ -43,6 +43,7 @@ Class=VM;ObjoScript/VM.xojo_code;&h0000000009907FFF;&h000000004D1497FF;false
 Class=VMException;ObjoScript/VMException.xojo_code;&h000000000F7BBFFF;&h000000004D1497FF;false
 Class=Value;ObjoScript/Value.xojo_code;&h00000000192B67FF;&h000000004D1497FF;false
 Interface=Comparable;ObjoScript/Comparable.xojo_code;&h000000002F0047FF;&h000000004D1497FF;false
+Class=Nothing;ObjoScript/Nothing.xojo_code;&h00000000075B57FF;&h000000004D1497FF;false
 DefaultWindow=WindowTest
 AppMenuBar=MainMenuBar
 MajorVersion=1
