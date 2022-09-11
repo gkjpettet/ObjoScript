@@ -1,11 +1,11 @@
 #tag Class
-Protected Class PrintStmt
+Protected Class AssertStmt
 Implements ObjoScript.Stmt
 	#tag Method, Flags = &h0, Description = 50617274206F66207468652053746D7456697369746F7220696E746572666163652E
 		Function Accept(visitor As ObjoScript.StmtVisitor) As Variant
 		  /// Part of the StmtVisitor interface.
 		  
-		  Return visitor.VisitPrintStmt(Self)
+		  Return visitor.VisitAssertStmt(Self)
 		End Function
 	#tag EndMethod
 
@@ -16,9 +16,9 @@ Implements ObjoScript.Stmt
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 546865206C6F636174696F6E206F662074686520607072696E7460206B6579776F72642E
+	#tag Method, Flags = &h0, Description = 546865206C6F636174696F6E206F6620746865206061737365727460206B6579776F72642E
 		Function Location() As ObjoScript.Token
-		  /// The location of the `print` keyword.
+		  /// The location of the `assert` keyword.
 		  ///
 		  /// Part of the ObjoScript.Stmt interface.
 		  
@@ -27,11 +27,11 @@ Implements ObjoScript.Stmt
 	#tag EndMethod
 
 
-	#tag Property, Flags = &h0, Description = 5468652065787072657373696F6E20746F207072696E742E
+	#tag Property, Flags = &h0, Description = 5468652065787072657373696F6E20746F2061737365727420697320547275652E
 		Expression As ObjoScript.Expr
 	#tag EndProperty
 
-	#tag Property, Flags = &h21, Description = 546865206C6F636174696F6E206F662074686520607072696E7460206B6579776F72642E
+	#tag Property, Flags = &h21, Description = 546865206C6F636174696F6E206F6620746865206061737365727460206B6579776F72642E
 		Private mLocation As ObjoScript.Token
 	#tag EndProperty
 

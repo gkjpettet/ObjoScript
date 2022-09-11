@@ -48,6 +48,7 @@ Class=Compiler;ObjoScript/Compiler.xojo_code;&h000000001007A7FF;&h000000004D1497
 Class=CompilerException;ObjoScript/CompilerException.xojo_code;&h0000000061621FFF;&h000000004D1497FF;false
 Class=StopWatch;ObjoScript/StopWatch.xojo_code;&h0000000060BE97FF;&h000000004D1497FF;false
 Class=PrintStmt;ObjoScript/PrintStmt.xojo_code;&h0000000025F967FF;&h000000004D1497FF;false
+Class=AssertStmt;ObjoScript/AssertStmt.xojo_code;&h000000003735DFFF;&h000000004D1497FF;false
 DefaultWindow=WindowTest
 AppMenuBar=MainMenuBar
 MajorVersion=1

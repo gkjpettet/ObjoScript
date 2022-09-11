@@ -145,7 +145,7 @@ Begin DesktopWindow WindowTest
       LockLeft        =   True
       LockRight       =   True
       LockTop         =   True
-      PanelCount      =   4
+      PanelCount      =   5
       Panels          =   ""
       Scope           =   2
       SelectedPanelIndex=   0
@@ -155,7 +155,7 @@ Begin DesktopWindow WindowTest
       Tooltip         =   ""
       Top             =   54
       Transparent     =   False
-      Value           =   3
+      Value           =   4
       Visible         =   True
       Width           =   617
       Begin DesktopListBox TokensListbox
@@ -314,10 +314,58 @@ Begin DesktopWindow WindowTest
          _ScrollOffset   =   0
          _ScrollWidth    =   -1
       End
-      Begin SimpleTextArea Output
+      Begin DesktopTextArea Output
          AllowAutoDeactivate=   True
          AllowFocusRing  =   False
-         AllowSpellChecking=   False
+         AllowSpellChecking=   True
+         AllowStyledText =   True
+         AllowTabs       =   False
+         BackgroundColor =   &cFFFFFF
+         Bold            =   False
+         Enabled         =   True
+         FontName        =   "System"
+         FontSize        =   0.0
+         FontUnit        =   0
+         Format          =   ""
+         HasBorder       =   True
+         HasHorizontalScrollbar=   False
+         HasVerticalScrollbar=   True
+         Height          =   601
+         HideSelection   =   True
+         Index           =   -2147483648
+         InitialParent   =   "Panel"
+         Italic          =   False
+         Left            =   635
+         LineHeight      =   0.0
+         LineSpacing     =   1.0
+         LockBottom      =   True
+         LockedInPosition=   False
+         LockLeft        =   True
+         LockRight       =   True
+         LockTop         =   True
+         MaximumCharactersAllowed=   0
+         Multiline       =   True
+         ReadOnly        =   True
+         Scope           =   2
+         TabIndex        =   0
+         TabPanelIndex   =   5
+         TabStop         =   True
+         Text            =   ""
+         TextAlignment   =   0
+         TextColor       =   &c000000
+         Tooltip         =   ""
+         Top             =   54
+         Transparent     =   False
+         Underline       =   False
+         UnicodeMode     =   1
+         ValidationMask  =   ""
+         Visible         =   True
+         Width           =   617
+      End
+      Begin DesktopTextArea DisassemblerOutput
+         AllowAutoDeactivate=   True
+         AllowFocusRing  =   False
+         AllowSpellChecking=   True
          AllowStyledText =   True
          AllowTabs       =   False
          BackgroundColor =   &cFFFFFF
@@ -357,58 +405,10 @@ Begin DesktopWindow WindowTest
          Top             =   54
          Transparent     =   False
          Underline       =   False
-         UnicodeMode     =   0
+         UnicodeMode     =   1
          ValidationMask  =   ""
          Visible         =   True
          Width           =   617
-         Begin DesktopTextArea DisassemblerOutput
-            AllowAutoDeactivate=   True
-            AllowFocusRing  =   False
-            AllowSpellChecking=   True
-            AllowStyledText =   True
-            AllowTabs       =   False
-            BackgroundColor =   &cFFFFFF
-            Bold            =   False
-            Enabled         =   True
-            FontName        =   "Menlo"
-            FontSize        =   0.0
-            FontUnit        =   0
-            Format          =   ""
-            HasBorder       =   True
-            HasHorizontalScrollbar=   False
-            HasVerticalScrollbar=   True
-            Height          =   601
-            HideSelection   =   True
-            Index           =   -2147483648
-            InitialParent   =   "Output"
-            Italic          =   False
-            Left            =   635
-            LineHeight      =   0.0
-            LineSpacing     =   1.0
-            LockBottom      =   True
-            LockedInPosition=   False
-            LockLeft        =   True
-            LockRight       =   True
-            LockTop         =   True
-            MaximumCharactersAllowed=   0
-            Multiline       =   True
-            ReadOnly        =   True
-            Scope           =   0
-            TabIndex        =   0
-            TabPanelIndex   =   4
-            TabStop         =   True
-            Text            =   ""
-            TextAlignment   =   0
-            TextColor       =   &c000000
-            Tooltip         =   ""
-            Top             =   54
-            Transparent     =   False
-            Underline       =   False
-            UnicodeMode     =   1
-            ValidationMask  =   ""
-            Visible         =   True
-            Width           =   617
-         End
       End
    End
    Begin DesktopBevelButton ButtonAST
@@ -642,6 +642,87 @@ Begin DesktopWindow WindowTest
       Visible         =   True
       Width           =   80
    End
+   Begin DesktopBevelButton ButtonOutput
+      Active          =   False
+      AllowAutoDeactivate=   True
+      AllowFocus      =   True
+      AllowTabStop    =   True
+      BackgroundColor =   &c00000000
+      BevelStyle      =   0
+      Bold            =   False
+      ButtonStyle     =   1
+      Caption         =   "Output"
+      CaptionAlignment=   3
+      CaptionDelta    =   0
+      CaptionPosition =   1
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      HasBackgroundColor=   False
+      Height          =   22
+      Icon            =   0
+      IconAlignment   =   0
+      IconDeltaX      =   0
+      IconDeltaY      =   0
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   857
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   True
+      MenuStyle       =   0
+      PanelIndex      =   0
+      Scope           =   2
+      TabIndex        =   15
+      TabPanelIndex   =   0
+      TextColor       =   &c00000000
+      Tooltip         =   ""
+      Top             =   20
+      Transparent     =   False
+      Underline       =   False
+      Value           =   False
+      Visible         =   True
+      Width           =   61
+      _mIndex         =   0
+      _mInitialParent =   ""
+      _mName          =   ""
+      _mPanelIndex    =   0
+   End
+   Begin DesktopButton ButtonRun
+      AllowAutoDeactivate=   True
+      Bold            =   False
+      Cancel          =   False
+      Caption         =   "Run"
+      Default         =   False
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      Height          =   20
+      Index           =   -2147483648
+      Italic          =   False
+      Left            =   1080
+      LockBottom      =   True
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   False
+      MacButtonStyle  =   0
+      Scope           =   0
+      TabIndex        =   16
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   687
+      Transparent     =   False
+      Underline       =   False
+      Visible         =   True
+      Width           =   80
+   End
 End
 #tag EndDesktopWindow
 
@@ -667,9 +748,8 @@ End
 		  
 		  SwitchToPanel(PANEL_DISASSEMBLER_OUTPUT)
 		  
-		  Var chunk As ObjoScript.Chunk
 		  Try
-		    chunk = Compiler.Compile(Code.Text)
+		    Chunk = Compiler.Compile(Code.Text)
 		    
 		    // Show the tokens.
 		    UpdateTokensListbox(Compiler.Tokens)
@@ -692,6 +772,22 @@ End
 		  End Try
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 52657475726E7320612073656E7369626C652064656661756C74206D6F6E6F737061636520666F6E74206E616D6520666F722074686520706C6174666F726D207765277265206F6E2E
+		Function DefaultMonospaceFont() As String
+		  /// Returns a sensible default monospace font name for the platform we're on.
+		  
+		  #If TargetMacOS Then
+		    Return "Menlo"
+		    
+		  #ElseIf TargetWindows Then
+		    Return "Consolas"
+		    
+		  #ElseIf TargetLinux Then
+		    Return "DejaVu Sans Mono"
+		  #EndIf
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
@@ -746,6 +842,15 @@ End
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 446973706C6179732064657461696C732061626F7574206120564D2072756E74696D65206572726F7220696E2074686520496E666F206C6162656C2E
+		Sub DisplayVMError(e As ObjoScript.VMException)
+		  /// Displays details about a VM runtime error in the Info label.
+		  
+		  Info.Text = e.LineNumber.ToString + ": " + e.Message
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Sub Reset(clearSource As Boolean = True)
 		  If clearSource Then Code.Text = ""
@@ -764,9 +869,30 @@ End
 		  mDisassemblerOutput.ResizeTo(-1)
 		  
 		  Compiler = New ObjoScript.Compiler
+		  Chunk = New ObjoScript.Chunk
 		  
+		  If VM <> Nil Then
+		    RemoveHandler VM.Print, AddressOf VMPrintDelegate
+		  End If
 		  VM = New ObjoScript.VM
+		  AddHandler VM.Print, AddressOf VMPrintDelegate
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub Run()
+		  Reset(False)
+		   
+		  Compile
+		  
+		  SwitchToPanel(PANEL_OUTPUT)
+		  
+		  Try
+		    VM.Interpret(Chunk)
+		  Catch e As ObjoScript.VMException
+		    DisplayVMError(e)
+		  End Try
 		End Sub
 	#tag EndMethod
 
@@ -778,6 +904,7 @@ End
 		    ButtonTokens.Value = False
 		    ButtonErrors.Value = False
 		    ButtonDisassembler.Value = False
+		    ButtonOutput.Value = False
 		    Panel.SelectedPanelIndex = id
 		    
 		  Case PANEL_TOKENS
@@ -785,6 +912,7 @@ End
 		    ButtonTokens.Value = True
 		    ButtonErrors.Value = False
 		    ButtonDisassembler.Value = False
+		    ButtonOutput.Value = False
 		    Panel.SelectedPanelIndex = id
 		    
 		  Case PANEL_ERRORS
@@ -792,6 +920,7 @@ End
 		    ButtonTokens.Value = False
 		    ButtonErrors.Value = True
 		    ButtonDisassembler.Value = False
+		    ButtonOutput.Value = False
 		    Panel.SelectedPanelIndex = PANEL_ERRORS
 		    
 		  Case PANEL_DISASSEMBLER_OUTPUT
@@ -799,7 +928,16 @@ End
 		    ButtonTokens.Value = False
 		    ButtonErrors.Value = False
 		    ButtonDisassembler.Value = True
+		    ButtonOutput.Value = False
 		    Panel.SelectedPanelIndex = PANEL_DISASSEMBLER_OUTPUT
+		    
+		  Case PANEL_OUTPUT
+		    ButtonAST.Value = False
+		    ButtonTokens.Value = False
+		    ButtonErrors.Value = False
+		    ButtonDisassembler.Value = False
+		    ButtonOutput.Value = True
+		    Panel.SelectedPanelIndex = PANEL_OUTPUT
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown panel ID.")
@@ -871,6 +1009,18 @@ End
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub VMPrintDelegate(sender As ObjoScript.VM, s As String)
+		  #Pragma Unused sender
+		  
+		  Output.Text = Output.Text + s + EndOfLine
+		End Sub
+	#tag EndMethod
+
+
+	#tag Property, Flags = &h0
+		Chunk As ObjoScript.Chunk
+	#tag EndProperty
 
 	#tag Property, Flags = &h0
 		Compiler As ObjoScript.Compiler
@@ -898,6 +1048,9 @@ End
 	#tag Constant, Name = PANEL_ERRORS, Type = Double, Dynamic = False, Default = \"2", Scope = Private
 	#tag EndConstant
 
+	#tag Constant, Name = PANEL_OUTPUT, Type = Double, Dynamic = False, Default = \"4", Scope = Private
+	#tag EndConstant
+
 	#tag Constant, Name = PANEL_TOKENS, Type = Double, Dynamic = False, Default = \"0", Scope = Private
 	#tag EndConstant
 
@@ -908,6 +1061,20 @@ End
 	#tag Event
 		Sub Pressed()
 		  Reset
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events Output
+	#tag Event
+		Sub Opening()
+		  Me.FontName = DefaultMonospaceFont
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events DisassemblerOutput
+	#tag Event
+		Sub Opening()
+		  Me.FontName = DefaultMonospaceFont
 		End Sub
 	#tag EndEvent
 #tag EndEvents
@@ -942,9 +1109,25 @@ End
 #tag Events ButtonCompile
 	#tag Event
 		Sub Pressed()
-		  /// Compile the source code in `Code` and run it.
+		  /// Compile the source code in `Code` but don't run it.
 		  
 		  Compile
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ButtonOutput
+	#tag Event
+		Sub Pressed()
+		  SwitchToPanel(PANEL_OUTPUT)
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ButtonRun
+	#tag Event
+		Sub Pressed()
+		  /// Compile and run the source code in `Code`.
+		  
+		  Run
 		End Sub
 	#tag EndEvent
 #tag EndEvents

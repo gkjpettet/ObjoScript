@@ -66,6 +66,8 @@ Protected Class VM
 		Private Sub Error(message As String, offset As Integer = -1)
 		  /// Raises a VMException at the current IP (unless otherwise specified).
 		  
+		  #Pragma BreakOnExceptions False
+		  
 		  // Default to the current IP if no offset is provided.
 		  offset = If(offset = -1, IP, offset)
 		  
@@ -193,12 +195,7 @@ Protected Class VM
 		    
 		    Select Case ReadByte
 		    Case OP_RETURN
-		      Var top As Variant = Pop
-		      If top IsA ObjoScript.Value Then
-		        System.DebugLog(ObjoScript.Value(top).ToString)
-		      Else
-		        System.DebugLog(top.StringValue)
-		      End If
+		      // Exit the VM.
 		      Return
 		      
 		    Case OP_CONSTANT
@@ -356,6 +353,12 @@ Protected Class VM
 		      // Pop the top value off the stack and print it via the VM's `Print` event.
 		      RaiseEvent Print(ValueToString(Pop))
 		      
+		    Case OP_ASSERT
+		      // Pop the top of the stack. If it's False then raise a runtime error.
+		      If IsFalsey(Pop) Then
+		        Error("Failed assertion.")
+		      End If
+		      
 		    End Select
 		  Wend
 		  
@@ -394,14 +397,21 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F66206120564D2076616C75652E
-		Private Function ValueToString(v As Variant) As String
+	#tag Method, Flags = &h0, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F66206120564D2076616C75652E
+		Shared Function ValueToString(v As Variant) As String
 		  /// Returns a string representation of a VM value.
 		  
 		  #Pragma Warning "TODO: Support instances"
 		  
 		  Select Case v.Type
-		  Case Variant.TypeString, Variant.TypeDouble, Variant.TypeBoolean
+		  Case Variant.TypeDouble
+		    If v.DoubleValue.IsInteger Then
+		      Return CType(v, Integer).ToString
+		    Else
+		      Return v.DoubleValue.ToString
+		    End If
+		    
+		  Case Variant.TypeString, Variant.TypeBoolean
 		    Return v.StringValue
 		    
 		  Else
@@ -409,7 +419,8 @@ Protected Class VM
 		      Return "Nothing"
 		      
 		    Else
-		      Error("Unable to create a string representation of the value.")
+		      // This shouldn't happen.
+		      Raise New UnsupportedOperationException("Unable to create a string representation of the value.")
 		    End If
 		  End Select
 		End Function
@@ -451,6 +462,9 @@ Protected Class VM
 
 
 	#tag Constant, Name = OP_ADD, Type = Double, Dynamic = False, Default = \"4", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_ASSERT, Type = Double, Dynamic = False, Default = \"29", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_BITWISE_AND, Type = Double, Dynamic = False, Default = \"22", Scope = Public

@@ -3,6 +3,18 @@ Protected Class ASTTreeView
 Inherits DesktopTreeView
 Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag Method, Flags = &h0
+		Function VisitAssertStmt(stmt As ObjoScript.AssertStmt) As Variant
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  
+		  Var node As New TreeViewNode("Assert")
+		  
+		  node.AppendNode(stmt.Expression.Accept(Self))
+		  
+		  Me.AppendNode(node)
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitBinary(expr As ObjoScript.BinaryExpr) As Variant
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  

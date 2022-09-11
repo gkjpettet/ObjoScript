@@ -11,6 +11,30 @@ Protected Class Parser
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 50617273657320616E206173736572742073746174656D656E742E20417373756D6573207468652070617273657220686173206A75737420636F6E73756D656420746865206061737365727460206B6579776F72642E
+		Private Function AssertStatement() As ObjoScript.Stmt
+		  /// Parses an assert statement. Assumes the parser has just consumed the `assert` keyword.
+		  ///
+		  /// Format:
+		  /// ```objo
+		  /// assert(EXPRESSION)
+		  /// ```
+		  
+		  // Store the location of the assert keyword.
+		  Var location As ObjoScript.Token = Previous
+		  
+		  Consume(ObjoScript.TokenTypes.LParen, "Expected an opening parenthesis after the `assert` keyword.")
+		  
+		  Var expr As ObjoScript.Expr = Expression
+		  
+		  Consume(ObjoScript.TokenTypes.RParen, "Expected a closing parenthesis after the assert expression.")
+		  
+		  ConsumeNewLine("Expected a new line EOL after the assert statement.")
+		  
+		  Return New ObjoScript.AssertStmt(expr, location)
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 5472756520696620776527766520726561636865642074686520656E64206F662074686520746F6B656E2073747265616D2E
 		Private Function AtEnd() As Boolean
 		  /// True if we've reached the end of the token stream.
@@ -432,6 +456,10 @@ Protected Class Parser
 		  
 		  If Match(ObjoScript.TokenTypes.Print) Then
 		    Return PrintStatement
+		    
+		  ElseIf Match(ObjoScript.TokenTypes.Assert) Then
+		    Return AssertStatement
+		    
 		  Else
 		    Return ExpressionStatement
 		  End If

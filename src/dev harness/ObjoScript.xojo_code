@@ -31,6 +31,15 @@ Protected Module ObjoScript
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 52657475726E7320547275652069662060646020697320616E20696E74656765722E
+		Function IsInteger(Extends d As Double) As Boolean
+		  /// Returns True if `d` is an integer.
+		  
+		  Return d = Floor(d)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 54727565206966207468697320697320616E20696E7465676572206F72206120646F75626C652E
 		Function IsNumber(Extends v As Variant) As Boolean
 		  /// True if this is an integer or a double.

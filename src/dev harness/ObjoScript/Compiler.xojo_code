@@ -231,6 +231,23 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C657320616E2060617373657274602073746174656D656E742E
+		Function VisitAssertStmt(stmt As ObjoScript.AssertStmt) As Variant
+		  /// Compiles an `assert` statement.
+		  ///
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  
+		  mLocation = stmt.Location
+		  Var assertLocation As ObjoScript.Token = stmt.Location
+		  
+		  // Compile the expression.
+		  Call stmt.Expression.Accept(Self)
+		  
+		  EmitByte(ObjoScript.VM.OP_ASSERT, assertLocation)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320612062696E6172792065787072657373696F6E2E
 		Function VisitBinary(expr As ObjoScript.BinaryExpr) As Variant
 		  /// Compiles a binary expression.
