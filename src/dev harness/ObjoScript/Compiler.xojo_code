@@ -395,6 +395,23 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732061207072696E742073746174656D656E742E
+		Function VisitPrintStmt(stmt As ObjoScript.PrintStmt) As Variant
+		  /// Compiles a print statement.
+		  ///
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  
+		  mLocation = stmt.Location
+		  Var printLocation As ObjoScript.Token = stmt.Location
+		  
+		  // Compile the expression.
+		  Call stmt.Expression.Accept(Self)
+		  
+		  EmitByte(ObjoScript.VM.OP_PRINT, printLocation)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 456D697473206120737472696E6720636F6E7374616E742E
 		Function VisitString(expr As ObjoScript.StringLiteral) As Variant
 		  /// Emits a string constant.

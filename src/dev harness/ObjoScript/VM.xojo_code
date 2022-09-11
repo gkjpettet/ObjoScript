@@ -352,6 +352,10 @@ Protected Class VM
 		      // If a or b are doubles, they are truncated to integers.
 		      Push(a.IntegerValue Xor b.IntegerValue)
 		      
+		    Case OP_PRINT
+		      // Pop the top value off the stack and print it via the VM's `Print` event.
+		      RaiseEvent Print(ValueToString(Pop))
+		      
 		    End Select
 		  Wend
 		  
@@ -410,6 +414,11 @@ Protected Class VM
 		  End Select
 		End Function
 	#tag EndMethod
+
+
+	#tag Hook, Flags = &h0, Description = 6073602069732074686520726573756C74206F66206576616C756174696E67206120607072696E74602065787072657373696F6E2E
+		Event Print(s As String)
+	#tag EndHook
 
 
 	#tag Property, Flags = &h0, Description = 546865206368756E6B206F6620636F6465207468697320564D2069732063757272656E746C7920696E74657270726574696E672E
@@ -508,6 +517,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_POP, Type = Double, Dynamic = False, Default = \"19", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_PRINT, Type = Double, Dynamic = False, Default = \"28", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_RETURN, Type = Double, Dynamic = False, Default = \"0", Scope = Public, Description = 5468652072657475726E206F70636F64652E

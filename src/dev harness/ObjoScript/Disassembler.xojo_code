@@ -177,6 +177,9 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_LOAD_MINUS1
 		    Return SimpleInstruction("LOAD -1", offset)
 		    
+		  Case ObjoScript.VM.OP_PRINT
+		    Return SimpleInstruction("PRINT", offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
