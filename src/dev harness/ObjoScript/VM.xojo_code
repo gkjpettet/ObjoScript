@@ -209,6 +209,15 @@ Protected Class VM
 		      Var constant As Variant = ReadConstantLong
 		      Push(constant)
 		      
+		    Case OP_LOAD_0
+		      Push(CType(0, Double))
+		      
+		    Case OP_LOAD_1
+		      Push(CType(1, Double))
+		      
+		    Case OP_LOAD_MINUS1
+		      Push(CType(-1, Double))
+		      
 		    Case OP_NEGATE
 		      If Peek(0).Type <> Variant.TypeDouble Then
 		        Error("Operand must be a number.")
@@ -469,6 +478,15 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_LESS_EQUAL, Type = Double, Dynamic = False, Default = \"13", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_LOAD_0, Type = Double, Dynamic = False, Default = \"26", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_LOAD_1, Type = Double, Dynamic = False, Default = \"25", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_LOAD_MINUS1, Type = Double, Dynamic = False, Default = \"27", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_MODULO, Type = Double, Dynamic = False, Default = \"8", Scope = Public

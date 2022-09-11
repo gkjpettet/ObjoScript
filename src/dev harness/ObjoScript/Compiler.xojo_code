@@ -27,10 +27,15 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320616E2061627374726163742073796E746178207472656520696E746F2061206368756E6B2E2052616973657320612060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
-		Function Compile(abstractTree() As ObjoScript.Stmt) As ObjoScript.Chunk
+		Function Compile(abstractTree() As ObjoScript.Stmt, shouldResetFirst As Boolean = True) As ObjoScript.Chunk
 		  /// Compiles an abstract syntax tree into a chunk. Raises a `CompilerException` if an error occurs.
+		  ///
+		  /// Resets by default but if this is being called internally (after the compiler has tokenised and parsed the source) 
+		  /// then we skip resetting by setting `shouldResetFirst` to True.
 		  
-		  Reset
+		  mStopWatch.Start
+		  
+		  If shouldResetFirst Then Reset
 		  
 		  mCompilingChunk = New ObjoScript.Chunk
 		  mAST = abstractTree
@@ -39,7 +44,20 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		    Call stmt.Accept(Self)
 		  Next stmt
 		  
-		  EndCompiler(mAST(mAST.LastIndex).Location)
+		  // Handle an empty AST.
+		  Var endLocation As ObjoScript.Token
+		  If mAST.Count = 0 Then
+		    // Synthesise a fake end location token.
+		    endLocation = New ObjoScript.Token(ObjoScript.TokenTypes.EOF, 0, 1)
+		  Else
+		    endLocation = mAST(mAST.LastIndex).Location
+		  End If
+		  
+		  // Wind down the compiler.
+		  EndCompiler(endLocation)
+		  
+		  mStopWatch.Stop
+		  mCompileTime = mStopWatch.ElapsedMilliseconds
 		  
 		  Return CurrentChunk
 		End Function
@@ -52,10 +70,16 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  Reset
 		  
 		  // Tokenise. This may raise a LexerException, therefore aborting compilation.
+		  mStopWatch.Start
 		  mTokens = Lexer.Tokenise(source)
+		  mStopWatch.Stop
+		  mTokeniseTime = mStopWatch.ElapsedMilliseconds
 		  
 		  // Parse.
+		  mStopWatch.Start
 		  mAST = Parser.Parse(Tokens)
+		  mStopWatch.Stop
+		  mParseTime = mStopWatch.ElapsedMilliseconds
 		  
 		  If Parser.HasError Then
 		    Var message As String
@@ -69,24 +93,7 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  End If
 		  
 		  // Compile.
-		  mCompilingChunk = New ObjoScript.Chunk
-		  
-		  For Each stmt As ObjoScript.Stmt In mAST
-		    Call stmt.Accept(Self)
-		  Next stmt
-		  
-		  Var endLocation As ObjoScript.Token
-		  If mAST.Count = 0 Then
-		    // Synthesise a fake end location token.
-		    endLocation = New ObjoScript.Token(ObjoScript.TokenTypes.EOF, 0, 1)
-		  Else
-		    endLocation = mAST(mAST.LastIndex).Location
-		  End If
-		  
-		  EndCompiler(endLocation)
-		  
-		  Return CurrentChunk
-		  
+		  Return Compile(mAST, False)
 		  
 		End Function
 	#tag EndMethod
@@ -127,6 +134,19 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  /// Adds `value` to the current chunk's constant pool at the current location. An alternative `location` can be specified.
 		  
 		  If location = Nil Then location = mLocation
+		  
+		  // Common cases.
+		  // The VM has dedicated instructions for producing certain numeric constants that are commonly used.
+		  If value.Type = Variant.TypeDouble Then
+		    Select Case value
+		    Case 0
+		      EmitByte(ObjoScript.VM.OP_LOAD_0, location)
+		      Return
+		    Case 1
+		      EmitByte(ObjoScript.VM.OP_LOAD_1, location)
+		      Return
+		    End Select
+		  End If
 		  
 		  Var index As Integer = AddConstant(value)
 		  
@@ -195,7 +215,10 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  mTokens.ResizeTo(-1)
 		  mAST.ResizeTo(-1)
 		  Parser = New ObjoScript.Parser
-		  mCompilingChunk = Nil
+		  mTokeniseTime = 0
+		  mParseTime = 0
+		  mCompileTime = 0
+		  mStopWatch = New ObjoScript.StopWatch(False)
 		End Sub
 	#tag EndMethod
 
@@ -398,7 +421,12 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		    // We can compile negation of numeric literals more efficiently
 		    // by letting the compiler negate the value and then emitting it as a constant.
 		    If expr.Operand IsA ObjoScript.NumberLiteral Then
-		      EmitConstant(-ObjoScript.NumberLiteral(expr.Operand).Value, expr.Operand.Location)
+		      If ObjoScript.NumberLiteral(expr.Operand).Value = 1 Then
+		        // -1 is a special case since it's used so often.
+		        EmitByte(ObjoScript.VM.OP_LOAD_Minus1, expr.Operand.Location)
+		      Else
+		        EmitConstant(-ObjoScript.NumberLiteral(expr.Operand).Value, expr.Operand.Location)
+		      End If
 		    Else
 		      // Compile the operand.
 		      Call expr.Operand.Accept(Self)
@@ -407,7 +435,10 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		    End If
 		    
 		  Case ObjoScript.TokenTypes.Not_
-		    #Pragma Warning "TODO: Compile Not operator"
+		    // Compile the operand.
+		    Call expr.Operand.Accept(Self)
+		    // Emit the not instruction.
+		    EmitByte(ObjoScript.VM.OP_NOT)
 		    
 		  Else
 		    Error("Unknown unary operator: " + expr.Operator.ToString)
@@ -416,12 +447,25 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 	#tag EndMethod
 
 
+	#tag ComputedProperty, Flags = &h0, Description = 5468652074696D652074616B656E20746F20636F6D70696C65207468652041535420286D696C6C697365636F6E6473292E
+		#tag Getter
+			Get
+			  Return mCompileTime
+			End Get
+		#tag EndGetter
+		CompileTime As Double
+	#tag EndComputedProperty
+
 	#tag Property, Flags = &h21, Description = 54686520636F6D70696C65722773206C657865722E205573656420746F20746F6B656E69736520736F7572636520636F64652E
 		Private Lexer As ObjoScript.Lexer
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 5468652061627374726163742073796E7461782074726565207468697320636F6D70696C657220697320636F6D70696C696E672E
 		Private mAST() As ObjoScript.Stmt
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mCompileTime As Double
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 546865206368756E6B2077652772652063757272656E746C7920636F6D70696C696E6720746F2E
@@ -432,6 +476,18 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		Private mLocation As ObjoScript.Token
 	#tag EndProperty
 
+	#tag Property, Flags = &h21
+		Private mParseTime As Double
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 496E7465726E616C2073746F7020776174636820666F722074696D696E6720686F77206C6F6E672074686520766172696F757320737461676573206F6620636F6D70696C6174696F6E2074616B652E
+		Private mStopWatch As ObjoScript.StopWatch
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mTokeniseTime As Double
+	#tag EndProperty
+
 	#tag Property, Flags = &h21, Description = 54686520746F6B656E73207468697320636F6D70696C657220697320636F6D70696C696E672E204D617920626520656D7074792069662074686520636F6D70696C65722077617320696E737472756374656420746F20636F6D70696C6520616E20415354206469726563746C792E
 		Private mTokens() As ObjoScript.Token
 	#tag EndProperty
@@ -439,6 +495,33 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 	#tag Property, Flags = &h21, Description = 54686520636F6D70696C65722773207061727365722E205573656420746F20706172736520736F7572636520636F646520746F6B656E732E
 		Private Parser As ObjoScript.Parser
 	#tag EndProperty
+
+	#tag ComputedProperty, Flags = &h0, Description = 5468652074696D652074616B656E20746F2070617273652074686520736F7572636520636F646520286D696C6C697365636F6E6473292E
+		#tag Getter
+			Get
+			  Return mParseTime
+			End Get
+		#tag EndGetter
+		ParseTime As Double
+	#tag EndComputedProperty
+
+	#tag ComputedProperty, Flags = &h0, Description = 5468652074696D652074616B656E20746F20746F6B656E6973652074686520736F7572636520636F646520286D696C6C697365636F6E6473292E
+		#tag Getter
+			Get
+			  Return mTokeniseTime
+			End Get
+		#tag EndGetter
+		TokeniseTime As Double
+	#tag EndComputedProperty
+
+	#tag ComputedProperty, Flags = &h0, Description = 54686520746F74616C2074696D652074616B656E20746F206C65782C20706172736520616E6420636F6D70696C652074686520736F7572636520636F646520286D696C6C697365636F6E6473292E
+		#tag Getter
+			Get
+			  Return mTokeniseTime + mParseTime + mCompileTime
+			End Get
+		#tag EndGetter
+		TotalTime As Double
+	#tag EndComputedProperty
 
 
 	#tag ViewBehavior

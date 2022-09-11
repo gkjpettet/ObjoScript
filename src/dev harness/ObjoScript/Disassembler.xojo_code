@@ -168,6 +168,15 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_BITWISE_XOR
 		    Return SimpleInstruction("BITWISE XOR", offset)
 		    
+		  Case ObjoScript.VM.OP_LOAD_0
+		    Return SimpleInstruction("LOAD 0", offset)
+		    
+		  Case ObjoScript.VM.OP_LOAD_1
+		    Return SimpleInstruction("LOAD 1", offset)
+		    
+		  Case ObjoScript.VM.OP_LOAD_MINUS1
+		    Return SimpleInstruction("LOAD -1", offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select

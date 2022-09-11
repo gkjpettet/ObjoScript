@@ -767,6 +767,8 @@ Protected Class Lexer
 		      // Could this be the start of a "//" comment?
 		      If Peek(1) = "/" Then
 		        ConsumeComment
+		      Else
+		        Exit
 		      End If
 		      
 		    Case EndOfLine.UNIX

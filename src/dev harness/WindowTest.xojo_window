@@ -624,7 +624,7 @@ Begin DesktopWindow WindowTest
       Height          =   20
       Index           =   -2147483648
       Italic          =   False
-      Left            =   1080
+      Left            =   1172
       LockBottom      =   True
       LockedInPosition=   False
       LockLeft        =   False
@@ -679,7 +679,7 @@ End
 		    
 		    // Disassemble the chunk.
 		    Disassembler.Disassemble(chunk, "Test")
-		    Info.Text = "Compilation successful."
+		    Info.Text = "Compilation successful (" + Compiler.TotalTime.ToString(Locale.Current, "#.#") + " ms)."
 		    
 		  Catch le As ObjoScript.LexerException
 		    DisplayLexerError(le)
