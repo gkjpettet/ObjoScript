@@ -141,6 +141,33 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_GREATER_EQUAL
 		    Return SimpleInstruction("GREATER_EQUAL", offset)
 		    
+		  Case ObjoScript.VM.OP_FALSE
+		    Return SimpleInstruction("FALSE", offset)
+		    
+		  Case ObjoScript.VM.OP_TRUE
+		    Return SimpleInstruction("TRUE", offset)
+		    
+		  Case ObjoScript.VM.OP_NOTHING
+		    Return SimpleInstruction("NOTHING", offset)
+		    
+		  Case ObjoScript.VM.OP_POP
+		    Return SimpleInstruction("POP", offset)
+		    
+		  Case ObjoScript.VM.OP_SHIFT_LEFT
+		    Return SimpleInstruction("SHIFT LEFT", offset)
+		    
+		  Case ObjoScript.VM.OP_SHIFT_RIGHT
+		    Return SimpleInstruction("SHIFT RIGHT", offset)
+		    
+		  Case ObjoScript.VM.OP_BITWISE_AND
+		    Return SimpleInstruction("BITWISE AND", offset)
+		    
+		  Case ObjoScript.VM.OP_BITWISE_OR
+		    Return SimpleInstruction("BITWISE OR", offset)
+		    
+		  Case ObjoScript.VM.OP_BITWISE_XOR
+		    Return SimpleInstruction("BITWISE XOR", offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select

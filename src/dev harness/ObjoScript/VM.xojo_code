@@ -5,7 +5,7 @@ Protected Class VM
 		  /// Asserts that `a` and `b` are both doubles, otherwise raises a runtime error.
 		  
 		  If a.Type <> Variant.TypeDouble Or b.Type <> Variant.TypeDouble Then
-		    RuntimeError("Both operands must be numbers.")
+		    Error("Both operands must be numbers.")
 		  End If
 		  
 		End Sub
@@ -18,7 +18,7 @@ Protected Class VM
 		  /// Assumes neither `a` or `b` are Nil.
 		  
 		  If a.Type <> b.Type Then
-		    RuntimeError("Both operands must be the same type.")
+		    Error("Both operands must be the same type.")
 		  End If
 		  
 		End Sub
@@ -59,6 +59,17 @@ Protected Class VM
 		    DisassemblerOutput.ResizeTo(-1)
 		  #EndIf
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 526169736573206120564D457863657074696F6E206174207468652063757272656E742049502028756E6C657373206F746865727769736520737065636966696564292E
+		Private Sub Error(message As String, offset As Integer = -1)
+		  /// Raises a VMException at the current IP (unless otherwise specified).
+		  
+		  // Default to the current IP if no offset is provided.
+		  offset = If(offset = -1, IP, offset)
+		  
+		  Raise New ObjoScript.VMException(message, Chunk.LineForOffset(offset), Chunk.ScriptIDForOffset(offset))
 		End Sub
 	#tag EndMethod
 
@@ -157,6 +168,8 @@ Protected Class VM
 		  /// Resets the VM.
 		  
 		  StackTop = 0
+		  Nothing = New ObjoScript.Nothing
+		  
 		End Sub
 	#tag EndMethod
 
@@ -198,7 +211,7 @@ Protected Class VM
 		      
 		    Case OP_NEGATE
 		      If Peek(0).Type <> Variant.TypeDouble Then
-		        RuntimeError("Operand must be a number.")
+		        Error("Operand must be a number.")
 		      End If
 		      // In this instruction, the answer replaces what's currently at the top of the stack.
 		      // Rather than pop, negate then push we'll do it in situ as it's ~6x faster.
@@ -207,8 +220,18 @@ Protected Class VM
 		    Case OP_ADD
 		      Var b As Variant = Pop
 		      Var a As Variant = Pop
-		      AssertNumbers(a, b)
-		      Push(a.DoubleValue + b.DoubleValue)
+		      If a.Type = Variant.TypeDouble And b.Type = Variant.TypeDouble Then
+		        // Both numbers.
+		        Push(a.DoubleValue + b.DoubleValue)
+		      ElseIf a.Type = Variant.TypeString And b.Type = Variant.TypeString Then
+		        // Both strings.
+		        Push(a.StringValue + b.StringValue)
+		      ElseIf a.Type = Variant.TypeString Or b.Type = Variant.TypeString Then
+		        // One of the operands is a string.
+		        Push(ValueToString(a) + ValueToString(b))
+		      Else
+		        Error("Both operands must be numbers or at least one operand must be a string.")
+		      End If
 		      
 		    Case OP_SUBTRACT
 		      Var b As Variant = Pop
@@ -273,20 +296,56 @@ Protected Class VM
 		      AssertNumbers(a, b)
 		      Push(a <= b)
 		      
+		    Case OP_TRUE
+		      Push(True)
+		      
+		    Case OP_FALSE
+		      Push(False)
+		      
+		    Case OP_NOTHING
+		      Push(Nothing)
+		      
+		    Case OP_POP
+		      Call Pop
+		      
+		    Case OP_SHIFT_LEFT
+		      Var b As Variant = Pop
+		      Var a As Variant = Pop
+		      AssertNumbers(a, b)
+		      // If a or b are doubles, they are truncated to integers.
+		      Push(Bitwise.ShiftLeft(a.IntegerValue, b.IntegerValue))
+		      
+		    Case OP_SHIFT_RIGHT
+		      Var b As Variant = Pop
+		      Var a As Variant = Pop
+		      AssertNumbers(a, b)
+		      // If a or b are doubles, they are truncated to integers.
+		      Push(Bitwise.ShiftRight(a.IntegerValue, b.IntegerValue))
+		      
+		    Case OP_BITWISE_AND
+		      Var b As Variant = Pop
+		      Var a As Variant = Pop
+		      AssertNumbers(a, b)
+		      // If a or b are doubles, they are truncated to integers.
+		      Push(a.IntegerValue And b.IntegerValue)
+		      
+		    Case OP_BITWISE_OR
+		      Var b As Variant = Pop
+		      Var a As Variant = Pop
+		      AssertNumbers(a, b)
+		      // If a or b are doubles, they are truncated to integers.
+		      Push(a.IntegerValue Or b.IntegerValue)
+		      
+		    Case OP_BITWISE_XOR
+		      Var b As Variant = Pop
+		      Var a As Variant = Pop
+		      AssertNumbers(a, b)
+		      // If a or b are doubles, they are truncated to integers.
+		      Push(a.IntegerValue Xor b.IntegerValue)
+		      
 		    End Select
 		  Wend
 		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21, Description = 526169736573206120564D457863657074696F6E206174207468652063757272656E742049502028756E6C657373206F746865727769736520737065636966696564292E
-		Private Sub RuntimeError(message As String, offset As Integer = -1)
-		  /// Raises a VMException at the current IP (unless otherwise specified).
-		  
-		  // Default to the current IP if no offset is provided.
-		  offset = If(offset = -1, IP, offset)
-		  
-		  Raise New ObjoScript.VMException(message, Chunk.LineForOffset(offset), Chunk.ScriptIDForOffset(offset))
 		End Sub
 	#tag EndMethod
 
@@ -296,7 +355,7 @@ Protected Class VM
 		  ///
 		  /// Assumes neither `a` or `b` are Nil.
 		  
-		  #Pragma Warning "TODO: Handle strings"
+		  #Pragma Warning "TODO: Handle objects"
 		  
 		  If a.Type <> b.Type Then Return False
 		  
@@ -304,12 +363,41 @@ Protected Class VM
 		  Case Variant.TypeDouble, Variant.TypeBoolean
 		    Return a = b
 		    
+		  Case Variant.TypeString
+		    If STRING_COMPARISON_RESPECTS_CASE Then
+		      // Case sensitive comparison.
+		      Return a.StringValue.Compare(b.StringValue, ComparisonOptions.CaseSensitive) = 0
+		    Else
+		      // Case insensitive comparison.
+		      Return a = b
+		    End If
 		  Else
 		    If a IsA ObjoScript.Nothing And b IsA ObjoScript.Nothing Then
 		      Return True
 		    End If
 		    
-		    RuntimeError("Unexpected value type.")
+		    Error("Unexpected value type.")
+		  End Select
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F66206120564D2076616C75652E
+		Private Function ValueToString(v As Variant) As String
+		  /// Returns a string representation of a VM value.
+		  
+		  #Pragma Warning "TODO: Support instances"
+		  
+		  Select Case v.Type
+		  Case Variant.TypeString, Variant.TypeDouble, Variant.TypeBoolean
+		    Return v.StringValue
+		    
+		  Else
+		    If v IsA ObjoScript.Nothing Then
+		      Return "Nothing"
+		      
+		    Else
+		      Error("Unable to create a string representation of the value.")
+		    End If
 		  End Select
 		End Function
 	#tag EndMethod
@@ -331,6 +419,10 @@ Protected Class VM
 		IP As Integer = 0
 	#tag EndProperty
 
+	#tag Property, Flags = &h21, Description = 53696E676C65746F6E20696E7374616E6365206F6620224E6F7468696E67222E
+		Private Nothing As ObjoScript.Nothing
+	#tag EndProperty
+
 	#tag Property, Flags = &h21, Description = 54686520564D277320737461636B2E
 		Private Stack(VM.STACK_MAX) As Variant
 	#tag EndProperty
@@ -343,6 +435,15 @@ Protected Class VM
 	#tag Constant, Name = OP_ADD, Type = Double, Dynamic = False, Default = \"4", Scope = Public
 	#tag EndConstant
 
+	#tag Constant, Name = OP_BITWISE_AND, Type = Double, Dynamic = False, Default = \"22", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_BITWISE_OR, Type = Double, Dynamic = False, Default = \"23", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_BITWISE_XOR, Type = Double, Dynamic = False, Default = \"24", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = OP_CONSTANT, Type = Double, Dynamic = False, Default = \"1", Scope = Public, Description = 5468652061646420636F6E7374616E74206F70636F64652E
 	#tag EndConstant
 
@@ -353,6 +454,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_EQUAL, Type = Double, Dynamic = False, Default = \"10", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_FALSE, Type = Double, Dynamic = False, Default = \"17", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_GREATER, Type = Double, Dynamic = False, Default = \"11", Scope = Public
@@ -379,16 +483,34 @@ Protected Class VM
 	#tag Constant, Name = OP_NOT, Type = Double, Dynamic = False, Default = \"9", Scope = Public
 	#tag EndConstant
 
+	#tag Constant, Name = OP_NOTHING, Type = Double, Dynamic = False, Default = \"18", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = OP_NOT_EQUAL, Type = Double, Dynamic = False, Default = \"15", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_POP, Type = Double, Dynamic = False, Default = \"19", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_RETURN, Type = Double, Dynamic = False, Default = \"0", Scope = Public, Description = 5468652072657475726E206F70636F64652E
 	#tag EndConstant
 
+	#tag Constant, Name = OP_SHIFT_LEFT, Type = Double, Dynamic = False, Default = \"20", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SHIFT_RIGHT, Type = Double, Dynamic = False, Default = \"21", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = OP_SUBTRACT, Type = Double, Dynamic = False, Default = \"5", Scope = Public
 	#tag EndConstant
 
+	#tag Constant, Name = OP_TRUE, Type = Double, Dynamic = False, Default = \"16", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = STACK_MAX, Type = Double, Dynamic = False, Default = \"255", Scope = Public, Description = 54686520757070657220626F756E6473206F662074686520737461636B2E
+	#tag EndConstant
+
+	#tag Constant, Name = STRING_COMPARISON_RESPECTS_CASE, Type = Boolean, Dynamic = False, Default = \"False", Scope = Public, Description = 54686520636173652073656E7369746976697479206F6620737472696E6720636F6D70617269736F6E73207768656E207573696E672074686520603D3D60206F70657261746F722E
 	#tag EndConstant
 
 	#tag Constant, Name = TRACE_EXECUTION, Type = Boolean, Dynamic = False, Default = \"True", Scope = Public, Description = 496620547275652028616E6420746869732069732061206465627567206275696C6429207468656E2074686520564D2077696C6C206F757470757420646562756720696E666F726D6174696F6E20746F207468652073797374656D206465627567206C6F672E204E6F2065666665637420696E20636F6D70696C656420617070732E

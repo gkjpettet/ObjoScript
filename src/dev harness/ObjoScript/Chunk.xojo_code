@@ -120,6 +120,10 @@ Protected Class Chunk
 	#tag EndProperty
 
 
+	#tag Constant, Name = MAX_CONSTANTS, Type = Double, Dynamic = False, Default = \"65534", Scope = Public, Description = 546865206D6178696D756D207065726D69737369626C6520696E646578206F66206120636F6E7374616E7420696E2061206368756E6B277320636F6E7374616E7420706F6F6C2E
+	#tag EndConstant
+
+
 	#tag ViewBehavior
 		#tag ViewProperty
 			Name="Name"

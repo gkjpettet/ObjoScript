@@ -134,37 +134,6 @@ Begin DesktopWindow WindowTest
       Visible         =   True
       Width           =   603
    End
-   Begin DesktopButton ButtonParse
-      AllowAutoDeactivate=   True
-      Bold            =   False
-      Cancel          =   False
-      Caption         =   "Parse"
-      Default         =   False
-      Enabled         =   True
-      FontName        =   "System"
-      FontSize        =   0.0
-      FontUnit        =   0
-      Height          =   20
-      Index           =   -2147483648
-      Italic          =   False
-      Left            =   1172
-      LockBottom      =   True
-      LockedInPosition=   False
-      LockLeft        =   False
-      LockRight       =   True
-      LockTop         =   False
-      MacButtonStyle  =   0
-      Scope           =   2
-      TabIndex        =   5
-      TabPanelIndex   =   0
-      TabStop         =   True
-      Tooltip         =   ""
-      Top             =   687
-      Transparent     =   False
-      Underline       =   False
-      Visible         =   True
-      Width           =   80
-   End
    Begin DesktopPagePanel Panel
       AllowAutoDeactivate=   True
       Enabled         =   True
@@ -592,37 +561,6 @@ Begin DesktopWindow WindowTest
       _mName          =   ""
       _mPanelIndex    =   0
    End
-   Begin DesktopButton ButtonTest
-      AllowAutoDeactivate=   True
-      Bold            =   False
-      Cancel          =   False
-      Caption         =   "Test"
-      Default         =   False
-      Enabled         =   True
-      FontName        =   "System"
-      FontSize        =   0.0
-      FontUnit        =   0
-      Height          =   20
-      Index           =   -2147483648
-      Italic          =   False
-      Left            =   1080
-      LockBottom      =   True
-      LockedInPosition=   False
-      LockLeft        =   False
-      LockRight       =   True
-      LockTop         =   False
-      MacButtonStyle  =   0
-      Scope           =   2
-      TabIndex        =   12
-      TabPanelIndex   =   0
-      TabStop         =   True
-      Tooltip         =   ""
-      Top             =   687
-      Transparent     =   False
-      Underline       =   False
-      Visible         =   True
-      Width           =   80
-   End
    Begin DesktopBevelButton ButtonDisassembler
       Active          =   False
       AllowAutoDeactivate=   True
@@ -673,6 +611,37 @@ Begin DesktopWindow WindowTest
       _mName          =   ""
       _mPanelIndex    =   0
    End
+   Begin DesktopButton ButtonCompile
+      AllowAutoDeactivate=   True
+      Bold            =   False
+      Cancel          =   False
+      Caption         =   "Compile"
+      Default         =   False
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      Height          =   20
+      Index           =   -2147483648
+      Italic          =   False
+      Left            =   1080
+      LockBottom      =   True
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   False
+      MacButtonStyle  =   0
+      Scope           =   0
+      TabIndex        =   14
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   687
+      Transparent     =   False
+      Underline       =   False
+      Visible         =   True
+      Width           =   80
+   End
 End
 #tag EndDesktopWindow
 
@@ -682,9 +651,48 @@ End
 		  Reset
 		  SwitchToPanel(PANEL_AST)
 		  
+		  Disassembler = New ObjoScript.Disassembler
+		  Addhandler Disassembler.Print, AddressOf DisassemblerPrintDelegate
+		  Addhandler Disassembler.PrintLine, AddressOf DisassemblerPrintLineDelegate
+		  
 		End Sub
 	#tag EndEvent
 
+
+	#tag Method, Flags = &h0
+		Sub Compile()
+		  #Pragma BreakOnExceptions False
+		  
+		  Reset(False)
+		  
+		  SwitchToPanel(PANEL_DISASSEMBLER_OUTPUT)
+		  
+		  Var chunk As ObjoScript.Chunk
+		  Try
+		    chunk = Compiler.Compile(Code.Text)
+		    
+		    // Show the tokens.
+		    UpdateTokensListbox(Compiler.Tokens)
+		    
+		    // Show the AST.
+		    UpdateASTView(Compiler.AST)
+		    
+		    // Disassemble the chunk.
+		    Disassembler.Disassemble(chunk, "Test")
+		    Info.Text = "Compilation successful."
+		    
+		  Catch le As ObjoScript.LexerException
+		    DisplayLexerError(le)
+		    
+		  Catch pe As ObjoScript.ParserException
+		    DisplayParserErrors(Compiler.ParserErrors)
+		    
+		  Catch ce As ObjoScript.CompilerException
+		    DisplayCompilerError(ce)
+		  End Try
+		  
+		End Sub
+	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Sub DisassemblerPrintDelegate(sender As ObjoScript.Disassembler, s As String)
@@ -705,6 +713,15 @@ End
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 446973706C6179732064657461696C732061626F7574206120636F6D70696C6572206572726F7220696E2074686520496E666F206C6162656C2E
+		Sub DisplayCompilerError(e As ObjoScript.CompilerException)
+		  /// Displays details about a compiler error in the Info label.
+		  
+		  Info.Text = e.Location.LineNumber.ToString + ": " + e.Message
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 446973706C6179732064657461696C732061626F75742061206C6578657220657863657074696F6E20696E2074686520496E666F206C6162656C2E
 		Sub DisplayLexerError(e As ObjoScript.LexerException)
 		  /// Displays details about a lexer exception in the Info label.
@@ -715,47 +732,17 @@ End
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 446973706C61797320616E79206572726F72732074686174206F6363757272656420647572696E672070617273696E672E
-		Sub DisplayParserErrors()
+		Sub DisplayParserErrors(errors() As ObjoScript.ParserException)
 		  /// Displays any errors that occurred during parsing.
 		  
-		  If Parser.Errors.Count = 1 Then
+		  If errors.Count = 1 Then
 		    Info.Text = "A parsing error occurred."
 		  Else
-		    Info.Text = Parser.Errors.Count.ToString + " parsing errors occurred."
+		    Info.Text = errors.Count.ToString + " parsing errors occurred."
 		  End If
 		  
-		  UpdateErrorsListbox
+		  UpdateParsingErrorsListbox(errors)
 		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub Parse()
-		  #Pragma BreakOnExceptions False
-		  
-		  Reset(False)
-		  
-		  SwitchToPanel(PANEL_AST)
-		  
-		  Try
-		    Tokens = Lexer.Tokenise(Code.Text)
-		    UpdateTokensListbox
-		    
-		    AST = Parser.Parse(Tokens)
-		    
-		    For Each stmt As ObjoScript.Stmt In AST
-		      Call stmt.Accept(ASTView)
-		    Next stmt
-		    
-		  Catch e As ObjoScript.LexerException
-		    DisplayLexerError(e)
-		  End Try
-		  
-		  If Parser.HasError Then
-		    DisplayParserErrors
-		  Else
-		    Info.Text = "No errors."
-		  End If
 		End Sub
 	#tag EndMethod
 
@@ -763,12 +750,8 @@ End
 		Sub Reset(clearSource As Boolean = True)
 		  If clearSource Then Code.Text = ""
 		  
-		  Lexer = New ObjoScript.Lexer
-		  Tokens.ResizeTo(-1)
 		  TokensListbox.RemoveAllRows
 		  
-		  Parser = New ObjoScript.Parser
-		  AST.ResizeTo(-1)
 		  ASTView.RemoveAllNodes
 		  
 		  ErrorsListbox.RemoveAllRows
@@ -779,6 +762,8 @@ End
 		  
 		  DisassemblerOutput.Text = ""
 		  mDisassemblerOutput.ResizeTo(-1)
+		  
+		  Compiler = New ObjoScript.Compiler
 		  
 		  VM = New ObjoScript.VM
 		  
@@ -823,31 +808,42 @@ End
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0
-		Sub UpdateErrorsListbox()
+	#tag Method, Flags = &h0, Description = 557064617465732074686520415354207669657720746F20636F6E7461696E20746865207061737365642060617374602E
+		Sub UpdateASTView(ast() As ObjoScript.Stmt)
+		  /// Updates the AST view to contain the passed `ast`.
+		  
+		  For Each stmt As ObjoScript.Stmt In ast
+		    Call stmt.Accept(ASTView)
+		  Next stmt
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 55706461746573207468652070617273696E67206572726F7273206C697374626F7820776974682074686520636F6E74656E7473206F6620606572726F7273602E
+		Sub UpdateParsingErrorsListbox(errors() As ObjoScript.ParserException)
+		  /// Updates the parsing errors listbox with the contents of `errors`.
+		  
 		  ErrorsListbox.RemoveAllRows
 		  
-		  If Parser = Nil Or Not Parser.HasError Then
-		    Return
-		  End If
+		  If errors.Count = 0 Then Return
 		  
-		  For Each e As ObjoScript.ParserException In Parser.Errors
+		  For Each e As ObjoScript.ParserException In errors
 		    ErrorsListbox.AddRow(e.Message, e.Location.LineNumber.ToString, e.Location.StartPosition.ToString, e.Location.ScriptID.ToString)
 		  Next e
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 557064617465732074686520746F6B656E73206C697374626F78207769746820746865207061737365642060746F6B656E73602E
-		Sub UpdateTokensListbox()
-		  /// Updates the tokens listbox with the passed.
+	#tag Method, Flags = &h0, Description = 557064617465732074686520746F6B656E73206C697374626F7820776974682074686520706173736564206172726179206F662060746F6B656E73602E
+		Sub UpdateTokensListbox(tokens() As ObjoScript.Token)
+		  /// Updates the tokens listbox with the passed array of `tokens`.
 		  ///
 		  /// type, line, abs pos, value, script ID.
 		  
 		  TokensListbox.RemoveAllRows
 		  
 		  Var type, value As String
-		  For Each t As ObjoScript.Token In Tokens
+		  For Each t As ObjoScript.Token In tokens
 		    
 		    // Compute the value and type.
 		    Select Case t.Type
@@ -877,23 +873,15 @@ End
 
 
 	#tag Property, Flags = &h0
-		AST() As ObjoScript.Stmt
+		Compiler As ObjoScript.Compiler
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
-		Lexer As ObjoScript.Lexer
+		Disassembler As ObjoScript.Disassembler
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
 		Private mDisassemblerOutput() As String
-	#tag EndProperty
-
-	#tag Property, Flags = &h0
-		Parser As ObjoScript.Parser
-	#tag EndProperty
-
-	#tag Property, Flags = &h0
-		Tokens() As ObjoScript.Token
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
@@ -923,13 +911,6 @@ End
 		End Sub
 	#tag EndEvent
 #tag EndEvents
-#tag Events ButtonParse
-	#tag Event
-		Sub Pressed()
-		  Parse
-		End Sub
-	#tag EndEvent
-#tag EndEvents
 #tag Events ButtonAST
 	#tag Event
 		Sub Pressed()
@@ -951,49 +932,19 @@ End
 		End Sub
 	#tag EndEvent
 #tag EndEvents
-#tag Events ButtonTest
-	#tag Event
-		Sub Pressed()
-		  // Create a chunk.
-		  
-		  SwitchToPanel(PANEL_DISASSEMBLER_OUTPUT)
-		  
-		  // Create a test chunk.
-		  // -((2 + 4) / 3)
-		  Var tok1 As New ObjoScript.Token(ObjoScript.TokenTypes.EOL, 0, 1, "", 0)
-		  Var chunk As New ObjoScript.Chunk
-		  chunk.WriteByte(ObjoScript.VM.OP_CONSTANT, tok1)
-		  chunk.WriteByte(chunk.AddConstant(CType(2, Double)), tok1)
-		  chunk.WriteByte(ObjoScript.VM.OP_CONSTANT, tok1)
-		  chunk.WriteByte(chunk.AddConstant(CType(4, Double)), tok1)
-		  
-		  chunk.WriteByte(ObjoScript.VM.OP_ADD, tok1)
-		  
-		  chunk.WriteByte(ObjoScript.VM.OP_CONSTANT, tok1)
-		  chunk.WriteByte(chunk.AddConstant(CType(3, Double)), tok1)
-		  
-		  chunk.WriteByte(ObjoScript.VM.OP_DIVIDE, tok1)
-		  
-		  chunk.WriteByte(ObjoScript.VM.OP_NEGATE, tok1)
-		  chunk.WriteByte(ObjoScript.VM.OP_RETURN, tok1)
-		  
-		  // Disassemble it.
-		  Var disassembler As New ObjoScript.Disassembler
-		  Addhandler disassembler.Print, AddressOf DisassemblerPrintDelegate
-		  Addhandler disassembler.PrintLine, AddressOf DisassemblerPrintLineDelegate
-		  disassembler.Disassemble(chunk, "Test Chunk", True)
-		  
-		  // Execute it.
-		  VM = New ObjoScript.VM
-		  VM.Interpret(chunk)
-		  
-		End Sub
-	#tag EndEvent
-#tag EndEvents
 #tag Events ButtonDisassembler
 	#tag Event
 		Sub Pressed()
 		  SwitchToPanel(PANEL_DISASSEMBLER_OUTPUT)
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ButtonCompile
+	#tag Event
+		Sub Pressed()
+		  /// Compile the source code in `Code` and run it.
+		  
+		  Compile
 		End Sub
 	#tag EndEvent
 #tag EndEvents
