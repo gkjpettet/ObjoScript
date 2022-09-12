@@ -48,6 +48,21 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitBlock(block As ObjoScript.BlockStmt) As Variant
+		  #Pragma Warning "TODO: Need to return nodes from ALL visits. Cannot rely on appending them."
+		  
+		  Var node As New TreeViewNode("Block")
+		  
+		  For Each statement As ObjoScript.Stmt In block.Statements
+		    node.AppendNode(statement.Accept(Self))
+		  Next statement
+		  
+		  Me.AppendNode(node)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitBoolean(expr As ObjoScript.BooleanLiteral) As Variant
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  

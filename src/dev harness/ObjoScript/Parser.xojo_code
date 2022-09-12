@@ -52,6 +52,31 @@ Protected Class Parser
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 506172736573206120626C6F636B206F662073746174656D656E74732E20417373756D6573207468652070617273657220686173206A75737420636F6E73756D656420746865206C656164696E6720607B602E
+		Function Block() As ObjoScript.Stmt
+		  /// Parses a block of statements.
+		  /// Assumes the parser has just consumed the leading `{`.
+		  
+		  Var location As ObjoScript.Token = Previous
+		  
+		  Var statements() As ObjoScript.Stmt
+		  
+		  // Consume an optional new line.
+		  Call Match(ObjoScript.TokenTypes.EOL)
+		  
+		  While Not Check(ObjoScript.TokenTypes.RCurly, ObjoScript.TokenTypes.EOF)
+		    statements.Add(Declaration)
+		  Wend
+		  
+		  Consume(ObjoScript.TokenTypes.RCurly, "Expected a closing brace after block.")
+		  
+		  ConsumeNewLine
+		  
+		  Return New ObjoScript.BlockStmt(statements, location)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E732074727565206966207468652063757272656E7420746F6B656E206D61746368657320616E79206F6620746865207370656369666965642074797065732E2053696D696C617220746F20604D617463682829602062757420646F6573204E4F5420636F6E73756D65207468652063757272656E7420746F6B656E2069662074686572652069732061206D617463682E
 		Private Function Check(types() As ObjoScript.TokenTypes) As Boolean
 		  /// Returns true if the current token matches any of the specified types.
@@ -467,6 +492,7 @@ Protected Class Parser
 		  Current = Nil
 		  mCurrentIndex = -1
 		  Errors.ResizeTo(-1)
+		  ScopeDepth = 0
 		End Sub
 	#tag EndMethod
 
@@ -474,7 +500,11 @@ Protected Class Parser
 		Private Function Statement() As ObjoScript.Stmt
 		  /// Parses a statement.
 		  
-		  If Match(ObjoScript.TokenTypes.Print) Then
+		  If Match(ObjoScript.TokenTypes.LCurly) Then
+		    #Pragma Warning "TODO: Track scope depth here as well as in the compiler?"
+		    Return Block
+		    
+		  ElseIf Match(ObjoScript.TokenTypes.Print) Then
 		    Return PrintStatement
 		    
 		  ElseIf Match(ObjoScript.TokenTypes.Assert) Then
@@ -553,7 +583,7 @@ Protected Class Parser
 		  
 		  ConsumeNewLine("Expected a new line or EOF after a variable declaration.")
 		  
-		  Return New VarDeclStmt(identifier.Lexeme, initialiser, varLocation)
+		  Return New VarDeclStmt(identifier, initialiser, varLocation)
 		  
 		End Function
 	#tag EndMethod
@@ -623,6 +653,10 @@ Protected Class Parser
 
 	#tag Property, Flags = &h0, Description = 5468652070726576696F75736C79206576616C756174656420746F6B656E202877696C6C206265204E696C207768656E207468652070617273657220626567696E73292E
 		Previous As ObjoScript.Token
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 5468652063757272656E742073636F70652064657074682E2030203D20676C6F62616C2073636F70652E
+		Private ScopeDepth As Integer = 0
 	#tag EndProperty
 
 

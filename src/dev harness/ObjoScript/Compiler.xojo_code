@@ -16,6 +16,20 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 547261636B732061206C6F63616C207661726961626C6520696E207468652063757272656E742073636F70652E
+		Private Sub AddLocal(identifier As ObjoScript.Token)
+		  /// Tracks a local variable in the current scope.
+		  
+		  If locals.Count > MAX_LOCALS Then
+		    Error("Too many local variables in scope.")
+		  End If
+		  
+		  // Set the local's depth to `-1`. This indicates the local is not yet initialised.
+		  Locals.Add(New ObjoScript.LocalVariable(identifier, -1))
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 52657475726E73207468652061627374726163742073796E7461782074726565206C61737420636F6D70696C6564206279207468697320636F6D70696C65722E2049742073686F756C6420626520636F6E7369646572656420726561642D6F6E6C792E
 		Function AST() As ObjoScript.Stmt()
 		  /// Returns the abstract syntax tree last compiled by this compiler.
@@ -24,6 +38,15 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  Return mAST
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub BeginScope()
+		  /// Begins a new scope.
+		  
+		  ScopeDepth = ScopeDepth + 1
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320616E2061627374726163742073796E746178207472656520696E746F2061206368756E6B2E2052616973657320612060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
@@ -106,10 +129,51 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 4F7574707574732074686520696E737472756374696F6E7320726571756972656420746F20646566696E65206120676C6F62616C207661726961626C652077686F7365206E616D652069732073746F72656420696E2074686520636F6E7374616E7420706F6F6C2061742060696E646578602E
+	#tag Method, Flags = &h0, Description = 466F72206C6F63616C207661726961626C65732C20746869732069732074686520706F696E742061742077686963682074686520636F6D70696C6572207265636F726473207468656972206578697374656E63652E
+		Sub DeclareVariable(identifier As ObjoScript.Token)
+		  /// For local variables, this is the point at which the compiler records their existence.
+		  ///
+		  /// `identifier` is the token representing the variable's name in the original source code.
+		  
+		  #Pragma Warning "TODO: Find a way to track the name of locals in the VM for runtime debugging"
+		  
+		  // Global variables are late bound so the compiler doesn't keep track of
+		  // which declarations for them it has seen.
+		  If ScopeDepth = 0 Then Return
+		  
+		  // Ensure that another variable has not been declared in current scope with this name.
+		  Var name As String = identifier.Lexeme
+		  For i As Integer = Locals.Count - 1 DownTo 0
+		    Var local As ObjoScript.LocalVariable = Locals(i)
+		    #Pragma Warning "What is this -1 business?"
+		    If local.Depth <> -1 And local.Depth < ScopeDepth Then
+		      Exit
+		    End If
+		    
+		    If name = local.Name Then
+		      Error("There is already a variable with this name (" + name + ") in this scope.")
+		    End If
+		  Next i
+		  
+		  // Must be a local variable. Add it to the list of variables in the current scope.
+		  AddLocal(identifier)
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 446566696E65732061207661726961626C6520617320726561647920746F207573652E
 		Private Sub DefineVariable(index As Integer)
-		  /// Outputs the instructions required to define a global variable whose name is stored in the
+		  /// Defines a variable as ready to use.
+		  ///
+		  /// For globals it outputs the instructions required to define a global variable whose name is stored in the
 		  /// constant pool at `index`.
+		  /// For locals, it marks the variable as ready for use by setting its `Depth` property to the current scope depth.
+		  
+		  // Nothing to do if this is a local variable definition.
+		  If ScopeDepth > 0 Then
+		    // Mark this local variable as initialised by setting its scope depth.
+		    Locals(Locals.LastIndex).Depth = ScopeDepth
+		    Return
+		  End If
 		  
 		  If index <= 255 Then
 		    // We only need a single byte operand to specify the index of the variable's name in the constant pool.
@@ -201,6 +265,28 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 456E6473207468652063757272656E742073636F70652E
+		Private Sub EndScope()
+		  /// Ends the current scope.
+		  
+		  ScopeDepth = ScopeDepth - 1
+		  
+		  // Remove any locals declared in this scope by popping them off the top of the stack.
+		  Var popCount As Integer = 0
+		  While Locals.Count > 0 And Locals(Locals.LastIndex).Depth > ScopeDepth
+		    popCount = popCount + 1
+		    // And removing them from the currently tracked locals array.
+		    Call Locals.Pop
+		  Wend
+		  
+		  // It's more efficient to pop multiple values off the stack at once, therefore we use OP_POP_N.
+		  If popCount > 0 Then
+		    EmitBytes(ObjoScript.VM.OP_POP_N, popCount)
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 526169736573206120436F6D70696C6572457863657074696F6E20617420606C6F636174696F6E602E
 		Private Sub Error(message As String, location As ObjoScript.Token = Nil)
 		  /// Raises a CompilerException at the current location. If the error is not at the current location,
@@ -236,7 +322,44 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  mParseTime = 0
 		  mCompileTime = 0
 		  mStopWatch = New ObjoScript.StopWatch(False)
+		  ScopeDepth = 0
+		  Locals.RemoveAll
+		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E732074686520737461636B20696E646578206F6620746865206C6F63616C207661726961626C65206E616D656420606E616D6560206F7220602D3160206966207468657265206973206E6F206D61746368696E67206C6F63616C207661726961626C6520776974682074686174206E616D652E
+		Private Function ResolveLocal(name As String) As Integer
+		  /// Returns the stack index of the local variable named `name` or `-1` if there is 
+		  /// no matching local variable with that name.
+		  ///
+		  /// This works because when we declare a local variable we append it to Locals.
+		  /// This means that the first declared variable is at index 0, the next one index 1 and so on.
+		  /// Therefore the Locals array in the compiler has the _exact_ same layout as the VM's stack
+		  /// will have at runtime. This means the variable's index in Locals is the same as its 
+		  /// stack slot.
+		  
+		  // Walk the list of local variables that are currently in scope.
+		  // If one is named `name` then we've found it.
+		  // We walk backwards so we find the _last_ declared variable named `name`
+		  // which ensures that inner local variables correctly shadow locals with the
+		  // same name in surrounding scopes.
+		  Var local As ObjoScript.LocalVariable
+		  For i As Integer = Locals.LastIndex DownTo 0
+		    local = Locals(i)
+		    If name = local.Name Then
+		      // Ensure that this local variable has been initialised.
+		      If local.Depth = -1 Then
+		        Error("You can't read a local variable in its own initialiser.")
+		      End If
+		      Return i
+		    End If
+		  Next i
+		  
+		  // There is no local variable with this name. It should therefore be assumed to be global.
+		  Return -1
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 54686520746F6B656E73207468697320636F6D70696C657220697320636F6D70696C696E672E204D617920626520656D7074792069662074686520636F6D70696C65722077617320696E737472756374656420746F20636F6D70696C6520616E20415354206469726563746C792E2053686F756C6420626520636F6E7369646572656420726561642D6F6E6C792E
@@ -274,18 +397,36 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  // Evaluate the value to assign.
 		  Call expr.Value.Accept(Self)
 		  
-		  // Add the name of the variable (the assignee) to the constant pool and get its index.
-		  Var index As Integer = AddConstant(expr.Name)
+		  ' // Add the name of the variable (the assignee) to the constant pool and get its index.
+		  ' Var index As Integer = AddConstant(expr.Name)
+		  ' 
+		  ' If index <= 255 Then
+		  ' // We only need a single byte operand to specify the index of the assignee's name in the constant pool.
+		  ' EmitBytes(ObjoScript.VM.OP_SET_GLOBAL, index)
+		  ' Else
+		  ' // We need two bytes for the operand.
+		  ' EmitByte(ObjoScript.VM.OP_SET_GLOBAL_LONG)
+		  ' EmitUInt16(index)
+		  ' End If
 		  
-		  If index <= 255 Then
-		    // We only need a single byte operand to specify the index of the assignee's name in the constant pool.
-		    EmitBytes(ObjoScript.VM.OP_SET_GLOBAL, index)
+		  Var arg As Integer = ResolveLocal(expr.Name)
+		  
+		  If arg <> -1 Then
+		    // Set a local variable.
+		    EmitBytes(ObjoScript.VM.OP_SET_LOCAL, arg)
 		  Else
-		    // We need two bytes for the operand.
-		    EmitByte(ObjoScript.VM.OP_SET_GLOBAL_LONG)
-		    EmitUInt16(index)
+		    // Set a global variable.
+		    // Add the name of the variable to the constant pool and get its index.
+		    Var index As Integer = AddConstant(expr.Name)
+		    If index <= 255 Then
+		      // We only need a single byte operand to specify the index of the assignee's name in the constant pool.
+		      EmitBytes(ObjoScript.VM.OP_SET_GLOBAL, index)
+		    Else
+		      // We need two bytes for the operand.
+		      EmitByte(ObjoScript.VM.OP_SET_GLOBAL_LONG)
+		      EmitUInt16(index)
+		    End If
 		  End If
-		  
 		End Function
 	#tag EndMethod
 
@@ -383,6 +524,22 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		    Error("Unknown binary operator """ + expr.Operator.ToString + """")
 		  End Select
 		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function VisitBlock(block As ObjoScript.BlockStmt) As Variant
+		  /// Compile a block of statements.
+		  ///
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  
+		  BeginScope
+		  
+		  For Each s As ObjoScript.Stmt In block.Statements
+		    Call s.Accept(Self)
+		  Next s
+		  
+		  EndScope
 		End Function
 	#tag EndMethod
 
@@ -532,8 +689,13 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  // Compile the initialiser.
 		  Call stmt.Initialiser.Accept(Self)
 		  
-		  // Add the name of the variable to the constant pool and get its index.
-		  Var index As Integer = AddConstant(stmt.Name)
+		  DeclareVariable(stmt.Identifier)
+		  
+		  Var index As Integer = -1 // -1 is a deliberate invalid index.
+		  If ScopeDepth = 0 Then
+		    // Global variable declaration. Add the name of the variable to the constant pool and get its index.
+		    index = AddConstant(stmt.Name)
+		  End If
 		  
 		  DefineVariable(index)
 		  
@@ -546,18 +708,36 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
-		  // Add the name of the variable to the constant pool and get its index.
-		  Var index As Integer = AddConstant(expr.Name)
+		  ' // Add the name of the variable to the constant pool and get its index.
+		  ' Var index As Integer = AddConstant(expr.Name)
+		  ' 
+		  ' If index <= 255 Then
+		  ' // We only need a single byte operand to specify the index of the variable's name in the constant pool.
+		  ' EmitBytes(ObjoScript.VM.OP_GET_GLOBAL, index)
+		  ' Else
+		  ' // We need two bytes for the operand.
+		  ' EmitByte(ObjoScript.VM.OP_GET_GLOBAL_LONG)
+		  ' EmitUInt16(index)
+		  ' End If
 		  
-		  If index <= 255 Then
-		    // We only need a single byte operand to specify the index of the variable's name in the constant pool.
-		    EmitBytes(ObjoScript.VM.OP_GET_GLOBAL, index)
+		  Var arg As Integer = ResolveLocal(expr.Name)
+		  
+		  If arg <> -1 Then
+		    // Retrieve a local variable.
+		    EmitBytes(ObjoScript.VM.OP_GET_LOCAL, arg)
 		  Else
-		    // We need two bytes for the operand.
-		    EmitByte(ObjoScript.VM.OP_GET_GLOBAL_LONG)
-		    EmitUInt16(index)
+		    // Retrieve a global variable.
+		    // Add the name of the variable to the constant pool and get its index.
+		    Var index As Integer = AddConstant(expr.Name)
+		    If index <= 255 Then
+		      // We only need a single byte operand to specify the index of the variable's name in the constant pool.
+		      EmitBytes(ObjoScript.VM.OP_GET_GLOBAL, index)
+		    Else
+		      // We need two bytes for the operand.
+		      EmitByte(ObjoScript.VM.OP_GET_GLOBAL_LONG)
+		      EmitUInt16(index)
+		    End If
 		  End If
-		  
 		End Function
 	#tag EndMethod
 
@@ -573,6 +753,10 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 
 	#tag Property, Flags = &h21, Description = 54686520636F6D70696C65722773206C657865722E205573656420746F20746F6B656E69736520736F7572636520636F64652E
 		Private Lexer As ObjoScript.Lexer
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 546865206C6F63616C207661726961626C657320746861742061726520696E2073636F70652E
+		Locals() As ObjoScript.LocalVariable
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 5468652061627374726163742073796E7461782074726565207468697320636F6D70696C657220697320636F6D70696C696E672E
@@ -620,6 +804,10 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		ParseTime As Double
 	#tag EndComputedProperty
 
+	#tag Property, Flags = &h21, Description = 5468652063757272656E742073636F70652064657074682E2030203D20676C6F62616C2073636F70652E
+		Private ScopeDepth As Integer = 0
+	#tag EndProperty
+
 	#tag ComputedProperty, Flags = &h0, Description = 5468652074696D652074616B656E20746F20746F6B656E6973652074686520736F7572636520636F646520286D696C6C697365636F6E6473292E
 		#tag Getter
 			Get
@@ -637,6 +825,10 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		#tag EndGetter
 		TotalTime As Double
 	#tag EndComputedProperty
+
+
+	#tag Constant, Name = MAX_LOCALS, Type = Double, Dynamic = False, Default = \"256", Scope = Public, Description = 546865206D6178696D756D206E756D626572206F66206C6F63616C207661726961626C657320746861742063616E20626520696E2073636F7065206174206F6E652074696D652E204C696D6974656420746F206F6E6520627974652064756520746F2074686520696E737472756374696F6E2773206F706572616E642073697A652E
+	#tag EndConstant
 
 
 	#tag ViewBehavior

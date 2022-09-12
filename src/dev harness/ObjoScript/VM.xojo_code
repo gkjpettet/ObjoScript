@@ -319,6 +319,10 @@ Protected Class VM
 		    Case OP_POP
 		      Call Pop
 		      
+		    Case OP_POP_N
+		      // Pop N values off the stack. N is the operand.
+		      StackTop = StackTop - ReadByte
+		      
 		    Case OP_SHIFT_LEFT
 		      Var b As Variant = Pop
 		      Var a As Variant = Pop
@@ -417,6 +421,16 @@ Protected Class VM
 		      Else
 		        Error("Undefined variable `" + name + "`.")
 		      End If
+		      
+		    Case OP_GET_LOCAL
+		      // The operand is the stack slot where the local variable lives.
+		      // Load the value at that index and then push it on to the top of the stack.
+		      Push(Stack(ReadByte))
+		      
+		    Case OP_SET_LOCAL
+		      // The operand is the stack slot where the local variable lives.
+		      // Store the value at the top of the stack in the stack slot corresponding to the local variable.
+		      Stack(ReadByte) = Peek(0)
 		      
 		    End Select
 		  Wend
@@ -528,6 +542,9 @@ Protected Class VM
 		33: OP_GET_GLOBAL_LONG
 		34: OP_SET_GLOBAL
 		35: OP_SET_GLOBAL_LONG
+		36: OP_POP_N
+		37: OP_GET_LOCAL
+		38: OP_SET_LOCAL
 		
 	#tag EndNote
 
@@ -607,6 +624,9 @@ Protected Class VM
 	#tag Constant, Name = OP_GET_GLOBAL_LONG, Type = Double, Dynamic = False, Default = \"33", Scope = Public
 	#tag EndConstant
 
+	#tag Constant, Name = OP_GET_LOCAL, Type = Double, Dynamic = False, Default = \"37", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = OP_GREATER, Type = Double, Dynamic = False, Default = \"11", Scope = Public
 	#tag EndConstant
 
@@ -649,6 +669,9 @@ Protected Class VM
 	#tag Constant, Name = OP_POP, Type = Double, Dynamic = False, Default = \"19", Scope = Public
 	#tag EndConstant
 
+	#tag Constant, Name = OP_POP_N, Type = Double, Dynamic = False, Default = \"36", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = OP_PRINT, Type = Double, Dynamic = False, Default = \"28", Scope = Public
 	#tag EndConstant
 
@@ -659,6 +682,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SET_GLOBAL_LONG, Type = Double, Dynamic = False, Default = \"35", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SET_LOCAL, Type = Double, Dynamic = False, Default = \"38", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SHIFT_LEFT, Type = Double, Dynamic = False, Default = \"20", Scope = Public

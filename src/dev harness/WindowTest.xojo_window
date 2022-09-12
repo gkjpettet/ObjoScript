@@ -755,7 +755,8 @@ End
 		    UpdateTokensListbox(Compiler.Tokens)
 		    
 		    // Show the AST.
-		    UpdateASTView(Compiler.AST)
+		    #Pragma Warning "Uncomment when fixed"
+		    'UpdateASTView(Compiler.AST)
 		    
 		    // Disassemble the chunk.
 		    Disassembler.Disassemble(chunk, "Test")
@@ -765,9 +766,19 @@ End
 		    DisplayLexerError(le)
 		    
 		  Catch pe As ObjoScript.ParserException
+		    // Show the tokens.
+		    UpdateTokensListbox(Compiler.Tokens)
+		    
 		    DisplayParserErrors(Compiler.ParserErrors)
 		    
 		  Catch ce As ObjoScript.CompilerException
+		    // Show the tokens.
+		    UpdateTokensListbox(Compiler.Tokens)
+		    
+		    // Show the AST.
+		    #Pragma Warning "Uncomment when fixed"
+		    'UpdateASTView(Compiler.AST)
+		    
 		    DisplayCompilerError(ce)
 		  End Try
 		  

@@ -232,6 +232,15 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_SET_GLOBAL_LONG
 		    Return ConstantInstruction(opcode, chunk, offset)
 		    
+		  Case ObjoScript.VM.OP_POP_N
+		    Return TwoByteInstruction("POP_N", chunk, offset)
+		    
+		  Case VM.OP_GET_LOCAL
+		    Return TwoByteInstruction("GET LOCAL", chunk, offset)
+		    
+		  Case VM.OP_SET_LOCAL
+		    Return TwoByteInstruction("SET LOCAL", chunk, offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
@@ -249,6 +258,25 @@ Protected Class Disassembler
 		  PrintLine(instructionName.JustifyLeft(COL_WIDTH))
 		  
 		  Return offset + 1
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5072696E747320746865206E616D65206F6620612074776F206279746520696E737472756374696F6E202873696E676C6520627974652C206F6E65206F706572616E642920616E642072657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
+		Function TwoByteInstruction(name As String, chunk As ObjoScript.Chunk, offset As Integer) As Integer
+		  /// Prints the name of a two byte instruction (single byte, one operand) and returns the offset for the next instruction.
+		  ///
+		  /// Format:
+		  /// OFFSET  LINE  (OPTIONAL SCRIPT ID)  NAME  OPERAND_VALUE
+		  
+		  // Print the instruction name.
+		  Print(name.JustifyLeft(2 * COL_WIDTH))
+		  
+		  // Print the operand's value.
+		  Var operand As Integer = chunk.ReadByte(offset + 1)
+		  Print(operand.ToString.JustifyLeft(COL_WIDTH))
+		  
+		  Return offset + 2
 		  
 		End Function
 	#tag EndMethod

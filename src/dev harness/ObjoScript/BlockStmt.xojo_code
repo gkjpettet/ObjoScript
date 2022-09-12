@@ -1,54 +1,42 @@
 #tag Class
-Protected Class VarDeclStmt
+Protected Class BlockStmt
 Implements ObjoScript.Stmt
 	#tag Method, Flags = &h0
 		Function Accept(visitor As ObjoScript.StmtVisitor) As Variant
 		  /// Part of the ObjoScript.Stmt interface.
 		  
-		  Return visitor.VisitVarDeclaration(Self)
+		  Call visitor.VisitBlock(Self)
+		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(identifier As ObjoScript.Token, initialiser As ObjoScript.Expr, location As ObjoScript.Token)
+		Sub Constructor(statements() As ObjoScript.Stmt, location As ObjoScript.Token)
+		  Self.Statements = statements
 		  mLocation = location
-		  Self.Identifier = identifier
-		  Self.Initialiser = initialiser
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 546865206076617260206B6579776F72642E
+	#tag Method, Flags = &h0, Description = 546865206C6F636174696F6E206F66207468697320626C6F636B2773206F70656E696E67206375726C792062726163652E
 		Function Location() As ObjoScript.Token
-		  /// The `var` keyword.
+		  /// The location of this block's opening curly brace.
 		  ///
 		  /// Part of the ObjoScript.Stmt interface.
 		  
 		  Return mLocation
+		  
 		End Function
 	#tag EndMethod
 
 
-	#tag Property, Flags = &h0, Description = 54686520746F6B656E20726570726573656E74696E672074686973207661726961626C652773206964656E7469666965722E
-		Identifier As ObjoScript.Token
-	#tag EndProperty
-
-	#tag Property, Flags = &h0
-		Initialiser As ObjoScript.Expr
-	#tag EndProperty
-
-	#tag Property, Flags = &h21, Description = 54686520746F6B656E20726570726573656E74696E672074686520756E617279206F70657261746F7220696E20746865206F726967696E616C20746F6B656E2073747265616D2E
+	#tag Property, Flags = &h21
 		Private mLocation As ObjoScript.Token
 	#tag EndProperty
 
-	#tag ComputedProperty, Flags = &h0, Description = 546865206E616D65206F6620746865207661726961626C6520746F206465636C6172652E
-		#tag Getter
-			Get
-			  Return Identifier.Lexeme
-			End Get
-		#tag EndGetter
-		Name As String
-	#tag EndComputedProperty
+	#tag Property, Flags = &h0, Description = 5468697320626C6F636B27732073746174656D656E74732E
+		Statements() As ObjoScript.Stmt
+	#tag EndProperty
 
 
 	#tag ViewBehavior
@@ -89,6 +77,14 @@ Implements ObjoScript.Stmt
 			Visible=true
 			Group="Position"
 			InitialValue="0"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="mLocation"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty
