@@ -106,6 +106,23 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 4F7574707574732074686520696E737472756374696F6E7320726571756972656420746F20646566696E65206120676C6F62616C207661726961626C652077686F7365206E616D652069732073746F72656420696E2074686520636F6E7374616E7420706F6F6C2061742060696E646578602E
+		Private Sub DefineVariable(index As Integer)
+		  /// Outputs the instructions required to define a global variable whose name is stored in the
+		  /// constant pool at `index`.
+		  
+		  If index <= 255 Then
+		    // We only need a single byte operand to specify the index of the variable's name in the constant pool.
+		    EmitBytes(ObjoScript.VM.OP_DEFINE_GLOBAL, index)
+		  Else
+		    // We need two bytes for the operand.
+		    EmitByte(ObjoScript.VM.OP_DEFINE_GLOBAL_LONG)
+		    EmitUInt16(index)
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 417070656E647320612073696E676C65206279746520746F207468652063757272656E74206368756E6B206174207468652063757272656E74206C6F636174696F6E2E20416E206F7074696F6E616C20606C6F636174696F6E602063616E2062652070726F76696465642E
 		Private Sub EmitByte(b As UInt8, location As ObjoScript.Token = Nil)
 		  /// Appends a single byte to the current chunk at the current location. An optional `location` can be provided.
@@ -244,6 +261,30 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  Call stmt.Expression.Accept(Self)
 		  
 		  EmitByte(ObjoScript.VM.OP_ASSERT, assertLocation)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C652061207661726961626C652061737369676E6D656E742E
+		Function VisitAssignment(expr As ObjoScript.AssignmentExpr) As Variant
+		  /// Compile a variable assignment.
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  // Evaluate the value to assign.
+		  Call expr.Value.Accept(Self)
+		  
+		  // Add the name of the variable (the assignee) to the constant pool and get its index.
+		  Var index As Integer = AddConstant(expr.Name)
+		  
+		  If index <= 255 Then
+		    // We only need a single byte operand to specify the index of the assignee's name in the constant pool.
+		    EmitBytes(ObjoScript.VM.OP_SET_GLOBAL, index)
+		  Else
+		    // We need two bytes for the operand.
+		    EmitByte(ObjoScript.VM.OP_SET_GLOBAL_LONG)
+		    EmitUInt16(index)
+		  End If
 		  
 		End Function
 	#tag EndMethod
@@ -477,6 +518,46 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  Else
 		    Error("Unknown unary operator: " + expr.Operator.ToString)
 		  End Select
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732061207661726961626C65206465636C61726174696F6E2E
+		Function VisitVarDeclaration(stmt As ObjoScript.VarDeclStmt) As Variant
+		  /// Compiles a variable declaration.
+		  ///
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  
+		  mLocation = stmt.Location
+		  
+		  // Compile the initialiser.
+		  Call stmt.Initialiser.Accept(Self)
+		  
+		  // Add the name of the variable to the constant pool and get its index.
+		  Var index As Integer = AddConstant(stmt.Name)
+		  
+		  DefineVariable(index)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C652072657472696576696E672061206E616D6564207661726961626C652E
+		Function VisitVariable(expr As ObjoScript.VariableExpr) As Variant
+		  /// Compile retrieving a named variable.
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  // Add the name of the variable to the constant pool and get its index.
+		  Var index As Integer = AddConstant(expr.Name)
+		  
+		  If index <= 255 Then
+		    // We only need a single byte operand to specify the index of the variable's name in the constant pool.
+		    EmitBytes(ObjoScript.VM.OP_GET_GLOBAL, index)
+		  Else
+		    // We need two bytes for the operand.
+		    EmitByte(ObjoScript.VM.OP_GET_GLOBAL_LONG)
+		    EmitUInt16(index)
+		  End If
+		  
 		End Function
 	#tag EndMethod
 

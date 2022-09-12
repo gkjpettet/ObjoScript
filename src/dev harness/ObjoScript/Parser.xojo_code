@@ -102,6 +102,22 @@ Protected Class Parser
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 4966207468652063757272656E7420746F6B656E206D6174636865732060657870656374656460207468656E206974277320636F6E73756D656420616E642072657475726E65642E204966206E6F742C20776520726169736520616E20657863657074696F6E207769746820606D657373616765602E
+		Function Consume(expected As ObjoScript.TokenTypes, message As String = "") As ObjoScript.Token
+		  /// If the current token matches `expected` then it's consumed and returned.
+		  /// If not, we raise an exception with `message`.
+		  
+		  If Current.Type <> expected Then
+		    message = If(message = "", "Expected " + expected.ToString + " but got " + Current.Type.ToString + " instead.", message)
+		    Raise New ObjoScript.ParserException(message, Current)
+		  Else
+		    Advance
+		    Return Previous
+		  End If
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 417373657274732074686174207468652063757272656E7420746F6B656E20697320616E20454F4C2E20496620736F20697420697320636F6E73756D65642E204F746865727769736520616E206572726F72207769746820746865206F7074696F6E616C20606D6573736167656020697320637265617465642E
 		Private Sub ConsumeNewLine(message As String = "")
 		  /// Asserts that the current token is an EOL. If so it is consumed. 
@@ -127,8 +143,12 @@ Protected Class Parser
 		  /// Declarations are a type of statement that bind new identifiers.
 		  /// Regular statements produce side effects but do not introduce new bindings.
 		  
-		  // For now, we only parse statements (not definitions like `var` and `class`).
-		  Return Statement
+		  If Match(ObjoScript.TokenTypes.Var_) Then
+		    Return VarDeclaration
+		    
+		  Else
+		    Return Statement
+		  End If
 		  
 		End Function
 	#tag EndMethod
@@ -231,7 +251,7 @@ Protected Class Parser
 		  TokenTypes.Greater           : BinaryOperator(Precedences.Comparison), _
 		  TokenTypes.GreaterEqual      : BinaryOperator(Precedences.Comparison), _
 		  TokenTypes.GreaterGreater    : BinaryOperator(Precedences.BitwiseShift), _
-		  TokenTypes.Identifier        : Unused, _
+		  TokenTypes.Identifier        : Prefix(New VariableParselet), _
 		  TokenTypes.If_               : Unused, _
 		  TokenTypes.Import            : Unused, _
 		  TokenTypes.In_               : Unused, _
@@ -276,8 +296,8 @@ Protected Class Parser
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 4966207468652063757272656E7420746F6B656E206D61746368657320616E79206F66207468652073706563696669656420747970657320697420697320636F6E73756D656420616E64207468652066756E6374696F6E2072657475726E7320547275652E204F7468657277697365206974206A7573742072657475726E732046616C73652E
-		Private Function Match(ParamArray types As ObjoScript.TokenTypes) As Boolean
+	#tag Method, Flags = &h0, Description = 4966207468652063757272656E7420746F6B656E206D61746368657320616E79206F66207468652073706563696669656420747970657320697420697320636F6E73756D656420616E64207468652066756E6374696F6E2072657475726E7320547275652E204F7468657277697365206974206A7573742072657475726E732046616C73652E
+		Function Match(ParamArray types As ObjoScript.TokenTypes) As Boolean
 		  /// If the current token matches any of the specified types it is consumed and 
 		  /// the function returns True. Otherwise it just returns False.
 		  
@@ -379,7 +399,7 @@ Protected Class Parser
 		  // If so, it will parse the "=" itself and handle it appropriately.
 		  Var canAssign As Boolean = precedence <= Precedences.Conditional
 		  
-		  Var left As ObjoScript.Expr = prefix.Parse(Self)
+		  Var left As ObjoScript.Expr = prefix.Parse(Self, canAssign)
 		  
 		  While precedence < GetRule(Current.Type).Precedence
 		    Advance
@@ -506,6 +526,34 @@ Protected Class Parser
 		  /// Convenience method for returning a new GrammarRule that is unused.
 		  
 		  Return New GrammarRule(Nil, Nil, Precedences.None)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 5061727365732061207661726961626C65206465636C61726174696F6E2E20417373756D6573207468652070617273657220686173206A75737420636F6E73756D656420746865206076617260206B6579776F72642E
+		Private Function VarDeclaration() As ObjoScript.Stmt
+		  /// Parses a variable declaration. Assumes the parser has just consumed the `var` keyword.
+		  ///
+		  /// Format:
+		  /// ```objo
+		  /// VAR IDENTIFIER (EQUAL expression)?
+		  /// ```
+		  /// 
+		  /// If an initialiser expression is not provided then the variable is initialised to Nothing.
+		  
+		  // Store the location of the var keyword.
+		  Var varLocation As ObjoScript.Token = Previous
+		  
+		  Var identifier As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier, "Expected a variable name.")
+		  
+		  Var initialiser As ObjoScript.Expr = New ObjoScript.NothingLiteral(varLocation)
+		  If Match(ObjoScript.TokenTypes.Equal) Then
+		    initialiser = Expression
+		  End If
+		  
+		  ConsumeNewLine("Expected a new line or EOF after a variable declaration.")
+		  
+		  Return New VarDeclStmt(identifier.Lexeme, initialiser, varLocation)
 		  
 		End Function
 	#tag EndMethod

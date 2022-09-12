@@ -18,6 +18,12 @@ Protected Interface StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E672061207661726961626C65206465636C61726174696F6E2E
+		Function VisitVarDeclaration(stmt As ObjoScript.VarDeclStmt) As Variant
+		  
+		End Function
+	#tag EndMethod
+
 
 End Interface
 #tag EndInterface

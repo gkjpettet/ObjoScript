@@ -40,6 +40,8 @@ Protected Class VM
 		  ///
 		  /// We will add `s` to our disassembler output buffer until the disassembler raises its `PrintLine()` event.
 		  
+		  #Pragma Unused sender
+		  
 		  #If DebugBuild
 		    DisassemblerOutput.Add(s)
 		  #EndIf
@@ -52,6 +54,8 @@ Protected Class VM
 		  /// Delegate method that is called by our disassembler's `PrintLine()` event.
 		  ///
 		  /// Dump the contents of the disassembler's buffer and `s` to the debug log.
+		  
+		  #Pragma Unused sender
 		  
 		  #If DebugBuild
 		    DisassemblerOutput.Add(s)
@@ -171,6 +175,7 @@ Protected Class VM
 		  
 		  StackTop = 0
 		  Nothing = New ObjoScript.Nothing
+		  Self.Globals = New Dictionary
 		  
 		End Sub
 	#tag EndMethod
@@ -359,6 +364,60 @@ Protected Class VM
 		        Error("Failed assertion.")
 		      End If
 		      
+		    Case OP_DEFINE_GLOBAL
+		      // Define a global variable, the name of which requires a single byte operand to get its index.
+		      Var name As String = ReadConstant
+		      // The value of the variable is on the top of the stack.
+		      globals.Value(name) = Pop
+		      
+		    Case OP_DEFINE_GLOBAL_LONG
+		      // Define a global variable, the name of which requires a two byte operand to get its index.
+		      Var name As String = ReadConstantLong
+		      // The value of the variable is on the top of the stack.
+		      globals.Value(name) = Pop
+		      
+		    Case OP_GET_GLOBAL
+		      // Get the name of the variable.
+		      Var name As String = ReadConstant
+		      // Read its value from the globals dictionary, raising a runtime error if it doesn't exist.
+		      Var value As Variant = Self.Globals.Lookup(name, Nil)
+		      If value = Nil Then
+		        Error("Undefined variable `" + name + "`.")
+		      Else
+		        Push(value)
+		      End If
+		      
+		    Case OP_GET_GLOBAL_LONG
+		      // Get the name of the variable.
+		      Var name As String = ReadConstantLong
+		      // Read its value from the globals dictionary, raising a runtime error if it doesn't exist.
+		      Var value As Variant = Self.Globals.Lookup(name, Nil)
+		      If value = Nil Then
+		        Error("Undefined variable `" + name + "`.")
+		      Else
+		        Push(value)
+		      End If
+		      
+		    Case OP_SET_GLOBAL
+		      // Get the global variable's name (requires a single byte operand to get its index).
+		      Var name As String = ReadConstant
+		      // Assign the value at the top of the stack to this variable, leaving the value on the stack.
+		      If Self.Globals.HasKey(name) Then
+		        Self.Globals.Value(name) = Peek(0)
+		      Else
+		        Error("Undefined variable `" + name + "`.")
+		      End If
+		      
+		    Case OP_SET_GLOBAL_LONG
+		      // Get the global variable's name (requires a two byte operand to get its index).
+		      Var name As String = ReadConstantLong
+		      // Assign the value at the top of the stack to this variable, leaving the value on the stack.
+		      If Self.Globals.HasKey(name) Then
+		        Self.Globals.Value(name) = Peek(0)
+		      Else
+		        Error("Undefined variable `" + name + "`.")
+		      End If
+		      
 		    End Select
 		  Wend
 		  
@@ -432,6 +491,47 @@ Protected Class VM
 	#tag EndHook
 
 
+	#tag Note, Name = Opcodes
+		0:  OP_RETURN
+		1:  OP_CONSTANT
+		2:  OP_CONSTANT_LONG
+		3:  OP_NEGATE
+		4:  OP_ADD
+		5:  OP_SUBTRACT
+		6:  OP_DIVIDE
+		7:  OP_MULTIPLY
+		8:  OP_MODULO
+		9:  OP_NOT
+		10: OP_EQUAL
+		11: OP_GREATER
+		12: OP_LESS
+		13: OP_LESS_EQUAL
+		14: OP_GREATER_EQUAL
+		15: OP_NOT_EQUAL
+		16: OP_TRUE
+		17: OP_FALSE
+		18: OP_NOTHING
+		19: OP_POP
+		20: OP_SHIFT_LEFT
+		21: OP_SHIFT_RIGHT
+		22: OP_BITWISE_AND
+		23: OP_BITWISE_OR
+		24: OP_BITWISE_XOR
+		25: OP_LOAD_1
+		26: OP_LOAD_0
+		27: OP_LOAD_MINUS1
+		28: OP_PRINT
+		29: OP_ASSERT
+		30: OP_DEFINE_GLOBAL
+		31: OP_DEFINE_GLOBAL_LONG
+		32: OP_GET_GLOBAL
+		33: OP_GET_GLOBAL_LONG
+		34: OP_SET_GLOBAL
+		35: OP_SET_GLOBAL_LONG
+		
+	#tag EndNote
+
+
 	#tag Property, Flags = &h0, Description = 546865206368756E6B206F6620636F6465207468697320564D2069732063757272656E746C7920696E74657270726574696E672E
 		Chunk As ObjoScript.Chunk
 	#tag EndProperty
@@ -442,6 +542,10 @@ Protected Class VM
 
 	#tag Property, Flags = &h21, Description = 54686520737472696E6773207061737365642062792074686520646973617373656D626C6572277320605072696E74282960206576656E742061726520616464656420746F2074686973206275666665722E204974277320636C6561726564207768656E2074686520646973617373656D626C6572207261697365732069747320605072696E744C696E65282960206576656E742E
 		Private DisassemblerOutput() As String
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 53746F7265732074686520564D277320676C6F62616C207661726961626C65732E204B6579203D207661726961626C65206E616D652028537472696E67292C2056616C7565203D207661726961626C652076616C7565202856617269616E74292E
+		Private Globals As Dictionary
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 54686520696E737472756374696F6E20706F696E7465722E2054686520696E64657820696E20746865206368756E6B27732060436F646560206172726179206F662074686520696E737472756374696F6E202A61626F757420746F2062652065786563757465642A2E
@@ -482,6 +586,12 @@ Protected Class VM
 	#tag Constant, Name = OP_CONSTANT_LONG, Type = Double, Dynamic = False, Default = \"2", Scope = Public, Description = 5468652061646420636F6E7374616E74202831362D62697429206F70636F64652E
 	#tag EndConstant
 
+	#tag Constant, Name = OP_DEFINE_GLOBAL, Type = Double, Dynamic = False, Default = \"30", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_DEFINE_GLOBAL_LONG, Type = Double, Dynamic = False, Default = \"31", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = OP_DIVIDE, Type = Double, Dynamic = False, Default = \"6", Scope = Public
 	#tag EndConstant
 
@@ -489,6 +599,12 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_FALSE, Type = Double, Dynamic = False, Default = \"17", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_GET_GLOBAL, Type = Double, Dynamic = False, Default = \"32", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_GET_GLOBAL_LONG, Type = Double, Dynamic = False, Default = \"33", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_GREATER, Type = Double, Dynamic = False, Default = \"11", Scope = Public
@@ -537,6 +653,12 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_RETURN, Type = Double, Dynamic = False, Default = \"0", Scope = Public, Description = 5468652072657475726E206F70636F64652E
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SET_GLOBAL, Type = Double, Dynamic = False, Default = \"34", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SET_GLOBAL_LONG, Type = Double, Dynamic = False, Default = \"35", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SHIFT_LEFT, Type = Double, Dynamic = False, Default = \"20", Scope = Public

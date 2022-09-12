@@ -17,11 +17,46 @@ Protected Class Disassembler
 		    constantIndex = chunk.ReadByte(offset + 1)
 		    newOffset = offset + 2
 		    name = "CONSTANT"
+		    
 		  Case ObjoScript.VM.OP_CONSTANT_LONG
 		    // Two byte operand.
 		    constantIndex = chunk.ReadUInt16(offset + 1)
 		    newOffset = offset + 3
 		    name = "CONSTANT_LONG"
+		    
+		  Case ObjoScript.VM.OP_DEFINE_GLOBAL
+		    constantIndex = chunk.ReadByte(offset + 1)
+		    newOffset = offset + 2
+		    name = "DEFINE GLOBAL"
+		    
+		  Case ObjoScript.VM.OP_DEFINE_GLOBAL_LONG
+		    // Two byte operand.
+		    constantIndex = chunk.ReadUInt16(offset + 1)
+		    newOffset = offset + 3
+		    name = "DEFINE_GLOBAL_LONG"
+		    
+		  Case ObjoScript.VM.OP_GET_GLOBAL
+		    constantIndex = chunk.ReadByte(offset + 1)
+		    newOffset = offset + 2
+		    name = "GET GLOBAL"
+		    
+		  Case ObjoScript.VM.OP_GET_GLOBAL_LONG
+		    // Two byte operand.
+		    constantIndex = chunk.ReadUInt16(offset + 1)
+		    newOffset = offset + 3
+		    name = "GET_GLOBAL_LONG"
+		    
+		  Case ObjoScript.VM.OP_SET_GLOBAL
+		    constantIndex = chunk.ReadByte(offset + 1)
+		    newOffset = offset + 2
+		    name = "SET GLOBAL"
+		    
+		  Case ObjoScript.VM.OP_SET_GLOBAL_LONG
+		    // Two byte operand.
+		    constantIndex = chunk.ReadUInt16(offset + 1)
+		    newOffset = offset + 3
+		    name = "SET_GLOBAL_LONG"
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown constant opcode.")
 		  End Select
@@ -35,11 +70,6 @@ Protected Class Disassembler
 		  // Print the constant's value.
 		  Var constant As Variant = chunk.Constants(constantIndex)
 		  PrintLine(ObjoScript.VM.ValueToString(constant))
-		  ' If constant IsA ObjoScript.Value Then
-		  ' PrintLine(ObjoScript.Value(constant).ToString)
-		  ' Else
-		  ' PrintLine(constant.StringValue)
-		  ' End If
 		  
 		  Return newOffset
 		  
@@ -184,6 +214,24 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_ASSERT
 		    Return SimpleInstruction("ASSERT", offset)
 		    
+		  Case ObjoScript.VM.OP_DEFINE_GLOBAL
+		    Return ConstantInstruction(opcode, chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_DEFINE_GLOBAL_LONG
+		    Return ConstantInstruction(opcode, chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_GET_GLOBAL
+		    Return ConstantInstruction(opcode, chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_GET_GLOBAL_LONG
+		    Return ConstantInstruction(opcode, chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_SET_GLOBAL
+		    Return ConstantInstruction(opcode, chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_SET_GLOBAL_LONG
+		    Return ConstantInstruction(opcode, chunk, offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
@@ -215,7 +263,7 @@ Protected Class Disassembler
 	#tag EndHook
 
 
-	#tag Constant, Name = COL_WIDTH, Type = Double, Dynamic = False, Default = \"8", Scope = Private, Description = 5468652077696474682061207374616E6461726420636F6C756D6E20696E2074686520646973617373656D626C79206F75747075742E
+	#tag Constant, Name = COL_WIDTH, Type = Double, Dynamic = False, Default = \"10", Scope = Private, Description = 5468652077696474682061207374616E6461726420636F6C756D6E20696E2074686520646973617373656D626C79206F75747075742E
 	#tag EndConstant
 
 

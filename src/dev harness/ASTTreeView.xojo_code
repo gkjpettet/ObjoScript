@@ -14,6 +14,19 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 5669736974696E672061207661726961626C652061737369676E6D656E742E
+		Function VisitAssignment(expr As ObjoScript.AssignmentExpr) As Variant
+		  /// Visiting a variable assignment.
+		  
+		  Var node As New TreeViewNode("Assign to `" + expr.Name + "`")
+		  
+		  node.AppendNode(expr.Value.Accept(Self))
+		  
+		  Me.AppendNode(node)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Function VisitBinary(expr As ObjoScript.BinaryExpr) As Variant
 		  /// Part of the ObjoScript.ExprVisitor interface.
@@ -130,6 +143,33 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  node.AppendNode(expr.Operand.Accept(Self))
 		  
 		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 50617274206F6620746865204F626A6F5363726970742E53746D7456697369746F7220696E746572666163652E
+		Function VisitVarDeclaration(stmt As ObjoScript.VarDeclStmt) As Variant
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  
+		  Var node As New TreeViewNode("Declare variable")
+		  
+		  Var nameNode As New TreeViewNode("Name: " + stmt.Name)
+		  node.AppendNode(nameNode)
+		  
+		  Var initialiser As New TreeViewNode("Initialiser")
+		  initialiser.AppendNode(stmt.Initialiser.Accept(Self))
+		  node.AppendNode(initialiser)
+		  
+		  Me.AppendNode(node)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function VisitVariable(expr As ObjoScript.VariableExpr) As Variant
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  Return New TreeViewNode("Variable: " + expr.Name)
 		  
 		End Function
 	#tag EndMethod

@@ -18,6 +18,8 @@ Implements ObjoScript.InfixParselet
 		  /// associativity, so we can use a single parselet class for all of those.
 		  /// Part of the ObjoScript.InfixParselet interface.
 		  
+		  #Pragma Unused canAssign
+		  
 		  Var operator As ObjoScript.Token = parser.Previous
 		  
 		  // To handle right-associative operators like "^", we allow a slightly

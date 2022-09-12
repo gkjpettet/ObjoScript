@@ -8,6 +8,8 @@ Implements ObjoScript.InfixParselet
 		  ///
 		  /// Part of the ObjoScript.InfixParselet interface.
 		  
+		  #Pragma Unused canAssign
+		  
 		  Return New PostfixExpr(left, parser.Previous)
 		  
 		End Function
