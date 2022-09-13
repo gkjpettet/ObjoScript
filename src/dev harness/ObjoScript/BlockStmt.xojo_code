@@ -5,7 +5,7 @@ Implements ObjoScript.Stmt
 		Function Accept(visitor As ObjoScript.StmtVisitor) As Variant
 		  /// Part of the ObjoScript.Stmt interface.
 		  
-		  Call visitor.VisitBlock(Self)
+		  Return visitor.VisitBlock(Self)
 		  
 		End Function
 	#tag EndMethod

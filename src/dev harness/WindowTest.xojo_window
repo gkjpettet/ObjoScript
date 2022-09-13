@@ -755,8 +755,7 @@ End
 		    UpdateTokensListbox(Compiler.Tokens)
 		    
 		    // Show the AST.
-		    #Pragma Warning "Uncomment when fixed"
-		    'UpdateASTView(Compiler.AST)
+		    ASTView.Display(Compiler.AST)
 		    
 		    // Disassemble the chunk.
 		    Disassembler.Disassemble(chunk, "Test")
@@ -776,8 +775,7 @@ End
 		    UpdateTokensListbox(Compiler.Tokens)
 		    
 		    // Show the AST.
-		    #Pragma Warning "Uncomment when fixed"
-		    'UpdateASTView(Compiler.AST)
+		    ASTView.Display(Compiler.AST)
 		    
 		    DisplayCompilerError(ce)
 		  End Try
@@ -953,17 +951,6 @@ End
 		  Else
 		    Raise New UnsupportedOperationException("Unknown panel ID.")
 		  End Select
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = 557064617465732074686520415354207669657720746F20636F6E7461696E20746865207061737365642060617374602E
-		Sub UpdateASTView(ast() As ObjoScript.Stmt)
-		  /// Updates the AST view to contain the passed `ast`.
-		  
-		  For Each stmt As ObjoScript.Stmt In ast
-		    Call stmt.Accept(ASTView)
-		  Next stmt
 		  
 		End Sub
 	#tag EndMethod

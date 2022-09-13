@@ -2,6 +2,19 @@
 Protected Class ASTTreeView
 Inherits DesktopTreeView
 Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
+	#tag Method, Flags = &h0, Description = 446973706C61797320606173746020696E20746869732054726565566965772E
+		Sub Display(ast() As ObjoScript.Stmt)
+		  /// Displays `ast` in this TreeView.
+		  
+		  Me.RemoveAllNodes
+		  
+		  For Each statement As ObjoScript.Stmt In ast
+		    Me.AppendNode(statement.Accept(Self))
+		  Next statement
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Function VisitAssertStmt(stmt As ObjoScript.AssertStmt) As Variant
 		  /// Part of the ObjoScript.StmtVisitor interface.
@@ -10,7 +23,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  node.AppendNode(stmt.Expression.Accept(Self))
 		  
-		  Me.AppendNode(node)
+		  Return node
 		End Function
 	#tag EndMethod
 
@@ -22,7 +35,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  node.AppendNode(expr.Value.Accept(Self))
 		  
-		  Me.AppendNode(node)
+		  Return node
 		  
 		End Function
 	#tag EndMethod
@@ -49,15 +62,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 
 	#tag Method, Flags = &h0
 		Function VisitBlock(block As ObjoScript.BlockStmt) As Variant
-		  #Pragma Warning "TODO: Need to return nodes from ALL visits. Cannot rely on appending them."
-		  
 		  Var node As New TreeViewNode("Block")
 		  
 		  For Each statement As ObjoScript.Stmt In block.Statements
 		    node.AppendNode(statement.Accept(Self))
 		  Next statement
 		  
-		  Me.AppendNode(node)
+		  Return node
 		  
 		End Function
 	#tag EndMethod
@@ -77,7 +88,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Function VisitExpressionStmt(stmt As ObjoScript.ExpressionStmt) As Variant
 		  /// Part of the ObjoScript.StmtVisitor interface.
 		  
-		  Me.AppendNode(stmt.Expression.Accept(Self))
+		  Return stmt.Expression.Accept(Self)
 		  
 		End Function
 	#tag EndMethod
@@ -134,7 +145,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  node.AppendNode(stmt.Expression.Accept(Self))
 		  
-		  Me.AppendNode(node)
+		  Return node
 		End Function
 	#tag EndMethod
 
@@ -175,7 +186,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  initialiser.AppendNode(stmt.Initialiser.Accept(Self))
 		  node.AppendNode(initialiser)
 		  
-		  Me.AppendNode(node)
+		  Return node
 		  
 		End Function
 	#tag EndMethod
