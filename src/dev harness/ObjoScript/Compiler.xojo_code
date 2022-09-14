@@ -135,8 +135,6 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  ///
 		  /// `identifier` is the token representing the variable's name in the original source code.
 		  
-		  #Pragma Warning "TODO: Find a way to track the name of locals in the VM for runtime debugging"
-		  
 		  // Global variables are late bound so the compiler doesn't keep track of
 		  // which declarations for them it has seen.
 		  If ScopeDepth = 0 Then Return
@@ -145,7 +143,6 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  Var name As String = identifier.Lexeme
 		  For i As Integer = Locals.Count - 1 DownTo 0
 		    Var local As ObjoScript.LocalVariable = Locals(i)
-		    #Pragma Warning "What is this -1 business?"
 		    If local.Depth <> -1 And local.Depth < ScopeDepth Then
 		      Exit
 		    End If
@@ -243,6 +240,23 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 456D6974732074686520606A756D70496E737472756374696F6E60206F63637572696E6720617420736F7572636520606C6F636174696F6E6020616E6420777269746573206120706C616365686F6C64657220282668464646462920666F7220746865206A756D70206F66667365742E2052657475726E7320746865206F6666736574206F6620746865206A756D7020696E737472756374696F6E2E
+		Private Function EmitJump(jumpInstruction As UInt8, location As ObjoScript.Token) As Integer
+		  /// Emits the `jumpInstruction` occuring at source `location` and writes a placeholder (&hFFFF) for the jump offset.
+		  /// Returns the offset of the jump instruction.
+		  ///
+		  /// We can jump a maximum of &hFFFF (65,535) bytes.
+		  
+		  EmitByte(jumpInstruction, location)
+		  
+		  EmitByte(&hff, location)
+		  EmitByte(&hff, location)
+		  
+		  Return CurrentChunk.Length - 2
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 417070656E647320616E20756E7369676E656420696E7465676572202862696720656E6469616E20666F726D61742C206D6F7374207369676E69666963616E7420627974652066697273742920746F207468652063757272656E74206368756E6B2E205468652063757272656E74206C6F636174696F6E206973207573656420756E6C657373206F7468657277697365207370656369666965642E
 		Private Sub EmitUInt16(i16 As UInt16, location As ObjoScript.Token = Nil)
 		  /// Appends an unsigned integer (big endian format, most significant byte first) to the current chunk.
@@ -308,6 +322,31 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  Return Parser.Errors
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 54616B657320746865206F666673657420696E207468652063757272656E74206368756E6B206F6620746865207374617274206F662061206A756D7020706C616365686F6C64657220616E64207265706C616365732074686520706C616365686F6C6465722077697468207468652074686520616D6F756E74206E656564656420746F20616464656420746F2074686520564D277320495020746F20636175736520697420746F206A756D7020746F207468652063757272656E7420706F736974696F6E20696E20746865206368756E6B2E
+		Private Sub PatchJump(offset As Integer)
+		  /// Takes the offset in the current chunk of the start of a jump placeholder and 
+		  /// replaces the placeholder with the the amount needed to added to the VM's IP to 
+		  /// cause it to jump to the current position in the chunk.
+		  
+		  // Compute the distance to jump to get from the end of the placeholder operand to 
+		  // the current offset in the chunk.
+		  // -2 to adjust for the bytecode for the jump offset itself.
+		  Var jumpDistance As Integer = CurrentChunk.Length - offset - 2
+		  
+		  // The maximum amount of code that can be jumped over is UInt16 max.
+		  If jumpDistance > 65535 Then
+		    Error("Maximum jump distance exceeded.")
+		  End If
+		  
+		  // Replace the 16-bit placeholder with the jump distance.
+		  Var msb As UInt8 = Floor(jumpDistance / 256)
+		  CurrentChunk.Code(offset) = msb
+		  CurrentChunk.Code(offset + 1) = jumpDistance - (msb * 256)
+		  
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 5265736574732074686520636F6D70696C657220736F206974277320726561647920746F20636F6D70696C6520616761696E2E
@@ -396,18 +435,6 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  
 		  // Evaluate the value to assign.
 		  Call expr.Value.Accept(Self)
-		  
-		  ' // Add the name of the variable (the assignee) to the constant pool and get its index.
-		  ' Var index As Integer = AddConstant(expr.Name)
-		  ' 
-		  ' If index <= 255 Then
-		  ' // We only need a single byte operand to specify the index of the assignee's name in the constant pool.
-		  ' EmitBytes(ObjoScript.VM.OP_SET_GLOBAL, index)
-		  ' Else
-		  ' // We need two bytes for the operand.
-		  ' EmitByte(ObjoScript.VM.OP_SET_GLOBAL_LONG)
-		  ' EmitUInt16(index)
-		  ' End If
 		  
 		  Var arg As Integer = ResolveLocal(expr.Name)
 		  
@@ -576,6 +603,44 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C657320616E20606966602073746174656D656E742E
+		Function VisitIfStmt(ifstmt As ObjoScript.IfStmt) As Variant
+		  /// Compiles an `if` statement.
+		  
+		  // Compile the condition - this will leave the result on the top of the stack at runtime.
+		  Call ifstmt.Condition.Accept(Self)
+		  
+		  // Emit the "jump if false" instruction. We'll patch this with the proper offset to jump
+		  // if condition = false _after_ we've compiled the "then branch".
+		  Var thenJump As Integer = EmitJump(ObjoScript.VM.OP_JUMP_IF_FALSE, ifstmt.Location)
+		  
+		  // When the condition is truthy we pop the value off the top of the stack before the 
+		  // code inside the "then branch".
+		  EmitByte(ObjoScript.VM.OP_POP)
+		  
+		  // Compile the "then branch" statement(s).
+		  Call ifstmt.ThenBranch.Accept(Self)
+		  
+		  // Emit the "unconditional jump" instruction. We'll patch this with the proper offset to jump
+		  // if condition = true _after_ we've compiled the "else branch".
+		  Var elseJump As Integer = EmitJump(ObjoScript.VM.OP_JUMP, ifstmt.Location)
+		  
+		  PatchJump(thenJump)
+		  
+		  // When the condition is falsey we pop the value off the top of the stack before the 
+		  // code inside the "else branch".
+		  EmitByte(ObjoScript.VM.OP_POP)
+		  
+		  // Compile the optional "else" branch statements.
+		  If ifstmt.ElseBranch <> Nil Then
+		    Call ifstmt.ElseBranch.Accept(Self)
+		  End If
+		  
+		  PatchJump(elseJump)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 456D69747320224E6F7468696E67222E
 		Function VisitNothing(expr As ObjoScript.NothingLiteral) As Variant
 		  /// Emits "Nothing".
@@ -708,17 +773,7 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
-		  ' // Add the name of the variable to the constant pool and get its index.
-		  ' Var index As Integer = AddConstant(expr.Name)
-		  ' 
-		  ' If index <= 255 Then
-		  ' // We only need a single byte operand to specify the index of the variable's name in the constant pool.
-		  ' EmitBytes(ObjoScript.VM.OP_GET_GLOBAL, index)
-		  ' Else
-		  ' // We need two bytes for the operand.
-		  ' EmitByte(ObjoScript.VM.OP_GET_GLOBAL_LONG)
-		  ' EmitUInt16(index)
-		  ' End If
+		  #Pragma Warning "TODO: Find a way to track the name of locals in the VM for runtime debugging"
 		  
 		  Var arg As Integer = ResolveLocal(expr.Name)
 		  

@@ -256,6 +256,9 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.String_
 		    Return "String"
 		    
+		  Case ObjoScript.TokenTypes.Then_
+		    Return "Then"
+		    
 		  Case ObjoScript.TokenTypes.This
 		    Return "This"
 		    
@@ -404,7 +407,8 @@ Protected Module ObjoScript
 		  Underscore
 		  Var_
 		  While_
-		Xor_
+		  Xor_
+		Then_
 	#tag EndEnum
 
 

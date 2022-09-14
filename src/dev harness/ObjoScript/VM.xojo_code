@@ -432,6 +432,18 @@ Protected Class VM
 		      // Store the value at the top of the stack in the stack slot corresponding to the local variable.
 		      Stack(ReadByte) = Peek(0)
 		      
+		    Case OP_JUMP
+		      // Unconditional jump `offset` bytes from the current instruction pointer.
+		      Var offset As UInt16 = ReadUInt16
+		      IP = IP + offset
+		      
+		    Case OP_JUMP_IF_FALSE
+		      // Jump `offset` bytes from the current instruction pointer _if_ the value on the top of the stack is false.
+		      Var offset As UInt16 = ReadUInt16
+		      If IsFalsey(Peek(0)) Then
+		        IP = IP + offset
+		      End If
+		      
 		    End Select
 		  Wend
 		  
@@ -545,6 +557,8 @@ Protected Class VM
 		36: OP_POP_N
 		37: OP_GET_LOCAL
 		38: OP_SET_LOCAL
+		39: OP_JUMP_IF_FALSE
+		40: OP_JUMP
 		
 	#tag EndNote
 
@@ -631,6 +645,12 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_GREATER_EQUAL, Type = Double, Dynamic = False, Default = \"14", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_JUMP, Type = Double, Dynamic = False, Default = \"40", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_JUMP_IF_FALSE, Type = Double, Dynamic = False, Default = \"39", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_LESS, Type = Double, Dynamic = False, Default = \"12", Scope = Public

@@ -904,6 +904,7 @@ Protected Class Lexer
 			            "print"      : ObjoScript.TokenTypes.Print, _
 			            "return"     : ObjoScript.TokenTypes.Return_, _
 			            "static"     : ObjoScript.TokenTypes.Static_, _
+			            "then"       : ObjoScript.TokenTypes.Then_, _
 			            "this"       : ObjoScript.TokenTypes.This, _
 			            "true"       : ObjoScript.TokenTypes.Boolean_, _
 			            "var"        : ObjoScript.TokenTypes.Var_, _

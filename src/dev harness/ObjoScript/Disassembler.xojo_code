@@ -235,15 +235,43 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_POP_N
 		    Return TwoByteInstruction("POP_N", chunk, offset)
 		    
-		  Case VM.OP_GET_LOCAL
+		  Case ObjoScript.VM.OP_GET_LOCAL
 		    Return TwoByteInstruction("GET LOCAL", chunk, offset)
 		    
-		  Case VM.OP_SET_LOCAL
+		  Case ObjoScript.VM.OP_SET_LOCAL
 		    Return TwoByteInstruction("SET LOCAL", chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_JUMP
+		    Return JumpInstruction("OP_JUMP", False, chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_JUMP_IF_FALSE
+		    Return JumpInstruction("OP_JUMP_IF_FALSE", False, chunk, offset)
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5072696E747320746865206E616D65206F662061206A756D7020696E737472756374696F6E202855496E743136206F706572616E642920616E642072657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E20496620606E6567617469766560207468656E20746869732069732061206261636B7761726473206A756D702E
+		Function JumpInstruction(name As String, negative As Boolean, chunk As ObjoScript.Chunk, offset As Integer) As Integer
+		  /// Prints the name of a jump instruction (UInt16 operand) and returns the offset for the next instruction.
+		  /// If `negative` then this is a backwards jump.
+		  ///
+		  /// Format:
+		  /// OFFSET  LINE  (OPTIONAL SCRIPT ID)  NAME  OFFSET -> DESTINATION
+		  
+		  // Print the instruction name.
+		  Print(name.JustifyLeft(2 * COL_WIDTH))
+		  
+		  // Print the destination offset
+		  Var jump As Integer = chunk.ReadUInt16(offset + 1)
+		  Var destination As Integer = offset + 3 + If(negative, -1, 1) * jump
+		  Var destCol As String = offset.ToString + " -> " + destination.ToString
+		  PrintLine(destCol.JustifyLeft(COL_WIDTH * 2))
+		  
+		  Return offset + 3
 		  
 		End Function
 	#tag EndMethod
@@ -274,7 +302,7 @@ Protected Class Disassembler
 		  
 		  // Print the operand's value.
 		  Var operand As Integer = chunk.ReadByte(offset + 1)
-		  Print(operand.ToString.JustifyLeft(COL_WIDTH))
+		  PrintLine(operand.ToString.JustifyLeft(COL_WIDTH))
 		  
 		  Return offset + 2
 		  

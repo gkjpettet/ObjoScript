@@ -94,6 +94,29 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitIfStmt(ifstmt As ObjoScript.IfStmt) As Variant
+		  Var node As New TreeViewNode("If")
+		  
+		  Var condition As TreeViewNode = New TreeViewNode("Condition")
+		  condition.AppendNode(ifstmt.Condition.Accept(Self))
+		  node.AppendNode(condition)
+		  
+		  Var thenBranch As New TreeViewNode("Then")
+		  thenBranch.AppendNode(ifstmt.ThenBranch.Accept(Self))
+		  node.AppendNode(thenBranch)
+		  
+		  If ifstmt.ElseBranch <> Nil Then
+		    Var elseBranch As New TreeViewNode("Else")
+		    elseBranch.AppendNode(ifstmt.ElseBranch.Accept(Self))
+		    node.AppendNode(elseBranch)
+		  End If
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitNothing(expr As ObjoScript.NothingLiteral) As Variant
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  

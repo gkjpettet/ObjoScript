@@ -741,7 +741,7 @@ End
 
 
 	#tag Method, Flags = &h0
-		Sub Compile()
+		Function Compile() As Boolean
 		  #Pragma BreakOnExceptions False
 		  
 		  Reset(False)
@@ -761,14 +761,21 @@ End
 		    Disassembler.Disassemble(chunk, "Test")
 		    Info.Text = "Compilation successful (" + Compiler.TotalTime.ToString(Locale.Current, "#.#") + " ms)."
 		    
+		    // Successful compilation.
+		    Return True
+		    
 		  Catch le As ObjoScript.LexerException
 		    DisplayLexerError(le)
+		    
+		    Return False
 		    
 		  Catch pe As ObjoScript.ParserException
 		    // Show the tokens.
 		    UpdateTokensListbox(Compiler.Tokens)
 		    
 		    DisplayParserErrors(Compiler.ParserErrors)
+		    
+		    Return False
 		    
 		  Catch ce As ObjoScript.CompilerException
 		    // Show the tokens.
@@ -778,9 +785,11 @@ End
 		    ASTView.Display(Compiler.AST)
 		    
 		    DisplayCompilerError(ce)
+		    
+		    Return False
 		  End Try
 		  
-		End Sub
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 52657475726E7320612073656E7369626C652064656661756C74206D6F6E6F737061636520666F6E74206E616D6520666F722074686520706C6174666F726D207765277265206F6E2E
@@ -893,7 +902,7 @@ End
 		Sub Run()
 		  Reset(False)
 		   
-		  Compile
+		  If Not Compile Then Return
 		  
 		  SwitchToPanel(PANEL_OUTPUT)
 		  
@@ -1109,7 +1118,7 @@ End
 		Sub Pressed()
 		  /// Compile the source code in `Code` but don't run it.
 		  
-		  Compile
+		  Call Compile
 		End Sub
 	#tag EndEvent
 #tag EndEvents

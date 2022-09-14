@@ -70,7 +70,10 @@ Protected Class Parser
 		  
 		  Consume(ObjoScript.TokenTypes.RCurly, "Expected a closing brace after block.")
 		  
-		  ConsumeNewLine
+		  // Edge case: The else keyword is permitted after a closing brace in if statements.
+		  If Not Check(ObjoScript.TokenTypes.Else_) Then
+		    ConsumeNewLine
+		  End If
 		  
 		  Return New ObjoScript.BlockStmt(statements, location)
 		  
@@ -231,6 +234,42 @@ Protected Class Parser
 		  Exception e As KeyNotFoundException
 		    Error("There is no grammar rule for the `" + token.ToString + "` token.")
 		    
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 50617273657320616E20606966602073746174656D656E742E20417373756D6573207468652070617273657220686173206A75737420636F6E73756D656420746865206069666020746F6B656E2E
+		Private Function IfStatement() As ObjoScript.Stmt
+		  /// Parses an `if` statement. Assumes the parser has just consumed the `if` token.
+		  
+		  Var ifKeyword As ObjoScript.Token = Previous
+		  
+		  Var condition As ObjoScript.Expr = Expression
+		  
+		  // Parse the "then" branch.
+		  Var thenBranch As ObjoScript.Stmt
+		  If Match(ObjoScript.TokenTypes.Then_) Then
+		    // Single line if.
+		    thenBranch = Statement
+		  ElseIf Match(ObjoScript.TokenTypes.LCurly) Then
+		    thenBranch = Block
+		  Else
+		    Error("Expected `then` or a `{` after the condition.")
+		  End If
+		  
+		  // Optional else statement.
+		  Var elseBranch As ObjoScript.Stmt = Nil
+		  If Match(ObjoScript.TokenTypes.Else_) Then
+		    If Match(ObjoScript.TokenTypes.If_) Then
+		      elseBranch = IfStatement
+		    ElseIf Match(ObjoScript.TokenTypes.LCurly) Then
+		      elseBranch = Block
+		    Else
+		      Error("Expected a `{` or another `if` statement after the `else` keyword.")
+		    End If
+		  End If
+		  
+		  Return New ObjoScript.IfStmt(condition, thenBranch, elseBranch, ifKeyword)
+		  
 		End Function
 	#tag EndMethod
 
@@ -506,6 +545,9 @@ Protected Class Parser
 		    
 		  ElseIf Match(ObjoScript.TokenTypes.Print) Then
 		    Return PrintStatement
+		    
+		  ElseIf Match(ObjoScript.TokenTypes.If_) Then
+		    Return IfStatement
 		    
 		  ElseIf Match(ObjoScript.TokenTypes.Assert) Then
 		    Return AssertStatement
