@@ -315,6 +315,61 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 436F6D70696C65732061206C6F676963616C2060616E64602065787072657373696F6E2E
+		Private Sub LogicalAnd(logical As ObjoScript.BinaryExpr)
+		  /// Compiles a logical `and` expression.
+		  ///
+		  /// Assumes `logical` is a logical `and` expression.
+		  
+		  mLocation = logical.Location
+		  
+		  // Compile the left hand operand to leave it on the VM's stack.
+		  Call logical.Left.Accept(Self)
+		  
+		  // Since the logical operators short circuit, if the left hand operand is false then the 
+		  // whole expression is false so we jump over the right operand and leave the left
+		  // operand on the top of the stack.
+		  Var endJump As Integer = EmitJump(ObjoScript.VM.OP_JUMP_IF_FALSE, logical.Location)
+		  
+		  // If the left hand operand was false then we need to pop it off the stack.
+		  EmitByte(ObjoScript.VM.OP_POP)
+		  
+		  // Compile the right hand operand.
+		  Call logical.Right.Accept(Self)
+		  
+		  // Back-patch the jump instruction.
+		  PatchJump(endJump)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 436F6D70696C65732061206C6F676963616C2060616E64602065787072657373696F6E2E
+		Private Sub LogicalOr(logical As ObjoScript.BinaryExpr)
+		  /// Compiles a logical `or` expression.
+		  ///
+		  /// Assumes `logical` is a logical `or` expression.
+		  
+		  mLocation = logical.Location
+		  
+		  // Compile the left hand operand to leave it on the VM's stack.
+		  Call logical.Left.Accept(Self)
+		  
+		  // Since the logical operators short circuit, if the left hand operand is true then
+		  // we jump over the right hand operand.
+		  Var endJump As Integer = EmitJump(ObjoScript.VM.OP_JUMP_IF_TRUE, logical.Location)
+		  
+		  // If the left operand was false we need to pop it off the stack.
+		  EmitByte(ObjoScript.VM.OP_POP)
+		  
+		  // The right hand operand only gets evaluated if the left operand was false.
+		  Call logical.Right.Accept(Self)
+		  
+		  // Back-patch the jump instruction.
+		  PatchJump(endJump)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 52657475726E7320616E206172726179206F6620616E792070617273657220657863657074696F6E732074686174206F6363757272656420647572696E67207468652070617273696E672070686173652E204D617920626520656D7074792E
 		Function ParserErrors() As ObjoScript.ParserException()
 		  /// Returns an array of any parser exceptions that occurred during the parsing phase. May be empty.
@@ -518,8 +573,7 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		    EmitByte(ObjoScript.VM.OP_BITWISE_AND)
 		    
 		  Case ObjoScript.TokenTypes.And_
-		    #Pragma Warning "TODO: Implement logical AND operator"
-		    Error("The logical `and` operator has not yet been implemented.")
+		    LogicalAnd(expr)
 		    
 		  Case ObjoScript.TokenTypes.Caret
 		    EmitByte(ObjoScript.VM.OP_BITWISE_XOR)
@@ -537,15 +591,13 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		    Error("The `is` operator has not yet been implemented.")
 		    
 		  Case ObjoScript.TokenTypes.Or_
-		    #Pragma Warning "TODO: Implement logical OR operator"
-		    Error("The logical `or` operator has not yet been implemented.")
+		    LogicalOr(expr)
 		    
 		  Case ObjoScript.TokenTypes.Pipe
 		    EmitByte(ObjoScript.VM.OP_BITWISE_OR)
 		    
 		  Case ObjoScript.TokenTypes.Xor_
-		    #Pragma Warning "TODO: Implement logical XOR operator"
-		    Error("The logical `xor` operator has not yet been implemented.")
+		    EmitByte(ObjoScript.VM.OP_LOGICAL_XOR)
 		    
 		  Else
 		    Error("Unknown binary operator """ + expr.Operator.ToString + """")

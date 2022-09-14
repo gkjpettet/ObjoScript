@@ -199,6 +199,9 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_BITWISE_XOR
 		    Return SimpleInstruction("BITWISE XOR", offset)
 		    
+		  Case ObjoScript.VM.OP_LOGICAL_XOR
+		    Return SimpleInstruction("LOGICAL XOR", offset)
+		    
 		  Case ObjoScript.VM.OP_LOAD_0
 		    Return SimpleInstruction("LOAD 0", offset)
 		    
@@ -246,6 +249,9 @@ Protected Class Disassembler
 		    
 		  Case ObjoScript.VM.OP_JUMP_IF_FALSE
 		    Return JumpInstruction("OP_JUMP_IF_FALSE", False, chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_JUMP_IF_TRUE
+		    Return JumpInstruction("OP_JUMP_IF_TRUE", False, chunk, offset)
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")

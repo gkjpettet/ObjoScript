@@ -100,6 +100,18 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 52657475726E73205472756520696620607660206973202A6E6F742A20636F6E73696465726564202266616C736579222E
+		Private Function IsTruthy(v As Variant) As Boolean
+		  /// Returns True if `v` is *not* considered "falsey".
+		  ///
+		  /// Objo considers the boolean value `false` and the Objo value `nothing` to
+		  /// be False, everything else is True.
+		  
+		  Return Not IsFalsey(v)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E73207468652076616C7565206064697374616E6365602066726F6D2074686520746F70206F662074686520737461636B2E204C6561766573207468652076616C7565206F6E2074686520737461636B2E20412076616C7565206F662060306020776F756C642072657475726E2074686520746F70206974656D2E
 		Private Function Peek(distance As Integer) As Variant
 		  /// Returns the value `distance` from the top of the stack. Leaves the value on the stack. A value of `0` would return the top item.
@@ -438,11 +450,23 @@ Protected Class VM
 		      IP = IP + offset
 		      
 		    Case OP_JUMP_IF_FALSE
-		      // Jump `offset` bytes from the current instruction pointer _if_ the value on the top of the stack is false.
+		      // Jump `offset` bytes from the current instruction pointer _if_ the value on the top of the stack is falsey.
 		      Var offset As UInt16 = ReadUInt16
 		      If IsFalsey(Peek(0)) Then
 		        IP = IP + offset
 		      End If
+		      
+		    Case OP_JUMP_IF_TRUE
+		      // Jump `offset` bytes from the current instruction pointer _if_ the value on the top of the stack is truthy.
+		      Var offset As UInt16 = ReadUInt16
+		      If IsTruthy(Peek(0)) Then
+		        IP = IP + offset
+		      End If
+		      
+		    Case OP_LOGICAL_XOR
+		      Var b As Variant = Pop
+		      Var a As Variant = Pop
+		      Push(IsTruthy(a) Xor IsTruthy(b))
 		      
 		    End Select
 		  Wend
@@ -559,6 +583,8 @@ Protected Class VM
 		38: OP_SET_LOCAL
 		39: OP_JUMP_IF_FALSE
 		40: OP_JUMP
+		41: OP_JUMP_IF_TRUE
+		42: OP_LOGICAL_XOR
 		
 	#tag EndNote
 
@@ -653,6 +679,9 @@ Protected Class VM
 	#tag Constant, Name = OP_JUMP_IF_FALSE, Type = Double, Dynamic = False, Default = \"39", Scope = Public
 	#tag EndConstant
 
+	#tag Constant, Name = OP_JUMP_IF_TRUE, Type = Double, Dynamic = False, Default = \"41", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = OP_LESS, Type = Double, Dynamic = False, Default = \"12", Scope = Public
 	#tag EndConstant
 
@@ -666,6 +695,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_LOAD_MINUS1, Type = Double, Dynamic = False, Default = \"27", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_LOGICAL_XOR, Type = Double, Dynamic = False, Default = \"42", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_MODULO, Type = Double, Dynamic = False, Default = \"8", Scope = Public
