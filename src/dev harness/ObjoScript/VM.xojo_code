@@ -70,7 +70,7 @@ Protected Class VM
 		Private Sub Error(message As String, offset As Integer = -1)
 		  /// Raises a VMException at the current IP (unless otherwise specified).
 		  
-		  #Pragma BreakOnExceptions False
+		  '#Pragma BreakOnExceptions False
 		  
 		  // Default to the current IP if no offset is provided.
 		  offset = If(offset = -1, IP, offset)
@@ -296,26 +296,26 @@ Protected Class VM
 		      Push(Not ValuesEqual(a, b))
 		      
 		    Case OP_GREATER
-		      Var b As Variant
-		      Var a As Variant
+		      Var b As Variant = Pop
+		      Var a As Variant = Pop
 		      AssertNumbers(a, b)
 		      Push(a > b)
 		      
 		    Case OP_GREATER_EQUAL
-		      Var b As Variant
-		      Var a As Variant
+		      Var b As Variant = Pop
+		      Var a As Variant = Pop
 		      AssertNumbers(a, b)
 		      Push(a >= b)
 		      
 		    Case OP_LESS
-		      Var b As Variant
-		      Var a As Variant
+		      Var b As Variant = Pop
+		      Var a As Variant = Pop
 		      AssertNumbers(a, b)
 		      Push(a < b)
 		      
 		    Case OP_LESS_EQUAL
-		      Var b As Variant
-		      Var a As Variant
+		      Var b As Variant = Pop
+		      Var a As Variant = Pop
 		      AssertNumbers(a, b)
 		      Push(a <= b)
 		      
@@ -445,7 +445,7 @@ Protected Class VM
 		      Stack(ReadByte) = Peek(0)
 		      
 		    Case OP_JUMP
-		      // Unconditional jump `offset` bytes from the current instruction pointer.
+		      // Unconditionally jump `offset` bytes from the current instruction pointer.
 		      Var offset As UInt16 = ReadUInt16
 		      IP = IP + offset
 		      
@@ -467,6 +467,11 @@ Protected Class VM
 		      Var b As Variant = Pop
 		      Var a As Variant = Pop
 		      Push(IsTruthy(a) Xor IsTruthy(b))
+		      
+		    Case OP_LOOP
+		      // Unconditionally jump `offset` bytes _back_ from the current instruction pointer.
+		      Var offset AS UInt16 = ReadUInt16
+		      IP = IP - offset
 		      
 		    End Select
 		  Wend
@@ -585,7 +590,7 @@ Protected Class VM
 		40: OP_JUMP
 		41: OP_JUMP_IF_TRUE
 		42: OP_LOGICAL_XOR
-		
+		43: OP_LOOP
 	#tag EndNote
 
 
@@ -698,6 +703,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_LOGICAL_XOR, Type = Double, Dynamic = False, Default = \"42", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_LOOP, Type = Double, Dynamic = False, Default = \"43", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_MODULO, Type = Double, Dynamic = False, Default = \"8", Scope = Public

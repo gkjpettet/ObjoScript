@@ -543,11 +543,14 @@ Protected Class Parser
 		    #Pragma Warning "TODO: Track scope depth here as well as in the compiler?"
 		    Return Block
 		    
-		  ElseIf Match(ObjoScript.TokenTypes.Print) Then
-		    Return PrintStatement
-		    
 		  ElseIf Match(ObjoScript.TokenTypes.If_) Then
 		    Return IfStatement
+		    
+		  ElseIf Match(ObjoScript.TokenTypes.While_) Then
+		    Return WhileStatement
+		    
+		  ElseIf Match(ObjoScript.TokenTypes.Print) Then
+		    Return PrintStatement
 		    
 		  ElseIf Match(ObjoScript.TokenTypes.Assert) Then
 		    Return AssertStatement
@@ -626,6 +629,27 @@ Protected Class Parser
 		  ConsumeNewLine("Expected a new line or EOF after a variable declaration.")
 		  
 		  Return New VarDeclStmt(identifier, initialiser, varLocation)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 506172736573206120607768696C65602073746174656D656E742E20417373756D65732074686520607768696C656020746F6B656E20686173206A757374206265656E20636F6E73756D65642E
+		Private Function WhileStatement() As ObjoScript.Stmt
+		  /// Parses a `while` statement.
+		  /// Assumes the `while` token has just been consumed.
+		  
+		  Var whileKeyword As ObjoScript.Token = Previous
+		  
+		  Var condition As ObjoScript.Expr = Expression
+		  
+		  // Optional new line.
+		  Call Match(ObjoScript.TokenTypes.EOL)
+		  
+		  // Body.
+		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the `while` condition.")
+		  Var body As ObjoScript.Stmt = Block
+		  
+		  Return New ObjoScript.WhileStmt(condition, body, whileKeyword)
 		  
 		End Function
 	#tag EndMethod

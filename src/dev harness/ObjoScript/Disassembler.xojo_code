@@ -253,6 +253,9 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_JUMP_IF_TRUE
 		    Return JumpInstruction("OP_JUMP_IF_TRUE", False, chunk, offset)
 		    
+		  Case ObjoScript.VM.OP_LOOP
+		    Return JumpInstruction("OP_LOOP", True, chunk, offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select

@@ -240,12 +240,15 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 456D6974732074686520606A756D70496E737472756374696F6E60206F63637572696E6720617420736F7572636520606C6F636174696F6E6020616E6420777269746573206120706C616365686F6C64657220282668464646462920666F7220746865206A756D70206F66667365742E2052657475726E7320746865206F6666736574206F6620746865206A756D7020696E737472756374696F6E2E
-		Private Function EmitJump(jumpInstruction As UInt8, location As ObjoScript.Token) As Integer
-		  /// Emits the `jumpInstruction` occuring at source `location` and writes a placeholder (&hFFFF) for the jump offset.
+	#tag Method, Flags = &h21, Description = 456D6974732074686520606A756D70496E737472756374696F6E60206F63637572696E6720617420736F7572636520606C6F636174696F6E6020286F72207468652063757272656E74206C6F636174696F6E206966204E696C2920616E6420777269746573206120706C616365686F6C64657220282668464646462920666F7220746865206A756D70206F66667365742E2052657475726E7320746865206F6666736574206F6620746865206A756D7020696E737472756374696F6E2E
+		Private Function EmitJump(jumpInstruction As UInt8, location As ObjoScript.Token = Nil) As Integer
+		  /// Emits the `jumpInstruction` occuring at source `location` (or the current location if Nil) 
+		  /// and writes a placeholder (&hFFFF) for the jump offset.
 		  /// Returns the offset of the jump instruction.
 		  ///
 		  /// We can jump a maximum of &hFFFF (65,535) bytes.
+		  
+		  location = If(location = Nil, mLocation, location)
 		  
 		  EmitByte(jumpInstruction, location)
 		  
@@ -255,6 +258,30 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  Return CurrentChunk.Length - 2
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 456D6974732061206E6577206C6F6F7020696E737472756374696F6E20776869636820756E636F6E646974696F6E616C6C79206A756D7073206261636B776172647320746F20606C6F6F705374617274602E20496620606C6F636174696F6E60206973204E696C20776520757365207468652063757272656E74206C6F636174696F6E2E
+		Private Sub EmitLoop(loopStart As Integer, location As ObjoScript.Token = Nil)
+		  /// Emits a new loop instruction which unconditionally jumps backwards to `loopStart`.
+		  /// If `location` is Nil we use the current location.
+		  
+		  location = If(location = Nil, mLocation, location)
+		  
+		  EmitByte(ObjoScript.VM.OP_LOOP)
+		  
+		  // Compute the offset to subtract from the VM's instruction pointer.
+		  // +2 accounts for OP_LOOP's own operands which we also need to jump over.
+		  Var offset As Integer = CurrentChunk.Length - loopStart + 2
+		  
+		  // The maximal amount of code that can be jumped over is UInt16 max.
+		  If offset > 65535 Then
+		    Error("Maximal loop body size exceeded.")
+		  End If
+		  
+		  // Emit the 16-bit offset.
+		  EmitUInt16(offset, location)
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 417070656E647320616E20756E7369676E656420696E7465676572202862696720656E6469616E20666F726D61742C206D6F7374207369676E69666963616E7420627974652066697273742920746F207468652063757272656E74206368756E6B2E205468652063757272656E74206C6F636174696F6E206973207573656420756E6C657373206F7468657277697365207370656369666965642E
@@ -845,6 +872,44 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		      EmitUInt16(index)
 		    End If
 		  End If
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C65206120607768696C6560206C6F6F702E
+		Function VisitWhileStmt(stmt As ObjoScript.WhileStmt) As Variant
+		  /// Compile a `while` loop.
+		  ///
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  
+		  // Track where we are in the source code.
+		  mLocation = stmt.Location
+		  
+		  // Store where the body of the loop begins, before the condition.
+		  Var loopStart As Integer = CurrentChunk.Length
+		  
+		  // Compile the condition.
+		  Call stmt.Condition.Accept(Self)
+		  
+		  // Skip over the body if the condition evaluates to false at runtime.
+		  Var exitJump As Integer = EmitJump(ObjoScript.VM.OP_JUMP_IF_FALSE)
+		  
+		  // Pop the condition off the stack if it was truthy.
+		  EmitByte(ObjoScript.VM.OP_POP)
+		  
+		  // Compile the optional loop body.
+		  If stmt.Body <> Nil Then
+		    Call stmt.Body.Accept(Self)
+		  End If
+		  
+		  // Jump back to the start of the loop if the condition evaluates to truthy.
+		  EmitLoop(loopStart)
+		  
+		  // Back-patch the jump.
+		  PatchJump(exitJump)
+		  
+		  // The condition must have been falsey - pop the condition off the stack.
+		  EmitByte(ObjoScript.VM.OP_POP)
+		  
 		End Function
 	#tag EndMethod
 
