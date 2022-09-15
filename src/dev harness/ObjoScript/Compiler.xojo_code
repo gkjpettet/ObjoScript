@@ -30,6 +30,31 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 436F6D70696C657320616E2061737369676E6D656E7420746F2061207661726961626C65206E616D656420606E616D65602E
+		Private Sub Assignment(name As String)
+		  /// Compiles an assignment to a variable named `name`.
+		  
+		  Var arg As Integer = ResolveLocal(name)
+		  
+		  If arg <> -1 Then
+		    // Set a local variable.
+		    EmitBytes(ObjoScript.VM.OP_SET_LOCAL, arg)
+		  Else
+		    // Set a global variable.
+		    // Add the name of the variable to the constant pool and get its index.
+		    Var index As Integer = AddConstant(name)
+		    If index <= 255 Then
+		      // We only need a single byte operand to specify the index of the assignee's name in the constant pool.
+		      EmitBytes(ObjoScript.VM.OP_SET_GLOBAL, index)
+		    Else
+		      // We need two bytes for the operand.
+		      EmitByte(ObjoScript.VM.OP_SET_GLOBAL_LONG)
+		      EmitUInt16(index)
+		    End If
+		  End If
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 52657475726E73207468652061627374726163742073796E7461782074726565206C61737420636F6D70696C6564206279207468697320636F6D70696C65722E2049742073686F756C6420626520636F6E7369646572656420726561642D6F6E6C792E
 		Function AST() As ObjoScript.Stmt()
 		  /// Returns the abstract syntax tree last compiled by this compiler.
@@ -431,6 +456,37 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 436F6D70696C6573206120222B2B22206F7220222D2D2220706F73746669782065787072657373696F6E2E20417373756D657320606578707260206973206120222B2B22206F7220222D2D222065787072657373696F6E2E
+		Private Sub PostFixIncrementDecrement(postfix As ObjoScript.PostfixExpr)
+		  /// Compiles a "++" or "--" postfix expression.
+		  /// Assumes `postfix` is a "++" or "--" expression.
+		  
+		  // The "++" and "--" operators require a variable name as their left hand operand.
+		  If postfix.Operand IsA ObjoScript.VariableExpr = False Then
+		    Error("The postfix `" + postfix.Operator.ToString + "` operator expects a variable name as its operand.")
+		  End If
+		  
+		  // Compile the operand.
+		  Call postfix.Operand.Accept(Self)
+		  
+		  Select Case postfix.Operator
+		  Case ObjoScript.TokenTypes.PlusPlus
+		    // Increment the value on the top of the stack by 1.
+		    EmitByte(ObjoScript.VM.OP_LOAD_1)
+		    EmitByte(ObjoScript.VM.OP_ADD)
+		    
+		  Case ObjoScript.TokenTypes.MinusMinus
+		    // Decrement the value on the top of the stack by 1.
+		    EmitByte(ObjoScript.VM.OP_LOAD_1)
+		    EmitByte(ObjoScript.VM.OP_SUBTRACT)
+		  End Select
+		  
+		  // Do the assignment.
+		  Assignment(ObjoScript.VariableExpr(postfix.Operand).Name)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 5265736574732074686520636F6D70696C657220736F206974277320726561647920746F20636F6D70696C6520616761696E2E
 		Sub Reset()
 		  /// Resets the compiler so it's ready to compile again.
@@ -518,24 +574,9 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  // Evaluate the value to assign.
 		  Call expr.Value.Accept(Self)
 		  
-		  Var arg As Integer = ResolveLocal(expr.Name)
+		  // Assign the value at the top of the stack to this variable.
+		  Assignment(expr.Name)
 		  
-		  If arg <> -1 Then
-		    // Set a local variable.
-		    EmitBytes(ObjoScript.VM.OP_SET_LOCAL, arg)
-		  Else
-		    // Set a global variable.
-		    // Add the name of the variable to the constant pool and get its index.
-		    Var index As Integer = AddConstant(expr.Name)
-		    If index <= 255 Then
-		      // We only need a single byte operand to specify the index of the assignee's name in the constant pool.
-		      EmitBytes(ObjoScript.VM.OP_SET_GLOBAL, index)
-		    Else
-		      // We need two bytes for the operand.
-		      EmitByte(ObjoScript.VM.OP_SET_GLOBAL_LONG)
-		      EmitUInt16(index)
-		    End If
-		  End If
 		End Function
 	#tag EndMethod
 
@@ -606,12 +647,10 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		    EmitByte(ObjoScript.VM.OP_BITWISE_XOR)
 		    
 		  Case ObjoScript.TokenTypes.DotDot
-		    #Pragma Warning "TODO: Implement DOTDOT operator"
-		    Error("The `..` operator has not yet been implemented.")
+		    EmitByte(ObjoScript.VM.OP_INCLUSIVE_RANGE)
 		    
 		  Case ObjoScript.TokenTypes.DotDotDot
-		    #Pragma Warning "TODO: Implement DOTDOTDOT operator"
-		    Error("The `...` operator has not yet been implemented.")
+		    EmitByte(ObjoScript.VM.OP_EXCLUSIVE_RANGE)
 		    
 		  Case ObjoScript.TokenTypes.Is_
 		    #Pragma Warning "TODO: Implement IS operator"
@@ -682,6 +721,63 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C6520612060666F7260206C6F6F702E
+		Function VisitForStmt(stmt As ObjoScript.ForStmt) As Variant
+		  /// Compile a `for` loop.
+		  ///
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  
+		  BeginScope
+		  
+		  // Track the current location.
+		  mLocation = stmt.Location
+		  
+		  // Compile the optional initialiser.
+		  If stmt.Initialiser <> Nil Then
+		    Call stmt.Initialiser.Accept(Self)
+		  End If
+		  
+		  // Store where the loop begins.
+		  Var loopStart As Integer = CurrentChunk.Length
+		  
+		  Var exitJump As Integer = -1
+		  
+		  // Compile the optional condition.
+		  If stmt.Condition <> Nil Then
+		    Call stmt.Condition.Accept(Self)
+		    
+		    // Jump out of the condition if the condition is falsey.
+		    exitJump = EmitJump(ObjoScript.VM.OP_JUMP_IF_FALSE, stmt.Condition.Location)
+		    
+		    // Pop the condition before executing the body.
+		    EmitByte(ObjoScript.VM.OP_POP)
+		  End If
+		  
+		  // Compile the loop's body.
+		  Call stmt.Body.Accept(self)
+		  
+		  // Compile the optional increment expression.
+		  If stmt.Increment <> Nil Then
+		    Call stmt.Increment.Accept(Self)
+		    // Pop the increment expression result off the stack.
+		    EmitByte(ObjoScript.VM.OP_POP, stmt.Increment.Location)
+		  End If
+		  
+		  EmitLoop(loopStart, stmt.Location)
+		  
+		  // Back-patch the conditional exit jump.
+		  // We only do this when there was a condition (exitJump <> -1).
+		  If exitJump <> -1 Then
+		    PatchJump(exitJump)
+		    // Pop the condition.
+		    EmitByte(ObjoScript.VM.OP_POP)
+		  End If
+		  
+		  EndScope
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320616E20606966602073746174656D656E742E
 		Function VisitIfStmt(ifstmt As ObjoScript.IfStmt) As Variant
 		  /// Compiles an `if` statement.
@@ -745,12 +841,21 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0
+	#tag Method, Flags = &h0, Description = 436F6D70696C65206120706F73742D6669782065787072657373696F6E2E
 		Function VisitPostfix(expr As ObjoScript.PostfixExpr) As Variant
-		  // Part of the ObjoScript.ExprVisitor interface.
-		  #Pragma Warning  "Don't forget to implement this method!"
+		  /// Compile a post-fix expression.
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
+		  // Store the current location.
 		  mLocation = expr.Location
+		  
+		  If expr.Operator = ObjoScript.TokenTypes.PlusPlus Or expr.Operator = ObjoScript.TokenTypes.MinusMinus Then
+		    PostFixIncrementDecrement(expr)
+		  Else
+		    Error("Unknown postfix operator `" + expr.Operator.ToString + "`.")
+		  End If
+		  
 		End Function
 	#tag EndMethod
 

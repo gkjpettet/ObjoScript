@@ -101,10 +101,10 @@ Protected Module ObjoScript
 		    Return "Dot"
 		    
 		  Case ObjoScript.TokenTypes.DotDot
-		    Return ".."
+		    Return "Inclusive Range"
 		    
 		  Case ObjoScript.TokenTypes.DotDotDot
-		    Return "..."
+		    Return "Exclusive Range"
 		    
 		  Case ObjoScript.TokenTypes.EOF
 		    Return "EOF"
@@ -132,6 +132,9 @@ Protected Module ObjoScript
 		    
 		  Case ObjoScript.TokenTypes.For_
 		    Return "For"
+		    
+		  Case ObjoScript.TokenTypes.ForEach
+		    Return "ForEach"
 		    
 		  Case ObjoScript.TokenTypes.Foreign
 		    Return "Foreign"
@@ -249,6 +252,9 @@ Protected Module ObjoScript
 		    
 		  Case ObjoScript.TokenTypes.StarEqual
 		    Return "*="
+		    
+		  Case ObjoScript.TokenTypes.Semicolon
+		    Return "Semicolon"
 		    
 		  Case ObjoScript.TokenTypes.Static_
 		    Return "Static"
@@ -408,7 +414,9 @@ Protected Module ObjoScript
 		  Var_
 		  While_
 		  Xor_
-		Then_
+		  Then_
+		  ForEach
+		Semicolon
 	#tag EndEnum
 
 

@@ -94,6 +94,47 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitForStmt(stmt As ObjoScript.ForStmt) As Variant
+		  Var node As New TreeViewNode("For Loop")
+		  
+		  // Optional initialiser.
+		  If stmt.Initialiser <> Nil Then
+		    Var initialiser As New TreeViewNode("Initialiser")
+		    initialiser.AppendNode(stmt.Initialiser.Accept(Self))
+		    node.AppendNode(initialiser)
+		  Else
+		    node.AppendNode(New TreeViewNode("No initialiser"))
+		  End If
+		  
+		  // Optional condition.
+		  If stmt.Condition <> Nil Then
+		    Var condition As New TreeViewNode("Condition")
+		    condition.AppendNode(stmt.Condition.Accept(Self))
+		    node.AppendNode(condition)
+		  Else
+		    node.AppendNode(New TreeViewNode("No condition"))
+		  End If
+		  
+		  // Optional increment statement.
+		  If stmt.Increment <> Nil Then
+		    Var increment As New TreeViewNode("Increment statement")
+		    increment.AppendNode(stmt.Increment.Accept(Self))
+		    node.AppendNode(increment)
+		  Else
+		    node.AppendNode(New TreeViewNode("No increment statement"))
+		  End If
+		  
+		  // Body.
+		  Var body As New TreeViewNode("Body")
+		  body.AppendNode(stmt.Body.Accept(Self))
+		  node.AppendNode(body)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitIfStmt(ifstmt As ObjoScript.IfStmt) As Variant
 		  Var node As New TreeViewNode("If")
 		  

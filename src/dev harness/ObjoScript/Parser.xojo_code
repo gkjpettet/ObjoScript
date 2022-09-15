@@ -44,6 +44,14 @@ Protected Class Parser
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 426567696E732061206E65772073636F70652E
+		Private Sub BeginScope()
+		  /// Begins a new scope.
+		  
+		  ScopeDepth = ScopeDepth + 1
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 436F6E76656E69656E6365206D6574686F6420666F722072657475726E696E672061206E6577206772616D6D61722072756C6520666F7220612062696E617279206F70657261746F722E
 		Private Function BinaryOperator(precedence As Integer, rightAssociative As Boolean = False) As ObjoScript.GrammarRule
 		  /// Convenience method for returning a new grammar rule for a binary operator.
@@ -56,6 +64,8 @@ Protected Class Parser
 		Function Block() As ObjoScript.Stmt
 		  /// Parses a block of statements.
 		  /// Assumes the parser has just consumed the leading `{`.
+		  
+		  BeginScope
 		  
 		  Var location As ObjoScript.Token = Previous
 		  
@@ -74,6 +84,8 @@ Protected Class Parser
 		  If Not Check(ObjoScript.TokenTypes.Else_) Then
 		    ConsumeNewLine
 		  End If
+		  
+		  EndScope
 		  
 		  Return New ObjoScript.BlockStmt(statements, location)
 		  
@@ -181,6 +193,14 @@ Protected Class Parser
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 456E6473207468652063757272656E742073636F70652E
+		Private Sub EndScope()
+		  /// Ends the current scope.
+		  
+		  ScopeDepth = ScopeDepth - 1
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 526169736573206120506172736572457863657074696F6E206174207468652063757272656E74206C6F636174696F6E2E20496620746865206572726F72206973206E6F74206174207468652063757272656E74206C6F636174696F6E2C20606C6F636174696F6E60206D61792062652070617373656420696E73746561642E
 		Sub Error(message As String, location As ObjoScript.Token = Nil)
 		  /// Raises a ParserException at the current location. If the error is not at the current location,
@@ -206,9 +226,12 @@ Protected Class Parser
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 50617273657320616E2065787072657373696F6E20616E6420777261707320697420757020696E7369646520612073746174656D656E742E
-		Private Function ExpressionStatement() As ObjoScript.Stmt
+	#tag Method, Flags = &h21, Description = 50617273657320616E2065787072657373696F6E20616E6420777261707320697420757020696E7369646520612073746174656D656E742E20607465726D696E61746F72602077696C6C20626520636F6E73756D65642E
+		Private Function ExpressionStatement(terminator As ObjoScript.TokenTypes = ObjoScript.TokenTypes.EOL) As ObjoScript.Stmt
 		  /// Parses an expression and wraps it up inside a statement.
+		  /// `terminator` will be consumed.
+		  ///
+		  /// `terminator` is the token that is required to occur after the declaration to be valid.
 		  
 		  // Store the location of the start of the expression.
 		  Var location As ObjoScript.Token = Current
@@ -216,9 +239,92 @@ Protected Class Parser
 		  // Consume the expression.
 		  Var expr As ObjoScript.Expr = Expression
 		  
-		  ConsumeNewLine
+		  // Most expression statements expect a new line after them but some (such as within a
+		  // `for` loop initialiser) require something else (e.g. a semicolon).
+		  If terminator = ObjoScript.TokenTypes.EOL Or terminator = ObjoScript.TokenTypes.EOF Then
+		    ConsumeNewLine("Expected a new line or EOF after expression statement.")
+		  Else
+		    Consume(terminator, "Expected a " + terminator.ToString + " after the expression.")
+		  End If
 		  
 		  Return New ObjoScript.ExpressionStmt(expr, location)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 50617273657320612060666F7260206C6F6F702E20417373756D65732077652068617665206A75737420636F6E73756D6564207468652060666F7260206B6579776F72642E
+		Private Function ForEachStatement() As ObjoScript.Stmt
+		  /// Parses a `forEach` loop.
+		  /// Assumes we have just consumed the `foreach` keyword.
+		  ///
+		  /// Syntax:
+		  ///
+		  /// ```objo
+		  /// forEach i in RANGE {
+		  ///  statements
+		  /// }
+		  /// ```
+		  
+		  #Pragma Warning "TODO: Implement foreach statements"
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 50617273657320612060666F7260206C6F6F702E20417373756D65732077652068617665206A75737420636F6E73756D6564207468652060666F7260206B6579776F72642E
+		Private Function ForStatement() As ObjoScript.Stmt
+		  /// Parses a `for` loop.
+		  /// Assumes we have just consumed the `for` keyword.
+		  ///
+		  /// Syntax:
+		  ///
+		  /// ```objo
+		  /// for (initialiser?; condition?; incrementExpression?) {
+		  ///  statements
+		  /// }
+		  /// ```
+		  
+		  // Since `for` loops can declare a variable, it should be scoped to the loop body.
+		  BeginScope
+		  
+		  Var forKeyword As ObjoScript.Token = Previous
+		  
+		  Consume(ObjoScript.TokenTypes.LParen, "Expected a `(` after the `for` keyword.")
+		  
+		  Var initialiser As ObjoScript.Stmt = Nil
+		  If Match(ObjoScript.TokenTypes.Semicolon) Then
+		    // No initialiser.
+		  ElseIf Match(ObjoScript.TokenTypes.Var_) Then
+		    // Variable declaration.
+		    initialiser = VarDeclaration(ObjoScript.TokenTypes.Semicolon)
+		  Else
+		    // Just an expression.
+		    initialiser = ExpressionStatement(ObjoScript.TokenTypes.Semicolon)
+		  End If
+		  
+		  // Optional condition to exit the loop.
+		  Var condition As ObjoScript.Expr = Nil
+		  If Not Match(ObjoScript.TokenTypes.Semicolon) Then
+		    condition = Expression
+		    Consume(ObjoScript.TokenTypes.Semicolon, "Expected a semicolon after the loop condition.")
+		  End If
+		  
+		  // Optional increment expression.
+		  Var increment As ObjoScript.Expr = Nil
+		  If Not Match(ObjoScript.TokenTypes.RParen) Then
+		    increment = Expression
+		    Consume(ObjoScript.TokenTypes.RParen, "Expected a `)` after the loop's increment expression.")
+		  End If
+		  
+		  // Optional newline.
+		  Call Match(ObjoScript.TokenTypes.EOL)
+		  
+		  // Expect a block.
+		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the `for` clauses.")
+		  Var body As ObjoScript.Stmt = Block()
+		  
+		  EndScope
+		  
+		  Return New ObjoScript.ForStmt(initialiser, condition, increment, body, forKeyword)
 		  
 		End Function
 	#tag EndMethod
@@ -345,6 +451,7 @@ Protected Class Parser
 		  TokenTypes.Return_           : Unused, _
 		  TokenTypes.RParen            : Unused, _
 		  TokenTypes.RSquare           : Unused, _
+		  TokenTypes.Semicolon         : Unused, _
 		  TokenTypes.Star              : BinaryOperator(Precedences.Factor), _
 		  TokenTypes.StarEqual         : Unused, _
 		  TokenTypes.Static_           : Unused, _
@@ -540,7 +647,6 @@ Protected Class Parser
 		  /// Parses a statement.
 		  
 		  If Match(ObjoScript.TokenTypes.LCurly) Then
-		    #Pragma Warning "TODO: Track scope depth here as well as in the compiler?"
 		    Return Block
 		    
 		  ElseIf Match(ObjoScript.TokenTypes.If_) Then
@@ -548,6 +654,12 @@ Protected Class Parser
 		    
 		  ElseIf Match(ObjoScript.TokenTypes.While_) Then
 		    Return WhileStatement
+		    
+		  ElseIf Match(ObjoScript.TokenTypes.For_) Then
+		    Return ForStatement
+		    
+		  ElseIf Match(ObjoScript.TokenTypes.ForEach) Then
+		    Return ForEachStatement
 		    
 		  ElseIf Match(ObjoScript.TokenTypes.Print) Then
 		    Return PrintStatement
@@ -605,9 +717,10 @@ Protected Class Parser
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 5061727365732061207661726961626C65206465636C61726174696F6E2E20417373756D6573207468652070617273657220686173206A75737420636F6E73756D656420746865206076617260206B6579776F72642E
-		Private Function VarDeclaration() As ObjoScript.Stmt
+	#tag Method, Flags = &h21, Description = 5061727365732061207661726961626C65206465636C61726174696F6E2E20417373756D6573207468652070617273657220686173206A75737420636F6E73756D656420746865206076617260206B6579776F72642E20607465726D696E61746F72602077696C6C20626520636F6E73756D65642E
+		Private Function VarDeclaration(terminator As ObjoScript.TokenTypes = ObjoScript.TokenTypes.EOL) As ObjoScript.Stmt
 		  /// Parses a variable declaration. Assumes the parser has just consumed the `var` keyword.
+		  /// `terminator` will be consumed.
 		  ///
 		  /// Format:
 		  /// ```objo
@@ -615,6 +728,7 @@ Protected Class Parser
 		  /// ```
 		  /// 
 		  /// If an initialiser expression is not provided then the variable is initialised to Nothing.
+		  /// `terminator` is the token that is required to occur after the declaration to be valid.
 		  
 		  // Store the location of the var keyword.
 		  Var varLocation As ObjoScript.Token = Previous
@@ -626,7 +740,13 @@ Protected Class Parser
 		    initialiser = Expression
 		  End If
 		  
-		  ConsumeNewLine("Expected a new line or EOF after a variable declaration.")
+		  // Most variable declarations expect a new line after them but some (such as within a
+		  // `for` loop initialiser) require something else (e.g. a semicolon).
+		  If terminator = ObjoScript.TokenTypes.EOL Or terminator = ObjoScript.TokenTypes.EOF Then
+		    ConsumeNewLine("Expected a new line or EOF after a variable declaration.")
+		  Else
+		    Consume(terminator, "Expected a " + terminator.ToString + " after the variable declaration.")
+		  End If
 		  
 		  Return New VarDeclStmt(identifier, initialiser, varLocation)
 		  

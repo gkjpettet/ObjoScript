@@ -57,6 +57,7 @@ Class=BlockStmt;ObjoScript/BlockStmt.xojo_code;&h00000000352E7FFF;&h000000004D14
 Class=LocalVariable;ObjoScript/LocalVariable.xojo_code;&h000000002FDB97FF;&h000000004D1497FF;false
 Class=IfStmt;ObjoScript/IfStmt.xojo_code;&h0000000074D35FFF;&h000000004D1497FF;false
 Class=WhileStmt;ObjoScript/WhileStmt.xojo_code;&h00000000272987FF;&h000000004D1497FF;false
+Class=ForStmt;ObjoScript/ForStmt.xojo_code;&h000000007F48EFFF;&h000000004D1497FF;false
 DefaultWindow=WindowTest
 AppMenuBar=MainMenuBar
 MajorVersion=1

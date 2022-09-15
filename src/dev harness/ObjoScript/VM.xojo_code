@@ -5,7 +5,7 @@ Protected Class VM
 		  /// Asserts that `a` and `b` are both doubles, otherwise raises a runtime error.
 		  
 		  If a.Type <> Variant.TypeDouble Or b.Type <> Variant.TypeDouble Then
-		    Error("Both operands must be numbers.")
+		    Error("Both operands must be numbers. Instead got " + ValueToString(a) + " and " + ValueToString(b))
 		  End If
 		  
 		End Sub
@@ -18,7 +18,7 @@ Protected Class VM
 		  /// Assumes neither `a` or `b` are Nil.
 		  
 		  If a.Type <> b.Type Then
-		    Error("Both operands must be the same type.")
+		    Error("Both operands must be the same type. Instead got " + ValueToString(a) + " and " + ValueToString(b))
 		  End If
 		  
 		End Sub
@@ -70,7 +70,7 @@ Protected Class VM
 		Private Sub Error(message As String, offset As Integer = -1)
 		  /// Raises a VMException at the current IP (unless otherwise specified).
 		  
-		  '#Pragma BreakOnExceptions False
+		  #Pragma BreakOnExceptions False
 		  
 		  // Default to the current IP if no offset is provided.
 		  offset = If(offset = -1, IP, offset)
@@ -200,11 +200,7 @@ Protected Class VM
 		      Var s() As String
 		      For i As Integer = 0 To StackTop - 1
 		        Var item As Variant = Stack(i)
-		        If item IsA ObjoScript.Value Then
-		          s.Add("[ " + ObjoScript.Value(item).ToString + " ]")
-		        Else
-		          s.Add("[ " + item.StringValue + " ]")
-		        End If
+		        s.Add("[ " + ValueToString(item) + " ]")
 		      Next i
 		      System.DebugLog(String.FromArray(s, ""))
 		      Call Disassembler.DisassembleInstruction(-1, -1, Chunk, IP)
@@ -473,6 +469,20 @@ Protected Class VM
 		      Var offset AS UInt16 = ReadUInt16
 		      IP = IP - offset
 		      
+		    Case OP_INCLUSIVE_RANGE
+		      Var upper As Variant = Pop
+		      Var lower As Variant = Pop
+		      AssertNumbers(lower, upper)
+		      // Internally, we represent ranges as a pair of doubles.
+		      Push(lower : upper)
+		      
+		    Case OP_EXCLUSIVE_RANGE
+		      Var upper As Variant = Pop
+		      Var lower As Variant = Pop
+		      AssertNumbers(lower, upper)
+		      // Internally, we represent ranges as a pair of doubles.
+		      Push(lower : upper.DoubleValue - 1)
+		      
 		    End Select
 		  Wend
 		  
@@ -501,13 +511,26 @@ Protected Class VM
 		      // Case insensitive comparison.
 		      Return a = b
 		    End If
+		    
 		  Else
 		    If a IsA ObjoScript.Nothing And b IsA ObjoScript.Nothing Then
 		      Return True
 		    End If
 		    
+		    // Ranges are stored internally as pairs of doubles (lower : upper)
+		    If a IsA Pair And b IsA Pair Then
+		      Var aPair As Pair = a
+		      Var bPair As Pair = b
+		      If aPair.Left = bPair.Left And aPair.Right = bPair.Right Then
+		        Return True
+		      End If
+		    End If
+		    
 		    Error("Unexpected value type.")
 		  End Select
+		  
+		  Return False
+		  
 		End Function
 	#tag EndMethod
 
@@ -531,6 +554,11 @@ Protected Class VM
 		  Else
 		    If v IsA ObjoScript.Nothing Then
 		      Return "Nothing"
+		      
+		    ElseIf v IsA Pair Then
+		      // Ranges are stored internally as pairs of doubles (lower : upper)
+		      Var vPair As Pair = v
+		      Return vPair.Left.StringValue + " : " + vPair.Right.StringValue
 		      
 		    Else
 		      // This shouldn't happen.
@@ -591,6 +619,8 @@ Protected Class VM
 		41: OP_JUMP_IF_TRUE
 		42: OP_LOGICAL_XOR
 		43: OP_LOOP
+		44: OP_INCLUSIVE_RANGE
+		45: OP_EXCLUSIVE_RANGE
 	#tag EndNote
 
 
@@ -660,6 +690,9 @@ Protected Class VM
 	#tag Constant, Name = OP_EQUAL, Type = Double, Dynamic = False, Default = \"10", Scope = Public
 	#tag EndConstant
 
+	#tag Constant, Name = OP_EXCLUSIVE_RANGE, Type = Double, Dynamic = False, Default = \"45", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = OP_FALSE, Type = Double, Dynamic = False, Default = \"17", Scope = Public
 	#tag EndConstant
 
@@ -676,6 +709,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_GREATER_EQUAL, Type = Double, Dynamic = False, Default = \"14", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_INCLUSIVE_RANGE, Type = Double, Dynamic = False, Default = \"44", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_JUMP, Type = Double, Dynamic = False, Default = \"40", Scope = Public

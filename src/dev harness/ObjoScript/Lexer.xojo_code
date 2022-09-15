@@ -531,6 +531,10 @@ Protected Class Lexer
 		    AddToken(MakeToken(ObjoScript.TokenTypes.Colon))
 		    Return
 		    
+		  Case ";"
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Semicolon))
+		    Return
+		    
 		  Case "?"
 		    AddToken(MakeToken(ObjoScript.TokenTypes.Query))
 		    Return
@@ -892,6 +896,7 @@ Protected Class Lexer
 			      "export"     : ObjoScript.TokenTypes.Export, _
 			      "false"      : ObjoScript.TokenTypes.Boolean_, _
 			      "for"        : ObjoScript.TokenTypes.For_, _
+			        "foreach"    : ObjoScript.TokenTypes.ForEach, _
 			        "foreign"    : ObjoScript.TokenTypes.Foreign, _
 			        "function"   : ObjoScript.TokenTypes.Function_, _
 			          "if"         : ObjoScript.TokenTypes.If_, _
