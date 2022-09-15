@@ -262,6 +262,9 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_EXCLUSIVE_RANGE
 		    Return SimpleInstruction("OP_EXCLUSIVE_RANGE", offset)
 		    
+		  Case ObjoScript.VM.OP_EXIT
+		    Return SimpleInstruction("OP_EXIT", offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select

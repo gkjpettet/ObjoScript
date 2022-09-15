@@ -483,6 +483,9 @@ Protected Class VM
 		      // Internally, we represent ranges as a pair of doubles.
 		      Push(lower : upper.DoubleValue - 1)
 		      
+		    Case OP_EXIT
+		      Error("Unexpected `exit` placeholder instruction. The chunk is invalid.")
+		      
 		    End Select
 		  Wend
 		  
@@ -621,6 +624,7 @@ Protected Class VM
 		43: OP_LOOP
 		44: OP_INCLUSIVE_RANGE
 		45: OP_EXCLUSIVE_RANGE
+		46: OP_BREAK
 	#tag EndNote
 
 
@@ -647,6 +651,66 @@ Protected Class VM
 	#tag Property, Flags = &h21, Description = 53696E676C65746F6E20696E7374616E6365206F6620224E6F7468696E67222E
 		Private Nothing As ObjoScript.Nothing
 	#tag EndProperty
+
+	#tag ComputedProperty, Flags = &h0, Description = 4B6579203D206F70636F64652028496E7465676572292C2056616C7565203D206E756D626572206F66206279746573207573656420666F72206F706572616E64732E
+		#tag Getter
+			Get
+			  Static d As New Dictionary( _
+			  OP_RETURN             : 0, _
+			  OP_CONSTANT           : 1, _
+			  OP_CONSTANT_LONG      : 2, _
+			  OP_NEGATE             : 0, _
+			  OP_ADD                : 0, _
+			  OP_SUBTRACT           : 0, _
+			  OP_DIVIDE             : 0, _
+			  OP_MULTIPLY           : 0, _
+			  OP_MODULO             : 0, _
+			  OP_NOT                : 0, _
+			  OP_EQUAL              : 0 , _
+			  OP_GREATER            : 0, _
+			  OP_LESS               : 0, _
+			  OP_LESS_EQUAL         : 0, _
+			  OP_GREATER_EQUAL      : 0, _
+			  OP_NOT_EQUAL          : 0, _
+			  OP_TRUE               : 0, _
+			  OP_FALSE              : 0, _
+			  OP_NOTHING            : 0, _
+			  OP_POP                : 0, _
+			  OP_SHIFT_LEFT         : 0, _
+			  OP_SHIFT_RIGHT        : 0, _
+			  OP_BITWISE_AND        : 0, _
+			  OP_BITWISE_OR         : 0, _
+			  OP_BITWISE_XOR        : 0, _
+			  OP_LOAD_1             : 0, _
+			  OP_LOAD_0             : 0, _
+			  OP_LOAD_MINUS1        : 0, _
+			  OP_PRINT              : 0, _
+			  OP_ASSERT             : 0, _
+			  OP_DEFINE_GLOBAL      : 1, _
+			  OP_DEFINE_GLOBAL_LONG : 2, _
+			  OP_GET_GLOBAL         : 1, _
+			  OP_GET_GLOBAL_LONG    : 2, _
+			  OP_SET_GLOBAL         : 1, _
+			  OP_SET_GLOBAL_LONG    : 2, _
+			  OP_POP_N              : 1, _
+			  OP_GET_LOCAL          : 1, _
+			  OP_SET_LOCAL          : 1, _
+			  OP_JUMP_IF_FALSE      : 2, _
+			  OP_JUMP               : 2, _
+			  OP_JUMP_IF_TRUE       : 2, _
+			  OP_LOGICAL_XOR        : 0, _
+			  OP_LOOP               : 2, _
+			  OP_INCLUSIVE_RANGE    : 0, _
+			  OP_EXCLUSIVE_RANGE    : 0, _
+			  OP_EXIT               : 0 _
+			  )
+			  
+			  Return d
+			  
+			End Get
+		#tag EndGetter
+		Shared OpcodeOperandMap As Dictionary
+	#tag EndComputedProperty
 
 	#tag Property, Flags = &h21, Description = 54686520564D277320737461636B2E
 		Private Stack(VM.STACK_MAX) As Variant
@@ -691,6 +755,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_EXCLUSIVE_RANGE, Type = Double, Dynamic = False, Default = \"45", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_EXIT, Type = Double, Dynamic = False, Default = \"46", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_FALSE, Type = Double, Dynamic = False, Default = \"17", Scope = Public

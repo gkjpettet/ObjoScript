@@ -85,6 +85,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitExitStmt(stmt As ObjoScript.ExitStmt) As Variant
+		  Return New TreeViewNode("Exit")
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitExpressionStmt(stmt As ObjoScript.ExpressionStmt) As Variant
 		  /// Part of the ObjoScript.StmtVisitor interface.
 		  

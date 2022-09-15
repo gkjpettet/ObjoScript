@@ -227,14 +227,16 @@ Protected Class Parser
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
+	#tag Method, Flags = &h21, Description = 50617273657320616E206065786974602073746174656D656E742E20417373756D65732074686520606578697460206B6579776F726420686173206A757374206265656E20636F6E73756D65642E
 		Private Function ExitStatement() As ObjoScript.Stmt
 		  /// Parses an `exit` statement.
 		  /// Assumes the `exit` keyword has just been consumed.
 		  
-		  #Pragma Warning "TODO: Implement parsing the `exit` keyword"
+		  Var exitKeyword As ObjoScript.Token = Previous
 		  
-		  Error("The `exit` keyword is not yet implemented.")
+		  ConsumeNewLine("Expected a new line after the `exit` keyword.")
+		  
+		  Return New ObjoScript.ExitStmt(exitKeyword)
 		  
 		End Function
 	#tag EndMethod
@@ -480,6 +482,7 @@ Protected Class Parser
 		  TokenTypes.StarEqual         : Unused, _
 		  TokenTypes.Static_           : Unused, _
 		  TokenTypes.String_           : Prefix(New LiteralParselet), _
+		  TokenTypes.Then_             : Unused, _
 		  TokenTypes.This              : Unused, _
 		  TokenTypes.Tilde             : NewRule(New UnaryParselet, Nil, Precedences.None), _
 		  TokenTypes.Underscore        : Unused, _

@@ -209,6 +209,40 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 47656E65726174657320636F646520746F2064697363617264206C6F63616C207661726961626C65732061742060646570746860206F7220677265617465722E20446F6573202A6E6F742A2061637475616C6C7920756E6465636C617265207661726961626C6573206F7220706F7020616E792073636F7065732E2052657475726E7320746865206E756D626572206F66206C6F63616C207661726961626C65732074686174207765726520656C696D696E617465642E
+		Private Function DiscardLocals(depth As Integer) As Integer
+		  /// Generates code to discard local variables at `depth` or greater. Does *not*
+		  /// actually undeclare variables or pop any scopes. 
+		  /// Returns the number of local variables that were eliminated.
+		  ///
+		  /// This is called directly when compiling "exit" statements to ditch the local variables
+		  /// before jumping out of the loop even though they are still in scope *past*
+		  /// the exit instruction.
+		  
+		  If ScopeDepth < 0 Then
+		    Error("Cannot exit top-level scope.")
+		  End If
+		  
+		  Var local As Integer = Locals.LastIndex
+		  While local >= 0 And Locals(local).Depth >= depth
+		    #Pragma Warning "TODO: Handle upvalues when implemented. Wren compiler.c line 1492"
+		    ' // If the local was closed over, make sure the upvalue gets closed when it
+		    ' // goes out of scope on the stack. We use EmitByte() and not EmitOp() here
+		    ' // because we don't want to track the stack effect of these pops since the
+		    ' // variables are still in scope after the break.
+		    ' If Locals(local).IsUpvalue Then
+		    ' EmitByte(OP_CLOSE_UPVALUE)
+		    ' Else
+		    EmitByte(ObjoScript.VM.OP_POP)
+		    ' End If
+		    
+		    local = local - 1
+		  Wend
+		  
+		  Return Locals.Count - local - 1
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 417070656E647320612073696E676C65206279746520746F207468652063757272656E74206368756E6B206174207468652063757272656E74206C6F636174696F6E2E20416E206F7074696F6E616C20606C6F636174696F6E602063616E2062652070726F76696465642E
 		Private Sub EmitByte(b As UInt8, location As ObjoScript.Token = Nil)
 		  /// Appends a single byte to the current chunk at the current location. An optional `location` can be provided.
@@ -331,6 +365,40 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21
+		Private Sub EndLoop()
+		  /// Ends the current innermost loop. Patches up all jumps and breaks now that
+		  /// we know where the end of the loop is.
+		  
+		  // Jump back to the start of the current loop if the condition evaluates to truthy.
+		  EmitLoop(CurrentLoop.Start)
+		  
+		  // Back-patch the jump.
+		  PatchJump(CurrentLoop.ExitJump)
+		  
+		  // The condition must have been falsey - pop the condition off the stack.
+		  EmitByte(ObjoScript.VM.OP_POP)
+		  
+		  // Find any `exit` placeholder instructions (which will be OP_EXIT in the
+		  // bytecode) and replace them with real jumps.
+		  Var i As Integer = CurrentLoop.BodyOffset
+		  While i < CurrentChunk.Length
+		    If CurrentChunk.Code(i) = ObjoScript.VM.OP_EXIT Then
+		      CurrentChunk.Code(i) = ObjoScript.VM.OP_JUMP
+		      PatchJump(i + 1)
+		      i = i + 3
+		    Else
+		      // Skip this instruction and its operands.
+		      i = i + 1 + OperandByteCountForOpcode(CurrentChunk.Code(i))
+		    End If
+		  Wend
+		  
+		  // Mark that we're exiting this loop.
+		  CurrentLoop = CurrentLoop.Enclosing
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 456E6473207468652063757272656E742073636F70652E
 		Private Sub EndScope()
 		  /// Ends the current scope.
@@ -364,6 +432,21 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  
 		  Raise New ObjoScript.CompilerException(message, location)
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 456D69747320746865204F505F4A554D505F49465F46414C534520696E737472756374696F6E207573656420746F207465737420746865206C6F6F7020636F6E646974696F6E20616E6420706F74656E7469616C6C79206578697420746865206C6F6F702E204B6565707320747261636B206F662074686520696E737472756374696F6E20736F2077652063616E207061746368206974206C61746572206F6E6365207765206B6E6F772077686572652074686520656E64206F662074686520626F64792069732E
+		Private Sub ExitLoopIfFalse()
+		  /// Emits the OP_JUMP_IF_FALSE instruction and an OP_POP used to test the loop condition and
+		  /// potentially exit the loop. Keeps track of the instruction so we can patch it
+		  /// later once we know where the end of the body is.
+		  ///
+		  /// Assumes a loop is currently being compiled.
+		  
+		  Self.CurrentLoop.ExitJump = EmitJump(ObjoScript.VM.OP_JUMP_IF_FALSE)
+		  
+		  // Pop the condition before executing the body.
+		  EmitByte(ObjoScript.VM.OP_POP)
 		End Sub
 	#tag EndMethod
 
@@ -420,6 +503,33 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  PatchJump(endJump)
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 436F6D70696C65732074686520626F6479206F662061206C6F6F7020616E6420747261636B732069747320657874656E7420736F207468617420636F6E7461696E6564202265786974222073746174656D656E74732063616E2062652068616E646C656420636F72726563746C792E
+		Private Sub LoopBody(body As ObjoScript.Stmt)
+		  /// Compiles the body of a loop and tracks its extent so that contained "break"
+		  /// statements can be handled correctly.
+		  
+		  Self.CurrentLoop.BodyOffset = CurrentChunk.Length
+		  
+		  // Compile the optional loop body.
+		  If body <> Nil Then
+		    Call body.Accept(Self)
+		  End If
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E7320746865206E756D626572206F66206279746573207573656420666F72206F706572616E647320666F7220606F70636F6465602E
+		Private Function OperandByteCountForOpcode(opcode As Integer) As Integer
+		  /// Returns the number of bytes used for operands for `opcode`.
+		  
+		  If ObjoScript.VM.OpcodeOperandMap.HasKey(opcode) Then
+		    Return ObjoScript.VM.OpcodeOperandMap.Value(opcode)
+		  Else
+		    Error("Unrecognised opcode: " + opcode.ToString)
+		  End If
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 52657475726E7320616E206172726179206F6620616E792070617273657220657863657074696F6E732074686174206F6363757272656420647572696E67207468652070617273696E672070686173652E204D617920626520656D7074792E
@@ -501,7 +611,7 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  mStopWatch = New ObjoScript.StopWatch(False)
 		  ScopeDepth = 0
 		  Locals.RemoveAll
-		  
+		  CurrentLoop = Nil
 		End Sub
 	#tag EndMethod
 
@@ -537,6 +647,21 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  Return -1
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 4D61726B732074686520626567696E6E696E67206F662061206C6F6F702E204B6565707320747261636B206F66207468652063757272656E7420696E737472756374696F6E20736F207765206B6E6F77207768617420746F206C6F6F70206261636B20746F2061742074686520656E64206F662074686520626F64792E
+		Private Sub StartLoop()
+		  /// Marks the beginning of a loop. Keeps track of the current instruction so we
+		  /// know what to loop back to at the end of the body.
+		  
+		  Var newLoop As New ObjoScript.LoopData
+		  newLoop.Enclosing = Self.CurrentLoop
+		  newLoop.Start = CurrentChunk.Length
+		  newLoop.ScopeDepth = ScopeDepth
+		  
+		  Self.CurrentLoop = newLoop
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 54686520746F6B656E73207468697320636F6D70696C657220697320636F6D70696C696E672E204D617920626520656D7074792069662074686520636F6D70696C65722077617320696E737472756374656420746F20636F6D70696C6520616E20415354206469726563746C792E2053686F756C6420626520636F6E7369646572656420726561642D6F6E6C792E
@@ -701,6 +826,31 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  Else
 		    EmitByte(ObjoScript.VM.OP_FALSE)
 		  End If
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C6520616E206065786974602073746174656D656E742E
+		Function VisitExitStmt(stmt As ObjoScript.ExitStmt) As Variant
+		  /// Compile an `exit` statement.
+		  ///
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  
+		  mLocation = stmt.Location
+		  
+		  If CurrentLoop = Nil Then
+		    Error("Cannot use the `exit` keyword outside of a loop.")
+		  End If
+		  
+		  // Since we will be jumping out of the scope, make sure any locals in it are
+		  // discarded first.
+		  Call DiscardLocals(CurrentLoop.ScopeDepth + 1)
+		  
+		  // Emit a placeholder instruction for the jump to the end of the body. When
+		  // we're done compiling the loop body and know where the end is, we'll
+		  // replace these with a jump instruction with the appropriate offset.
+		  // We use `OP_EXIT` as the placeholder.
+		  Call EmitJump(ObjoScript.VM.OP_EXIT)
 		  
 		End Function
 	#tag EndMethod
@@ -986,34 +1136,48 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.StmtVisitor interface.
 		  
-		  // Track where we are in the source code.
+		  // Track our location.
 		  mLocation = stmt.Location
 		  
-		  // Store where the body of the loop begins, before the condition.
-		  Var loopStart As Integer = CurrentChunk.Length
+		  StartLoop
 		  
 		  // Compile the condition.
 		  Call stmt.Condition.Accept(Self)
 		  
-		  // Skip over the body if the condition evaluates to false at runtime.
-		  Var exitJump As Integer = EmitJump(ObjoScript.VM.OP_JUMP_IF_FALSE)
+		  ExitLoopIfFalse
 		  
-		  // Pop the condition off the stack if it was truthy.
-		  EmitByte(ObjoScript.VM.OP_POP)
+		  LoopBody(stmt.Body)
 		  
-		  // Compile the optional loop body.
-		  If stmt.Body <> Nil Then
-		    Call stmt.Body.Accept(Self)
-		  End If
+		  EndLoop
 		  
-		  // Jump back to the start of the loop if the condition evaluates to truthy.
-		  EmitLoop(loopStart)
-		  
-		  // Back-patch the jump.
-		  PatchJump(exitJump)
-		  
-		  // The condition must have been falsey - pop the condition off the stack.
-		  EmitByte(ObjoScript.VM.OP_POP)
+		  ' // Track where we are in the source code.
+		  ' mLocation = stmt.Location
+		  ' 
+		  ' // Store where the body of the loop begins, before the condition.
+		  ' Var loopStart As Integer = CurrentChunk.Length
+		  ' 
+		  ' // Compile the condition.
+		  ' Call stmt.Condition.Accept(Self)
+		  ' 
+		  ' // Skip over the body if the condition evaluates to false at runtime.
+		  ' Var exitJump As Integer = EmitJump(ObjoScript.VM.OP_JUMP_IF_FALSE)
+		  ' 
+		  ' // Pop the condition off the stack if it was truthy.
+		  ' EmitByte(ObjoScript.VM.OP_POP)
+		  ' 
+		  ' // Compile the optional loop body.
+		  ' If stmt.Body <> Nil Then
+		  ' Call stmt.Body.Accept(Self)
+		  ' End If
+		  ' 
+		  ' // Jump back to the start of the loop if the condition evaluates to truthy.
+		  ' EmitLoop(loopStart)
+		  ' 
+		  ' // Back-patch the jump.
+		  ' PatchJump(exitJump)
+		  ' 
+		  ' // The condition must have been falsey - pop the condition off the stack.
+		  ' EmitByte(ObjoScript.VM.OP_POP)
 		  
 		End Function
 	#tag EndMethod
@@ -1027,6 +1191,10 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		#tag EndGetter
 		CompileTime As Double
 	#tag EndComputedProperty
+
+	#tag Property, Flags = &h21, Description = 5468652063757272656E7420696E6E65726D6F7374206C6F6F70206265696E6720636F6D70696C65642C206F72204E696C206966206E6F7420696E2061206C6F6F702E
+		Private CurrentLoop As ObjoScript.LoopData
+	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 54686520636F6D70696C65722773206C657865722E205573656420746F20746F6B656E69736520736F7572636520636F64652E
 		Private Lexer As ObjoScript.Lexer
@@ -1147,6 +1315,38 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="TokeniseTime"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Double"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="ParseTime"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Double"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="CompileTime"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Double"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="TotalTime"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Double"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
