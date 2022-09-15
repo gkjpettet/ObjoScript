@@ -365,19 +365,23 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub EndLoop()
-		  /// Ends the current innermost loop. Patches up all jumps and breaks now that
+	#tag Method, Flags = &h21, Description = 456E6473207468652063757272656E7420696E6E65726D6F7374206C6F6F702E205061746368657320757020616C6C206A756D707320616E64206578697473206E6F772074686174207765206B6E6F772077686572652074686520656E64206F6620746865206C6F6F702069732E
+		Private Sub EndLoop(hasCondition As Boolean = True)
+		  /// Ends the current innermost loop. Patches up all jumps and exits now that
 		  /// we know where the end of the loop is.
 		  
 		  // Jump back to the start of the current loop if the condition evaluates to truthy.
 		  EmitLoop(CurrentLoop.Start)
 		  
-		  // Back-patch the jump.
-		  PatchJump(CurrentLoop.ExitJump)
-		  
-		  // The condition must have been falsey - pop the condition off the stack.
-		  EmitByte(ObjoScript.VM.OP_POP)
+		  // If `hasCondition` is false (e.g. in some `for` loops) then we don't need to 
+		  // patch the exit jump or pop the condition.
+		  If hasCondition Then
+		    // Back-patch the jump.
+		    PatchJump(CurrentLoop.ExitJump)
+		    
+		    // The condition must have been falsey - pop the condition off the stack.
+		    EmitByte(ObjoScript.VM.OP_POP)
+		  End If
 		  
 		  // Find any `exit` placeholder instructions (which will be OP_EXIT in the
 		  // bytecode) and replace them with real jumps.
@@ -887,41 +891,31 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		    Call stmt.Initialiser.Accept(Self)
 		  End If
 		  
-		  // Store where the loop begins.
-		  Var loopStart As Integer = CurrentChunk.Length
-		  
-		  Var exitJump As Integer = -1
+		  StartLoop
 		  
 		  // Compile the optional condition.
 		  If stmt.Condition <> Nil Then
 		    Call stmt.Condition.Accept(Self)
-		    
-		    // Jump out of the condition if the condition is falsey.
-		    exitJump = EmitJump(ObjoScript.VM.OP_JUMP_IF_FALSE, stmt.Condition.Location)
-		    
-		    // Pop the condition before executing the body.
-		    EmitByte(ObjoScript.VM.OP_POP)
+		  Else
+		    // No condition provided. Set it to true (infinite loop).
+		    EmitByte(ObjoScript.VM.OP_TRUE)
 		  End If
 		  
-		  // Compile the loop's body.
-		  Call stmt.Body.Accept(self)
+		  // Emit code to exit the loop if the condition is falsey.
+		  ExitLoopIfFalse
 		  
-		  // Compile the optional increment expression.
+		  // Compile the loop's body.
+		  LoopBody(stmt.Body)
+		  
+		  // Compile the optional increment expression. This is essentially inserted after the 
+		  // body of the loop.
 		  If stmt.Increment <> Nil Then
 		    Call stmt.Increment.Accept(Self)
 		    // Pop the increment expression result off the stack.
 		    EmitByte(ObjoScript.VM.OP_POP, stmt.Increment.Location)
 		  End If
 		  
-		  EmitLoop(loopStart, stmt.Location)
-		  
-		  // Back-patch the conditional exit jump.
-		  // We only do this when there was a condition (exitJump <> -1).
-		  If exitJump <> -1 Then
-		    PatchJump(exitJump)
-		    // Pop the condition.
-		    EmitByte(ObjoScript.VM.OP_POP)
-		  End If
+		  EndLoop
 		  
 		  EndScope
 		  
@@ -1150,34 +1144,6 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  
 		  EndLoop
 		  
-		  ' // Track where we are in the source code.
-		  ' mLocation = stmt.Location
-		  ' 
-		  ' // Store where the body of the loop begins, before the condition.
-		  ' Var loopStart As Integer = CurrentChunk.Length
-		  ' 
-		  ' // Compile the condition.
-		  ' Call stmt.Condition.Accept(Self)
-		  ' 
-		  ' // Skip over the body if the condition evaluates to false at runtime.
-		  ' Var exitJump As Integer = EmitJump(ObjoScript.VM.OP_JUMP_IF_FALSE)
-		  ' 
-		  ' // Pop the condition off the stack if it was truthy.
-		  ' EmitByte(ObjoScript.VM.OP_POP)
-		  ' 
-		  ' // Compile the optional loop body.
-		  ' If stmt.Body <> Nil Then
-		  ' Call stmt.Body.Accept(Self)
-		  ' End If
-		  ' 
-		  ' // Jump back to the start of the loop if the condition evaluates to truthy.
-		  ' EmitLoop(loopStart)
-		  ' 
-		  ' // Back-patch the jump.
-		  ' PatchJump(exitJump)
-		  ' 
-		  ' // The condition must have been falsey - pop the condition off the stack.
-		  ' EmitByte(ObjoScript.VM.OP_POP)
 		  
 		End Function
 	#tag EndMethod
