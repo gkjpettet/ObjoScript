@@ -175,6 +175,18 @@ Protected Class Parser
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 50617273657320612060636F6E74696E7565602073746174656D656E742E20417373756D6573207468652060636F6E74696E756560206B6579776F726420686173206A757374206265656E20636F6E73756D65642E
+		Private Function ContinueStatement() As ObjoScript.Stmt
+		  /// Parses a `continue` statement.
+		  /// Assumes the `continue` keyword has just been consumed.
+		  
+		  #Pragma Warning "TODO: Implement parsing the `continue` keyword"
+		  
+		  Error("The `continue` keyword is not yet implemented.")
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 50617273652061206465636C61726174696F6E20696E746F2061206053746D74602E
 		Private Function Declaration() As ObjoScript.Stmt
 		  /// Parse a declaration into a `Stmt`.
@@ -213,6 +225,18 @@ Protected Class Parser
 		  Raise New ObjoScript.ParserException(message, location)
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function ExitStatement() As ObjoScript.Stmt
+		  /// Parses an `exit` statement.
+		  /// Assumes the `exit` keyword has just been consumed.
+		  
+		  #Pragma Warning "TODO: Implement parsing the `exit` keyword"
+		  
+		  Error("The `exit` keyword is not yet implemented.")
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 50617273657320616E2065787072657373696F6E2E
@@ -666,6 +690,12 @@ Protected Class Parser
 		    
 		  ElseIf Match(ObjoScript.TokenTypes.Assert) Then
 		    Return AssertStatement
+		    
+		  ElseIf Match(ObjoScript.TokenTypes.Exit_) Then
+		    Return ExitStatement
+		    
+		  ElseIf Match(ObjoScript.TokenTypes.Continue_) Then
+		    Return ContinueStatement
 		    
 		  Else
 		    Return ExpressionStatement
