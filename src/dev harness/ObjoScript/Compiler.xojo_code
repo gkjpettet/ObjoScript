@@ -366,22 +366,18 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 456E6473207468652063757272656E7420696E6E65726D6F7374206C6F6F702E205061746368657320757020616C6C206A756D707320616E64206578697473206E6F772074686174207765206B6E6F772077686572652074686520656E64206F6620746865206C6F6F702069732E
-		Private Sub EndLoop(hasCondition As Boolean = True)
+		Private Sub EndLoop()
 		  /// Ends the current innermost loop. Patches up all jumps and exits now that
 		  /// we know where the end of the loop is.
 		  
 		  // Jump back to the start of the current loop if the condition evaluates to truthy.
 		  EmitLoop(CurrentLoop.Start)
 		  
-		  // If `hasCondition` is false (e.g. in some `for` loops) then we don't need to 
-		  // patch the exit jump or pop the condition.
-		  If hasCondition Then
-		    // Back-patch the jump.
-		    PatchJump(CurrentLoop.ExitJump)
-		    
-		    // The condition must have been falsey - pop the condition off the stack.
-		    EmitByte(ObjoScript.VM.OP_POP)
-		  End If
+		  // Back-patch the jump.
+		  PatchJump(CurrentLoop.ExitJump)
+		  
+		  // The condition must have been falsey - pop the condition off the stack.
+		  EmitByte(ObjoScript.VM.OP_POP)
 		  
 		  // Find any `exit` placeholder instructions (which will be OP_EXIT in the
 		  // bytecode) and replace them with real jumps.
