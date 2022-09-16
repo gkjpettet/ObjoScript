@@ -274,7 +274,7 @@ Protected Class VM
 		      Var b As Variant = Pop
 		      Var a As Variant = Pop
 		      AssertNumbers(a, b)
-		      Push(a.DoubleValue Mod b.DoubleValue)
+		      Push(CType(a.DoubleValue Mod b.DoubleValue, Double))
 		      
 		    Case OP_NOT
 		      // Since unary operators don't change the stack and operate on the top of the stack, we'll 
@@ -336,35 +336,35 @@ Protected Class VM
 		      Var a As Variant = Pop
 		      AssertNumbers(a, b)
 		      // If a or b are doubles, they are truncated to integers.
-		      Push(Bitwise.ShiftLeft(a.IntegerValue, b.IntegerValue))
+		      Push(Ctype(Bitwise.ShiftLeft(a.IntegerValue, b.IntegerValue), Double))
 		      
 		    Case OP_SHIFT_RIGHT
 		      Var b As Variant = Pop
 		      Var a As Variant = Pop
 		      AssertNumbers(a, b)
 		      // If a or b are doubles, they are truncated to integers.
-		      Push(Bitwise.ShiftRight(a.IntegerValue, b.IntegerValue))
+		      Push(Ctype(Bitwise.ShiftRight(a.IntegerValue, b.IntegerValue), Double))
 		      
 		    Case OP_BITWISE_AND
 		      Var b As Variant = Pop
 		      Var a As Variant = Pop
 		      AssertNumbers(a, b)
 		      // If a or b are doubles, they are truncated to integers.
-		      Push(a.IntegerValue And b.IntegerValue)
+		      Push(Ctype(a.IntegerValue And b.IntegerValue, Double))
 		      
 		    Case OP_BITWISE_OR
 		      Var b As Variant = Pop
 		      Var a As Variant = Pop
 		      AssertNumbers(a, b)
 		      // If a or b are doubles, they are truncated to integers.
-		      Push(a.IntegerValue Or b.IntegerValue)
+		      Push(Ctype(a.IntegerValue Or b.IntegerValue, Double))
 		      
 		    Case OP_BITWISE_XOR
 		      Var b As Variant = Pop
 		      Var a As Variant = Pop
 		      AssertNumbers(a, b)
 		      // If a or b are doubles, they are truncated to integers.
-		      Push(a.IntegerValue Xor b.IntegerValue)
+		      Push(Ctype(a.IntegerValue Xor b.IntegerValue, Double))
 		      
 		    Case OP_PRINT
 		      // Pop the top value off the stack and print it via the VM's `Print` event.
@@ -625,6 +625,7 @@ Protected Class VM
 		44: OP_INCLUSIVE_RANGE
 		45: OP_EXCLUSIVE_RANGE
 		46: OP_BREAK
+		
 	#tag EndNote
 
 

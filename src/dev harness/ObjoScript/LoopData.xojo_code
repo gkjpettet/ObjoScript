@@ -28,6 +28,10 @@ Protected Class LoopData
 		Start As Integer
 	#tag EndProperty
 
+	#tag Property, Flags = &h0, Description = 54686520746F6B656E2074686174206265696E67732074686973206C6F6F702E
+		StartToken As ObjoScript.Token
+	#tag EndProperty
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

@@ -180,9 +180,11 @@ Protected Class Parser
 		  /// Parses a `continue` statement.
 		  /// Assumes the `continue` keyword has just been consumed.
 		  
-		  #Pragma Warning "TODO: Implement parsing the `continue` keyword"
+		  Var continueKeyword As ObjoScript.Token = Previous
 		  
-		  Error("The `continue` keyword is not yet implemented.")
+		  ConsumeNewLine("Expected a new line after the `continue` keyword.")
+		  
+		  Return New ObjoScript.ContinueStmt(continueKeyword)
 		  
 		End Function
 	#tag EndMethod

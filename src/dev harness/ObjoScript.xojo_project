@@ -60,6 +60,7 @@ Class=WhileStmt;ObjoScript/WhileStmt.xojo_code;&h00000000272987FF;&h000000004D14
 Class=ForStmt;ObjoScript/ForStmt.xojo_code;&h000000007F48EFFF;&h000000004D1497FF;false
 Class=LoopData;ObjoScript/LoopData.xojo_code;&h0000000006FFFFFF;&h000000004D1497FF;false
 Class=ExitStmt;ObjoScript/ExitStmt.xojo_code;&h000000006C8EB7FF;&h000000004D1497FF;false
+Class=ContinueStmt;ObjoScript/ContinueStmt.xojo_code;&h0000000007846FFF;&h000000004D1497FF;false
 DefaultWindow=WindowTest
 AppMenuBar=MainMenuBar
 MajorVersion=1

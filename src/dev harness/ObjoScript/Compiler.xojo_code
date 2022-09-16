@@ -371,7 +371,7 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  /// we know where the end of the loop is.
 		  
 		  // Jump back to the start of the current loop if the condition evaluates to truthy.
-		  EmitLoop(CurrentLoop.Start)
+		  EmitLoop(CurrentLoop.Start, CurrentLoop.StartToken)
 		  
 		  // Back-patch the jump.
 		  PatchJump(CurrentLoop.ExitJump)
@@ -650,14 +650,17 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 4D61726B732074686520626567696E6E696E67206F662061206C6F6F702E204B6565707320747261636B206F66207468652063757272656E7420696E737472756374696F6E20736F207765206B6E6F77207768617420746F206C6F6F70206261636B20746F2061742074686520656E64206F662074686520626F64792E
-		Private Sub StartLoop()
+		Private Sub StartLoop(location As ObjoScript.Token = Nil)
 		  /// Marks the beginning of a loop. Keeps track of the current instruction so we
 		  /// know what to loop back to at the end of the body.
+		  
+		  location = If(location = Nil, mLocation, location)
 		  
 		  Var newLoop As New ObjoScript.LoopData
 		  newLoop.Enclosing = Self.CurrentLoop
 		  newLoop.Start = CurrentChunk.Length
 		  newLoop.ScopeDepth = ScopeDepth
+		  newLoop.StartToken = location
 		  
 		  Self.CurrentLoop = newLoop
 		  
@@ -826,6 +829,28 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  Else
 		    EmitByte(ObjoScript.VM.OP_FALSE)
 		  End If
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C657320612060636F6E74696E7565602073746174656D656E742E
+		Function VisitContinueStmt(stmt As ObjoScript.ContinueStmt) As Variant
+		  /// Compiles a `continue` statement.
+		  ///
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  
+		  mLocation = stmt.Location
+		  
+		  If CurrentLoop = Nil Then
+		    Error("Cannot use `continue` outside of a loop.")
+		  End If
+		  
+		  // Since we will be jumping out of the scope, make sure any locals in it
+		  // are discarded first.
+		  Call DiscardLocals(CurrentLoop.ScopeDepth + 1)
+		  
+		  // Emit a jump back to the top of the loop.
+		  EmitLoop(CurrentLoop.Start)
 		  
 		End Function
 	#tag EndMethod
