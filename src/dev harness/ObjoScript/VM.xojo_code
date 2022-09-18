@@ -34,6 +34,16 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 52657475726E7320746865206368756E6B207765206172652063757272656E746C792072656164696E672066726F6D2E2049742773206F776E6564206279207468652066756E6374696F6E2077686F73652063616C6C206672616D65207765206172652063757272656E746C7920696E2E
+		Private Function CurrentChunk() As ObjoScript.Chunk
+		  /// Returns the chunk we are currently reading from. It's owned by the function whose 
+		  /// call frame we are currently in.
+		  
+		  Return CurrentFrame.Func.Chunk
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 44656C6567617465206D6574686F6420746861742069732063616C6C6564206279206F757220646973617373656D626C6572277320605072696E74282960206576656E742E
 		Private Sub DisassemblerPrintDelegate(sender As ObjoScript.Disassembler, s As String)
 		  /// Delegate method that is called by our disassembler's `Print()` event.
@@ -73,18 +83,9 @@ Protected Class VM
 		  #Pragma BreakOnExceptions False
 		  
 		  // Default to the current IP if no offset is provided.
-		  offset = If(offset = -1, IP, offset)
+		  offset = If(offset = -1, CurrentFrame.IP, offset)
 		  
-		  Raise New ObjoScript.VMException(message, Chunk.LineForOffset(offset), Chunk.ScriptIDForOffset(offset))
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub Interpret(chunk As ObjoScript.Chunk)
-		  Self.Chunk = chunk
-		  Self.IP = 0
-		  Run
-		  
+		  Raise New ObjoScript.VMException(message, CurrentChunk.LineForOffset(offset), CurrentChunk.ScriptIDForOffset(offset))
 		End Sub
 	#tag EndMethod
 
@@ -144,8 +145,8 @@ Protected Class VM
 		Private Function ReadByte() As UInt8
 		  /// Reads the byte in `Chunk` at the current `IP` and returns it. Increments the IP.
 		  
-		  IP = IP + 1
-		  Return Chunk.ReadByte(IP - 1)
+		  CurrentFrame.IP = CurrentFrame.IP + 1
+		  Return CurrentChunk.ReadByte(CurrentFrame.IP - 1)
 		End Function
 	#tag EndMethod
 
@@ -155,7 +156,7 @@ Protected Class VM
 		  
 		  // The bytecode at `IP` gives us the index in the constant pool.
 		  
-		  Return Chunk.Constants(ReadByte)
+		  Return CurrentChunk.Constants(ReadByte)
 		  
 		End Function
 	#tag EndMethod
@@ -166,7 +167,7 @@ Protected Class VM
 		  
 		  // The bytecode at `IP` gives us the index in the constant pool.
 		  
-		  Return Chunk.Constants(ReadUInt16)
+		  Return CurrentChunk.Constants(ReadUInt16)
 		  
 		End Function
 	#tag EndMethod
@@ -175,8 +176,8 @@ Protected Class VM
 		Private Function ReadUInt16() As UInt16
 		  /// Reads two bytes from `Chunk` at the current `IP` and returns them as a UInt16. Increments the IP by 2.
 		  
-		  IP = IP + 2
-		  Return Chunk.ReadUInt16(IP - 2)
+		  CurrentFrame.IP = CurrentFrame.IP + 2
+		  Return CurrentChunk.ReadUInt16(CurrentFrame.IP - 2)
 		  
 		End Function
 	#tag EndMethod
@@ -186,14 +187,41 @@ Protected Class VM
 		  /// Resets the VM.
 		  
 		  StackTop = 0
+		  Stack.ResizeTo(-1)
+		  Stack.ResizeTo(MAX_STACK * MAX_FRAMES)
+		  
+		  FrameCount = 0
+		  Frames.ResizeTo(-1)
+		  Frames.ResizeTo(MAX_FRAMES)
+		  // Allocate new call frames up front so we don't incur object creation overhead at runtime.
+		  For i As Integer = 0 To Frames.LastRowIndex
+		    Frames(i) = New ObjoScript.CallFrame
+		  Next i
+		  
 		  Nothing = New ObjoScript.Nothing
 		  Self.Globals = New Dictionary
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub Run()
+	#tag Method, Flags = &h0, Description = 52756E7320612066756E6374696F6E2E
+		Sub Run(func As ObjoScript.Func)
+		  /// Runs a function.
+		  
+		  Reset 
+		  
+		  // Push the function to run onto the stack as a runtime value.
+		  Push(New ObjoScript.Value(func))
+		  
+		  // Create a new call frame for the main function.
+		  'Call CallValue(New ObjoScript.Value(func), 0)
+		  Frames(FrameCount).Func = func
+		  Frames(FrameCount).IP = 0
+		  Frames(FrameCount).StackBase = 0
+		  FrameCount = 1
+		  
+		  CurrentFrame = Frames(0)
+		  
 		  While True
 		    // Disassemble each instruction if requested.
 		    #If DebugBuild And TRACE_EXECUTION
@@ -203,7 +231,7 @@ Protected Class VM
 		        s.Add("[ " + ValueToString(item) + " ]")
 		      Next i
 		      System.DebugLog(String.FromArray(s, ""))
-		      Call Disassembler.DisassembleInstruction(-1, -1, Chunk, IP)
+		      Call Disassembler.DisassembleInstruction(-1, -1, CurrentChunk, CurrentFrame.IP)
 		    #EndIf
 		    
 		    Select Case ReadByte
@@ -433,30 +461,30 @@ Protected Class VM
 		    Case OP_GET_LOCAL
 		      // The operand is the stack slot where the local variable lives.
 		      // Load the value at that index and then push it on to the top of the stack.
-		      Push(Stack(ReadByte))
+		      Push(Stack(CurrentFrame.StackBase + ReadByte))
 		      
 		    Case OP_SET_LOCAL
 		      // The operand is the stack slot where the local variable lives.
 		      // Store the value at the top of the stack in the stack slot corresponding to the local variable.
-		      Stack(ReadByte) = Peek(0)
+		      Stack(CurrentFrame.StackBase + ReadByte) = Peek(0)
 		      
 		    Case OP_JUMP
 		      // Unconditionally jump `offset` bytes from the current instruction pointer.
 		      Var offset As UInt16 = ReadUInt16
-		      IP = IP + offset
+		      CurrentFrame.IP = CurrentFrame.IP + offset
 		      
 		    Case OP_JUMP_IF_FALSE
 		      // Jump `offset` bytes from the current instruction pointer _if_ the value on the top of the stack is falsey.
 		      Var offset As UInt16 = ReadUInt16
 		      If IsFalsey(Peek(0)) Then
-		        IP = IP + offset
+		        CurrentFrame.IP = CurrentFrame.IP + offset
 		      End If
 		      
 		    Case OP_JUMP_IF_TRUE
 		      // Jump `offset` bytes from the current instruction pointer _if_ the value on the top of the stack is truthy.
 		      Var offset As UInt16 = ReadUInt16
 		      If IsTruthy(Peek(0)) Then
-		        IP = IP + offset
+		        CurrentFrame.IP = CurrentFrame.IP + offset
 		      End If
 		      
 		    Case OP_LOGICAL_XOR
@@ -467,7 +495,7 @@ Protected Class VM
 		    Case OP_LOOP
 		      // Unconditionally jump `offset` bytes _back_ from the current instruction pointer.
 		      Var offset AS UInt16 = ReadUInt16
-		      IP = IP - offset
+		      CurrentFrame.IP = CurrentFrame.IP - offset
 		      
 		    Case OP_INCLUSIVE_RANGE
 		      Var upper As Variant = Pop
@@ -555,7 +583,10 @@ Protected Class VM
 		    Return v.StringValue
 		    
 		  Else
-		    If v IsA ObjoScript.Nothing Then
+		    If v IsA ObjoScript.Value Then
+		      Return ObjoScript.Value(v).ToString
+		      
+		    ElseIf v IsA ObjoScript.Nothing Then
 		      Return "Nothing"
 		      
 		    ElseIf v IsA Pair Then
@@ -629,8 +660,8 @@ Protected Class VM
 	#tag EndNote
 
 
-	#tag Property, Flags = &h0, Description = 546865206368756E6B206F6620636F6465207468697320564D2069732063757272656E746C7920696E74657270726574696E672E
-		Chunk As ObjoScript.Chunk
+	#tag Property, Flags = &h21, Description = 5468652063757272656E742063616C6C206672616D652E
+		Private CurrentFrame As ObjoScript.CallFrame
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
@@ -641,12 +672,16 @@ Protected Class VM
 		Private DisassemblerOutput() As String
 	#tag EndProperty
 
-	#tag Property, Flags = &h21, Description = 53746F7265732074686520564D277320676C6F62616C207661726961626C65732E204B6579203D207661726961626C65206E616D652028537472696E67292C2056616C7565203D207661726961626C652076616C7565202856617269616E74292E
-		Private Globals As Dictionary
+	#tag Property, Flags = &h21, Description = 546865206E756D626572206F66206F6E676F696E672066756E6374696F6E2063616C6C732E
+		Private FrameCount As Integer = 0
 	#tag EndProperty
 
-	#tag Property, Flags = &h0, Description = 54686520696E737472756374696F6E20706F696E7465722E2054686520696E64657820696E20746865206368756E6B27732060436F646560206172726179206F662074686520696E737472756374696F6E202A61626F757420746F2062652065786563757465642A2E
-		IP As Integer = 0
+	#tag Property, Flags = &h21, Description = 4120737461636B206F662063616C6C206672616D65732E
+		Private Frames(-1) As ObjoScript.CallFrame
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 53746F7265732074686520564D277320676C6F62616C207661726961626C65732E204B6579203D207661726961626C65206E616D652028537472696E67292C2056616C7565203D207661726961626C652076616C7565202856617269616E74292E
+		Private Globals As Dictionary
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 53696E676C65746F6E20696E7374616E6365206F6620224E6F7468696E67222E
@@ -714,13 +749,19 @@ Protected Class VM
 	#tag EndComputedProperty
 
 	#tag Property, Flags = &h21, Description = 54686520564D277320737461636B2E
-		Private Stack(VM.STACK_MAX) As Variant
+		Private Stack(-1) As Variant
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 506F696E747320746F2074686520696E64657820696E2060537461636B60206A757374202A706173742A2074686520656C656D656E7420636F6E7461696E696E672074686520746F702076616C75652E205468657265666F726520603060206D65616E732074686520737461636B20697320656D7074792E20497427732074686520696E64657820746865206E6578742076616C75652077696C6C2062652070757368656420746F2E
 		Private StackTop As Integer = 0
 	#tag EndProperty
 
+
+	#tag Constant, Name = MAX_FRAMES, Type = Double, Dynamic = False, Default = \"63", Scope = Public, Description = 54686520757070657220626F756E6473206F66207468652063616C6C206672616D6520737461636B2E
+	#tag EndConstant
+
+	#tag Constant, Name = MAX_STACK, Type = Double, Dynamic = False, Default = \"255", Scope = Public, Description = 54686520757070657220626F756E6473206F662074686520737461636B2E
+	#tag EndConstant
 
 	#tag Constant, Name = OP_ADD, Type = Double, Dynamic = False, Default = \"4", Scope = Public
 	#tag EndConstant
@@ -863,9 +904,6 @@ Protected Class VM
 	#tag Constant, Name = OP_TRUE, Type = Double, Dynamic = False, Default = \"16", Scope = Public
 	#tag EndConstant
 
-	#tag Constant, Name = STACK_MAX, Type = Double, Dynamic = False, Default = \"255", Scope = Public, Description = 54686520757070657220626F756E6473206F662074686520737461636B2E
-	#tag EndConstant
-
 	#tag Constant, Name = STRING_COMPARISON_RESPECTS_CASE, Type = Boolean, Dynamic = False, Default = \"False", Scope = Public, Description = 54686520636173652073656E7369746976697479206F6620737472696E6720636F6D70617269736F6E73207768656E207573696E672074686520603D3D60206F70657261746F722E
 	#tag EndConstant
 
@@ -910,14 +948,6 @@ Protected Class VM
 			Name="Top"
 			Visible=true
 			Group="Position"
-			InitialValue="0"
-			Type="Integer"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="IP"
-			Visible=false
-			Group="Behavior"
 			InitialValue="0"
 			Type="Integer"
 			EditorType=""

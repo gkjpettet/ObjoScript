@@ -74,46 +74,10 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C657320616E2061627374726163742073796E746178207472656520696E746F2061206368756E6B2E2052616973657320612060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
-		Function Compile(abstractTree() As ObjoScript.Stmt, shouldResetFirst As Boolean = True) As ObjoScript.Chunk
-		  /// Compiles an abstract syntax tree into a chunk. Raises a `CompilerException` if an error occurs.
-		  ///
-		  /// Resets by default but if this is being called internally (after the compiler has tokenised and parsed the source) 
-		  /// then we skip resetting by setting `shouldResetFirst` to True.
-		  
-		  mStopWatch.Start
-		  
-		  If shouldResetFirst Then Reset
-		  
-		  mCompilingChunk = New ObjoScript.Chunk
-		  mAST = abstractTree
-		  
-		  For Each stmt As ObjoScript.Stmt In mAST
-		    Call stmt.Accept(Self)
-		  Next stmt
-		  
-		  // Handle an empty AST.
-		  Var endLocation As ObjoScript.Token
-		  If mAST.Count = 0 Then
-		    // Synthesise a fake end location token.
-		    endLocation = New ObjoScript.Token(ObjoScript.TokenTypes.EOF, 0, 1)
-		  Else
-		    endLocation = mAST(mAST.LastIndex).Location
-		  End If
-		  
-		  // Wind down the compiler.
-		  EndCompiler(endLocation)
-		  
-		  mStopWatch.Stop
-		  mCompileTime = mStopWatch.ElapsedMilliseconds
-		  
-		  Return CurrentChunk
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = 436F6D70696C657320726177204F626A6F20736F7572636520636F646520696E746F2061206368756E6B2E2052616973657320612060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
-		Function Compile(source As String) As ObjoScript.Chunk
-		  /// Compiles raw Objo source code into a chunk. May raise a `LexerException`, `ParserException` or `CompilerException` if an error occurs.
+	#tag Method, Flags = &h0, Description = 436F6D70696C657320726177204F626A6F20736F7572636520636F646520696E746F206120746F70206C6576656C2066756E6374696F6E2E204D6179207261697365206120604C65786572457863657074696F6E602C2060506172736572457863657074696F6E60206F722060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
+		Function Compile(source As String) As ObjoScript.Func
+		  /// Compiles raw Objo source code into a top level function. 
+		  /// May raise a `LexerException`, `ParserException` or `CompilerException` if an error occurs.
 		  
 		  Reset
 		  
@@ -141,8 +105,47 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  End If
 		  
 		  // Compile.
-		  Return Compile(mAST, False)
+		  Return Compile("", 0, mAST, ObjoScript.FunctionTypes.TopLevel, False)
 		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C657320616E2061627374726163742073796E746178207472656520696E746F2061206368756E6B2E2052616973657320612060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
+		Function Compile(name As String, arity As Integer, body() As ObjoScript.Stmt, type As ObjoScript.FunctionTypes = ObjoScript.FunctionTypes.TopLevel, shouldResetFirst As Boolean = True) As ObjoScript.Func
+		  /// Compiles an abstract syntax tree into a chunk. Raises a `CompilerException` if an error occurs.
+		  ///
+		  /// Resets by default but if this is being called internally (after the compiler has tokenised and parsed the source) 
+		  /// then we skip resetting by setting `shouldResetFirst` to True.
+		  
+		  mStopWatch.Start
+		  
+		  If shouldResetFirst Then Reset
+		  
+		  Func = New ObjoScript.Func(name, arity)
+		  Type = type
+		  
+		  mAST = body
+		  
+		  For Each stmt As ObjoScript.Stmt In mAST
+		    Call stmt.Accept(Self)
+		  Next stmt
+		  
+		  // Handle an empty AST.
+		  Var endLocation As ObjoScript.Token
+		  If mAST.Count = 0 Then
+		    // Synthesise a fake end location token.
+		    endLocation = New ObjoScript.Token(ObjoScript.TokenTypes.EOF, 0, 1)
+		  Else
+		    endLocation = mAST(mAST.LastIndex).Location
+		  End If
+		  
+		  // Wind down the compiler.
+		  EndCompiler(endLocation)
+		  
+		  mStopWatch.Stop
+		  mCompileTime = mStopWatch.ElapsedMilliseconds
+		  
+		  Return Func
 		End Function
 	#tag EndMethod
 
@@ -150,7 +153,7 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		Function CurrentChunk() As ObjoScript.Chunk
 		  /// Returns the chunk this compiler is currently compiling into.
 		  
-		  Return mCompilingChunk
+		  Return Func.Chunk
 		End Function
 	#tag EndMethod
 
@@ -610,7 +613,12 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  mCompileTime = 0
 		  mStopWatch = New ObjoScript.StopWatch(False)
 		  ScopeDepth = 0
+		  
 		  Locals.RemoveAll
+		  // Claim slot 0 in the stack for the VM's internal use.
+		  Var synthetic As New ObjoScript.Token(ObjoScript.TokenTypes.Identifier, 0, 1, "", -1)
+		  Locals.Add(New ObjoScript.LocalVariable(synthetic, 0))
+		  
 		  CurrentLoop = Nil
 		End Sub
 	#tag EndMethod
@@ -1183,6 +1191,10 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		Private CurrentLoop As ObjoScript.LoopData
 	#tag EndProperty
 
+	#tag Property, Flags = &h0, Description = 5468652066756E6374696F6E2063757272656E746C79206265696E6720636F6D70696C65642E
+		Func As ObjoScript.Func
+	#tag EndProperty
+
 	#tag Property, Flags = &h21, Description = 54686520636F6D70696C65722773206C657865722E205573656420746F20746F6B656E69736520736F7572636520636F64652E
 		Private Lexer As ObjoScript.Lexer
 	#tag EndProperty
@@ -1197,10 +1209,6 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 
 	#tag Property, Flags = &h21
 		Private mCompileTime As Double
-	#tag EndProperty
-
-	#tag Property, Flags = &h21, Description = 546865206368756E6B2077652772652063757272656E746C7920636F6D70696C696E6720746F2E
-		Private mCompilingChunk As ObjoScript.Chunk
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 54686520746F6B656E2074686520636F6D70696C65722069732063757272656E746C7920636F6D70696C696E672E
@@ -1257,6 +1265,10 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		#tag EndGetter
 		TotalTime As Double
 	#tag EndComputedProperty
+
+	#tag Property, Flags = &h0, Description = 5468652074797065206F662066756E6374696F6E2063757272656E746C79206265696E6720636F6D70696C65642E
+		Type As ObjoScript.FunctionTypes = ObjoScript.FunctionTypes.TopLevel
+	#tag EndProperty
 
 
 	#tag Constant, Name = MAX_LOCALS, Type = Double, Dynamic = False, Default = \"256", Scope = Public, Description = 546865206D6178696D756D206E756D626572206F66206C6F63616C207661726961626C657320746861742063616E20626520696E2073636F7065206174206F6E652074696D652E204C696D6974656420746F206F6E6520627974652064756520746F2074686520696E737472756374696F6E2773206F706572616E642073697A652E

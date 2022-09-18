@@ -1,53 +1,38 @@
 #tag Class
 Protected Class Value
-Implements ObjoScript.Comparable
 	#tag Method, Flags = &h0
-		Sub Constructor(d As Double)
-		  Self.Type = Value.Types.Number
-		  Self.Data = d
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub Constructor(type As ObjoScript.Value.Types, data As Variant)
-		  Self.Type = type
-		  Self.Data = data
-		  
+		Sub Constructor(v As Variant)
+		  If v IsA ObjoScript.Func Then
+		    Self.mValue = v
+		    Self.Type = ObjoScript.ValueTypes.Func
+		    
+		  Else
+		    Raise New UnsupportedOperationException("Unknown value type.")
+		  End If
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 52657475726E73206120756E6971756520696E7465676572206861736820726570726573656E74696E672074686973206F626A6563742E
 		Function Hash() As Integer
-		  /// Returns a unique integer hash representing this object.
-		  ///
-		  /// Part of the ObjoScript.Comparable interface.
+		  /// A unique hash representing this value.
 		  
-		  Select Case Self.Type
-		  Case Value.Types.Nothing
-		    // This clashes with the integer value `0` obviously.
-		    Return 0
-		    
-		  Case Value.Types.Number
-		    Return data.Hash
+		  Select Case Type
+		  Case ObjoScript.ValueTypes.Func
+		    Return mValue.Hash
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown value type.")
 		  End Select
-		  
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0
+	#tag Method, Flags = &h0, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F6620746869732076616C75652E
 		Function ToString() As String
 		  /// Returns a string representation of this value.
 		  
-		  Select Case Self.Type
-		  Case Value.Types.Nothing
-		    Return "Nothing"
-		    
-		  Case Value.Types.Number
-		    Return data.StringValue
+		  Select Case Type
+		  Case ObjoScript.ValueTypes.Func
+		    Return ObjoScript.Func(mValue).ToString
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown value type.")
@@ -56,19 +41,13 @@ Implements ObjoScript.Comparable
 	#tag EndMethod
 
 
-	#tag Property, Flags = &h0, Description = 546869732076616C756527732061637475616C20646174612E
-		Data As Variant
+	#tag Property, Flags = &h21, Description = 546865207261772076616C75652E
+		Private mValue As Variant
 	#tag EndProperty
 
-	#tag Property, Flags = &h0
-		Type As ObjoScript.Value.Types = ObjoScript.Value.Types.Nothing
+	#tag Property, Flags = &h0, Description = 546869732076616C7565277320747970652E
+		Type As ObjoScript.ValueTypes
 	#tag EndProperty
-
-
-	#tag Enum, Name = Types, Type = Integer, Flags = &h0
-		Number
-		Nothing
-	#tag EndEnum
 
 
 	#tag ViewBehavior

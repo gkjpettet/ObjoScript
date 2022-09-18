@@ -749,7 +749,7 @@ End
 		  SwitchToPanel(PANEL_DISASSEMBLER_OUTPUT)
 		  
 		  Try
-		    Chunk = Compiler.Compile(Code.Text)
+		    Func = Compiler.Compile(Code.Text)
 		    
 		    // Show the tokens.
 		    UpdateTokensListbox(Compiler.Tokens)
@@ -758,7 +758,7 @@ End
 		    ASTView.Display(Compiler.AST)
 		    
 		    // Disassemble the chunk.
-		    Disassembler.Disassemble(chunk, "Test")
+		    Disassembler.Disassemble(Func.Chunk, "Test")
 		    Info.Text = "Compilation successful (" + Compiler.TotalTime.ToString(Locale.Current, "#.#") + " ms)."
 		    
 		    // Successful compilation.
@@ -887,7 +887,7 @@ End
 		  mDisassemblerOutput.ResizeTo(-1)
 		  
 		  Compiler = New ObjoScript.Compiler
-		  Chunk = New ObjoScript.Chunk
+		  Func = Nil
 		  
 		  If VM <> Nil Then
 		    RemoveHandler VM.Print, AddressOf VMPrintDelegate
@@ -907,7 +907,7 @@ End
 		  SwitchToPanel(PANEL_OUTPUT)
 		  
 		  Try
-		    VM.Interpret(Chunk)
+		    VM.Run(Func)
 		  Catch e As ObjoScript.VMException
 		    DisplayVMError(e)
 		  End Try
@@ -1026,15 +1026,15 @@ End
 
 
 	#tag Property, Flags = &h0
-		Chunk As ObjoScript.Chunk
-	#tag EndProperty
-
-	#tag Property, Flags = &h0
 		Compiler As ObjoScript.Compiler
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
 		Disassembler As ObjoScript.Disassembler
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 54686520636F6D70696C656420746F702D6C6576656C2066756E6374696F6E2E
+		Func As ObjoScript.Func
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
