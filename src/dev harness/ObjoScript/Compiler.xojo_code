@@ -849,7 +849,7 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		  // are discarded first.
 		  Call DiscardLocals(CurrentLoop.ScopeDepth + 1)
 		  
-		  // Emit a jump back to the top of the loop.
+		  // Emit a jump back to the top of the current loop.
 		  EmitLoop(CurrentLoop.Start)
 		  
 		End Function
