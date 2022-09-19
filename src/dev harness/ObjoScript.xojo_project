@@ -63,6 +63,7 @@ Class=ContinueStmt;ObjoScript/ContinueStmt.xojo_code;&h0000000007846FFF;&h000000
 Class=Func;ObjoScript/Func.xojo_code;&h00000000191E37FF;&h000000004D1497FF;false
 Class=CallFrame;ObjoScript/CallFrame.xojo_code;&h0000000074E92FFF;&h000000004D1497FF;false
 Class=Value;ObjoScript/Value.xojo_code;&h000000003475B7FF;&h000000004D1497FF;false
+Class=FuncDeclStmt;ObjoScript/FuncDeclStmt.xojo_code;&h0000000005030FFF;&h000000004D1497FF;false
 DefaultWindow=WindowTest
 AppMenuBar=MainMenuBar
 MajorVersion=1

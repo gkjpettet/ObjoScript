@@ -67,7 +67,7 @@ Protected Class Parser
 		  
 		  BeginScope
 		  
-		  Var location As ObjoScript.Token = Previous
+		  Var openingBrace As ObjoScript.Token = Previous
 		  
 		  Var statements() As ObjoScript.Stmt
 		  
@@ -78,6 +78,7 @@ Protected Class Parser
 		    statements.Add(Declaration)
 		  Wend
 		  
+		  Var closingBrace As ObjoScript.Token = _
 		  Consume(ObjoScript.TokenTypes.RCurly, "Expected a closing brace after block.")
 		  
 		  // Edge case: The else keyword is permitted after a closing brace in if statements.
@@ -87,7 +88,7 @@ Protected Class Parser
 		  
 		  EndScope
 		  
-		  Return New ObjoScript.BlockStmt(statements, location)
+		  Return New ObjoScript.BlockStmt(statements, openingBrace, closingBrace)
 		  
 		End Function
 	#tag EndMethod
@@ -199,6 +200,9 @@ Protected Class Parser
 		  
 		  If Match(ObjoScript.TokenTypes.Var_) Then
 		    Return VarDeclaration
+		    
+		  ElseIf Match (ObjoScript.TokenTypes.Function_) Then
+		    Return FunctionDeclaration
 		    
 		  Else
 		    Return Statement
@@ -353,6 +357,38 @@ Protected Class Parser
 		  EndScope
 		  
 		  Return New ObjoScript.ForStmt(initialiser, condition, increment, body, forKeyword)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 50617273657320612066756E6374696F6E206465636C61726174696F6E2E20417373756D6573207468652070617273657220686173206A75737420636F6E73756D656420746865206066756E6374696F6E60206B6579776F72642E
+		Private Function FunctionDeclaration() As ObjoScript.Stmt
+		  /// Parses a function declaration.
+		  /// Assumes the parser has just consumed the `function` keyword.
+		  
+		  // Store the location of the function keyword.
+		  Var funcLocation As ObjoScript.Token = Previous
+		  
+		  // Get the name of the function.
+		  Var name As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier, "Expected a function name.")
+		  
+		  Consume(ObjoScript.TokenTypes.LParen, "Expected an opening parenthesis after the function's name.")
+		  
+		  // Optional parameters.
+		  Var params() As ObjoScript.Token
+		  If Not Check(ObjoScript.TokenTypes.RParen) Then
+		    Do
+		      params.Add(Consume(ObjoScript.TokenTypes.Identifier, "Expected parameter name."))
+		    Loop Until Not Match(ObjoScript.TokenTypes.Comma)
+		  End If
+		  
+		  Consume(ObjoScript.TokenTypes.RParen, "Expected a closing parenthesis after function parameters.")
+		  
+		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after function parameters.")
+		  
+		  Var body As ObjoScript.BlockStmt = ObjoScript.BlockStmt(Block)
+		  
+		  Return New FuncDeclStmt(name, params, body, funcLocation)
 		  
 		End Function
 	#tag EndMethod

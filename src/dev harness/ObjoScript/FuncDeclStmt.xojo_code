@@ -1,45 +1,50 @@
 #tag Class
-Protected Class BlockStmt
+Protected Class FuncDeclStmt
 Implements ObjoScript.Stmt
 	#tag Method, Flags = &h0
 		Function Accept(visitor As ObjoScript.StmtVisitor) As Variant
 		  /// Part of the ObjoScript.Stmt interface.
 		  
-		  Return visitor.VisitBlock(Self)
-		  
+		  Return visitor.VisitFuncDeclaration(Self)
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(statements() As ObjoScript.Stmt, openingBrace As ObjoScript.Token, closingBrace As ObjoScript.Token)
-		  Self.Statements = statements
-		  mOpeningBrace = openingBrace
-		  Self.ClosingBrace = closingBrace
+		Sub Constructor(name As ObjoScript.Token, params() As ObjoScript.Token, body As ObjoScript.BlockStmt, funcKeyword As ObjoScript.Token)
+		  Self.Name = name
+		  Self.Parameters = params
+		  Self.Body = body
+		  mFuncKeyword = funcKeyword
+		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 546865206C6F636174696F6E206F66207468697320626C6F636B2773206F70656E696E67206375726C792062726163652E
+	#tag Method, Flags = &h0, Description = 546865206066756E6374696F6E60206B6579776F72642E
 		Function Location() As ObjoScript.Token
-		  /// The location of this block's opening curly brace.
+		  /// The `function` keyword.
 		  ///
 		  /// Part of the ObjoScript.Stmt interface.
 		  
-		  Return mOpeningBrace
+		  Return mFuncKeyword
 		  
 		End Function
 	#tag EndMethod
 
 
-	#tag Property, Flags = &h0, Description = 54686520636C6F73696E67206272616365206F66207468697320626C6F636B2E
-		ClosingBrace As ObjoScript.Token
+	#tag Property, Flags = &h0, Description = 5468652066756E6374696F6E277320626F64792E
+		Body As ObjoScript.BlockStmt
 	#tag EndProperty
 
-	#tag Property, Flags = &h21, Description = 546865206F70656E696E6720627261636520746F6B656E2E
-		Private mOpeningBrace As ObjoScript.Token
+	#tag Property, Flags = &h21, Description = 546865206066756E6374696F6E60206B6579776F72642E
+		Private mFuncKeyword As ObjoScript.Token
 	#tag EndProperty
 
-	#tag Property, Flags = &h0, Description = 5468697320626C6F636B27732073746174656D656E74732E
-		Statements() As ObjoScript.Stmt
+	#tag Property, Flags = &h0, Description = 5468652066756E6374696F6E2773206E616D6520617320746865206964656E74696669657220746F6B656E20696E2074686520736F7572636520636F64652E
+		Name As ObjoScript.Token
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 5468652066756E6374696F6E277320706172616D657465727320286D617920626520656D707479292E
+		Parameters() As ObjoScript.Token
 	#tag EndProperty
 
 
@@ -85,7 +90,7 @@ Implements ObjoScript.Stmt
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="mOpeningBrace"
+			Name="Name"
 			Visible=false
 			Group="Behavior"
 			InitialValue=""

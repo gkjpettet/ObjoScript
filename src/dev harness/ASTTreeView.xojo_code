@@ -151,6 +151,39 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitFuncDeclaration(f As ObjoScript.FuncDeclStmt) As Variant
+		  Var node As New TreeViewNode("Function declaration")
+		  
+		  // Name.
+		  node.AppendNode(New TreeViewNode("Name: " + f.Name.Lexeme))
+		  
+		  // Parameters.
+		  Var paramsNode As TreeViewNode
+		  If f.Parameters.Count = 0 Then
+		    paramsNode = New TreeViewNode("No parameters")
+		  Else
+		    Var params As String
+		    For i As Integer = 0 To f.Parameters.LastIndex
+		      params = params + f.Parameters(i).Lexeme
+		      If i < f.Parameters.LastIndex Then
+		        params = params + ", "
+		      End If
+		    Next i
+		    paramsNode = New TreeViewNode("Parameters: " + params)
+		  End If
+		  node.AppendNode(paramsNode)
+		  
+		  // Body.
+		  Var bodyNode As TreeViewNode = f.Body.Accept(Self)
+		  bodyNode.Text = "Body"
+		  node.AppendNode(bodyNode)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitIfStmt(ifstmt As ObjoScript.IfStmt) As Variant
 		  Var node As New TreeViewNode("If")
 		  

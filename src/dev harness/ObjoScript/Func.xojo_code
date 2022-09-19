@@ -20,9 +20,10 @@ Protected Class Func
 
 	#tag Method, Flags = &h0
 		Sub Constructor(name As String, arity As Integer)
-		  mSignature = ComputeSignature(name, arity)
+		  Self.Name = name
 		  Self.Arity = arity
 		  Self.Chunk = New ObjoScript.Chunk
+		  mSignature = ComputeSignature(name, arity)
 		End Sub
 	#tag EndMethod
 
@@ -30,12 +31,7 @@ Protected Class Func
 		Function ToString() As String
 		  /// Returns a string representation of this function.
 		  
-		  If mSignature = "" Then
-		    // This is the top-level script.
-		    Return "main()"
-		  Else
-		    Return mSignature
-		  End If
+		  Return mSignature
 		  
 		End Function
 	#tag EndMethod
@@ -49,8 +45,12 @@ Protected Class Func
 		Chunk As ObjoScript.Chunk
 	#tag EndProperty
 
-	#tag Property, Flags = &h21, Description = 546869732066756E6374696F6E2773207369676E61747572652E
+	#tag Property, Flags = &h21
 		Private mSignature As String
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 546869732066756E6374696F6E2773206E616D652E
+		Name As String
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0, Description = 546869732066756E6374696F6E2773207369676E61747572652E
@@ -108,7 +108,7 @@ Protected Class Func
 			Name="Arity"
 			Visible=false
 			Group="Behavior"
-			InitialValue=""
+			InitialValue="0"
 			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty
