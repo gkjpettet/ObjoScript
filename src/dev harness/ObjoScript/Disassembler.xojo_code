@@ -265,6 +265,9 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_EXIT
 		    Return SimpleInstruction("OP_EXIT", offset)
 		    
+		  Case ObjoScript.VM.OP_CALL
+		    Return TwoByteInstruction("OP_CALL", chunk, offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select

@@ -85,6 +85,25 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitCall(expr As ObjoScript.CallExpr) As Variant
+		  Var node As New TreeViewNode("Call")
+		  
+		  Var calleeNode As New TreeViewNode("Callee")
+		  calleeNode.AppendNode(expr.Callee.Accept(Self))
+		  node.AppendNode(calleeNode)
+		  
+		  Var argNode As New TreeViewNode("Arguments")
+		  For Each arg As ObjoScript.Expr In expr.Arguments
+		    argNode.AppendNode(arg.Accept(Self))
+		  Next arg
+		  node.AppendNode(argNode)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitContinueStmt(stmt As ObjoScript.ContinueStmt) As Variant
 		  #Pragma Unused stmt
 		  

@@ -290,6 +290,21 @@ Protected Module ObjoScript
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F6620746869732076616C756520747970652E
+		Function ToString(Extends type As ObjoScript.ValueTypes) As String
+		  /// Returns a string representation of this value type.
+		  
+		  Select Case type
+		  Case ObjoScript.ValueTypes.Func
+		    Return "Function"
+		    
+		  Else
+		    Raise New InvalidArgumentException("Unknown value type.")
+		  End Select
+		  
+		End Function
+	#tag EndMethod
+
 
 	#tag ComputedProperty, Flags = &h1, Description = 436F6E7461696E73206E6F6E2D616C7068616E756D6572696320636861726163746572732E204B6579203D20537472696E672C2056616C7565203D2048657820756E69636F646520636F6465706F696E742E
 		#tag Getter

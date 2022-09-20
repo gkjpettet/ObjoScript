@@ -1,6 +1,18 @@
 #tag Class
 Protected Class Value
 	#tag Method, Flags = &h0
+		Function AsFunction() As ObjoScript.Func
+		  /// Returns this value as a `Func` object.
+		  /// If this value is not a `Func` it raises an `UnsupportedOperationException`.
+		  
+		  Return mValue
+		  
+		  Exception e As IllegalCastException
+		    Raise New UnsupportedOperationException("Cannot cast a value of type `" + Type.ToString + "` to `Func`.")
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub Constructor(v As Variant)
 		  If v IsA ObjoScript.Func Then
 		    Self.mValue = v
@@ -89,6 +101,14 @@ Protected Class Value
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Type"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="ObjoScript.ValueTypes"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

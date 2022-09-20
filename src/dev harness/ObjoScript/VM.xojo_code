@@ -24,6 +24,55 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 43616C6C7320612066756E6374696F6E2E2060617267436F756E746020697320746865206E756D626572206F6620617267756D656E7473206F6E2074686520737461636B20666F7220746869732066756E6374696F6E2063616C6C2E
+		Private Sub CallFunction(f As ObjoScript.Func, argCount As Integer)
+		  /// Calls a function. `argCount` is the number of arguments on the stack for this function call.
+		  
+		  // Check we have the correct number of arguments.
+		  If argCount <> f.Arity Then
+		    Error("Expected " + f.Arity.ToString + " arguments but " + _
+		    "got " + argCount.ToString + ".")
+		  End If
+		  
+		  // Make sure we don't overflow with a deep call frame (most likely a user error with 
+		  // a runaway recursive issue).
+		  If FrameCount = MAX_FRAMES Then
+		    Error("Stack overflow.")
+		  End If
+		  
+		  // ==============================
+		  // Set up the call frame to call.
+		  // ==============================
+		  Frames(FrameCount).Func = f
+		  Frames(FrameCount).IP = 0
+		  // -1 to skip over local stack slot 0 which contains the function being called.
+		  Frames(FrameCount).StackBase = StackTop - argCount - 1
+		  
+		  // Update the call frame counter, thereby essentially pushing the call frame onto the call stack.
+		  FrameCount = FrameCount + 1
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 506572666F726D7320612063616C6C206F6E20607660207768696368206578706563747320746F2066696E642060617267436F756E746020617267756D656E747320696E207468652063616C6C20737461636B2E
+		Private Sub CallValue(v As Variant, argCount As Integer)
+		  /// Performs a call on `v` which expects to find `argCount` arguments in the call stack.
+		  
+		  If v IsA ObjoScript.Value = False Then
+		    Error("Can only call functions.")
+		  End If
+		  
+		  Select Case ObjoScript.Value(v).Type
+		  Case ObjoScript.ValueTypes.Func
+		    CallFunction(ObjoScript.Value(v).AsFunction, argCount)
+		    
+		  Else
+		    Error("Can only call functions.")
+		  End Select
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Sub Constructor()
 		  Disassembler = New ObjoScript.Disassembler
@@ -213,13 +262,10 @@ Protected Class VM
 		  // Push the function to run onto the stack as a runtime value.
 		  Push(New ObjoScript.Value(func))
 		  
-		  // Create a new call frame for the main function.
-		  'Call CallValue(New ObjoScript.Value(func), 0)
-		  Frames(FrameCount).Func = func
-		  Frames(FrameCount).IP = 0
-		  Frames(FrameCount).StackBase = 0
-		  FrameCount = 1
+		  // Call the passed function.
+		  CallFunction(func, 0)
 		  
+		  // The current call frame is the first one.
 		  CurrentFrame = Frames(0)
 		  
 		  While True
@@ -514,6 +560,14 @@ Protected Class VM
 		    Case OP_EXIT
 		      Error("Unexpected `exit` placeholder instruction. The chunk is invalid.")
 		      
+		    Case OP_CALL
+		      // We peek past the arguments to find the function to call.
+		      Var argcount As Integer = ReadByte
+		      Call CallValue(Peek(argcount), argcount)
+		      
+		      // Update the current call frame (as a new call frame will have been created by the `CallValue` method).
+		      CurrentFrame = Frames(FrameCount - 1)
+		      
 		    End Select
 		  Wend
 		  
@@ -656,7 +710,7 @@ Protected Class VM
 		44: OP_INCLUSIVE_RANGE
 		45: OP_EXCLUSIVE_RANGE
 		46: OP_BREAK
-		
+		47: OP_CALL
 	#tag EndNote
 
 
@@ -776,6 +830,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_BITWISE_XOR, Type = Double, Dynamic = False, Default = \"24", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_CALL, Type = Double, Dynamic = False, Default = \"47", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_CONSTANT, Type = Double, Dynamic = False, Default = \"1", Scope = Public, Description = 5468652061646420636F6E7374616E74206F70636F64652E

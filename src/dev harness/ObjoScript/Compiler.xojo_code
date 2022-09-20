@@ -1,6 +1,6 @@
 #tag Class
 Protected Class Compiler
-Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
+Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag Method, Flags = &h21, Description = 41646473206076616C75656020746F207468652063757272656E74206368756E6B277320636F6E7374616E7420706F6F6C20616E642072657475726E732069747320696E64657820696E2074686520706F6F6C2E
 		Private Function AddConstant(value As Variant) As Integer
 		  /// Adds `value` to the current chunk's constant pool and returns its index in the pool.
@@ -908,6 +908,34 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Function VisitCall(expr As ObjoScript.CallExpr) As Variant
+		  /// Compiles a call expression.
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  // Track where we are.
+		  mLocation = expr.Location
+		  
+		  // Compile the callee.
+		  Call expr.Callee.Accept(Self)
+		  
+		  // Check the argument count is within the limit.
+		  If expr.Arguments.Count > 255 Then
+		    Error("A call cannot have more than 255 arguments.")
+		  End If
+		  
+		  // Compile the arguments.
+		  For Each arg As ObjoScript.Expr In expr.Arguments
+		    Call arg.Accept(Self)
+		  Next arg
+		  
+		  // Emit the call instruction with the number of arguments as its operand.
+		  EmitBytes(ObjoScript.VM.OP_CALL, expr.Arguments.Count)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320612060636F6E74696E7565602073746174656D656E742E
 		Function VisitContinueStmt(stmt As ObjoScript.ContinueStmt) As Variant
 		  /// Compiles a `continue` statement.
@@ -1440,6 +1468,14 @@ Implements ObjoScript.ExprVisitor, ObjoScript.StmtVisitor
 			Group="Behavior"
 			InitialValue=""
 			Type="Double"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Type"
+			Visible=false
+			Group="Behavior"
+			InitialValue="ObjoScript.FunctionTypes.TopLevel"
+			Type="ObjoScript.FunctionTypes"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
