@@ -129,10 +129,23 @@ Protected Class VM
 		Private Sub Error(message As String, offset As Integer = -1)
 		  /// Raises a VMException at the current IP (unless otherwise specified).
 		  
+		  #Pragma Warning "TODO: Don't always print the stack trace to the debug console"
+		  
 		  #Pragma BreakOnExceptions False
 		  
 		  // Default to the current IP if no offset is provided.
 		  offset = If(offset = -1, CurrentFrame.IP, offset)
+		  
+		  // Print a rudimentary stack trace.
+		  #Pragma Warning "TODO: CHECK: Line offsets/opcodes might be wrong here."
+		  System.DebugLog("Stack trace")
+		  For i As Integer = FrameCount - 1 DownTo 0
+		    Var frame As ObjoScript.CallFrame = Frames(i)
+		    Var func As ObjoScript.Func = frame.Func
+		    Var funcName As String = If(func.Name = "", "<main>", func.Name)
+		    Var s As String = "[line " + func.Chunk.LineForOffset(frame.IP - 1).ToString + "] in " + funcName
+		    System.DebugLog(s)
+		  Next i
 		  
 		  Raise New ObjoScript.VMException(message, CurrentChunk.LineForOffset(offset), CurrentChunk.ScriptIDForOffset(offset))
 		End Sub
