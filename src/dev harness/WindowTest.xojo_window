@@ -646,7 +646,6 @@ Begin DesktopWindow WindowTest
       Active          =   False
       AllowAutoDeactivate=   True
       AllowFocus      =   True
-      AllowTabStop    =   True
       BackgroundColor =   &c00000000
       BevelStyle      =   0
       Bold            =   False
@@ -679,6 +678,7 @@ Begin DesktopWindow WindowTest
       Scope           =   2
       TabIndex        =   15
       TabPanelIndex   =   0
+      TabStop         =   True
       TextColor       =   &c00000000
       Tooltip         =   ""
       Top             =   20
@@ -895,13 +895,14 @@ End
 		  VM = New ObjoScript.VM
 		  AddHandler VM.Print, AddressOf VMPrintDelegate
 		  
+		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub Run()
 		  Reset(False)
-		   
+		  
 		  If Not Compile Then Return
 		  
 		  SwitchToPanel(PANEL_OUTPUT)

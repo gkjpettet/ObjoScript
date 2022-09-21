@@ -86,7 +86,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  If shouldResetFirst Then Reset
 		  
 		  Func = New ObjoScript.Func(fdecl.Name.Lexeme, fdecl.Parameters.Count)
-		  Type = type
+		  Self.Type = type
 		  
 		  If type = ObjoScript.FunctionTypes.Func Then
 		    BeginScope
@@ -156,7 +156,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Else
 		      message = Parser.Errors.Count.ToString + " parsing errors occurred."
 		    End If
-		    #Pragma BreakOnExceptions False
+		    '#Pragma BreakOnExceptions False
 		    Raise New ObjoScript.ParserException(message, Parser.Errors(0).Location)
 		  End If
 		  
@@ -381,6 +381,17 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 456D69747320612072657475726E20696E737472756374696F6E2C2064656661756C74696E6720746F2072657475726E696E67204E6F7468696E67206F6E2066756E6374696F6E2072657475726E732E2044656661756C747320746F207468652063757272656E74206C6F636174696F6E2E
+		Private Sub EmitReturn(location As ObjoScript.Token = Nil)
+		  /// Emits a return instruction, defaulting to returning Nothing on function returns.
+		  /// Defaults to the current location.
+		  
+		  EmitByte(ObjoScript.VM.OP_NOTHING, location)
+		  EmitByte(ObjoScript.VM.OP_RETURN, location)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 417070656E647320616E20756E7369676E656420696E7465676572202862696720656E6469616E20666F726D61742C206D6F7374207369676E69666963616E7420627974652066697273742920746F207468652063757272656E74206368756E6B2E205468652063757272656E74206C6F636174696F6E206973207573656420756E6C657373206F7468657277697365207370656369666965642E
 		Private Sub EmitUInt16(i16 As UInt16, location As ObjoScript.Token = Nil)
 		  /// Appends an unsigned integer (big endian format, most significant byte first) to the current chunk.
@@ -397,8 +408,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Sub EndCompiler(location As ObjoScript.Token)
 		  /// Called when the compiler finishes.
 		  
-		  // For now we will emit an OP_RETURN.
-		  EmitByte(ObjoScript.VM.OP_RETURN, location)
+		  EmitReturn(location)
 		  
 		End Sub
 	#tag EndMethod
@@ -464,7 +474,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Raises a CompilerException at the current location. If the error is not at the current location,
 		  /// `location` may be passed instead.
 		  
-		  #Pragma BreakOnExceptions False
+		  '#Pragma BreakOnExceptions False
 		  
 		  If location = Nil Then location = mLocation
 		  
@@ -1167,6 +1177,24 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Call stmt.Expression.Accept(Self)
 		  
 		  EmitByte(ObjoScript.VM.OP_PRINT, printLocation)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C657320612072657475726E2073746174656D656E742E
+		Function VisitReturn(r As ObjoScript.ReturnStmt) As Variant
+		  /// Compiles a return statement.
+		  
+		  If Self.Type = ObjoScript.FunctionTypes.TopLevel Then
+		    Error("Cannot use the `return` keyword in top-level code.")
+		  End If
+		  
+		  mLocation = r.Location
+		  
+		  // Compile the return value.
+		  Call r.Value.Accept(Self)
+		  
+		  EmitByte(ObjoScript.VM.OP_RETURN, r.Location)
 		  
 		End Function
 	#tag EndMethod

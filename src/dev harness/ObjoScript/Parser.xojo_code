@@ -164,7 +164,7 @@ Protected Class Parser
 		  /// Asserts that the current token is an EOL. If so it is consumed. 
 		  /// Otherwise an error with the optional `message` is created.
 		  
-		  #Pragma BreakOnExceptions False
+		  '#Pragma BreakOnExceptions False
 		  
 		  If Current.Type <> ObjoScript.TokenTypes.EOL Then
 		    message = If(message = "", "Expected a new line.", message)
@@ -224,7 +224,7 @@ Protected Class Parser
 		  /// Raises a ParserException at the current location. If the error is not at the current location,
 		  /// `location` may be passed instead.
 		  
-		  #Pragma BreakOnExceptions False
+		  '#Pragma BreakOnExceptions False
 		  
 		  If location = Nil Then location = Current
 		  
@@ -274,7 +274,12 @@ Protected Class Parser
 		  // Most expression statements expect a new line after them but some (such as within a
 		  // `for` loop initialiser) require something else (e.g. a semicolon).
 		  If terminator = ObjoScript.TokenTypes.EOL Or terminator = ObjoScript.TokenTypes.EOF Then
-		    ConsumeNewLine("Expected a new line or EOF after expression statement.")
+		    // Edge case: This statement immediately precedes the closing brace of a block.
+		    If Check(ObjoScript.TokenTypes.RCurly) Then
+		      // Do nothing.
+		    Else
+		      ConsumeNewLine("Expected a new line or EOF after expression statement.")
+		    End If
 		  Else
 		    Consume(terminator, "Expected a " + terminator.ToString + " after the expression.")
 		  End If
@@ -448,10 +453,9 @@ Protected Class Parser
 		  /// Initialises the parser's grammar rules.
 		  
 		  #Pragma Warning "TODO"
-		  ' 1. Need to add CallParselet and elevate precedence for the `LParen` entry.
-		  ' 2. Add LCurly
-		  ' 3. Add Lsquare
-		  ' 4. Add Dot 
+		  ' 1. Add LCurly
+		  ' 2. Add Lsquare
+		  ' 3. Add Dot 
 		  
 		  mRules = New Dictionary( _
 		  TokenTypes.Ampersand         : BinaryOperator(Precedences.BitwiseAnd), _
@@ -707,6 +711,28 @@ Protected Class Parser
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 5061727365732061206072657475726E602073746174656D656E742E20417373756D6573207468652070617273657220686173206A75737420636F6E73756D656420746865206072657475726E60206B6579776F72642E
+		Private Function ReturnStatement() As ObjoScript.Stmt
+		  /// Parses a `return` statement.
+		  /// Assumes the parser has just consumed the `return` keyword.
+		  
+		  Var returnKeyword As ObjoScript.Token = Previous
+		  
+		  Var returnValue As ObjoScript.Expr
+		  If Match(ObjoScript.TokenTypes.EOL, ObjoScript.TokenTypes.EOF) Then
+		    returnValue = New ObjoScript.NothingLiteral(returnKeyword)
+		  Else
+		    returnValue = Expression
+		    If Not Check(ObjoScript.TokenTypes.RParen) Then
+		      ConsumeNewLine("Expected a new line or closing brace after the return statement value.")
+		    End If
+		  End If
+		  
+		  Return New ReturnStmt(returnKeyword, returnValue)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 50617273657320612073746174656D656E742E
 		Private Function Statement() As ObjoScript.Stmt
 		  /// Parses a statement.
@@ -737,6 +763,9 @@ Protected Class Parser
 		    
 		  ElseIf Match(ObjoScript.TokenTypes.Continue_) Then
 		    Return ContinueStatement
+		    
+		  ElseIf Match(ObjoScript.TokenTypes.Return_) Then
+		    Return ReturnStatement
 		    
 		  Else
 		    Return ExpressionStatement

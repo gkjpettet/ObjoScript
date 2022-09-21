@@ -8,6 +8,8 @@ Implements ObjoScript.InfixParselet
 		  ///
 		  /// Part of the ObjoScript.InfixParselet interface.
 		  
+		  #Pragma Unused canAssign
+		  
 		  Var lparen As ObjoScript.Token = parser.Previous
 		  
 		  Var arguments() As ObjoScript.Expr

@@ -282,6 +282,19 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitReturn(r As ObjoScript.ReturnStmt) As Variant
+		  Var node As New TreeViewNode("Return")
+		  
+		  Var valueNode As New TreeViewNode("Value")
+		  valueNode.AppendNode(r.Value.Accept(Self))
+		  node.AppendNode(valueNode)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitString(expr As ObjoScript.StringLiteral) As Variant
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  

@@ -4,6 +4,10 @@ Protected Class VM
 		Private Sub AssertNumbers(a As Variant, b As Variant)
 		  /// Asserts that `a` and `b` are both doubles, otherwise raises a runtime error.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  If a.Type <> Variant.TypeDouble Or b.Type <> Variant.TypeDouble Then
 		    Error("Both operands must be numbers. Instead got " + ValueToString(a) + " and " + ValueToString(b))
 		  End If
@@ -17,6 +21,10 @@ Protected Class VM
 		  ///
 		  /// Assumes neither `a` or `b` are Nil.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  If a.Type <> b.Type Then
 		    Error("Both operands must be the same type. Instead got " + ValueToString(a) + " and " + ValueToString(b))
 		  End If
@@ -27,6 +35,10 @@ Protected Class VM
 	#tag Method, Flags = &h21, Description = 43616C6C7320612066756E6374696F6E2E2060617267436F756E746020697320746865206E756D626572206F6620617267756D656E7473206F6E2074686520737461636B20666F7220746869732066756E6374696F6E2063616C6C2E
 		Private Sub CallFunction(f As ObjoScript.Func, argCount As Integer)
 		  /// Calls a function. `argCount` is the number of arguments on the stack for this function call.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  // Check we have the correct number of arguments.
 		  If argCount <> f.Arity Then
@@ -58,6 +70,10 @@ Protected Class VM
 		Private Sub CallValue(v As Variant, argCount As Integer)
 		  /// Performs a call on `v` which expects to find `argCount` arguments in the call stack.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  If v IsA ObjoScript.Value = False Then
 		    Error("Can only call functions.")
 		  End If
@@ -87,6 +103,10 @@ Protected Class VM
 		Private Function CurrentChunk() As ObjoScript.Chunk
 		  /// Returns the chunk we are currently reading from. It's owned by the function whose 
 		  /// call frame we are currently in.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  Return CurrentFrame.Func.Chunk
 		  
@@ -158,6 +178,10 @@ Protected Class VM
 		  /// Objo considers the boolean value `false` and the Objo value `nothing` to
 		  /// be False, everything else is True.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  Return (v.Type = Variant.TypeBoolean And v = False) Or v IsA ObjoScript.Nothing
 		  
 		End Function
@@ -170,6 +194,10 @@ Protected Class VM
 		  /// Objo considers the boolean value `false` and the Objo value `nothing` to
 		  /// be False, everything else is True.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  Return Not IsFalsey(v)
 		  
 		End Function
@@ -179,6 +207,10 @@ Protected Class VM
 		Private Function Peek(distance As Integer) As Variant
 		  /// Returns the value `distance` from the top of the stack. Leaves the value on the stack. A value of `0` would return the top item.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  Return Stack(StackTop - distance - 1)
 		End Function
 	#tag EndMethod
@@ -186,6 +218,10 @@ Protected Class VM
 	#tag Method, Flags = &h21, Description = 506F707320612076616C7565206F6666206F662074686520737461636B2E
 		Private Function Pop() As Variant
 		  /// Pops a value off of the stack.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  StackTop = StackTop - 1
 		  Return Stack(StackTop)
@@ -197,6 +233,10 @@ Protected Class VM
 		Private Sub Push(value As Variant)
 		  /// Pushes a value onto the stack.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  Stack(StackTop) = value
 		  StackTop = StackTop + 1
 		  
@@ -207,6 +247,10 @@ Protected Class VM
 		Private Function ReadByte() As UInt8
 		  /// Reads the byte in `Chunk` at the current `IP` and returns it. Increments the IP.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  CurrentFrame.IP = CurrentFrame.IP + 1
 		  Return CurrentChunk.ReadByte(CurrentFrame.IP - 1)
 		End Function
@@ -216,7 +260,9 @@ Protected Class VM
 		Private Function ReadConstant() As Variant
 		  /// Reads a constant from the chunk's constant pool using a single byte operand. Increments IP.
 		  
-		  // The bytecode at `IP` gives us the index in the constant pool.
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  Return CurrentChunk.Constants(ReadByte)
 		  
@@ -227,7 +273,9 @@ Protected Class VM
 		Private Function ReadConstantLong() As Variant
 		  /// Reads a constant from the chunk's constant pool using two byte operands. Increments IP.
 		  
-		  // The bytecode at `IP` gives us the index in the constant pool.
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  Return CurrentChunk.Constants(ReadUInt16)
 		  
@@ -237,6 +285,10 @@ Protected Class VM
 	#tag Method, Flags = &h21, Description = 52656164732074776F2062797465732066726F6D20604368756E6B60206174207468652063757272656E74206049506020616E642072657475726E73207468656D20617320612055496E7431362E20496E6372656D656E74732074686520495020627920322E
 		Private Function ReadUInt16() As UInt16
 		  /// Reads two bytes from `Chunk` at the current `IP` and returns them as a UInt16. Increments the IP by 2.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  CurrentFrame.IP = CurrentFrame.IP + 2
 		  Return CurrentChunk.ReadUInt16(CurrentFrame.IP - 2)
@@ -270,7 +322,11 @@ Protected Class VM
 		Sub Run(func As ObjoScript.Func)
 		  /// Runs a function.
 		  
-		  Reset 
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
+		  Reset
 		  
 		  // Push the function to run onto the stack as a runtime value.
 		  Push(New ObjoScript.Value(func))
@@ -295,8 +351,25 @@ Protected Class VM
 		    
 		    Select Case ReadByte
 		    Case OP_RETURN
-		      // Exit the VM.
-		      Return
+		      // Get the return value off the stack.
+		      Var result As Variant = Pop
+		      
+		      FrameCount = FrameCount - 1
+		      
+		      If FrameCount = 0 Then
+		        // Exit the VM.
+		        Call Pop
+		        Return
+		      End If
+		      
+		      // Reset the stack top to what it was prior to this call.
+		      StackTop = CurrentFrame.StackBase
+		      
+		      // Push the result to the top of the stack.
+		      Push(result)
+		      
+		      // Drop the frame.
+		      CurrentFrame = Frames(FrameCount - 1)
 		      
 		    Case OP_CONSTANT
 		      Var constant As Variant = ReadConstant
@@ -592,6 +665,10 @@ Protected Class VM
 		  /// True if values `a` and `b` are considered equal by the VM.
 		  ///
 		  /// Assumes neither `a` or `b` are Nil.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  #Pragma Warning "TODO: Handle objects"
 		  
@@ -977,7 +1054,7 @@ Protected Class VM
 	#tag Constant, Name = STRING_COMPARISON_RESPECTS_CASE, Type = Boolean, Dynamic = False, Default = \"False", Scope = Public, Description = 54686520636173652073656E7369746976697479206F6620737472696E6720636F6D70617269736F6E73207768656E207573696E672074686520603D3D60206F70657261746F722E
 	#tag EndConstant
 
-	#tag Constant, Name = TRACE_EXECUTION, Type = Boolean, Dynamic = False, Default = \"True", Scope = Public, Description = 496620547275652028616E6420746869732069732061206465627567206275696C6429207468656E2074686520564D2077696C6C206F757470757420646562756720696E666F726D6174696F6E20746F207468652073797374656D206465627567206C6F672E204E6F2065666665637420696E20636F6D70696C656420617070732E
+	#tag Constant, Name = TRACE_EXECUTION, Type = Boolean, Dynamic = False, Default = \"False", Scope = Public, Description = 496620547275652028616E6420746869732069732061206465627567206275696C6429207468656E2074686520564D2077696C6C206F757470757420646562756720696E666F726D6174696F6E20746F207468652073797374656D206465627567206C6F672E204E6F2065666665637420696E20636F6D70696C656420617070732E
 	#tag EndConstant
 
 
