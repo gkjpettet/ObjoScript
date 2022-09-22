@@ -127,6 +127,10 @@ Protected Class VM
 		    CallFunction(ObjoScript.Func(v), argCount)
 		    
 		  Case ObjoScript.ValueTypes.BoundMethod
+		    // Put the receiver of the call (the instance before the dot) in slot 0 for the upcoming call frame.
+		    Stack(StackTop - argCount - 1) = ObjoScript.BoundMethod(v).Receiver
+		    
+		    // Call the bound method.
 		    CallFunction(ObjoScript.BoundMethod(v).Method, argCount)
 		    
 		  Else

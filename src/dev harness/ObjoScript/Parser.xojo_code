@@ -541,7 +541,7 @@ Protected Class Parser
 		  TokenTypes.Static_           : Unused, _
 		  TokenTypes.String_           : Prefix(New LiteralParselet), _
 		  TokenTypes.Then_             : Unused, _
-		  TokenTypes.This              : Unused, _
+		  TokenTypes.This              : Prefix(New ThisParselet), _
 		  TokenTypes.Tilde             : NewRule(New UnaryParselet, Nil, Precedences.None), _
 		  TokenTypes.Underscore        : Unused, _
 		  TokenTypes.Var_              : Unused, _

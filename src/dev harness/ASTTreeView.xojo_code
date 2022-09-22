@@ -385,6 +385,15 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitThis(this As ObjoScript.ThisExpr) As Variant
+		  #Pragma Unused this
+		  
+		  Return New TreeViewNode("This")
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitUnary(expr As ObjoScript.UnaryExpr) As Variant
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  

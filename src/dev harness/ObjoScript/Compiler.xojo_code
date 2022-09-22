@@ -124,7 +124,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Func = New ObjoScript.Func(name, parameters.Count)
 		  Self.Type = type
 		  
-		  If type = ObjoScript.FunctionTypes.Func Then
+		  If type <> ObjoScript.FunctionTypes.TopLevel Then
 		    BeginScope
 		    
 		    // Compile the parameters.
@@ -723,7 +723,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  Locals.RemoveAll
 		  // Claim slot 0 in the stack for the VM's internal use.
-		  Var synthetic As New ObjoScript.Token(ObjoScript.TokenTypes.Identifier, 0, 1, "", -1)
+		  Var synthetic As New ObjoScript.Token(ObjoScript.TokenTypes.Identifier, 0, 1, If(Type = ObjoScript.FunctionTypes.Method, "this", ""), -1)
 		  Locals.Add(New ObjoScript.LocalVariable(synthetic, 0))
 		  
 		  CurrentLoop = Nil
@@ -1243,7 +1243,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Compile the body.
 		  Var compiler As New ObjoScript.Compiler
-		  Var body As ObjoScript.Func = compiler.Compile(m.Name, m.Parameters, m.Body, ObjoScript.FunctionTypes.Func)
+		  Var body As ObjoScript.Func = compiler.Compile(m.Name, m.Parameters, m.Body, ObjoScript.FunctionTypes.Method)
 		  body.IsSetter = m.IsSetter
 		  
 		  // Store the compiled method body as a constant in this function's constant pool
@@ -1354,6 +1354,30 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  Call EmitConstant(expr.Value)
 		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732061206074686973602065787072657373696F6E2E
+		Function VisitThis(this As ObjoScript.ThisExpr) As Variant
+		  /// Compiles a `this` expression.
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  mLocation = this.Location
+		  
+		  If Self.Type <> ObjoScript.FunctionTypes.Method Then
+		    Error("`this` can only be used within a method.")
+		  End If
+		  
+		  DeclareVariable(this.Location)
+		  
+		  Var index As Integer = -1 // -1 is a deliberate invalid index.
+		  If ScopeDepth = 0 Then
+		    // Global variable declaration. Add the name of the variable to the constant pool and get its index.
+		    index = AddConstant(this.Location.Lexeme)
+		  End If
+		  
+		  DefineVariable(index)
 		End Function
 	#tag EndMethod
 
