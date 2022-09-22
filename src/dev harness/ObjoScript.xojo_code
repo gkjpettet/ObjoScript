@@ -298,12 +298,32 @@ Protected Module ObjoScript
 		  Case ObjoScript.ValueTypes.Func
 		    Return "Function"
 		    
+		  Case ObjoScript.ValueTypes.Klass
+		    Return "Class"
+		    
+		  Case ObjoScript.ValueTypes.Instance
+		    Return "Instance"
+		    
 		  Else
 		    Raise New InvalidArgumentException("Unknown value type.")
 		  End Select
 		  
 		End Function
 	#tag EndMethod
+
+
+	#tag Note, Name = Values
+		The VM's stack is a Variant array. Values on the stack are stored as follows:
+		
+		- Nothing  : Objo Nothing 
+		- Numbers  : Xojo Double
+		- Booleans : Xojo Boolean
+		- Strings  : Xojo String
+		- Functions: Objo Value (mValue = Objo Func)
+		- Classes  : Objo Value (mValue = Objo Klass)
+		
+		
+	#tag EndNote
 
 
 	#tag ComputedProperty, Flags = &h1, Description = 436F6E7461696E73206E6F6E2D616C7068616E756D6572696320636861726163746572732E204B6579203D20537472696E672C2056616C7565203D2048657820756E69636F646520636F6465706F696E742E
@@ -441,6 +461,8 @@ Protected Module ObjoScript
 
 	#tag Enum, Name = ValueTypes, Type = Integer, Flags = &h1
 		Func
+		  Klass
+		Instance
 	#tag EndEnum
 
 

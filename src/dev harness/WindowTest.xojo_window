@@ -908,7 +908,10 @@ End
 		  SwitchToPanel(PANEL_OUTPUT)
 		  
 		  Try
+		    Var watch As New ObjoScript.StopWatch(True)
 		    VM.Run(Func)
+		    watch.Stop
+		    Info.Text = "Executed in " + watch.ElapsedMilliseconds.ToString + " ms"
 		  Catch e As ObjoScript.VMException
 		    DisplayVMError(e)
 		  End Try

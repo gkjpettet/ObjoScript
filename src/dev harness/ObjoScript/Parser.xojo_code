@@ -44,14 +44,6 @@ Protected Class Parser
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 426567696E732061206E65772073636F70652E
-		Private Sub BeginScope()
-		  /// Begins a new scope.
-		  
-		  ScopeDepth = ScopeDepth + 1
-		End Sub
-	#tag EndMethod
-
 	#tag Method, Flags = &h21, Description = 436F6E76656E69656E6365206D6574686F6420666F722072657475726E696E672061206E6577206772616D6D61722072756C6520666F7220612062696E617279206F70657261746F722E
 		Private Function BinaryOperator(precedence As Integer, rightAssociative As Boolean = False) As ObjoScript.GrammarRule
 		  /// Convenience method for returning a new grammar rule for a binary operator.
@@ -64,8 +56,6 @@ Protected Class Parser
 		Function Block() As ObjoScript.Stmt
 		  /// Parses a block of statements.
 		  /// Assumes the parser has just consumed the leading `{`.
-		  
-		  BeginScope
 		  
 		  Var openingBrace As ObjoScript.Token = Previous
 		  
@@ -85,8 +75,6 @@ Protected Class Parser
 		  If Not Check(ObjoScript.TokenTypes.Else_) Then
 		    ConsumeNewLine
 		  End If
-		  
-		  EndScope
 		  
 		  Return New ObjoScript.BlockStmt(statements, openingBrace, closingBrace)
 		  
@@ -117,6 +105,24 @@ Protected Class Parser
 		  Next type
 		  
 		  Return False
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 506172736573206120636C617373206465636C61726174696F6E2073746174656D656E742E20417373756D6573207468652070617273657220686173206A75737420636F6E73756D6564207468652060636C61737360206B6579776F726420746F6B656E2E
+		Private Function ClassDeclaration() As ObjoScript.Stmt
+		  /// Parses a class declaration statement.
+		  /// Assumes the parser has just consumed the `class` keyword token.
+		  
+		  Var classKeyword As ObjoScript.Token = Previous
+		  
+		  Var identifier As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier, "Expected a class name.")
+		  
+		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the class name.")
+		  
+		  Var body As BlockStmt = ObjoScript.BlockStmt(Block)
+		  
+		  Return New ObjoScript.ClassDeclStmt(identifier, body, classKeyword)
 		  
 		End Function
 	#tag EndMethod
@@ -201,22 +207,17 @@ Protected Class Parser
 		  If Match(ObjoScript.TokenTypes.Var_) Then
 		    Return VarDeclaration
 		    
-		  ElseIf Match (ObjoScript.TokenTypes.Function_) Then
+		  ElseIf Match(ObjoScript.TokenTypes.Function_) Then
 		    Return FunctionDeclaration
+		    
+		  ElseIf Match(ObjoScript.TokenTypes.Class_) Then
+		    Return ClassDeclaration
 		    
 		  Else
 		    Return Statement
 		  End If
 		  
 		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21, Description = 456E6473207468652063757272656E742073636F70652E
-		Private Sub EndScope()
-		  /// Ends the current scope.
-		  
-		  ScopeDepth = ScopeDepth - 1
-		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 526169736573206120506172736572457863657074696F6E206174207468652063757272656E74206C6F636174696F6E2E20496620746865206572726F72206973206E6F74206174207468652063757272656E74206C6F636174696F6E2C20606C6F636174696F6E60206D61792062652070617373656420696E73746561642E
@@ -320,9 +321,6 @@ Protected Class Parser
 		  /// }
 		  /// ```
 		  
-		  // Since `for` loops can declare a variable, it should be scoped to the loop body.
-		  BeginScope
-		  
 		  Var forKeyword As ObjoScript.Token = Previous
 		  
 		  Consume(ObjoScript.TokenTypes.LParen, "Expected a `(` after the `for` keyword.")
@@ -358,8 +356,6 @@ Protected Class Parser
 		  // Expect a block.
 		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the `for` clauses.")
 		  Var body As ObjoScript.Stmt = Block()
-		  
-		  EndScope
 		  
 		  Return New ObjoScript.ForStmt(initialiser, condition, increment, body, forKeyword)
 		  
@@ -707,7 +703,7 @@ Protected Class Parser
 		  Current = Nil
 		  mCurrentIndex = -1
 		  Errors.ResizeTo(-1)
-		  ScopeDepth = 0
+		  
 		End Sub
 	#tag EndMethod
 
@@ -939,10 +935,6 @@ Protected Class Parser
 
 	#tag Property, Flags = &h0, Description = 5468652070726576696F75736C79206576616C756174656420746F6B656E202877696C6C206265204E696C207768656E207468652070617273657220626567696E73292E
 		Previous As ObjoScript.Token
-	#tag EndProperty
-
-	#tag Property, Flags = &h21, Description = 5468652063757272656E742073636F70652064657074682E2030203D20676C6F62616C2073636F70652E
-		Private ScopeDepth As Integer = 0
 	#tag EndProperty
 
 

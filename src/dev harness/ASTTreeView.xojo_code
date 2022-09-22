@@ -104,6 +104,23 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitClassDeclaration(c As ObjoScript.ClassDeclStmt) As Variant
+		  Var node As New TreeViewNode("Class declaration")
+		  
+		  // Class name.
+		  node.AppendNode(New TreeViewNode("Name: " + c.Name))
+		  
+		  // Class body.
+		  Var classBodyNode As New TreeViewNode("Body")
+		  classBodyNode.AppendNode(c.Body.Accept(Self))
+		  node.AppendNode(classBodyNode)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitContinueStmt(stmt As ObjoScript.ContinueStmt) As Variant
 		  #Pragma Unused stmt
 		  

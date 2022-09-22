@@ -1,9 +1,9 @@
 #tag Class
 Protected Class Compiler
 Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
-	#tag Method, Flags = &h21, Description = 41646473206076616C75656020746F207468652063757272656E74206368756E6B277320636F6E7374616E7420706F6F6C20616E642072657475726E732069747320696E64657820696E2074686520706F6F6C2E
+	#tag Method, Flags = &h21, Description = 41646473206076616C75656020746F207468652063757272656E742066756E6374696F6E277320636F6E7374616E7420706F6F6C20616E642072657475726E732069747320696E64657820696E2074686520706F6F6C2E
 		Private Function AddConstant(value As Variant) As Integer
-		  /// Adds `value` to the current chunk's constant pool and returns its index in the pool.
+		  /// Adds `value` to the current function's constant pool and returns its index in the pool.
 		  
 		  Var index As Integer = CurrentChunk.AddConstant(value)
 		  
@@ -946,6 +946,38 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C65206120636C617373206465636C61726174696F6E2E
+		Function VisitClassDeclaration(c As ObjoScript.ClassDeclStmt) As Variant
+		  /// Compile a class declaration.
+		  ///
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  
+		  #Pragma Warning "TODO: Compile the body"
+		  
+		  mLocation = c.Location
+		  
+		  If Self.Type <> ObjoScript.FunctionTypes.TopLevel Then
+		    Error("Classes can only be declared within the top level of a script.")
+		  End If
+		  
+		  DeclareVariable(c.Identifier)
+		  
+		  // Add the name of the class to the function's constants pool.
+		  Var index As Integer = AddConstant(c.Name)
+		  
+		  // Emit the "declare class" opcode (which one depends on the index in the constant pool).
+		  If index <= 255 Then
+		    EmitBytes(ObjoScript.VM.OP_CLASS, index, c.Location)
+		  Else
+		    EmitByte(ObjoScript.VM.OP_CLASS_LONG, c.Location)
+		    EmitUInt16(index, c.Location)
+		  End If
+		  
+		  DefineVariable(index)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320612060636F6E74696E7565602073746174656D656E742E
 		Function VisitContinueStmt(stmt As ObjoScript.ContinueStmt) As Variant
 		  /// Compiles a `continue` statement.
@@ -1064,6 +1096,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = funcDecl.Location
 		  
+		  // Since we don't support closures, we only allow functions to be declared
+		  // at the top level of a script (i.e. not within other functions).
+		  If Self.Type <> ObjoScript.FunctionTypes.TopLevel Then
+		    Error("Functions can only be declared within the top level of a script.")
+		  End If
+		  
 		  DeclareVariable(funcDecl.Name, True)
 		  
 		  // Compile the function body.
@@ -1074,7 +1112,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  Var index As Integer
 		  If ScopeDepth = 0 Then
-		    // Global function. Add the name of the function to the chunk's constants pool.
+		    // Global function. Add the name of the function to the function's constants pool.
 		    index = AddConstant(funcDecl.Name.Lexeme)
 		  End If
 		  
@@ -1504,7 +1542,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 			Group="Behavior"
 			InitialValue="ObjoScript.FunctionTypes.TopLevel"
 			Type="ObjoScript.FunctionTypes"
-			EditorType=""
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - TopLevel"
+				"1 - Func"
+			#tag EndEnumValues
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class

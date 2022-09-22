@@ -1,5 +1,18 @@
 #tag Class
 Protected Class Value
+	#tag Method, Flags = &h0, Description = 52657475726E7320746869732076616C7565206173206120604B6C61737360206F626A6563742E20496620746869732076616C7565206973206E6F74206120604B6C617373602069742072616973657320616E2060556E737570706F727465644F7065726174696F6E457863657074696F6E602E
+		Function AsClass() As ObjoScript.Klass
+		  /// Returns this value as a `Klass` object.
+		  /// If this value is not a `Klass` it raises an `UnsupportedOperationException`.
+		  
+		  Return mValue
+		  
+		  Exception e As IllegalCastException
+		    Raise New UnsupportedOperationException("Cannot cast a value of type `" + Type.ToString + "` to `Klass`.")
+		    
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Function AsFunction() As ObjoScript.Func
 		  /// Returns this value as a `Func` object.
@@ -12,15 +25,37 @@ Protected Class Value
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 52657475726E7320746869732076616C7565206173206120604B6C61737360206F626A6563742E20496620746869732076616C7565206973206E6F74206120604B6C617373602069742072616973657320616E2060556E737570706F727465644F7065726174696F6E457863657074696F6E602E
+		Function AsInstance() As ObjoScript.Instance
+		  /// Returns this value as an `Instance` object.
+		  /// If this value is not an `Instance` it raises an `UnsupportedOperationException`.
+		  
+		  Return mValue
+		  
+		  Exception e As IllegalCastException
+		    Raise New UnsupportedOperationException("Cannot cast a value of type `" + Type.ToString + "` to `Instance`.")
+		    
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Sub Constructor(v As Variant)
-		  If v IsA ObjoScript.Func Then
-		    Self.mValue = v
-		    Self.Type = ObjoScript.ValueTypes.Func
+		  If v IsA ObjoScript.Instance Then
+		    mValue = v
+		    Type = ObjoScript.ValueTypes.Instance
+		    
+		  ElseIf v IsA ObjoScript.Func Then
+		    mValue = v
+		    Type = ObjoScript.ValueTypes.Func
+		    
+		  ElseIf v IsA ObjoScript.Klass Then
+		    mValue = v
+		    Type = ObjoScript.ValueTypes.Klass
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown value type.")
 		  End If
+		  
 		End Sub
 	#tag EndMethod
 
@@ -43,8 +78,14 @@ Protected Class Value
 		  /// Returns a string representation of this value.
 		  
 		  Select Case Type
+		  Case ObjoScript.ValueTypes.Instance
+		    Return ObjoScript.Instance(mValue).Klass.Name + " instance"
+		    
 		  Case ObjoScript.ValueTypes.Func
 		    Return ObjoScript.Func(mValue).ToString
+		    
+		  Case ObjoScript.ValueTypes.Klass
+		    Return ObjoScript.Klass(mValue).ToString
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown value type.")
@@ -109,7 +150,10 @@ Protected Class Value
 			Group="Behavior"
 			InitialValue=""
 			Type="ObjoScript.ValueTypes"
-			EditorType=""
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - Func"
+			#tag EndEnumValues
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class

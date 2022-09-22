@@ -32,6 +32,16 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 2243616C6C7322206120636C6173732E20457373656E7469616C6C79207468697320637265617465732061206E657720696E7374616E63652E
+		Private Sub CallClass(klass As ObjoScript.Klass, argCount As Integer)
+		  /// "Calls" a class. Essentially this creates a new instance.
+		  
+		  #Pragma Warning "TODO: Don't ignore the argCount. Required for initialisers"
+		  
+		  Stack(StackTop - argCount - 1) = New ObjoScript.Value(New ObjoScript.Instance(klass))
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 43616C6C7320612066756E6374696F6E2E2060617267436F756E746020697320746865206E756D626572206F6620617267756D656E7473206F6E2074686520737461636B20666F7220746869732066756E6374696F6E2063616C6C2E
 		Private Sub CallFunction(f As ObjoScript.Func, argCount As Integer)
 		  /// Calls a function. `argCount` is the number of arguments on the stack for this function call.
@@ -79,6 +89,9 @@ Protected Class VM
 		  End If
 		  
 		  Select Case ObjoScript.Value(v).Type
+		  Case ObjoScript.ValueTypes.Klass
+		    CallClass(ObjoScript.Value(v).AsClass, argCount)
+		    
 		  Case ObjoScript.ValueTypes.Func
 		    CallFunction(ObjoScript.Value(v).AsFunction, argCount)
 		    
@@ -654,6 +667,14 @@ Protected Class VM
 		      // Update the current call frame (as a new call frame will have been created by the `CallValue` method).
 		      CurrentFrame = Frames(FrameCount - 1)
 		      
+		    Case OP_CLASS
+		      Var className As String = ReadConstant
+		      Push(New ObjoScript.Value(New ObjoScript.Klass(className)))
+		      
+		    Case OP_CLASS_LONG
+		      Var className As String = ReadConstantLong
+		      Push(New ObjoScript.Value(New ObjoScript.Klass(className)))
+		      
 		    End Select
 		  Wend
 		  
@@ -801,6 +822,8 @@ Protected Class VM
 		45: OP_EXCLUSIVE_RANGE
 		46: OP_BREAK
 		47: OP_CALL
+		48: OP_CLASS
+		49: OP_CLASS_LONG
 	#tag EndNote
 
 
@@ -923,6 +946,12 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_CALL, Type = Double, Dynamic = False, Default = \"47", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_CLASS, Type = Double, Dynamic = False, Default = \"48", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_CLASS_LONG, Type = Double, Dynamic = False, Default = \"49", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_CONSTANT, Type = Double, Dynamic = False, Default = \"1", Scope = Public, Description = 5468652061646420636F6E7374616E74206F70636F64652E

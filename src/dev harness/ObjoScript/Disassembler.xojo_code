@@ -57,6 +57,16 @@ Protected Class Disassembler
 		    newOffset = offset + 3
 		    name = "SET_GLOBAL_LONG"
 		    
+		  Case ObjoScript.VM.OP_CLASS
+		    constantIndex = chunk.ReadByte(offset + 1)
+		    newOffset = offset + 2
+		    name = "CLASS"
+		    
+		  Case ObjoScript.VM.OP_CLASS_LONG
+		    constantIndex = chunk.ReadUInt16(offset + 1)
+		    newOffset = offset + 3
+		    name = "CLASS_LONG"
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown constant opcode.")
 		  End Select
@@ -267,6 +277,12 @@ Protected Class Disassembler
 		    
 		  Case ObjoScript.VM.OP_CALL
 		    Return TwoByteInstruction("OP_CALL", chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_CLASS
+		    Return ConstantInstruction(opcode, chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_CLASS_LONG
+		    Return ConstantInstruction(opcode, chunk, offset)
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
