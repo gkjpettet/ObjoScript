@@ -1,12 +1,15 @@
 #tag Class
 Protected Class ValueSet
-	#tag Method, Flags = &h0, Description = 416464732060736020746F20746865207365742E2052657475726E732074686520696E64657820696E2074686520736574207468617420607360206F636375706965732E
+	#tag Method, Flags = &h0, Description = 416464732060766020746F20746865207365742E2052657475726E732074686520696E64657820696E2074686520736574207468617420607660206F636375706965732E2043617365202A73656E7369746976652A20666F7220737472696E672076617269616E74732E
 		Function Add(v As Variant) As Integer
 		  /// Adds `v` to the set. Returns the index in the set that `v` occupies.  
+		  /// Case *sensitive* for string variants.
 		  
 		  Var hash As Integer
 		  If v IsA ObjoScript.Value Then
 		    hash = ObjoScript.Value(v).Hash
+		  ElseIf v.Type = Variant.TypeString Then
+		    hash = EncodeHex(v).Hash
 		  Else
 		    hash = v.Hash
 		  End If
@@ -37,6 +40,8 @@ Protected Class ValueSet
 		  
 		  If v IsA ObjoScript.Value Then
 		    Return mLookupTable.HasKey(ObjoScript.Value(v).Hash)
+		  ElseIf v.Type = Variant.TypeString Then
+		    Return mLookupTable.HasKey(EncodeHex(v).Hash)
 		  Else
 		    Return mLookupTable.HasKey(v.Hash)
 		  End If
@@ -50,6 +55,8 @@ Protected Class ValueSet
 		  
 		  If v IsA ObjoScript.Value Then
 		    Return mLookupTable.Lookup(ObjoScript.Value(v).Hash, -1)
+		  ElseIf v.Type = Variant.TypeString Then
+		    Return mLookupTable.Lookup(EncodeHex(v).Hash, -1)
 		  Else
 		    Return mLookupTable.Lookup(v.Hash, -1)
 		  End If
@@ -80,6 +87,10 @@ Protected Class ValueSet
 		    item = mItems(i)
 		    If item IsA ObjoScript.Value Then
 		      mLookupTable.Value(ObjoScript.Value(item).Hash) = i
+		      
+		    ElseIf item.Type = Variant.TypeString Then
+		      mLookupTable.Value(EncodeHex(item).Hash) = i
+		      
 		    Else
 		      mLookupTable.Value(item.Hash) = i
 		    End If
@@ -97,6 +108,10 @@ Protected Class ValueSet
 		  Var hash As Integer
 		  If v IsA ObjoScript.Value Then
 		    hash = ObjoScript.Value(v).Hash
+		    
+		  ElseIf v.Type = Variant.TypeString Then
+		    hash = EncodeHex(v).Hash
+		    
 		  Else
 		    hash = v.Hash
 		  End If

@@ -11,31 +11,40 @@ Implements ObjoScript.Expr
 
 	#tag Method, Flags = &h0
 		Sub Constructor(identifier As ObjoScript.Token, value As ObjoScript.Expr)
-		  mLocation = identifier
+		  mIdentifier = identifier
 		  Self.Value = value
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 546865207661726961626C652773206964656E74696669657220746F6B656E2E
+	#tag Method, Flags = &h0, Description = 546865207661726961626C65206F72206669656C642773206964656E74696669657220746F6B656E2E
 		Function Location() As ObjoScript.Token
-		  /// The variable's identifier token.
+		  /// The variable or field's identifier token.
 		  ///
 		  /// Part of the ObjoScript.Expr interface.
 		  
-		  Return mLocation
+		  Return mIdentifier
 		End Function
 	#tag EndMethod
 
 
-	#tag Property, Flags = &h21, Description = 546865207661726961626C652773206964656E74696669657220746F6B656E2E
-		Private mLocation As ObjoScript.Token
+	#tag ComputedProperty, Flags = &h0, Description = 54727565206966207468697320697320616E2061737369676E6D656E7420746F2061206669656C642E
+		#tag Getter
+			Get
+			  Return mIdentifier.Type = ObjoScript.TokenTypes.FieldIdentifier
+			End Get
+		#tag EndGetter
+		IsField As Boolean
+	#tag EndComputedProperty
+
+	#tag Property, Flags = &h21, Description = 546865207661726961626C65206F72206669656C642773206964656E74696669657220746F6B656E2E
+		Private mIdentifier As ObjoScript.Token
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0, Description = 546865206E616D65206F6620746865207661726961626C6520746F2061737369676E20746F2E
 		#tag Getter
 			Get
-			  Return mLocation.Lexeme
+			  Return mIdentifier.Lexeme
 			End Get
 		#tag EndGetter
 		Name As String
@@ -88,11 +97,11 @@ Implements ObjoScript.Expr
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Value"
+			Name="IsField"
 			Visible=false
 			Group="Behavior"
 			InitialValue=""
-			Type="Integer"
+			Type="Boolean"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

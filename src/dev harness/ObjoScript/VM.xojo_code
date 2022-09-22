@@ -226,7 +226,7 @@ Protected Class VM
 		  
 		  #Pragma Warning "TODO: Don't always print the stack trace to the debug console"
 		  
-		  #Pragma BreakOnExceptions False
+		  '#Pragma BreakOnExceptions False
 		  
 		  // Default to the current IP if no offset is provided.
 		  offset = If(offset = -1, CurrentFrame.IP, offset)
@@ -243,6 +243,30 @@ Protected Class VM
 		  Next i
 		  
 		  Raise New ObjoScript.VMException(message, CurrentChunk.LineForOffset(offset), CurrentChunk.ScriptIDForOffset(offset))
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 526574726965766573207468652076616C7565206F662061206669656C64206E616D656420606E616D6560206F6E2074686520696E7374616E63652063757272656E746C79206F6E2074686520746F70206F662074686520737461636B20616E64207468656E20707573686573206974206F6E20746F2074686520746F70206F662074686520737461636B2E
+		Private Sub GetField(name As String)
+		  /// Retrieves the value of a field named `name` on the instance currently on the top of the 
+		  /// stack and then pushes it on to the top of the stack.
+		  
+		  // Get the instance off the top of the stack.
+		  Var instance As ObjoScript.Instance = Peek(0)
+		  
+		  // Get the value of the field from the instance.
+		  Var value As Variant = instance.Fields.Lookup(name, Nil)
+		  
+		  If value = Nil Then
+		    Error("Undefined field `" + name + "` on class `" + instance.Klass.Name + "`.")
+		  End If
+		  
+		  // Pop the instance off the top of the stack.
+		  Call Pop
+		  
+		  // Push the value on to the stack.
+		  Push(value)
+		  
 		End Sub
 	#tag EndMethod
 
@@ -755,8 +779,62 @@ Protected Class VM
 		    Case OP_SETTER_LONG
 		      Setter(ReadConstantLong)
 		      
+		    Case OP_GET_FIELD
+		      GetField(ReadConstant)
+		      
+		    Case OP_GET_FIELD_LONG
+		      GetField(ReadConstantLong)
+		      
+		    Case OP_SET_FIELD
+		      ' System.DebugLog("=============")
+		      ' RemoveHandler Disassembler.Print, AddressOf DisassemblerPrintDelegate
+		      ' RemoveHandler Disassembler.PrintLine, AddressOf DisassemblerPrintLineDelegate
+		      ' Var dis As New ObjoScript.Disassembler
+		      ' AddHandler dis.Print, AddressOf DisassemblerPrintDelegate
+		      ' AddHandler dis.PrintLine, AddressOf DisassemblerPrintLineDelegate
+		      ' Call dis.Disassemble(CurrentFrame.Func.Chunk, CurrentFrame.Func.Name)
+		      
+		      SetField(ReadConstant)
+		      
+		    Case OP_SET_FIELD_LONG
+		      SetField(ReadConstantLong)
+		      
 		    End Select
 		  Wend
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 536574732061206669656C64206E616D656420606E616D6560206F6E2074686520696E7374616E63652074686174206973206F6E652066726F6D2074686520746F70206F662074686520737461636B20746F207468652076616C7565206F6E2074686520746F70206F662074686520737461636B2E
+		Private Sub SetField(name As String)
+		  /// Sets a field named `name` on the instance that is one from the top of the stack to the value on the top of the stack.
+		  ///
+		  /// |
+		  /// | ValueToAssign   <-- top of the stack
+		  /// | Instance        <-- the instance that should have the field named `name`.
+		  /// |
+		  
+		  // Check we have an instance in the correct place.
+		  Var instance As ObjoScript.Instance
+		  If Peek(1) IsA ObjoScript.Instance Then
+		    instance = Peek(1)
+		  Else
+		    Error("Only instances have fields.")
+		  End If
+		  
+		  If instance.Fields.HasKey(name) = False Then
+		    Error("There is no field named `" + name + "` on " + instance.ToString + ".")
+		  End If
+		  
+		  // Set the field to the value on the top of the stack and pop it off.
+		  Var value As Variant = Pop
+		  instance.Fields.Value(name) = value
+		  
+		  // Pop the instance off the stack.
+		  Call Pop
+		  
+		  // Push the value back on the stack (since this is an expression).
+		  Push(value)
 		  
 		End Sub
 	#tag EndMethod
@@ -956,7 +1034,10 @@ Protected Class VM
 		53: OP_SETTER_LONG
 		54: OP_GETTER
 		55: OP_GETTER_LONG
-		
+		56: OP_GET_FIELD
+		57: OP_GET_FIELD_LONG
+		58: OP_SET_FIELD
+		59: OP_SET_FIELD_LONG
 	#tag EndNote
 
 
@@ -1120,6 +1201,12 @@ Protected Class VM
 	#tag Constant, Name = OP_GETTER_LONG, Type = Double, Dynamic = False, Default = \"55", Scope = Public
 	#tag EndConstant
 
+	#tag Constant, Name = OP_GET_FIELD, Type = Double, Dynamic = False, Default = \"56", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_GET_FIELD_LONG, Type = Double, Dynamic = False, Default = \"57", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = OP_GET_GLOBAL, Type = Double, Dynamic = False, Default = \"32", Scope = Public
 	#tag EndConstant
 
@@ -1210,6 +1297,12 @@ Protected Class VM
 	#tag Constant, Name = OP_SETTER_LONG, Type = Double, Dynamic = False, Default = \"53", Scope = Public
 	#tag EndConstant
 
+	#tag Constant, Name = OP_SET_FIELD, Type = Double, Dynamic = False, Default = \"58", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SET_FIELD_LONG, Type = Double, Dynamic = False, Default = \"59", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = OP_SET_GLOBAL, Type = Double, Dynamic = False, Default = \"34", Scope = Public
 	#tag EndConstant
 
@@ -1234,7 +1327,7 @@ Protected Class VM
 	#tag Constant, Name = STRING_COMPARISON_RESPECTS_CASE, Type = Boolean, Dynamic = False, Default = \"False", Scope = Public, Description = 54686520636173652073656E7369746976697479206F6620737472696E6720636F6D70617269736F6E73207768656E207573696E672074686520603D3D60206F70657261746F722E
 	#tag EndConstant
 
-	#tag Constant, Name = TRACE_EXECUTION, Type = Boolean, Dynamic = False, Default = \"False", Scope = Public, Description = 496620547275652028616E6420746869732069732061206465627567206275696C6429207468656E2074686520564D2077696C6C206F757470757420646562756720696E666F726D6174696F6E20746F207468652073797374656D206465627567206C6F672E204E6F2065666665637420696E20636F6D70696C656420617070732E
+	#tag Constant, Name = TRACE_EXECUTION, Type = Boolean, Dynamic = False, Default = \"True", Scope = Public, Description = 496620547275652028616E6420746869732069732061206465627567206275696C6429207468656E2074686520564D2077696C6C206F757470757420646562756720696E666F726D6174696F6E20746F207468652073797374656D206465627567206C6F672E204E6F2065666665637420696E20636F6D70696C656420617070732E
 	#tag EndConstant
 
 

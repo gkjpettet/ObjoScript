@@ -496,7 +496,7 @@ Protected Class Parser
 		  TokenTypes.EqualEqual        : BinaryOperator(Precedences.Equality), _
 		  TokenTypes.Exit_             : Unused, _
 		  TokenTypes.Export            : Unused, _
-		  TokenTypes.FieldIdentifier   : Unused, _
+		  TokenTypes.FieldIdentifier   : Prefix(New VariableParselet), _
 		  TokenTypes.Foreign           : Unused, _
 		  TokenTypes.ForwardSlash      : BinaryOperator(Precedences.Factor), _
 		  TokenTypes.ForwardSlashEqual : Unused, _
@@ -661,6 +661,8 @@ Protected Class Parser
 		  While Not AtEnd
 		    Try
 		      mAST.Add(Declaration)
+		      // Superfluous EOL?
+		      Call Match(ObjoScript.TokenTypes.EOL)
 		    Catch e As ObjoScript.ParserException
 		      Panic(e)
 		    End Try

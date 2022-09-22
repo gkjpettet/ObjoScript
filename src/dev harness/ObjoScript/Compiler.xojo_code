@@ -5,6 +5,16 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Private Function AddConstant(value As Variant) As Integer
 		  /// Adds `value` to the current function's constant pool and returns its index in the pool.
 		  
+		  #Pragma Warning "BUG: I think strings need to be stored case sensitively"
+		  ' class Person {
+		  ' init(name) {
+		  ' _name = name
+		  ' }
+		  ' }
+		  ' 
+		  ' Var garry = Person()
+		  ' garry.init("Garry")
+		  
 		  Var index As Integer = CurrentChunk.AddConstant(value)
 		  
 		  If index > ObjoScript.Chunk.MAX_CONSTANTS Then
@@ -31,11 +41,24 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 436F6D70696C657320616E2061737369676E6D656E7420746F2061207661726961626C65206E616D656420606E616D65602E
-		Private Sub Assignment(name As String)
+		Private Sub Assignment(name As String, isField As Boolean = False)
 		  /// Compiles an assignment to a variable named `name`.
+		  ///
+		  /// The value to assign will already be on the top of the stack.
+		  
+		  // Assign to a field on this instance?
+		  If isField Then
+		    If Self.Type <> ObjoScript.FunctionTypes.Method Then
+		      Error("Fields can only be accessed from within a method.")
+		    End If
+		    // Add the name of the field to the constant pool and get its index.
+		    Var index As Integer = AddConstant(name)
+		    // Emit the set field instruction.
+		    EmitIndexedOpcode(ObjoScript.VM.OP_SET_FIELD, ObjoScript.VM.OP_SET_FIELD_LONG, index)
+		    Return
+		  End If
 		  
 		  Var arg As Integer = ResolveLocal(name)
-		  
 		  If arg <> -1 Then
 		    // Set a local variable.
 		    EmitBytes(ObjoScript.VM.OP_SET_LOCAL, arg)
@@ -814,11 +837,21 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
+		  #Pragma Warning "BROKEN"
+		  ' class Person {
+		  ' init(name) {
+		  ' _name = name
+		  ' }
+		  ' }
+		  ' 
+		  ' Var garry = Person()
+		  ' garry.init("Garry")
+		  
 		  // Evaluate the value to assign.
 		  Call expr.Value.Accept(Self)
 		  
 		  // Assign the value at the top of the stack to this variable.
-		  Assignment(expr.Name)
+		  Assignment(expr.Name, expr.IsField)
 		  
 		End Function
 	#tag EndMethod
@@ -1452,8 +1485,19 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  #Pragma Warning "TODO: Find a way to track the name of locals in the VM for runtime debugging"
 		  
-		  Var arg As Integer = ResolveLocal(expr.Name)
+		  // Retrieve a field on this instance?
+		  If expr.IsField Then
+		    If Self.Type <> ObjoScript.FunctionTypes.Method Then
+		      Error("Fields can only be accessed from within a method.")
+		    End If
+		    // Add the name of the field to the constant pool and get its index.
+		    Var index As Integer = AddConstant(expr.Name)
+		    // Push the field on to the stack.
+		    EmitIndexedOpcode(ObjoScript.VM.OP_GET_FIELD, ObjoScript.VM.OP_GET_FIELD_LONG, index)
+		    Return Nil
+		  End If
 		  
+		  Var arg As Integer = ResolveLocal(expr.Name)
 		  If arg <> -1 Then
 		    // Retrieve a local variable.
 		    EmitBytes(ObjoScript.VM.OP_GET_LOCAL, arg)
@@ -1464,6 +1508,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    // Push the variable on to the stack.
 		    EmitGetGlobal(index)
 		  End If
+		  
 		End Function
 	#tag EndMethod
 
