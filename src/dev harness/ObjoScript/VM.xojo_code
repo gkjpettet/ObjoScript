@@ -38,7 +38,7 @@ Protected Class VM
 		  
 		  #Pragma Warning "TODO: Don't ignore the argCount. Required for initialisers"
 		  
-		  Stack(StackTop - argCount - 1) = New ObjoScript.Value(New ObjoScript.Instance(klass))
+		  Stack(StackTop - argCount - 1) = New ObjoScript.Instance(klass)
 		End Sub
 	#tag EndMethod
 
@@ -85,18 +85,18 @@ Protected Class VM
 		  #Pragma StackOverflowChecking False
 		  
 		  If v IsA ObjoScript.Value = False Then
-		    Error("Can only call functions.")
+		    Error("Can only call functions, classes and methods.")
 		  End If
 		  
 		  Select Case ObjoScript.Value(v).Type
 		  Case ObjoScript.ValueTypes.Klass
-		    CallClass(ObjoScript.Value(v).AsClass, argCount)
+		    CallClass(ObjoScript.Klass(v), argCount)
 		    
 		  Case ObjoScript.ValueTypes.Func
-		    CallFunction(ObjoScript.Value(v).AsFunction, argCount)
+		    CallFunction(ObjoScript.Func(v), argCount)
 		    
 		  Else
-		    Error("Can only call functions.")
+		    Error("Can only call functions, classes and methods.")
 		  End Select
 		  
 		End Sub
@@ -342,7 +342,7 @@ Protected Class VM
 		  Reset
 		  
 		  // Push the function to run onto the stack as a runtime value.
-		  Push(New ObjoScript.Value(func))
+		  Push(func)
 		  
 		  // Call the passed function.
 		  CallFunction(func, 0)
@@ -669,11 +669,11 @@ Protected Class VM
 		      
 		    Case OP_CLASS
 		      Var className As String = ReadConstant
-		      Push(New ObjoScript.Value(New ObjoScript.Klass(className)))
+		      Push(New ObjoScript.Klass(className))
 		      
 		    Case OP_CLASS_LONG
 		      Var className As String = ReadConstantLong
-		      Push(New ObjoScript.Value(New ObjoScript.Klass(className)))
+		      Push(New ObjoScript.Klass(className))
 		      
 		    End Select
 		  Wend

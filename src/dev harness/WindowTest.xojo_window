@@ -911,7 +911,7 @@ End
 		    Var watch As New ObjoScript.StopWatch(True)
 		    VM.Run(Func)
 		    watch.Stop
-		    Info.Text = "Executed in " + watch.ElapsedMilliseconds.ToString + " ms"
+		    Info.Text = "Compile: " + Compiler.CompileTime.ToString(Locale.Current, "#.#") + " ms. Execute: " + watch.ElapsedMilliseconds.ToString + " ms"
 		  Catch e As ObjoScript.VMException
 		    DisplayVMError(e)
 		  End Try

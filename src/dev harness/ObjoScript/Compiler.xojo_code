@@ -1108,7 +1108,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var f As ObjoScript.Func = CompileFunction(funcDecl)
 		  
 		  // Store the compiled function as a constant in this function's constant pool.
-		  Call EmitConstant(New ObjoScript.Value(f))
+		  Call EmitConstant(f)
 		  
 		  Var index As Integer
 		  If ScopeDepth = 0 Then

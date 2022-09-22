@@ -319,8 +319,10 @@ Protected Module ObjoScript
 		- Numbers  : Xojo Double
 		- Booleans : Xojo Boolean
 		- Strings  : Xojo String
-		- Functions: Objo Value (mValue = Objo Func)
-		- Classes  : Objo Value (mValue = Objo Klass)
+		- Functions: ObjoScript.Func
+		- Classes  : ObjoScript.Klass
+		- Instances: ObjoScript.Instance
+		
 		
 		
 	#tag EndNote
