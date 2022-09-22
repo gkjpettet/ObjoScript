@@ -32,6 +32,37 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 42696E6473206120726567756C6172202867657474657229206D6574686F64206E616D656420606E616D656020746F2074686520696E7374616E6365206F6E2074686520746F70206F662074686520737461636B2E20417373657274732074686520746F70206F662074686520737461636B20697320616E20696E7374616E63652E
+		Private Sub BindMethod(name As String)
+		  /// Binds a regular (getter) method named `name` to the instance on the top of the stack.
+		  /// Asserts the top of the stack is an instance.
+		  
+		  // Check we have an instance on the top of the stack.
+		  Var instance As ObjoScript.Instance
+		  If Peek(0) IsA ObjoScript.Instance Then
+		    instance = Peek(0)
+		  Else
+		    Error("Methods can only be invoked on instances.")
+		  End If
+		  
+		  Var method As ObjoScript.Func = instance.klass.Methods.Lookup(name, Nil)
+		  
+		  If method = Nil Then
+		    Error("Undefined method `" + name + "` on " + instance.klass.ToString + ".")
+		  End If
+		  
+		  // Bind this method to the instance which is currently on the top of the stack.
+		  Var bound As New ObjoScript.BoundMethod(instance, method)
+		  
+		  // Pop off of the instance.
+		  Call Pop
+		  
+		  // Push the bound method on to the stack.
+		  Push(bound)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 2243616C6C7322206120636C6173732E20457373656E7469616C6C79207468697320637265617465732061206E657720696E7374616E63652E
 		Private Sub CallClass(klass As ObjoScript.Klass, argCount As Integer)
 		  /// "Calls" a class. Essentially this creates a new instance.
@@ -95,6 +126,9 @@ Protected Class VM
 		  Case ObjoScript.ValueTypes.Func
 		    CallFunction(ObjoScript.Func(v), argCount)
 		    
+		  Case ObjoScript.ValueTypes.BoundMethod
+		    CallFunction(ObjoScript.BoundMethod(v).Method, argCount)
+		    
 		  Else
 		    Error("Can only call functions, classes and methods.")
 		  End Select
@@ -124,6 +158,30 @@ Protected Class VM
 		  Return CurrentFrame.Func.Chunk
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 446566696E65732061206D6574686F64206E616D656420606E616D6560206F6E2074686520636C617373206F6E2074686520746F70206F662074686520737461636B2E
+		Private Sub DefineMethod(name As String, setter As UInt8)
+		  /// Defines a method named `name` on the class just below the method's body on the stack/
+		  ///
+		  /// The method's body should be on the top of the stack with its class just beneath it.
+		  /// This is a setter method if setter = 1, otherwise it's a regular method.
+		  
+		  Var method As ObjoScript.Func = Peek(0)
+		  Var klass As ObjoScript.Klass = Peek(1)
+		  
+		  If setter = 0 Then
+		    // Regular method.
+		    klass.Methods.Value(name) = method
+		  Else
+		    // Setter.
+		    klass.Setters.Value(name) = method
+		  End If
+		  
+		  // Pop the method's body off the stack.
+		  Call Pop
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 44656C6567617465206D6574686F6420746861742069732063616C6C6564206279206F757220646973617373656D626C6572277320605072696E74282960206576656E742E
@@ -675,9 +733,73 @@ Protected Class VM
 		      Var className As String = ReadConstantLong
 		      Push(New ObjoScript.Klass(className))
 		      
+		    Case OP_METHOD
+		      DefineMethod(ReadConstant, ReadByte)
+		      
+		    Case OP_METHOD_LONG
+		      DefineMethod(ReadConstantLong, ReadByte)
+		      
+		    Case OP_GETTER
+		      BindMethod(ReadConstant)
+		      
+		    Case OP_GETTER_LONG
+		      BindMethod(ReadConstantLong)
+		      
+		    Case OP_SETTER
+		      Setter(ReadConstant)
+		      
+		    Case OP_SETTER_LONG
+		      Setter(ReadConstantLong)
+		      
 		    End Select
 		  Wend
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 43616C6C73207468652073657474657220666F722074686520696E7374616E6365206F6E652066726F6D2074686520746F70206F662074686520737461636B2C2070617373696E6720696E207468652076616C7565206F6E2074686520746F70206F662074686520737461636B2061732074686520706172616D657465722E
+		Private Sub Setter(name As String)
+		  /// Calls the setter for the instance one from the top of the stack, passing in the 
+		  /// value on the top of the stack as the parameter.
+		  ///
+		  /// |
+		  /// | ValueToAssign   <-- top of the stack
+		  /// | Instance
+		  /// |
+		  
+		  // Check we have an instance in the correct place.
+		  Var instance As ObjoScript.Instance
+		  If Peek(1) IsA ObjoScript.Instance Then
+		    instance = Peek(1)
+		  Else
+		    Error("Setters can only be invoked on instances.")
+		  End If
+		  
+		  // Get the value to assign. This will be the parameter to the setter method.
+		  Var value As Variant = Pop
+		  
+		  Var setter As ObjoScript.Func = instance.klass.Setters.Lookup(name, Nil)
+		  If setter = Nil Then
+		    Error("Undefined setter `" + name + "` on " + instance.klass.ToString + ".")
+		  End If
+		  
+		  // Bind this method to the instance which is currently on the top of the stack.
+		  Var bound As New ObjoScript.BoundMethod(instance, setter)
+		  
+		  // Pop off of the instance.
+		  Call Pop
+		  
+		  // Push the bound method on to the stack.
+		  Push(bound)
+		  
+		  // Push the value to assign back on the stack.
+		  Push(value)
+		  
+		  // Call the method.
+		  CallValue(bound, 1)
+		  
+		  // Update the current call frame (as a new call frame will have been created by the `CallValue` method).
+		  CurrentFrame = Frames(FrameCount - 1)
 		End Sub
 	#tag EndMethod
 
@@ -824,6 +946,13 @@ Protected Class VM
 		47: OP_CALL
 		48: OP_CLASS
 		49: OP_CLASS_LONG
+		50: OP_METHOD
+		51: OP_METHOD_LONG
+		52: OP_SETTER
+		53: OP_SETTER_LONG
+		54: OP_GETTER
+		55: OP_GETTER_LONG
+		
 	#tag EndNote
 
 
@@ -981,6 +1110,12 @@ Protected Class VM
 	#tag Constant, Name = OP_FALSE, Type = Double, Dynamic = False, Default = \"17", Scope = Public
 	#tag EndConstant
 
+	#tag Constant, Name = OP_GETTER, Type = Double, Dynamic = False, Default = \"54", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_GETTER_LONG, Type = Double, Dynamic = False, Default = \"55", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = OP_GET_GLOBAL, Type = Double, Dynamic = False, Default = \"32", Scope = Public
 	#tag EndConstant
 
@@ -1029,6 +1164,12 @@ Protected Class VM
 	#tag Constant, Name = OP_LOOP, Type = Double, Dynamic = False, Default = \"43", Scope = Public
 	#tag EndConstant
 
+	#tag Constant, Name = OP_METHOD, Type = Double, Dynamic = False, Default = \"50", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_METHOD_LONG, Type = Double, Dynamic = False, Default = \"51", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = OP_MODULO, Type = Double, Dynamic = False, Default = \"8", Scope = Public
 	#tag EndConstant
 
@@ -1057,6 +1198,12 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_RETURN, Type = Double, Dynamic = False, Default = \"0", Scope = Public, Description = 5468652072657475726E206F70636F64652E
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SETTER, Type = Double, Dynamic = False, Default = \"52", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SETTER_LONG, Type = Double, Dynamic = False, Default = \"53", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SET_GLOBAL, Type = Double, Dynamic = False, Default = \"34", Scope = Public

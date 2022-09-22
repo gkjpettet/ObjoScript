@@ -20,11 +20,12 @@ Implements ObjoScript.Value
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(name As String, arity As Integer)
+		Sub Constructor(name As String, arity As Integer, isSetter As Boolean = False)
 		  Self.Name = name
 		  Self.Arity = arity
 		  Self.Chunk = New ObjoScript.Chunk
 		  mSignature = ComputeSignature(name, arity)
+		  Self.IsSetter = isSetter
 		End Sub
 	#tag EndMethod
 
@@ -72,6 +73,10 @@ Implements ObjoScript.Value
 
 	#tag Property, Flags = &h0, Description = 546869732066756E6374696F6E2773206368756E6B206F662062797465636F64652E
 		Chunk As ObjoScript.Chunk
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 49662054727565207468656E2074686973206973206120736574746572206D6574686F642E20536574746572732063616E20626520696E766F6B656420696D6D6564696174656C79206265666F726520616E20603D60207369676E2E
+		IsSetter As Boolean = False
 	#tag EndProperty
 
 	#tag Property, Flags = &h21

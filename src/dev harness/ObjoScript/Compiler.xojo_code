@@ -74,62 +74,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C657320612066756E6374696F6E206465636C61726174696F6E20696E746F20612066756E6374696F6E2E2052616973657320612060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
-		Function Compile(fdecl As ObjoScript.FuncDeclStmt, type As ObjoScript.FunctionTypes, shouldResetFirst As Boolean = True) As ObjoScript.Func
-		  /// Compiles a function declaration into a function. Raises a `CompilerException` if an error occurs.
-		  ///
-		  /// Resets by default but if this is being called internally (after the compiler has tokenised and parsed the source) 
-		  /// then we skip resetting by setting `shouldResetFirst` to True.
-		  
-		  mStopWatch.Start
-		  
-		  If shouldResetFirst Then Reset
-		  
-		  Func = New ObjoScript.Func(fdecl.Name.Lexeme, fdecl.Parameters.Count)
-		  Self.Type = type
-		  
-		  If type = ObjoScript.FunctionTypes.Func Then
-		    BeginScope
-		    
-		    // Compile the parameters.
-		    If fdecl.Parameters.Count > 255 Then
-		      Error("Functions cannot have more than 255 parameters.")
-		    End If
-		    Func.Arity = fdecl.Parameters.Count
-		    
-		    For Each p As ObjoScript.Token In fdecl.Parameters
-		      DeclareVariable(p)
-		      DefineVariable(0) // The index value doesn't matter as the parameters are local.
-		    Next p
-		  End If
-		  
-		  // Compile the body of the function.
-		  mAST = fdecl.Body.Statements
-		  For Each stmt As ObjoScript.Stmt In mAST
-		    Call stmt.Accept(Self)
-		  Next stmt
-		  
-		  // Handle an empty body/AST.
-		  Var endLocation As ObjoScript.Token
-		  If mAST.Count = 0 Then
-		    // Synthesise a fake end location token.
-		    endLocation = New ObjoScript.Token(ObjoScript.TokenTypes.EOF, 0, 1)
-		  ElseIf mAST(mAST.LastIndex) IsA ObjoScript.BlockStmt Then
-		    endLocation = ObjoScript.BlockStmt(mAST(mAST.LastIndex)).ClosingBrace
-		  Else
-		    endLocation = mAST(mAST.LastIndex).Location
-		  End If
-		  
-		  // Wind down the compiler.
-		  EndCompiler(endLocation)
-		  
-		  mStopWatch.Stop
-		  mCompileTime = mStopWatch.ElapsedMilliseconds
-		  
-		  Return Func
-		End Function
-	#tag EndMethod
-
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320726177204F626A6F20736F7572636520636F646520696E746F206120746F70206C6576656C2066756E6374696F6E2E204D6179207261697365206120604C65786572457863657074696F6E602C2060506172736572457863657074696F6E60206F722060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
 		Function Compile(source As String) As ObjoScript.Func
 		  /// Compiles raw Objo source code into a top level function. 
@@ -161,18 +105,81 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  End If
 		  
 		  // Compile.
-		  Return Compile(MainFunction(ast), ObjoScript.FunctionTypes.TopLevel, False)
+		  Return CompileMainFunction(ast)
 		  
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C65732074686520706172616D657465727320616E6420626F6479206F6620746865207061737365642066756E6374696F6E206465636C61726174696F6E2E
-		Function CompileFunction(fdecl As ObjoScript.FuncDeclStmt) As ObjoScript.Func
-		  /// Compiles the parameters and body of the passed function declaration.
+	#tag Method, Flags = &h0, Description = 436F6D70696C657320612066756E6374696F6E206465636C61726174696F6E20696E746F20612066756E6374696F6E2E2052616973657320612060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
+		Function Compile(name As String, parameters() As ObjoScript.Token, body As ObjoScript.BlockStmt, type As ObjoScript.FunctionTypes, shouldResetFirst As Boolean = True) As ObjoScript.Func
+		  /// Compiles a function declaration into a function. Raises a `CompilerException` if an error occurs.
+		  ///
+		  /// Resets by default but if this is being called internally (after the compiler has tokenised and parsed the source) 
+		  /// then we skip resetting by setting `shouldResetFirst` to True.
 		  
-		  Var compiler As New ObjoScript.Compiler
+		  mStopWatch.Start
 		  
-		  Return compiler.Compile(fdecl, ObjoScript.FunctionTypes.Func)
+		  If shouldResetFirst Then Reset
+		  
+		  Func = New ObjoScript.Func(name, parameters.Count)
+		  Self.Type = type
+		  
+		  If type = ObjoScript.FunctionTypes.Func Then
+		    BeginScope
+		    
+		    // Compile the parameters.
+		    If parameters.Count > 255 Then
+		      Error("Functions cannot have more than 255 parameters.")
+		    End If
+		    Func.Arity = parameters.Count
+		    
+		    For Each p As ObjoScript.Token In parameters
+		      DeclareVariable(p)
+		      DefineVariable(0) // The index value doesn't matter as the parameters are local.
+		    Next p
+		  End If
+		  
+		  // Compile the body of the function.
+		  mAST = body.Statements
+		  For Each stmt As ObjoScript.Stmt In mAST
+		    Call stmt.Accept(Self)
+		  Next stmt
+		  
+		  // Handle an empty body/AST.
+		  Var endLocation As ObjoScript.Token
+		  If mAST.Count = 0 Then
+		    // Synthesise a fake end location token.
+		    endLocation = New ObjoScript.Token(ObjoScript.TokenTypes.EOF, 0, 1)
+		  ElseIf mAST(mAST.LastIndex) IsA ObjoScript.BlockStmt Then
+		    endLocation = ObjoScript.BlockStmt(mAST(mAST.LastIndex)).ClosingBrace
+		  Else
+		    endLocation = mAST(mAST.LastIndex).Location
+		  End If
+		  
+		  // Wind down the compiler.
+		  EndCompiler(endLocation)
+		  
+		  mStopWatch.Stop
+		  mCompileTime = mStopWatch.ElapsedMilliseconds
+		  
+		  Return Func
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 54616B657320616E206172726179206F662073746174656D656E747320616E642072657475726E732074686520636F6D70696C656420656E7472792D6C6576656C20226D61696E222066756E6374696F6E2E
+		Private Function CompileMainFunction(body() As ObjoScript.Stmt) As ObjoScript.Func
+		  /// Takes an array of statements and returns the compiled entry-level "main" function.
+		  
+		  // Synthesise a token for the (non-existent) opening and closing curly braces and the 
+		  // (non-existent) `function` keyword of this implicit main function.
+		  Var openingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "", -1)
+		  Var closingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.RCurly, 0, 0, "", -1)
+		  
+		  // Empty parameters.
+		  Var params() As ObjoScript.Token
+		  
+		  Return Compile("", params, New ObjoScript.BlockStmt(body, openingBrace, closingBrace), ObjoScript.FunctionTypes.TopLevel, False)
+		  
 		End Function
 	#tag EndMethod
 
@@ -302,10 +309,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 41646473206076616C75656020746F207468652063757272656E74206368756E6B277320636F6E7374616E7420706F6F6C206174207468652063757272656E74206C6F636174696F6E2E2052657475726E732074686520696E64657820696E2074686520636F6E7374616E7420706F6F6C206F7220602D31602069662068617320646564696361746564206F70636F6465206163636573736F722E
+	#tag Method, Flags = &h21, Description = 41646473206076616C75656020746F207468652063757272656E74206368756E6B277320636F6E7374616E7420706F6F6C206174207468652063757272656E74206C6F636174696F6E2E2052657475726E732074686520696E64657820696E2074686520636F6E7374616E7420706F6F6C206F7220602D31602069662068617320646564696361746564206F70636F6465206163636573736F722E20507573686573206076616C756560206F6E20746F2074686520737461636B2E
 		Private Function EmitConstant(value As Variant, location As ObjoScript.Token = Nil) As Integer
 		  /// Adds `value` to the current chunk's constant pool at the current location.
 		  /// Returns the index in the constant pool or `-1` if has dedicated opcode accessor.
+		  /// Pushes `value` on to the stack.
 		  
 		  If location = Nil Then location = mLocation
 		  
@@ -335,6 +343,47 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  Return index
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 456D69747320616E20696E737472756374696F6E20746F20676574206120676C6F62616C207661726961626C652077686F7365206E616D652069732073746F72656420696E2074686520636F6E7374616E7420706F6F6C2061742060696E6465786020616E642070757368206974206F6E746F2074686520737461636B2E
+		Private Sub EmitGetGlobal(index As Integer, location As ObjoScript.Token = Nil)
+		  /// Emits an instruction to get a global variable whose name is stored in 
+		  /// the constant pool at `index` and push it onto the stack.
+		  ///
+		  /// It's a convenience method that exists to simplify the fact that there are two GET_GLOBAL 
+		  // instructions which depend on the size of `index`.
+		  
+		  location = If(location = Nil, mLocation, location)
+		  
+		  If index <= 255 Then
+		    // We only need a single byte operand to specify the index of the variable's name in the constant pool.
+		    EmitBytes(ObjoScript.VM.OP_GET_GLOBAL, index, location)
+		  Else
+		    // We need two bytes for the operand.
+		    EmitByte(ObjoScript.VM.OP_GET_GLOBAL_LONG, location)
+		    EmitUInt16(index, location)
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 49662060696E64657860203C3D20323535207468656E206073686F72744F70636F64656020697320656D697474656420666F6C6C6F776564206279207468652073696E676C6520627974652060696E646578602E204F746865727769736520606C6F6E674F70636F64656020697320656D697474656420666F6C6C6F776564206279207468652074776F20627974652060696E646578602E
+		Private Sub EmitIndexedOpcode(shortOpcode As UInt8, longOpcode As UInt8, index As Integer, location As ObjoScript.Token = Nil)
+		  /// If `index` <= 255 then `shortOpcode` is emitted followed by the single byte `index`. Otherwise `longOpcode` is emitted
+		  /// followed by the two byte `index`.
+		  
+		  location = If(location = Nil, mLocation, location)
+		  
+		  If index <= 255 Then
+		    // We only need a single byte operand to specify the index.
+		    EmitBytes(shortOpcode, index, location)
+		  Else
+		    // We need two bytes for the operand.
+		    EmitByte(longOpcode, location)
+		    EmitUInt16(index, location)
+		  End If
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 456D6974732074686520606A756D70496E737472756374696F6E60206F63637572696E6720617420736F7572636520606C6F636174696F6E6020286F72207468652063757272656E74206C6F636174696F6E206966204E696C2920616E6420777269746573206120706C616365686F6C64657220282668464646462920666F7220746865206A756D70206F66667365742E2052657475726E7320746865206F6666736574206F6620746865206A756D7020696E737472756374696F6E2E
@@ -565,25 +614,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Call body.Accept(Self)
 		  End If
 		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21, Description = 54616B657320616E206172726179206F662073746174656D656E747320616E642072657475726E732074686520656E7472792D6C6576656C20226D61696E222066756E6374696F6E206465636C61726174696F6E2E
-		Private Function MainFunction(body() As ObjoScript.Stmt) As ObjoScript.FuncDeclStmt
-		  /// Takes an array of statements and returns the entry-level "main" function declaration.
-		  
-		  // Synthesise a token for the (non-existent) opening and closing curly braces and the 
-		  // (non-existent) `function` keyword of this implicit main function.
-		  Var openingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "", -1)
-		  Var closingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.RCurly, 0, 0, "", -1)
-		  Var funcKeyword As New ObjoScript.Token(ObjoScript.TokenTypes.Function_, 0, 0, "", -1)
-		  Var mainIdentifier As New ObjoScript.Token(ObjoScript.TokenTypes.Identifier, 0, 0, "", -1)
-		  
-		  // Empty parameters.
-		  Var params() As ObjoScript.Token
-		  
-		  Return New ObjoScript.FuncDeclStmt(mainIdentifier, params, New ObjoScript.BlockStmt(body, openingBrace, closingBrace), funcKeyword)
-		  
-		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 4D61726B7320746865206D6F737420726563656E74206C6F63616C207661726961626C6520617320696E697469616C697365642062792073657474696E67206974732073636F70652064657074682E
@@ -952,8 +982,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.StmtVisitor interface.
 		  
-		  #Pragma Warning "TODO: Compile the body"
-		  
 		  mLocation = c.Location
 		  
 		  If Self.Type <> ObjoScript.FunctionTypes.TopLevel Then
@@ -966,6 +994,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var index As Integer = AddConstant(c.Name)
 		  
 		  // Emit the "declare class" opcode (which one depends on the index in the constant pool).
+		  // This will push the class on to the top of the stack.
 		  If index <= 255 Then
 		    EmitBytes(ObjoScript.VM.OP_CLASS, index, c.Location)
 		  Else
@@ -973,7 +1002,19 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    EmitUInt16(index, c.Location)
 		  End If
 		  
+		  // Define the class as a global variable.
 		  DefineVariable(index)
+		  
+		  // Push the class back on to the stack so the methods can find it.
+		  EmitGetGlobal(index)
+		  
+		  // Compile any methods.
+		  For Each m As ObjoScript.MethodDeclStmt In c.Methods
+		    Call m.Accept(Self)
+		  Next m
+		  
+		  // Pop the class off the stack.
+		  EmitByte(ObjoScript.VM.OP_POP)
 		  
 		End Function
 	#tag EndMethod
@@ -996,6 +1037,31 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Emit a jump back to the top of the current loop.
 		  EmitLoop(CurrentLoop.Start)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C65206120646F742065787072657373696F6E20286D6574686F6420696E766F636174696F6E292E
+		Function VisitDot(dot As ObjoScript.DotExpr) As Variant
+		  /// Compile a dot expression (method invocation).
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  mLocation = dot.Location
+		  
+		  // Compile the operand to put it on the stack.
+		  Call dot.Operand.Accept(Self)
+		  
+		  // Load the method's name into the constant pool.
+		  Var index As Integer = AddConstant(dot.Identifier.Lexeme)
+		  
+		  If dot.IsSetter Then
+		    // Compile the value to assign.
+		    Call dot.ValueToAssign.Accept(Self)
+		    EmitIndexedOpcode(ObjoScript.VM.OP_SETTER, ObjoScript.VM.OP_SETTER_LONG, index)
+		  Else
+		    EmitIndexedOpcode(ObjoScript.VM.OP_GETTER, ObjoScript.VM.OP_GETTER_LONG, index)
+		  End If
 		  
 		End Function
 	#tag EndMethod
@@ -1105,7 +1171,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  DeclareVariable(funcDecl.Name, True)
 		  
 		  // Compile the function body.
-		  Var f As ObjoScript.Func = CompileFunction(funcDecl)
+		  Var compiler As New ObjoScript.Compiler
+		  Var f As ObjoScript.Func = compiler.Compile(funcDecl.Name.Lexeme, funcDecl.Parameters, funcDecl.Body, ObjoScript.FunctionTypes.Func)
 		  
 		  // Store the compiled function as a constant in this function's constant pool.
 		  Call EmitConstant(f)
@@ -1155,6 +1222,47 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  End If
 		  
 		  PatchJump(elseJump)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120636C617373206D6574686F64206465636C61726174696F6E2E
+		Function VisitMethodDeclaration(m As ObjoScript.MethodDeclStmt) As Variant
+		  /// Compiles a class method declaration.
+		  ///
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  /// To define a new method, the VM needs three things:
+		  ///  1. The name of the method.
+		  ///  2. The function that is the method body.
+		  ///  3. The class to bind the method to.
+		  
+		  mLocation = m.Location
+		  
+		  // Add the name of the method to the function's constants pool.
+		  Var index As Integer = AddConstant(m.Name)
+		  
+		  // Compile the body.
+		  Var compiler As New ObjoScript.Compiler
+		  Var body As ObjoScript.Func = compiler.Compile(m.Name, m.Parameters, m.Body, ObjoScript.FunctionTypes.Func)
+		  body.IsSetter = m.IsSetter
+		  
+		  // Store the compiled method body as a constant in this function's constant pool
+		  // and push it on to the stack.
+		  Call EmitConstant(body)
+		  
+		  // Emit the "declare method" opcode (which one depends on the index in the constant pool).
+		  // The operands are the index of the method's name in the constants pool and whether
+		  // this is a setter (1) or regular method (0).
+		  If index <= 255 Then
+		    EmitByte(ObjoScript.VM.OP_METHOD)
+		    EmitByte(index)
+		    EmitByte(If(m.IsSetter, 1, 0))
+		  Else
+		    EmitByte(ObjoScript.VM.OP_METHOD_LONG)
+		    EmitUInt16(index)
+		    EmitByte(If(m.IsSetter, 1, 0))
+		  End If
+		  
 		  
 		End Function
 	#tag EndMethod
@@ -1329,14 +1437,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    // Retrieve a global variable.
 		    // Add the name of the variable to the constant pool and get its index.
 		    Var index As Integer = AddConstant(expr.Name)
-		    If index <= 255 Then
-		      // We only need a single byte operand to specify the index of the variable's name in the constant pool.
-		      EmitBytes(ObjoScript.VM.OP_GET_GLOBAL, index)
-		    Else
-		      // We need two bytes for the operand.
-		      EmitByte(ObjoScript.VM.OP_GET_GLOBAL_LONG)
-		      EmitUInt16(index)
-		    End If
+		    // Push the variable on to the stack.
+		    EmitGetGlobal(index)
 		  End If
 		End Function
 	#tag EndMethod

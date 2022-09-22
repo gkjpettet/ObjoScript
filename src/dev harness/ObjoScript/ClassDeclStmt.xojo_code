@@ -10,9 +10,9 @@ Implements ObjoScript.Stmt
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(identifier As ObjoScript.Token, body As BlockStmt, classKeyword As ObjoScript.Token)
+		Sub Constructor(identifier As ObjoScript.Token, methods() As ObjoScript.MethodDeclStmt, classKeyword As ObjoScript.Token)
 		  Self.Identifier = identifier
-		  Self.Body = body
+		  Self.Methods = methods
 		  mClassKeyword = classKeyword
 		End Sub
 	#tag EndMethod
@@ -29,16 +29,16 @@ Implements ObjoScript.Stmt
 	#tag EndMethod
 
 
-	#tag Property, Flags = &h0, Description = 54686520636C617373206465636C61726174696F6E277320626F64792E
-		Body As ObjoScript.BlockStmt
-	#tag EndProperty
-
 	#tag Property, Flags = &h0, Description = 54686520636C61737327206E616D6520746F6B656E2E
 		Identifier As ObjoScript.Token
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 5468652060636C61737360206B6579776F726420746F6B656E2E
 		Private mClassKeyword As ObjoScript.Token
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 5468697320636C61737327206D6574686F64206465636C61726174696F6E732E204D617920626520656D7074792E
+		Methods() As ObjoScript.MethodDeclStmt
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0, Description = 546865206E616D65206F662074686520636C61737320746F206465636C6172652E

@@ -66,6 +66,9 @@ Protected Class Parser
 		  
 		  While Not Check(ObjoScript.TokenTypes.RCurly, ObjoScript.TokenTypes.EOF)
 		    statements.Add(Declaration)
+		    
+		    // Optional new line.
+		    Call Match(ObjoScript.TokenTypes.EOL)
 		  Wend
 		  
 		  Var closingBrace As ObjoScript.Token = _
@@ -120,9 +123,21 @@ Protected Class Parser
 		  
 		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the class name.")
 		  
-		  Var body As BlockStmt = ObjoScript.BlockStmt(Block)
+		  // Optional new line.
+		  Call Match(ObjoScript.TokenTypes.EOL)
 		  
-		  Return New ObjoScript.ClassDeclStmt(identifier, body, classKeyword)
+		  // Optional methods.
+		  Var methods() As ObjoScript.MethodDeclStmt
+		  While Not Check(ObjoScript.TokenTypes.RCurly, ObjoScript.TokenTypes.EOF)
+		    methods.Add(MethodDeclaration(identifier.Lexeme))
+		    
+		    // Optional new line.
+		    Call Match(ObjoScript.TokenTypes.EOL)
+		  Wend
+		  
+		  Consume(ObjoScript.TokenTypes.RCurly, "Expected a `}` after the class body.")
+		  
+		  Return New ObjoScript.ClassDeclStmt(identifier, methods, classKeyword)
 		  
 		End Function
 	#tag EndMethod
@@ -204,6 +219,9 @@ Protected Class Parser
 		  /// Declarations are a type of statement that bind new identifiers.
 		  /// Regular statements produce side effects but do not introduce new bindings.
 		  
+		  // Skip superfluous new line.
+		  Call Match(ObjoScript.TokenTypes.EOL)
+		  
 		  If Match(ObjoScript.TokenTypes.Var_) Then
 		    Return VarDeclaration
 		    
@@ -265,6 +283,9 @@ Protected Class Parser
 		  /// `terminator` will be consumed.
 		  ///
 		  /// `terminator` is the token that is required to occur after the declaration to be valid.
+		  
+		  // Skip superfluous new line.
+		  Call Match(ObjoScript.TokenTypes.EOL)
 		  
 		  // Store the location of the start of the expression.
 		  Var location As ObjoScript.Token = Current
@@ -451,7 +472,6 @@ Protected Class Parser
 		  #Pragma Warning "TODO"
 		  ' 1. Add LCurly
 		  ' 2. Add Lsquare
-		  ' 3. Add Dot 
 		  
 		  mRules = New Dictionary( _
 		  TokenTypes.Ampersand         : BinaryOperator(Precedences.BitwiseAnd), _
@@ -466,7 +486,7 @@ Protected Class Parser
 		  TokenTypes.Comma             : Unused, _
 		  TokenTypes.Construct         : Unused, _
 		  TokenTypes.Continue_         : Unused, _
-		  TokenTypes.Dot               : Unused, _
+		  TokenTypes.Dot               : NewRule(Nil, New DotParselet, Precedences.Call_), _
 		  TokenTypes.DotDot            : BinaryOperator(Precedences.Range), _
 		  TokenTypes.DotDotDot         : BinaryOperator(Precedences.Range), _
 		  TokenTypes.Else_             : Unused, _
@@ -543,6 +563,48 @@ Protected Class Parser
 		  End If
 		  
 		  Return False
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function MethodDeclaration(className As String) As ObjoScript.MethodDeclStmt
+		  /// Parses a class method declaration.
+		  ///
+		  /// There are two types of methods: regular and setters.
+		  /// Regular methods may or may not return values and can accept any number of arguments.
+		  /// Setters do not return a value and must have one argument. Format:
+		  /// ```
+		  /// age=(value){} // Note the `=` to denote it's a setter.
+		  /// ```
+		  
+		  Var identifier As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier)
+		  
+		  // Setter?
+		  Var isSetter As Boolean = Match(ObjoScript.TokenTypes.Equal)
+		  
+		  Consume(ObjoScript.TokenTypes.LParen, "Expected an opening parenthesis after the method's name.")
+		  
+		  // Optional parameters.
+		  Var params() As ObjoScript.Token
+		  If Not Check(ObjoScript.TokenTypes.RParen) Then
+		    Do
+		      params.Add(Consume(ObjoScript.TokenTypes.Identifier, "Expected parameter name."))
+		    Loop Until Not Match(ObjoScript.TokenTypes.Comma)
+		  End If
+		  
+		  // Setters must have exactly one parameter.
+		  If isSetter And params.Count <> 1 Then
+		    Error("Setters must have exactly one parameter.", identifier)
+		  End If
+		  
+		  Consume(ObjoScript.TokenTypes.RParen, "Expected a closing parenthesis after method parameters.")
+		  
+		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after method parameters.")
+		  
+		  Var body As ObjoScript.BlockStmt = ObjoScript.BlockStmt(Block)
+		  
+		  Return New MethodDeclStmt(className, identifier, isSetter, params, body)
 		  
 		End Function
 	#tag EndMethod

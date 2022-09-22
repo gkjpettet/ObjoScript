@@ -4,6 +4,8 @@ Implements ObjoScript.Value
 	#tag Method, Flags = &h0
 		Sub Constructor(name As String)
 		  Self.Name = name
+		  Self.Methods = New Dictionary
+		  Self.Setters = New Dictionary
 		  
 		End Sub
 	#tag EndMethod
@@ -43,8 +45,16 @@ Implements ObjoScript.Value
 	#tag EndMethod
 
 
+	#tag Property, Flags = &h0, Description = 54686520726567756C617220286E6F6E2D7365747465722920636C617373206D6574686F647320284B6579203D206D6574686F64206E616D652C2056616C7565203D204F626A6F5363726970742E46756E63292E
+		Methods As Dictionary
+	#tag EndProperty
+
 	#tag Property, Flags = &h0, Description = 546865206E616D65206F662074686520636C6173732E
 		Name As String
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 5468652073657474657220636C617373206D6574686F647320284B6579203D206D6574686F64206E616D652C2056616C7565203D204F626A6F5363726970742E46756E63292E
+		Setters As Dictionary
 	#tag EndProperty
 
 

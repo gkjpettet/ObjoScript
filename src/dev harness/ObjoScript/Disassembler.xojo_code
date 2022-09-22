@@ -67,6 +67,26 @@ Protected Class Disassembler
 		    newOffset = offset + 3
 		    name = "CLASS_LONG"
 		    
+		  Case ObjoScript.VM.OP_GETTER
+		    constantIndex = chunk.ReadByte(offset + 1)
+		    newOffset = offset + 2
+		    name = "GETTER"
+		    
+		  Case ObjoScript.VM.OP_GETTER_LONG
+		    constantIndex = chunk.ReadUInt16(offset + 1)
+		    newOffset = offset + 3
+		    name = "GETTER_LONG"
+		    
+		  Case ObjoScript.VM.OP_SETTER
+		    constantIndex = chunk.ReadByte(offset + 1)
+		    newOffset = offset + 2
+		    name = "SETTER"
+		    
+		  Case ObjoScript.VM.OP_SETTER_LONG
+		    constantIndex = chunk.ReadUInt16(offset + 1)
+		    newOffset = offset + 3
+		    name = "SETTER_LONG"
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown constant opcode.")
 		  End Select
@@ -284,6 +304,21 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_CLASS_LONG
 		    Return ConstantInstruction(opcode, chunk, offset)
 		    
+		  Case ObjoScript.VM.OP_METHOD, ObjoScript.VM.OP_METHOD_LONG
+		    Return MethodInstruction(opcode, chunk, offset)
+		    
+		  CASE ObjoScript.VM.OP_SETTER
+		    Return ConstantInstruction(opcode, chunk, offset)
+		    
+		  CASE ObjoScript.VM.OP_SETTER_LONG
+		    Return ConstantInstruction(opcode, chunk, offset)
+		    
+		  CASE ObjoScript.VM.OP_GETTER
+		    Return ConstantInstruction(opcode, chunk, offset)
+		    
+		  CASE ObjoScript.VM.OP_GETTER_LONG
+		    Return ConstantInstruction(opcode, chunk, offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
@@ -309,6 +344,56 @@ Protected Class Disassembler
 		  PrintLine(destCol.JustifyLeft(COL_WIDTH * 2))
 		  
 		  Return offset + 3
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5072696E74732074686520696E737472756374696F6E2773206E616D652C2074686520696E646578206F6620746865206D6574686F642773206E616D6520696E2074686520636F6E7374616E7420706F6F6C2C20746865206D6574686F64206E616D6520616E642069662069742773206120736574746572206F72206E6F742E2052657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
+		Function MethodInstruction(opcode As UInt8, chunk As ObjoScript.Chunk, offset As Integer) As Integer
+		  /// Prints the instruction's name, the index of the method's name in the constant pool, the method name and if it's a setter or not.
+		  /// Returns the offset for the next instruction.
+		  ///
+		  /// The METHOD instructiona takes a two or three byte operands (1/2 for the index of the name in the constant pool and one specifying if the
+		  /// the method is a setter (1) or a regular method (0).
+		  /// Format:
+		  /// OFFSET  LINE  (OPTIONAL SCRIPT ID)  OPCODE  POOL_INDEX  METHOD_NAME   SETTER?
+		  
+		  // Get and print the index in the constant pool.
+		  Var constantIndex, newOffset, isSetter As Integer
+		  Var name As String
+		  Select Case opcode
+		  Case ObjoScript.VM.OP_METHOD
+		    constantIndex = chunk.ReadByte(offset + 1)
+		    isSetter = chunk.ReadByte(offset + 2)
+		    newOffset = offset + 3
+		    name = "METHOD"
+		    
+		  Case ObjoScript.VM.OP_METHOD_LONG
+		    // Two byte operand.
+		    constantIndex = chunk.ReadUInt16(offset + 1)
+		    isSetter = chunk.ReadByte(offset + 3)
+		    newOffset = offset + 4
+		    name = "METHOD_LONG"
+		    
+		  Else
+		    Raise New UnsupportedOperationException("Unknown constant opcode.")
+		  End Select
+		  
+		  // Print the instruction name.
+		  Print(name.JustifyLeft(2 * COL_WIDTH))
+		  
+		  Var indexCol As String = constantIndex.ToString(Locale.Current, "#####")
+		  Print(indexCol.JustifyLeft(COL_WIDTH))
+		  
+		  // Print the method's name.
+		  Var methodNameValue As Variant = chunk.Constants(constantIndex)
+		  Var methodName As String = ObjoScript.VM.ValueToString(methodNameValue)
+		  Print(methodName.JustifyLeft(2 * COL_WIDTH))
+		  
+		  // Setter?
+		  PrintLine(If(isSetter = 0, "False", "True"))
+		  
+		  Return newOffset
 		  
 		End Function
 	#tag EndMethod

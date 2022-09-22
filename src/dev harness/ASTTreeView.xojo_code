@@ -110,10 +110,14 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Class name.
 		  node.AppendNode(New TreeViewNode("Name: " + c.Name))
 		  
-		  // Class body.
-		  Var classBodyNode As New TreeViewNode("Body")
-		  classBodyNode.AppendNode(c.Body.Accept(Self))
-		  node.AppendNode(classBodyNode)
+		  // Methods
+		  If c.Methods.Count > 0 Then
+		    Var methods As New TreeViewNode("Methods")
+		    For Each m As ObjoScript.MethodDeclStmt In c.Methods
+		      methods.AppendNode(m.Accept(Self))
+		    Next m
+		    node.AppendNode(methods)
+		  End If
 		  
 		  Return node
 		  
@@ -125,6 +129,28 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  #Pragma Unused stmt
 		  
 		  Return New TreeViewNode("Continue")
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function VisitDot(dot As ObjoScript.DotExpr) As Variant
+		  Var type As String = If(dot.IsSetter, "setter", "regular")
+		  Var node As New TreeViewNode("Dot (" + type + ")")
+		  
+		  node.AppendNode(New TreeViewNode("Identifier: " + dot.Identifier.Lexeme))
+		  
+		  Var operandNode As New TreeViewNode("Operand")
+		  operandNode.AppendNode(dot.Operand.Accept(Self))
+		  node.AppendNode(operandNode)
+		  
+		  If dot.IsSetter Then
+		    Var setter As New TreeViewNode("Value to assign")
+		    setter.AppendNode(dot.ValueToAssign.Accept(Self))
+		    node.AppendNode(setter)
+		  End If
+		  
+		  Return node
+		  
 		End Function
 	#tag EndMethod
 
@@ -236,6 +262,42 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    elseBranch.AppendNode(ifstmt.ElseBranch.Accept(Self))
 		    node.AppendNode(elseBranch)
 		  End If
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function VisitMethodDeclaration(m As ObjoScript.MethodDeclStmt) As Variant
+		  Var node As New TreeViewNode("Method declaration")
+		  
+		  node.AppendNode(New TreeViewNode("Name: " + m.Name))
+		  
+		  node.AppendNode(New TreeViewNode("Class: " + m.ClassName))
+		  
+		  node.AppendNode(New TreeViewNode("Is setter: " + If(m.IsSetter, "True", "False")))
+		  
+		  // Parameters.
+		  Var paramsNode As TreeViewNode
+		  If m.Parameters.Count = 0 Then
+		    paramsNode = New TreeViewNode("No parameters")
+		  Else
+		    Var params As String
+		    For i As Integer = 0 To m.Parameters.LastIndex
+		      params = params + m.Parameters(i).Lexeme
+		      If i < m.Parameters.LastIndex Then
+		        params = params + ", "
+		      End If
+		    Next i
+		    paramsNode = New TreeViewNode("Parameters: " + params)
+		  End If
+		  node.AppendNode(paramsNode)
+		  
+		  // Body.
+		  Var bodyNode As TreeViewNode = m.Body.Accept(Self)
+		  bodyNode.Text = "Body"
+		  node.AppendNode(bodyNode)
 		  
 		  Return node
 		  

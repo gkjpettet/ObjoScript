@@ -304,6 +304,9 @@ Protected Module ObjoScript
 		  Case ObjoScript.ValueTypes.Instance
 		    Return "Instance"
 		    
+		  Case ObjoScript.ValueTypes.BoundMethod
+		    Return "Bound method"
+		    
 		  Else
 		    Raise New InvalidArgumentException("Unknown value type.")
 		  End Select
@@ -315,15 +318,14 @@ Protected Module ObjoScript
 	#tag Note, Name = Values
 		The VM's stack is a Variant array. Values on the stack are stored as follows:
 		
-		- Nothing  : Objo Nothing 
-		- Numbers  : Xojo Double
-		- Booleans : Xojo Boolean
-		- Strings  : Xojo String
-		- Functions: ObjoScript.Func
-		- Classes  : ObjoScript.Klass
-		- Instances: ObjoScript.Instance
-		
-		
+		- Nothing     : Objo Nothing 
+		- Numbers     : Xojo Double
+		- Booleans    : Xojo Boolean
+		- Strings     : Xojo String
+		- Functions   : ObjoScript.Func
+		- Classes     : ObjoScript.Klass
+		- Instances   : ObjoScript.Instance
+		- Method calls: ObjoScript.BoundMethod
 		
 	#tag EndNote
 
@@ -464,7 +466,8 @@ Protected Module ObjoScript
 	#tag Enum, Name = ValueTypes, Type = Integer, Flags = &h1
 		Func
 		  Klass
-		Instance
+		  Instance
+		BoundMethod
 	#tag EndEnum
 
 
