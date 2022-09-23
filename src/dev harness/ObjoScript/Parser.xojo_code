@@ -185,7 +185,7 @@ Protected Class Parser
 		  /// Asserts that the current token is an EOL. If so it is consumed. 
 		  /// Otherwise an error with the optional `message` is created.
 		  
-		  '#Pragma BreakOnExceptions False
+		  #Pragma BreakOnExceptions False
 		  
 		  If Current.Type <> ObjoScript.TokenTypes.EOL Then
 		    message = If(message = "", "Expected a new line.", message)
@@ -243,7 +243,7 @@ Protected Class Parser
 		  /// Raises a ParserException at the current location. If the error is not at the current location,
 		  /// `location` may be passed instead.
 		  
-		  '#Pragma BreakOnExceptions False
+		  #Pragma BreakOnExceptions False
 		  
 		  If location = Nil Then location = Current
 		  
@@ -468,10 +468,6 @@ Protected Class Parser
 	#tag Method, Flags = &h21, Description = 496E697469616C6973657320746865207061727365722773206772616D6D61722072756C65732E
 		Private Sub InitialiseGrammar()
 		  /// Initialises the parser's grammar rules.
-		  
-		  #Pragma Warning "TODO"
-		  ' 1. Add LCurly
-		  ' 2. Add Lsquare
 		  
 		  mRules = New Dictionary( _
 		  TokenTypes.Ampersand         : BinaryOperator(Precedences.BitwiseAnd), _

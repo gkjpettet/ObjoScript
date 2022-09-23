@@ -5,8 +5,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Private Function AddConstant(value As Variant) As Integer
 		  /// Adds `value` to the current function's constant pool and returns its index in the pool.
 		  
-		  #Pragma Warning "BUG: I think strings need to be stored case sensitively"
-		  
 		  Var index As Integer = CurrentChunk.AddConstant(value)
 		  
 		  If index > ObjoScript.Chunk.MAX_CONSTANTS Then
@@ -103,7 +101,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Else
 		      message = Parser.Errors.Count.ToString + " parsing errors occurred."
 		    End If
-		    '#Pragma BreakOnExceptions False
+		    #Pragma BreakOnExceptions False
 		    Raise New ObjoScript.ParserException(message, Parser.Errors(0).Location)
 		  End If
 		  
@@ -516,7 +514,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Raises a CompilerException at the current location. If the error is not at the current location,
 		  /// `location` may be passed instead.
 		  
-		  '#Pragma BreakOnExceptions False
+		  #Pragma BreakOnExceptions False
 		  
 		  If location = Nil Then location = mLocation
 		  

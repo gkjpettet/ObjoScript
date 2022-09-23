@@ -155,7 +155,7 @@ Begin DesktopWindow WindowTest
       Tooltip         =   ""
       Top             =   54
       Transparent     =   False
-      Value           =   4
+      Value           =   2
       Visible         =   True
       Width           =   617
       Begin DesktopListBox TokensListbox
@@ -865,6 +865,14 @@ End
 		  /// Displays details about a VM runtime error in the Info label.
 		  
 		  Info.Text = e.LineNumber.ToString + ": " + e.Message
+		  
+		  Var s() As String
+		  s.Add("======================")
+		  s.Add("RUNTIME ERROR")
+		  s.Add("======================")
+		  s.Add("[line " + e.LineNumber.ToString + "]: " + e.Message) + EndOfLine
+		  s.Add("STACK TRACE") + EndOfLine + EndOfLine
+		  Output.Text = Output.Text + EndOfLine + String.FromArray(s, EndOfLine) + String.FromArray(e.VMStackTrace, EndOfLine)
 		  
 		End Sub
 	#tag EndMethod

@@ -224,25 +224,22 @@ Protected Class VM
 		Private Sub Error(message As String, offset As Integer = -1)
 		  /// Raises a VMException at the current IP (unless otherwise specified).
 		  
-		  #Pragma Warning "TODO: Don't always print the stack trace to the debug console"
-		  
-		  '#Pragma BreakOnExceptions False
+		  #Pragma BreakOnExceptions False
 		  
 		  // Default to the current IP if no offset is provided.
 		  offset = If(offset = -1, CurrentFrame.IP, offset)
 		  
-		  // Print a rudimentary stack trace.
-		  #Pragma Warning "TODO: CHECK: Line offsets/opcodes might be wrong here."
-		  System.DebugLog("Stack trace")
+		  // Create a rudimentary stack trace.
+		  Var stackFrames() As String
 		  For i As Integer = FrameCount - 1 DownTo 0
 		    Var frame As ObjoScript.CallFrame = Frames(i)
 		    Var func As ObjoScript.Func = frame.Func
-		    Var funcName As String = If(func.Name = "", "<main>", func.Name)
+		    Var funcName As String = If(func.Name = "", "`<main>`", "`" + func.Name + "`")
 		    Var s As String = "[line " + func.Chunk.LineForOffset(frame.IP - 1).ToString + "] in " + funcName
-		    System.DebugLog(s)
+		    stackFrames.Add(s)
 		  Next i
 		  
-		  Raise New ObjoScript.VMException(message, CurrentChunk.LineForOffset(offset), CurrentChunk.ScriptIDForOffset(offset))
+		  Raise New ObjoScript.VMException(message, CurrentChunk.LineForOffset(offset), stackFrames, CurrentChunk.ScriptIDForOffset(offset))
 		End Sub
 	#tag EndMethod
 
@@ -813,11 +810,8 @@ Protected Class VM
 		  /// | Instance        <-- the instance that should have the field named `name`.
 		  /// |
 		  
-		  #Pragma Warning "BUG: `this` is not where I think it is"
-		  ' It's lower down the stack than Peek(1) as it's displaced by the arguments to the method call it's in.
-		  ' Check using StackBase is correct. I think it is because field can only occur within a method and I think
-		  ' the method always ensures that the instance is at StackBase.
-		  
+		  // Since fields can only be set from within a method we can safely assume that `this` should be in the 
+		  // method callframe's slot 0/StackBase (it should have been placed there by `CallValue()`).
 		  Var instance As ObjoScript.Instance
 		  If Stack(CurrentFrame.StackBase) IsA ObjoScript.Instance Then
 		    instance = Stack(CurrentFrame.StackBase)
@@ -826,15 +820,13 @@ Protected Class VM
 		  End If
 		  
 		  // Set the field to the value on the top of the stack and pop it off.
-		  // If the field has never been assigned to before it is created.
+		  // If the field has never been assigned to before then we create it.
 		  Var value As Variant = Pop
 		  instance.Fields.Value(name) = value
 		  
-		  ' // Pop the instance off the stack.
-		  ' Call Pop
-		  
 		  // Push the value back on the stack (since this is an expression).
 		  Push(value)
+		  
 		  
 		End Sub
 	#tag EndMethod
@@ -895,28 +887,33 @@ Protected Class VM
 		  #Pragma NilObjectChecking False
 		  #Pragma StackOverflowChecking False
 		  
-		  #Pragma Warning "TODO: Handle objects"
-		  
 		  If a.Type <> b.Type Then Return False
 		  
 		  Select Case a.Type
+		    // ===================
+		    // Doubles & Booleans.
+		    // ===================
 		  Case Variant.TypeDouble, Variant.TypeBoolean
 		    Return a = b
 		    
 		  Case Variant.TypeString
-		    If STRING_COMPARISON_RESPECTS_CASE Then
-		      // Case sensitive comparison.
-		      Return a.StringValue.Compare(b.StringValue, ComparisonOptions.CaseSensitive) = 0
-		    Else
-		      // Case insensitive comparison.
-		      Return a = b
-		    End If
+		    // ===================
+		    // Strings.
+		    // ===================
+		    // Case sensitive comparison.
+		    Return a.StringValue.Compare(b.StringValue, ComparisonOptions.CaseSensitive) = 0
 		    
 		  Else
+		    // ===================
+		    // "Nothing".
+		    // ===================
 		    If a IsA ObjoScript.Nothing And b IsA ObjoScript.Nothing Then
 		      Return True
 		    End If
 		    
+		    // ===================
+		    // Ranges.
+		    // ===================
 		    // Ranges are stored internally as pairs of doubles (lower : upper)
 		    If a IsA Pair And b IsA Pair Then
 		      Var aPair As Pair = a
@@ -924,6 +921,13 @@ Protected Class VM
 		      If aPair.Left = bPair.Left And aPair.Right = bPair.Right Then
 		        Return True
 		      End If
+		    End If
+		    
+		    // ===================
+		    // Instances.
+		    // ===================
+		    If a IsA ObjoScript.Instance And b IsA ObjoScript.Instance Then
+		      Return a = b
 		    End If
 		    
 		    Error("Unexpected value type.")
@@ -937,8 +941,6 @@ Protected Class VM
 	#tag Method, Flags = &h0, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F66206120564D2076616C75652E
 		Shared Function ValueToString(v As Variant) As String
 		  /// Returns a string representation of a VM value.
-		  
-		  #Pragma Warning "TODO: Support instances"
 		  
 		  Select Case v.Type
 		  Case Variant.TypeDouble
@@ -1322,9 +1324,6 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_TRUE, Type = Double, Dynamic = False, Default = \"16", Scope = Public
-	#tag EndConstant
-
-	#tag Constant, Name = STRING_COMPARISON_RESPECTS_CASE, Type = Boolean, Dynamic = False, Default = \"False", Scope = Public, Description = 54686520636173652073656E7369746976697479206F6620737472696E6720636F6D70617269736F6E73207768656E207573696E672074686520603D3D60206F70657261746F722E
 	#tag EndConstant
 
 	#tag Constant, Name = TRACE_EXECUTION, Type = Boolean, Dynamic = False, Default = \"False", Scope = Public, Description = 496620547275652028616E6420746869732069732061206465627567206275696C6429207468656E2074686520564D2077696C6C206F757470757420646562756720696E666F726D6174696F6E20746F207468652073797374656D206465627567206C6F672E204E6F2065666665637420696E20636F6D70696C656420617070732E

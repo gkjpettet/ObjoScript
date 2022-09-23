@@ -2,10 +2,11 @@
 Protected Class VMException
 Inherits RuntimeException
 	#tag Method, Flags = &h0
-		Sub Constructor(message As String, lineNumber As Integer, scriptID As Integer = -1)
+		Sub Constructor(message As String, lineNumber As Integer, stackTrace() As String, scriptID As Integer = -1)
 		  Super.Constructor(message)
 		  
 		  Self.LineNumber = lineNumber
+		  Self.VMStackTrace = stackTrace
 		  Self.ScriptID = scriptID
 		  
 		End Sub
@@ -18,6 +19,10 @@ Inherits RuntimeException
 
 	#tag Property, Flags = &h0, Description = 546865204944206F6620746865207363726970742074726967676572696E67207468697320564D20657863657074696F6E2E
 		ScriptID As Integer = 0
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 4120727564696D656E746172792074726163696E67206F662074686520737461636B20617420746865206D6F6D656E74207468652072756E74696D65206572726F72206F636375727265642E
+		VMStackTrace() As String
 	#tag EndProperty
 
 
@@ -82,7 +87,15 @@ Inherits RuntimeException
 			Name="LineNumber"
 			Visible=false
 			Group="Behavior"
-			InitialValue=""
+			InitialValue="0"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="ScriptID"
+			Visible=false
+			Group="Behavior"
+			InitialValue="0"
 			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty
