@@ -496,7 +496,7 @@ Protected Class Parser
 		  TokenTypes.EqualEqual        : BinaryOperator(Precedences.Equality), _
 		  TokenTypes.Exit_             : Unused, _
 		  TokenTypes.Export            : Unused, _
-		  TokenTypes.FieldIdentifier   : Prefix(New VariableParselet), _
+		  TokenTypes.FieldIdentifier   : Prefix(New FieldParselet), _
 		  TokenTypes.Foreign           : Unused, _
 		  TokenTypes.ForwardSlash      : BinaryOperator(Precedences.Factor), _
 		  TokenTypes.ForwardSlashEqual : Unused, _

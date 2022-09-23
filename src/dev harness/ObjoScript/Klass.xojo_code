@@ -4,8 +4,8 @@ Implements ObjoScript.Value
 	#tag Method, Flags = &h0
 		Sub Constructor(name As String)
 		  Self.Name = name
-		  Self.Methods = New Dictionary
-		  Self.Setters = New Dictionary
+		  Self.Methods = ParseJSON("{}") // HACK: Case sensitive.
+		  Self.Setters = ParseJSON("{}") // HACK: Case sensitive.
 		  
 		End Sub
 	#tag EndMethod
@@ -104,7 +104,7 @@ Implements ObjoScript.Value
 			Visible=false
 			Group="Behavior"
 			InitialValue=""
-			Type="Integer"
+			Type="String"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

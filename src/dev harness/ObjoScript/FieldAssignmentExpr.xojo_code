@@ -1,11 +1,11 @@
 #tag Class
-Protected Class AssignmentExpr
+Protected Class FieldAssignmentExpr
 Implements ObjoScript.Expr
 	#tag Method, Flags = &h0
 		Function Accept(visitor As ObjoScript.ExprVisitor) As Variant
 		  /// Part of the ObjoScript.Expr interface.
 		  
-		  Return visitor.VisitAssignment(Self)
+		  Return visitor.VisitFieldAssignment(Self)
 		End Function
 	#tag EndMethod
 
@@ -17,9 +17,9 @@ Implements ObjoScript.Expr
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 546865207661726961626C652773206964656E74696669657220746F6B656E2E
+	#tag Method, Flags = &h0, Description = 546865206669656C642773206964656E74696669657220746F6B656E2E
 		Function Location() As ObjoScript.Token
-		  /// The variable's identifier token.
+		  /// The field's identifier token.
 		  ///
 		  /// Part of the ObjoScript.Expr interface.
 		  
@@ -28,11 +28,11 @@ Implements ObjoScript.Expr
 	#tag EndMethod
 
 
-	#tag Property, Flags = &h21, Description = 546865207661726961626C652773206964656E74696669657220746F6B656E2E
+	#tag Property, Flags = &h21, Description = 546865206669656C642773206964656E74696669657220746F6B656E2E
 		Private mIdentifier As ObjoScript.Token
 	#tag EndProperty
 
-	#tag ComputedProperty, Flags = &h0, Description = 546865206E616D65206F6620746865207661726961626C6520746F2061737369676E20746F2E
+	#tag ComputedProperty, Flags = &h0, Description = 546865206E616D65206F6620746865206669656C6420746F2061737369676E20746F2E
 		#tag Getter
 			Get
 			  Return mIdentifier.Lexeme
@@ -41,7 +41,7 @@ Implements ObjoScript.Expr
 		Name As String
 	#tag EndComputedProperty
 
-	#tag Property, Flags = &h0, Description = 5468652065787072657373696F6E20746F2061737369676E20746F2074686973207661726961626C652E
+	#tag Property, Flags = &h0, Description = 5468652065787072657373696F6E20746F2061737369676E20746F2074686973206669656C642E
 		Value As ObjoScript.Expr
 	#tag EndProperty
 

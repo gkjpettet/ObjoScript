@@ -172,6 +172,28 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitField(expr As ObjoScript.FieldExpr) As Variant
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  Return New TreeViewNode("Field: " + expr.Name)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5669736974696E672061206669656C642061737369676E6D656E742E
+		Function VisitFieldAssignment(expr As ObjoScript.FieldAssignmentExpr) As Variant
+		  /// Visiting a field assignment.
+		  
+		  Var node As New TreeViewNode("Assign to field `" + expr.Name + "`")
+		  
+		  node.AppendNode(expr.Value.Accept(Self))
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitForStmt(stmt As ObjoScript.ForStmt) As Variant
 		  Var node As New TreeViewNode("For Loop")
 		  

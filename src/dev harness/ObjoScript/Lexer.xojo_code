@@ -364,6 +364,52 @@ Protected Class Lexer
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 496E697469616C697365732074686520726573657276656420776F7264732064696374696F6E6172792E204B6579203D206B6579776F72642028636173652073656E736974697665292C2056616C7565203D204F626A6F5363726970742E546F6B656E547970657329
+		Private Shared Function InitialiseReservedWords() As Dictionary
+		  /// Initialises the reserved words dictionary.
+		  /// Key = keyword (case sensitive), Value = ObjoScript.TokenTypes)
+		  
+		  // HACK Create a case sensitive dictionary.
+		  Var d As Dictionary = ParseJSON("{}")
+		  
+		  d.Value("and")        = ObjoScript.TokenTypes.And_
+		  d.Value("as")         = ObjoScript.TokenTypes.As_
+		  d.Value("assert")     = ObjoScript.TokenTypes.Assert
+		  d.Value("breakpoint") = ObjoScript.TokenTypes.Breakpoint
+		  d.Value("class")      = ObjoScript.TokenTypes.Class_
+		  d.Value("continue")   = ObjoScript.TokenTypes.Continue_
+		  d.Value("construct")  = ObjoScript.TokenTypes.Construct
+		  d.Value("else")       = ObjoScript.TokenTypes.Else_
+		  d.Value("exit")       = ObjoScript.TokenTypes.Exit_
+		  d.Value("export")     = ObjoScript.TokenTypes.Export
+		  d.Value("false")      = ObjoScript.TokenTypes.Boolean_
+		  d.Value("for")        = ObjoScript.TokenTypes.For_
+		  d.Value("foreach")    = ObjoScript.TokenTypes.ForEach
+		  d.Value("foreign")    = ObjoScript.TokenTypes.Foreign
+		  d.Value("function")   = ObjoScript.TokenTypes.Function_
+		  d.Value("if")         = ObjoScript.TokenTypes.If_
+		  d.Value("import")     = ObjoScript.TokenTypes.Import
+		  d.Value("in")         = ObjoScript.TokenTypes.In_
+		  d.Value("is")         = ObjoScript.TokenTypes.Is_
+		  d.Value("not")        = ObjoScript.TokenTypes.Not_
+		  d.Value("nothing")    = ObjoScript.TokenTypes.Nothing
+		  d.Value("or")         = ObjoScript.TokenTypes.Or_
+		  d.Value("print")      = ObjoScript.TokenTypes.Print
+		  d.Value("return")     = ObjoScript.TokenTypes.Return_
+		  d.Value("static")     = ObjoScript.TokenTypes.Static_
+		  d.Value("then")       = ObjoScript.TokenTypes.Then_
+		  d.Value("this")       = ObjoScript.TokenTypes.This
+		  d.Value("true")       = ObjoScript.TokenTypes.Boolean_
+		  d.Value("var")        = ObjoScript.TokenTypes.Var_
+		  d.Value("while")      = ObjoScript.TokenTypes.While_
+		  d.Value("xor")        =  ObjoScript.TokenTypes.Xor_
+		  
+		  Return d
+		  
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060636020697320636F6E7369646572656420616C7068616E756D657269632E
 		Private Function IsAlpha(c As String) As Boolean
 		  /// Returns True if `c` is considered alphanumeric.
@@ -883,41 +929,10 @@ Protected Class Lexer
 			  /// and "nothing" mapped to their token type.
 			  /// Key = keyword string, value = ObjoScript.TokenTypes.
 			  
-			  Static d As New Dictionary(_
-			  "and"        : ObjoScript.TokenTypes.And_, _
-			  "as"         : ObjoScript.TokenTypes.As_, _
-			  "assert"     : ObjoScript.TokenTypes.Assert, _
-			  "breakpoint" : ObjoScript.TokenTypes.Breakpoint, _
-			  "class"      : ObjoScript.TokenTypes.Class_, _
-			    "continue"   : ObjoScript.TokenTypes.Continue_, _
-			    "construct"  : ObjoScript.TokenTypes.Construct, _
-			    "else"       : ObjoScript.TokenTypes.Else_, _
-			      "exit"       : ObjoScript.TokenTypes.Exit_, _
-			      "export"     : ObjoScript.TokenTypes.Export, _
-			      "false"      : ObjoScript.TokenTypes.Boolean_, _
-			      "for"        : ObjoScript.TokenTypes.For_, _
-			        "foreach"    : ObjoScript.TokenTypes.ForEach, _
-			        "foreign"    : ObjoScript.TokenTypes.Foreign, _
-			        "function"   : ObjoScript.TokenTypes.Function_, _
-			          "if"         : ObjoScript.TokenTypes.If_, _
-			            "import"     : ObjoScript.TokenTypes.Import, _
-			            "in"         : ObjoScript.TokenTypes.In_, _
-			            "is"         : ObjoScript.TokenTypes.Is_, _
-			            "not"        : ObjoScript.TokenTypes.Not_, _
-			            "nothing"    : ObjoScript.TokenTypes.Nothing, _
-			            "or"         : ObjoScript.TokenTypes.Or_, _
-			            "print"      : ObjoScript.TokenTypes.Print, _
-			            "return"     : ObjoScript.TokenTypes.Return_, _
-			            "static"     : ObjoScript.TokenTypes.Static_, _
-			            "then"       : ObjoScript.TokenTypes.Then_, _
-			            "this"       : ObjoScript.TokenTypes.This, _
-			            "true"       : ObjoScript.TokenTypes.Boolean_, _
-			            "var"        : ObjoScript.TokenTypes.Var_, _
-			            "while"      : ObjoScript.TokenTypes.While_, _
-			              "xor"        : ObjoScript.TokenTypes.Xor_)
-			              
-			              Return d
-			              
+			  Static d As Dictionary = InitialiseReservedWords
+			  
+			  Return d
+			  
 			End Get
 		#tag EndGetter
 		Shared ReservedWords As Dictionary

@@ -5,22 +5,13 @@ Protected Class ValueSet
 		  /// Adds `v` to the set. Returns the index in the set that `v` occupies.  
 		  /// Case *sensitive* for string variants.
 		  
-		  Var hash As Integer
-		  If v IsA ObjoScript.Value Then
-		    hash = ObjoScript.Value(v).Hash
-		  ElseIf v.Type = Variant.TypeString Then
-		    hash = EncodeHex(v).Hash
-		  Else
-		    hash = v.Hash
-		  End If
-		  
-		  If mLookupTable.HasKey(hash) Then
+		  If mLookupTable.HasKey(v) Then
 		    // Already in the set. Return the index.
-		    Return mLookupTable.Value(hash)
+		    Return mLookupTable.Value(v)
 		  Else
 		    // Add the value.
 		    mItems.Add(v)
-		    mLookupTable.Value(hash) = mItems.LastIndex
+		    mLookupTable.Value(v) = mItems.LastIndex
 		    Return mItems.LastIndex
 		  End If
 		  
@@ -29,7 +20,8 @@ Protected Class ValueSet
 
 	#tag Method, Flags = &h0
 		Sub Constructor()
-		  mLookupTable = New Dictionary
+		  // HACK: Creates a case-sensitive dictionary.
+		  mLookupTable = ParseJSON("{}")
 		  
 		End Sub
 	#tag EndMethod
@@ -38,13 +30,7 @@ Protected Class ValueSet
 		Function Contains(v As Variant) As Boolean
 		  /// Returns `True` if `v` is in this set.
 		  
-		  If v IsA ObjoScript.Value Then
-		    Return mLookupTable.HasKey(ObjoScript.Value(v).Hash)
-		  ElseIf v.Type = Variant.TypeString Then
-		    Return mLookupTable.HasKey(EncodeHex(v).Hash)
-		  Else
-		    Return mLookupTable.HasKey(v.Hash)
-		  End If
+		  Return mLookupTable.HasKey(v)
 		  
 		End Function
 	#tag EndMethod
@@ -53,14 +39,7 @@ Protected Class ValueSet
 		Function IndexOf(v As Variant) As Integer
 		  /// Returns the index in the set of `v` or `-1` if `v` is not in the set.
 		  
-		  If v IsA ObjoScript.Value Then
-		    Return mLookupTable.Lookup(ObjoScript.Value(v).Hash, -1)
-		  ElseIf v.Type = Variant.TypeString Then
-		    Return mLookupTable.Lookup(EncodeHex(v).Hash, -1)
-		  Else
-		    Return mLookupTable.Lookup(v.Hash, -1)
-		  End If
-		  
+		  Return mLookupTable.Lookup(v, -1)
 		End Function
 	#tag EndMethod
 
@@ -85,15 +64,7 @@ Protected Class ValueSet
 		  Var item As Variant
 		  For i As Integer = 0 To iLimit
 		    item = mItems(i)
-		    If item IsA ObjoScript.Value Then
-		      mLookupTable.Value(ObjoScript.Value(item).Hash) = i
-		      
-		    ElseIf item.Type = Variant.TypeString Then
-		      mLookupTable.Value(EncodeHex(item).Hash) = i
-		      
-		    Else
-		      mLookupTable.Value(item.Hash) = i
-		    End If
+		    mLookupTable.Value(item) = i
 		  Next i
 		  
 		End Sub
@@ -105,21 +76,10 @@ Protected Class ValueSet
 		  ///
 		  /// If `v` was removed, there is a performance penalty as we have to re-index the `mItems` array for the lookup table.
 		  
-		  Var hash As Integer
-		  If v IsA ObjoScript.Value Then
-		    hash = ObjoScript.Value(v).Hash
-		    
-		  ElseIf v.Type = Variant.TypeString Then
-		    hash = EncodeHex(v).Hash
-		    
-		  Else
-		    hash = v.Hash
-		  End If
-		  
-		  If Not mLookupTable.HasKey(hash) Then
+		  If Not mLookupTable.HasKey(v) Then
 		    Return False
 		  Else
-		    mItems.RemoveAt(mLookupTable.Value(hash))
+		    mItems.RemoveAt(mLookupTable.Value(v))
 		    RebuildLookupTable
 		    Return True
 		  End If

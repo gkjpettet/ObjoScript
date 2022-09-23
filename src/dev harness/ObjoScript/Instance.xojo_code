@@ -5,7 +5,7 @@ Implements ObjoScript.Value
 		Sub Constructor(klass As ObjoScript.Klass)
 		  Self.Klass = klass
 		  mName = Self.Klass.Name + " instance"
-		  Self.Fields = New Dictionary
+		  Self.Fields = ParseJSON("{}") // HACK: Case sensitive.
 		  
 		End Sub
 	#tag EndMethod

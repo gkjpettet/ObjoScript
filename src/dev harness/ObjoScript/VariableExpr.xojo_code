@@ -16,26 +16,16 @@ Implements ObjoScript.Expr
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 546865207661726961626C65206F72206669656C64206964656E74696669657220746F6B656E20697473656C662E
+	#tag Method, Flags = &h0, Description = 546865207661726961626C65206964656E74696669657220746F6B656E20697473656C662E
 		Function Location() As ObjoScript.Token
-		  /// The variable or field identifier token itself.
+		  /// The variable identifier token itself.
 		  
 		  Return mIdentifier
 		End Function
 	#tag EndMethod
 
 
-	#tag ComputedProperty, Flags = &h0, Description = 5472756520696620746869732069732061206669656C64206C6F6F6B75702E
-		#tag Getter
-			Get
-			  Return mIdentifier.Type = ObjoScript.TokenTypes.FieldIdentifier
-			  
-			End Get
-		#tag EndGetter
-		IsField As Boolean
-	#tag EndComputedProperty
-
-	#tag Property, Flags = &h21, Description = 546865207661726961626C65206F72206669656C64206964656E74696669657220746F6B656E20697473656C662E
+	#tag Property, Flags = &h21, Description = 546865207661726961626C65206964656E74696669657220746F6B656E20697473656C662E
 		Private mIdentifier As ObjoScript.Token
 	#tag EndProperty
 

@@ -1,38 +1,35 @@
 #tag Class
-Protected Class AssignmentExpr
+Protected Class FieldExpr
 Implements ObjoScript.Expr
 	#tag Method, Flags = &h0
 		Function Accept(visitor As ObjoScript.ExprVisitor) As Variant
-		  /// Part of the ObjoScript.Expr interface.
+		  /// Part of the ExprVisitor interface.
 		  
-		  Return visitor.VisitAssignment(Self)
+		  Return visitor.VisitField(Self)
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(identifier As ObjoScript.Token, value As ObjoScript.Expr)
+		Sub Constructor(identifier As ObjoScript.Token)
 		  mIdentifier = identifier
-		  Self.Value = value
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 546865207661726961626C652773206964656E74696669657220746F6B656E2E
+	#tag Method, Flags = &h0, Description = 546865206669656C64206964656E74696669657220746F6B656E20697473656C662E
 		Function Location() As ObjoScript.Token
-		  /// The variable's identifier token.
-		  ///
-		  /// Part of the ObjoScript.Expr interface.
+		  /// The field identifier token itself.
 		  
 		  Return mIdentifier
 		End Function
 	#tag EndMethod
 
 
-	#tag Property, Flags = &h21, Description = 546865207661726961626C652773206964656E74696669657220746F6B656E2E
+	#tag Property, Flags = &h21, Description = 546865206669656C64206964656E74696669657220746F6B656E20697473656C662E
 		Private mIdentifier As ObjoScript.Token
 	#tag EndProperty
 
-	#tag ComputedProperty, Flags = &h0, Description = 546865206E616D65206F6620746865207661726961626C6520746F2061737369676E20746F2E
+	#tag ComputedProperty, Flags = &h0, Description = 546865206669656C642773206E616D652E
 		#tag Getter
 			Get
 			  Return mIdentifier.Lexeme
@@ -41,20 +38,8 @@ Implements ObjoScript.Expr
 		Name As String
 	#tag EndComputedProperty
 
-	#tag Property, Flags = &h0, Description = 5468652065787072657373696F6E20746F2061737369676E20746F2074686973207661726961626C652E
-		Value As ObjoScript.Expr
-	#tag EndProperty
-
 
 	#tag ViewBehavior
-		#tag ViewProperty
-			Name="Name"
-			Visible=true
-			Group="ID"
-			InitialValue=""
-			Type="String"
-			EditorType=""
-		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Index"
 			Visible=true
@@ -85,6 +70,14 @@ Implements ObjoScript.Expr
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Name"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="String"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

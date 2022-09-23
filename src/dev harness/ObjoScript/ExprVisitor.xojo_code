@@ -30,6 +30,18 @@ Protected Interface ExprVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E672061206669656C642E20546869732069732061206C6F6F6B7570206F7065726174696F6E2E
+		Function VisitField(expr As ObjoScript.FieldExpr) As Variant
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E672061206669656C642061737369676E6D656E742E
+		Function VisitFieldAssignment(expr As ObjoScript.FieldAssignmentExpr) As Variant
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E672061206E6F7468696E67206C69746572616C2E
 		Function VisitNothing(expr As ObjoScript.NothingLiteral) As Variant
 		  

@@ -412,8 +412,7 @@ Protected Class VM
 		  Next i
 		  
 		  Nothing = New ObjoScript.Nothing
-		  Self.Globals = New Dictionary
-		  
+		  Self.Globals = ParseJSON("{}") // HACK: Case sensitive.
 		End Sub
 	#tag EndMethod
 
@@ -814,24 +813,25 @@ Protected Class VM
 		  /// | Instance        <-- the instance that should have the field named `name`.
 		  /// |
 		  
-		  // Check we have an instance in the correct place.
+		  #Pragma Warning "BUG: `this` is not where I think it is"
+		  ' It's lower down the stack than Peek(1) as it's displaced by the arguments to the method call it's in.
+		  ' Check using StackBase is correct. I think it is because field can only occur within a method and I think
+		  ' the method always ensures that the instance is at StackBase.
+		  
 		  Var instance As ObjoScript.Instance
-		  If Peek(1) IsA ObjoScript.Instance Then
-		    instance = Peek(1)
+		  If Stack(CurrentFrame.StackBase) IsA ObjoScript.Instance Then
+		    instance = Stack(CurrentFrame.StackBase)
 		  Else
 		    Error("Only instances have fields.")
 		  End If
 		  
-		  If instance.Fields.HasKey(name) = False Then
-		    Error("There is no field named `" + name + "` on " + instance.ToString + ".")
-		  End If
-		  
 		  // Set the field to the value on the top of the stack and pop it off.
+		  // If the field has never been assigned to before it is created.
 		  Var value As Variant = Pop
 		  instance.Fields.Value(name) = value
 		  
-		  // Pop the instance off the stack.
-		  Call Pop
+		  ' // Pop the instance off the stack.
+		  ' Call Pop
 		  
 		  // Push the value back on the stack (since this is an expression).
 		  Push(value)
@@ -1327,7 +1327,7 @@ Protected Class VM
 	#tag Constant, Name = STRING_COMPARISON_RESPECTS_CASE, Type = Boolean, Dynamic = False, Default = \"False", Scope = Public, Description = 54686520636173652073656E7369746976697479206F6620737472696E6720636F6D70617269736F6E73207768656E207573696E672074686520603D3D60206F70657261746F722E
 	#tag EndConstant
 
-	#tag Constant, Name = TRACE_EXECUTION, Type = Boolean, Dynamic = False, Default = \"True", Scope = Public, Description = 496620547275652028616E6420746869732069732061206465627567206275696C6429207468656E2074686520564D2077696C6C206F757470757420646562756720696E666F726D6174696F6E20746F207468652073797374656D206465627567206C6F672E204E6F2065666665637420696E20636F6D70696C656420617070732E
+	#tag Constant, Name = TRACE_EXECUTION, Type = Boolean, Dynamic = False, Default = \"False", Scope = Public, Description = 496620547275652028616E6420746869732069732061206465627567206275696C6429207468656E2074686520564D2077696C6C206F757470757420646562756720696E666F726D6174696F6E20746F207468652073797374656D206465627567206C6F672E204E6F2065666665637420696E20636F6D70696C656420617070732E
 	#tag EndConstant
 
 
