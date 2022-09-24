@@ -125,6 +125,38 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitConstructorDeclaration(c As ObjoScript.ConstructorDeclStmt) As Variant
+		  Var node As New TreeViewNode("Constructor")
+		  
+		  node.AppendNode(New TreeViewNode("Class: " + c.ClassName))
+		  
+		  // Parameters.
+		  Var paramsNode As TreeViewNode
+		  If c.Parameters.Count = 0 Then
+		    paramsNode = New TreeViewNode("No parameters")
+		  Else
+		    Var params As String
+		    For i As Integer = 0 To c.Parameters.LastIndex
+		      params = params + c.Parameters(i).Lexeme
+		      If i < c.Parameters.LastIndex Then
+		        params = params + ", "
+		      End If
+		    Next i
+		    paramsNode = New TreeViewNode("Parameters: " + params)
+		  End If
+		  node.AppendNode(paramsNode)
+		  
+		  // Body.
+		  Var bodyNode As TreeViewNode = c.Body.Accept(Self)
+		  bodyNode.Text = "Body"
+		  node.AppendNode(bodyNode)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitContinueStmt(stmt As ObjoScript.ContinueStmt) As Variant
 		  #Pragma Unused stmt
 		  

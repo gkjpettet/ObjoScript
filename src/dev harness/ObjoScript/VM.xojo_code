@@ -67,9 +67,17 @@ Protected Class VM
 		Private Sub CallClass(klass As ObjoScript.Klass, argCount As Integer)
 		  /// "Calls" a class. Essentially this creates a new instance.
 		  
-		  #Pragma Warning "TODO: Don't ignore the argCount. Required for initialisers"
-		  
 		  Stack(StackTop - argCount - 1) = New ObjoScript.Instance(klass)
+		  
+		  // Invoke the constructor (if defined). 
+		  // We allow a class to omit providing a default (zero parameter) constructor.
+		  Var constructor As ObjoScript.Func = klass.Constructors.Lookup(argCount, Nil)
+		  If constructor <> Nil Then
+		    CallFunction(constructor, argCount)
+		  ElseIf argCount <> 0 Then
+		    Error("The default `" + klass.Name + "` constructor expected 0 arguments but got " + argCount.ToString + ".")
+		  End If
+		  
 		End Sub
 	#tag EndMethod
 
@@ -164,9 +172,28 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 446566696E65732061206D6574686F64206E616D656420606E616D6560206F6E2074686520636C617373206F6E2074686520746F70206F662074686520737461636B2E
+	#tag Method, Flags = &h21, Description = 446566696E6573206120636F6E7374727563746F72206F6E2074686520636C617373206A7573742062656C6F772074686520636F6E7374727563746F72277320626F6479206F6E2074686520737461636B2E
+		Private Sub DefineConstructor(arity As Integer)
+		  /// Defines a constructor on the class just below the constructor's body on the stack.
+		  ///
+		  /// The constructor's body should be on the top of the stack with its class just beneath it.
+		  /// Since the compiler guarantees that there will never be two constructors with the same arity, 
+		  /// we use the constructor's arity as the key in the class' `Constructor` dictonary to store it.
+		  
+		  Var constructor As ObjoScript.Func = Peek(0)
+		  Var klass As ObjoScript.Klass = Peek(1)
+		  
+		  klass.Constructors.Value(arity) = constructor
+		  
+		  // Pop the constructor's body off the stack.
+		  Call Pop
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 446566696E65732061206D6574686F64206E616D656420606E616D6560206F6E2074686520636C617373206A7573742062656C6F7720746865206D6574686F64277320626F6479206F6E2074686520737461636B2E
 		Private Sub DefineMethod(name As String, setter As UInt8)
-		  /// Defines a method named `name` on the class just below the method's body on the stack/
+		  /// Defines a method named `name` on the class just below the method's body on the stack.
 		  ///
 		  /// The method's body should be on the top of the stack with its class just beneath it.
 		  /// This is a setter method if setter = 1, otherwise it's a regular method.
@@ -248,8 +275,14 @@ Protected Class VM
 		  /// Retrieves the value of a field named `name` on the instance currently on the top of the 
 		  /// stack and then pushes it on to the top of the stack.
 		  
-		  // Get the instance off the top of the stack.
-		  Var instance As ObjoScript.Instance = Peek(0)
+		  // Since fields can only be retrieved from within a method we can safely assume that `this` should be in the 
+		  // method callframe's slot 0 (it should have been placed there by `CallValue()`).
+		  Var instance As ObjoScript.Instance
+		  If Stack(CurrentFrame.StackBase) IsA ObjoScript.Instance Then
+		    instance = Stack(CurrentFrame.StackBase)
+		  Else
+		    Error("Only instances have fields.")
+		  End If
 		  
 		  // Get the value of the field from the instance.
 		  Var value As Variant = instance.Fields.Lookup(name, Nil)
@@ -257,9 +290,6 @@ Protected Class VM
 		  If value = Nil Then
 		    Error("Undefined field `" + name + "` on class `" + instance.Klass.Name + "`.")
 		  End If
-		  
-		  // Pop the instance off the top of the stack.
-		  Call Pop
 		  
 		  // Push the value on to the stack.
 		  Push(value)
@@ -782,18 +812,13 @@ Protected Class VM
 		      GetField(ReadConstantLong)
 		      
 		    Case OP_SET_FIELD
-		      ' System.DebugLog("=============")
-		      ' RemoveHandler Disassembler.Print, AddressOf DisassemblerPrintDelegate
-		      ' RemoveHandler Disassembler.PrintLine, AddressOf DisassemblerPrintLineDelegate
-		      ' Var dis As New ObjoScript.Disassembler
-		      ' AddHandler dis.Print, AddressOf DisassemblerPrintDelegate
-		      ' AddHandler dis.PrintLine, AddressOf DisassemblerPrintLineDelegate
-		      ' Call dis.Disassemble(CurrentFrame.Func.Chunk, CurrentFrame.Func.Name)
-		      
 		      SetField(ReadConstant)
 		      
 		    Case OP_SET_FIELD_LONG
 		      SetField(ReadConstantLong)
+		      
+		    Case OP_CONSTRUCTOR
+		      DefineConstructor(ReadByte)
 		      
 		    End Select
 		  Wend
@@ -1040,6 +1065,7 @@ Protected Class VM
 		57: OP_GET_FIELD_LONG
 		58: OP_SET_FIELD
 		59: OP_SET_FIELD_LONG
+		60: OP_CONSTRUCTOR
 	#tag EndNote
 
 
@@ -1174,6 +1200,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_CONSTANT_LONG, Type = Double, Dynamic = False, Default = \"2", Scope = Public, Description = 5468652061646420636F6E7374616E74202831362D62697429206F70636F64652E
+	#tag EndConstant
+
+	#tag Constant, Name = OP_CONSTRUCTOR, Type = Double, Dynamic = False, Default = \"60", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_DEFINE_GLOBAL, Type = Double, Dynamic = False, Default = \"30", Scope = Public

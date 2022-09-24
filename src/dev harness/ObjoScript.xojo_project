@@ -79,6 +79,7 @@ Class=DotExpr;ObjoScript/DotExpr.xojo_code;&h000000000AFF9FFF;&h000000004D1497FF
 Class=BoundMethod;ObjoScript/BoundMethod.xojo_code;&h0000000053FE17FF;&h000000004D1497FF;false
 Class=ThisParselet;ObjoScript/ThisParselet.xojo_code;&h0000000026AF7FFF;&h000000004D1497FF;false
 Class=ThisExpr;ObjoScript/ThisExpr.xojo_code;&h00000000350F67FF;&h000000004D1497FF;false
+Class=ConstructorDeclStmt;ObjoScript/ConstructorDeclStmt.xojo_code;&h000000006B748FFF;&h000000004D1497FF;false
 DefaultWindow=WindowTest
 AppMenuBar=MainMenuBar
 MajorVersion=1

@@ -99,6 +99,8 @@ Protected Class Lexer
 		  Select Case type
 		  Case ObjoScript.TokenTypes.Identifier, ObjoScript.TokenTypes.Boolean_
 		    mTokens.Add(MakeToken(type, lexeme))
+		  Case ObjoScript.TokenTypes.This
+		    mTokens.Add(MakeToken(type, "this"))
 		  Else
 		    mTokens.Add(MakeToken(type))
 		  End Select
@@ -372,40 +374,39 @@ Protected Class Lexer
 		  // HACK Create a case sensitive dictionary.
 		  Var d As Dictionary = ParseJSON("{}")
 		  
-		  d.Value("and")        = ObjoScript.TokenTypes.And_
-		  d.Value("as")         = ObjoScript.TokenTypes.As_
-		  d.Value("assert")     = ObjoScript.TokenTypes.Assert
-		  d.Value("breakpoint") = ObjoScript.TokenTypes.Breakpoint
-		  d.Value("class")      = ObjoScript.TokenTypes.Class_
-		  d.Value("continue")   = ObjoScript.TokenTypes.Continue_
-		  d.Value("construct")  = ObjoScript.TokenTypes.Construct
-		  d.Value("else")       = ObjoScript.TokenTypes.Else_
-		  d.Value("exit")       = ObjoScript.TokenTypes.Exit_
-		  d.Value("export")     = ObjoScript.TokenTypes.Export
-		  d.Value("false")      = ObjoScript.TokenTypes.Boolean_
-		  d.Value("for")        = ObjoScript.TokenTypes.For_
-		  d.Value("foreach")    = ObjoScript.TokenTypes.ForEach
-		  d.Value("foreign")    = ObjoScript.TokenTypes.Foreign
-		  d.Value("function")   = ObjoScript.TokenTypes.Function_
-		  d.Value("if")         = ObjoScript.TokenTypes.If_
-		  d.Value("import")     = ObjoScript.TokenTypes.Import
-		  d.Value("in")         = ObjoScript.TokenTypes.In_
-		  d.Value("is")         = ObjoScript.TokenTypes.Is_
-		  d.Value("not")        = ObjoScript.TokenTypes.Not_
-		  d.Value("nothing")    = ObjoScript.TokenTypes.Nothing
-		  d.Value("or")         = ObjoScript.TokenTypes.Or_
-		  d.Value("print")      = ObjoScript.TokenTypes.Print
-		  d.Value("return")     = ObjoScript.TokenTypes.Return_
-		  d.Value("static")     = ObjoScript.TokenTypes.Static_
-		  d.Value("then")       = ObjoScript.TokenTypes.Then_
-		  d.Value("this")       = ObjoScript.TokenTypes.This
-		  d.Value("true")       = ObjoScript.TokenTypes.Boolean_
-		  d.Value("var")        = ObjoScript.TokenTypes.Var_
-		  d.Value("while")      = ObjoScript.TokenTypes.While_
-		  d.Value("xor")        =  ObjoScript.TokenTypes.Xor_
+		  d.Value("and")         = ObjoScript.TokenTypes.And_
+		  d.Value("as")          = ObjoScript.TokenTypes.As_
+		  d.Value("assert")      = ObjoScript.TokenTypes.Assert
+		  d.Value("breakpoint")  = ObjoScript.TokenTypes.Breakpoint
+		  d.Value("class")       = ObjoScript.TokenTypes.Class_
+		  d.Value("continue")    = ObjoScript.TokenTypes.Continue_
+		  d.Value("constructor") = ObjoScript.TokenTypes.Constructor
+		  d.Value("else")        = ObjoScript.TokenTypes.Else_
+		  d.Value("exit")        = ObjoScript.TokenTypes.Exit_
+		  d.Value("export")      = ObjoScript.TokenTypes.Export
+		  d.Value("false")       = ObjoScript.TokenTypes.Boolean_
+		  d.Value("for")         = ObjoScript.TokenTypes.For_
+		  d.Value("foreach")     = ObjoScript.TokenTypes.ForEach
+		  d.Value("foreign")     = ObjoScript.TokenTypes.Foreign
+		  d.Value("function")    = ObjoScript.TokenTypes.Function_
+		  d.Value("if")          = ObjoScript.TokenTypes.If_
+		  d.Value("import")      = ObjoScript.TokenTypes.Import
+		  d.Value("in")          = ObjoScript.TokenTypes.In_
+		  d.Value("is")          = ObjoScript.TokenTypes.Is_
+		  d.Value("not")         = ObjoScript.TokenTypes.Not_
+		  d.Value("nothing")     = ObjoScript.TokenTypes.Nothing
+		  d.Value("or")          = ObjoScript.TokenTypes.Or_
+		  d.Value("print")       = ObjoScript.TokenTypes.Print
+		  d.Value("return")      = ObjoScript.TokenTypes.Return_
+		  d.Value("static")      = ObjoScript.TokenTypes.Static_
+		  d.Value("then")        = ObjoScript.TokenTypes.Then_
+		  d.Value("this")        = ObjoScript.TokenTypes.This
+		  d.Value("true")        = ObjoScript.TokenTypes.Boolean_
+		  d.Value("var")         = ObjoScript.TokenTypes.Var_
+		  d.Value("while")       = ObjoScript.TokenTypes.While_
+		  d.Value("xor")         =  ObjoScript.TokenTypes.Xor_
 		  
 		  Return d
-		  
 		  
 		End Function
 	#tag EndMethod

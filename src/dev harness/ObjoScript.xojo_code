@@ -94,8 +94,8 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.Continue_
 		    Return "continue"
 		    
-		  Case ObjoScript.TokenTypes.Construct
-		    Return "construct"
+		  Case ObjoScript.TokenTypes.Constructor
+		    Return "constructor"
 		    
 		  Case ObjoScript.TokenTypes.Dot
 		    Return "dot"
@@ -384,7 +384,8 @@ Protected Module ObjoScript
 	#tag Enum, Name = FunctionTypes, Type = Integer, Flags = &h1, Description = 54686520646966666572656E74207479706573206F662066756E6374696F6E2E
 		TopLevel
 		  Func
-		Method
+		  Method
+		Constructor
 	#tag EndEnum
 
 	#tag Enum, Name = TokenTypes, Type = Integer, Flags = &h1
@@ -398,7 +399,7 @@ Protected Module ObjoScript
 		  Class_
 		  Colon
 		  Comma
-		  Construct
+		  Constructor
 		  Continue_
 		  Dot
 		  DotDot
@@ -412,6 +413,7 @@ Protected Module ObjoScript
 		  Export
 		  FieldIdentifier
 		  For_
+		  ForEach
 		  Foreign
 		  ForwardSlash
 		  ForwardSlashEqual
@@ -449,6 +451,7 @@ Protected Module ObjoScript
 		  Return_
 		  RParen
 		  RSquare
+		  Semicolon
 		  Star
 		  StarEqual
 		  Static_
@@ -459,9 +462,7 @@ Protected Module ObjoScript
 		  Var_
 		  While_
 		  Xor_
-		  Then_
-		  ForEach
-		Semicolon
+		Then_
 	#tag EndEnum
 
 	#tag Enum, Name = ValueTypes, Type = Integer, Flags = &h1

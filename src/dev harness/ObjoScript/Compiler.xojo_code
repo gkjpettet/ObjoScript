@@ -426,7 +426,14 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Emits a return instruction, defaulting to returning Nothing on function returns.
 		  /// Defaults to the current location.
 		  
-		  EmitByte(ObjoScript.VM.OP_NOTHING, location)
+		  If Self.Type = ObjoScript.FunctionTypes.Constructor Then
+		    // Rather than return "Nothing", constructors must default to 
+		    // returning `this` which will be in slot 0 of the call frame.
+		    EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0, location)
+		  Else
+		    EmitByte(ObjoScript.VM.OP_NOTHING, location)
+		  End If
+		  
 		  EmitByte(ObjoScript.VM.OP_RETURN, location)
 		  
 		End Sub
@@ -714,7 +721,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  Locals.RemoveAll
 		  // Claim slot 0 in the stack for the VM's internal use.
-		  Var synthetic As New ObjoScript.Token(ObjoScript.TokenTypes.Identifier, 0, 1, If(Type = ObjoScript.FunctionTypes.Method, "this", ""), -1)
+		  // For methods and constructors it will be `this`.
+		  Var name As String = ""
+		  Select Case Type
+		  Case ObjoScript.FunctionTypes.Method, ObjoScript.FunctionTypes.Constructor
+		    name = "this"
+		  End Select
+		  Var synthetic As New ObjoScript.Token(ObjoScript.TokenTypes.Identifier, 0, 1, name, -1)
 		  Locals.Add(New ObjoScript.LocalVariable(synthetic, 0))
 		  
 		  CurrentLoop = Nil
@@ -999,6 +1012,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Push the class back on to the stack so the methods can find it.
 		  EmitGetGlobal(index)
 		  
+		  // Compile any constructors.
+		  For Each constructor As ObjoScript.ConstructorDeclStmt In c.Constructors
+		    Call constructor.Accept(Self)
+		  Next constructor
+		  
 		  // Compile any methods.
 		  For Each m As ObjoScript.MethodDeclStmt In c.Methods
 		    Call m.Accept(Self)
@@ -1006,6 +1024,33 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Pop the class off the stack.
 		  EmitByte(ObjoScript.VM.OP_POP)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120636C61737320636F6E7374727563746F722E
+		Function VisitConstructorDeclaration(c As ObjoScript.ConstructorDeclStmt) As Variant
+		  /// Compiles a class constructor.
+		  ///
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  /// To define a new constructor, the VM needs two things:
+		  ///  1. The function that is the method body.
+		  ///  2. The class to bind the method to.
+		  
+		  mLocation = c.Location
+		  
+		  // Compile the body.
+		  Var compiler As New ObjoScript.Compiler
+		  Var body As ObjoScript.Func = compiler.Compile(c.Signature, c.Parameters, c.Body, ObjoScript.FunctionTypes.Constructor)
+		  
+		  // Store the compiled constructor body as a constant in this function's constant pool
+		  // and push it on to the stack.
+		  Call EmitConstant(body)
+		  
+		  // Emit the "declare constructor" opcode (which one depends on the index in the constant pool).
+		  // The operand is the arity of the constructor. This will be the key in the class' `Constructors` dictionary
+		  // at runtime.
+		  EmitBytes(ObjoScript.VM.OP_CONSTRUCTOR, c.Arity, c.Location)
 		  
 		End Function
 	#tag EndMethod
@@ -1104,11 +1149,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
-		  If Self.Type <> ObjoScript.FunctionTypes.Method Then
-		    Error("Fields can only be accessed from within a method.")
+		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		    Error("Fields can only be accessed from within a method or constructor.")
 		  End If
+		  
 		  // Add the name of the field to the constant pool and get its index.
 		  Var index As Integer = AddConstant(expr.Name)
+		  
 		  // Push the field on to the stack.
 		  EmitIndexedOpcode(ObjoScript.VM.OP_GET_FIELD, ObjoScript.VM.OP_GET_FIELD_LONG, index)
 		  Return Nil
@@ -1126,8 +1173,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Evaluate the value to assign, leaving it on the top of the stack.
 		  Call expr.Value.Accept(Self)
 		  
-		  If Self.Type <> ObjoScript.FunctionTypes.Method Then
-		    Error("Fields can only be accessed from within a method.")
+		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		    Error("Fields can only be accessed from within a method or constructor.")
 		  End If
 		  
 		  // Add the name of the field to the constant pool and get its index.
@@ -1369,8 +1416,18 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = r.Location
 		  
-		  // Compile the return value.
-		  Call r.Value.Accept(Self)
+		  // Handle the return value. If none was specified then the parser will synthesis a NothingLiteral.
+		  If Self.Type = ObjoScript.FunctionTypes.Constructor Then
+		    // Constructors must always return `this` which will be at slot 0 in the call frame.
+		    If r.Value IsA ObjoScript.NothingLiteral Then
+		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		    Else
+		      Error("Can't return a value from a constructor.")
+		    End If
+		  Else
+		    // Compile the return value.
+		    Call r.Value.Accept(Self)
+		  End If
 		  
 		  EmitByte(ObjoScript.VM.OP_RETURN, r.Location)
 		  
@@ -1395,21 +1452,26 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
+		  #Pragma Warning "CHECK: Is this call to get_local correct. I think it is"
+		  
 		  mLocation = this.Location
 		  
-		  If Self.Type <> ObjoScript.FunctionTypes.Method Then
-		    Error("`this` can only be used within a method.")
+		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		    Error("`this` can only be used within a method or constructor.")
 		  End If
 		  
-		  DeclareVariable(this.Location)
+		  // `this` is always at slot 0 of the call frame.
+		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
 		  
-		  Var index As Integer = -1 // -1 is a deliberate invalid index.
-		  If ScopeDepth = 0 Then
-		    // Global variable declaration. Add the name of the variable to the constant pool and get its index.
-		    index = AddConstant(this.Location.Lexeme)
-		  End If
-		  
-		  DefineVariable(index)
+		  ' DeclareVariable(this.Location)
+		  ' 
+		  ' Var index As Integer = -1 // -1 is a deliberate invalid index.
+		  ' If ScopeDepth = 0 Then
+		  ' // Global variable declaration. Add the name of the variable to the constant pool and get its index.
+		  ' index = AddConstant(this.Location.Lexeme)
+		  ' End If
+		  ' 
+		  ' DefineVariable(index)
 		End Function
 	#tag EndMethod
 

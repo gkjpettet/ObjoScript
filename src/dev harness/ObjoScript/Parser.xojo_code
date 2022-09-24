@@ -120,16 +120,29 @@ Protected Class Parser
 		  Var classKeyword As ObjoScript.Token = Previous
 		  
 		  Var identifier As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier, "Expected a class name.")
+		  Var className As String = identifier.Lexeme
 		  
 		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the class name.")
 		  
 		  // Optional new line.
 		  Call Match(ObjoScript.TokenTypes.EOL)
 		  
-		  // Optional methods.
+		  // Optional constructors/methods.
 		  Var methods() As ObjoScript.MethodDeclStmt
+		  Var constructors(), cdecl As ObjoScript.ConstructorDeclStmt
+		  Var constructorArities As New Dictionary // Key = arity: Value = Nil
 		  While Not Check(ObjoScript.TokenTypes.RCurly, ObjoScript.TokenTypes.EOF)
-		    methods.Add(MethodDeclaration(identifier.Lexeme))
+		    If Match(ObjoScript.TokenTypes.Constructor) Then
+		      cdecl = ConstructorDeclaration(className)
+		      If constructorArities.HasKey(cdecl.Arity) Then
+		        Var s As String = If(cdecl.Arity = 1, "a single parameter", cdecl.Arity.ToString + " parameters")
+		        Error("A constructor with " + s + " has already been declared.")
+		      Else
+		        constructors.Add(cdecl)
+		      End If
+		    Else
+		      methods.Add(MethodDeclaration(className))
+		    End If
 		    
 		    // Optional new line.
 		    Call Match(ObjoScript.TokenTypes.EOL)
@@ -137,7 +150,7 @@ Protected Class Parser
 		  
 		  Consume(ObjoScript.TokenTypes.RCurly, "Expected a `}` after the class body.")
 		  
-		  Return New ObjoScript.ClassDeclStmt(identifier, methods, classKeyword)
+		  Return New ObjoScript.ClassDeclStmt(identifier, constructors, methods, classKeyword)
 		  
 		End Function
 	#tag EndMethod
@@ -147,6 +160,38 @@ Protected Class Parser
 		  InitialiseGrammar
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 506172736573206120636C61737320636F6E7374727563746F72206465636C61726174696F6E2E
+		Private Function ConstructorDeclaration(className As String) As ObjoScript.ConstructorDeclStmt
+		  /// Parses a class constructor declaration.
+		  ///
+		  /// Assumes the parser has just consumed the `constructor` keyword.
+		  /// ```
+		  /// constructor(params){}
+		  /// ```
+		  
+		  Var keyword As ObjoScript.Token = Previous
+		  
+		  Consume(ObjoScript.TokenTypes.LParen, "Expected an opening parenthesis after the `constructor` keyword.")
+		  
+		  // Optional parameters.
+		  Var params() As ObjoScript.Token
+		  If Not Check(ObjoScript.TokenTypes.RParen) Then
+		    Do
+		      params.Add(Consume(ObjoScript.TokenTypes.Identifier, "Expected parameter name."))
+		    Loop Until Not Match(ObjoScript.TokenTypes.Comma)
+		  End If
+		  
+		  Consume(ObjoScript.TokenTypes.RParen, "Expected a closing parenthesis after the constructor's parameters.")
+		  
+		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the constructor's parameters.")
+		  
+		  Var body As ObjoScript.BlockStmt = ObjoScript.BlockStmt(Block)
+		  
+		  Return New ConstructorDeclStmt(className, params, body, keyword)
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 4966207468652063757272656E7420746F6B656E206D6174636865732060657870656374656460207468656E206974277320636F6E73756D65642E204966206E6F742C20776520726169736520616E20657863657074696F6E207769746820606D657373616765602E
@@ -480,7 +525,7 @@ Protected Class Parser
 		  TokenTypes.Class_            : Unused, _
 		  TokenTypes.Colon             : Unused, _
 		  TokenTypes.Comma             : Unused, _
-		  TokenTypes.Construct         : Unused, _
+		  TokenTypes.Constructor       : Unused, _
 		  TokenTypes.Continue_         : Unused, _
 		  TokenTypes.Dot               : NewRule(Nil, New DotParselet, Precedences.Call_), _
 		  TokenTypes.DotDot            : BinaryOperator(Precedences.Range), _
@@ -497,6 +542,7 @@ Protected Class Parser
 		  TokenTypes.ForwardSlash      : BinaryOperator(Precedences.Factor), _
 		  TokenTypes.ForwardSlashEqual : Unused, _
 		  TokenTypes.For_              : Unused, _
+		  TokenTypes.ForEach           : Unused, _
 		  TokenTypes.Function_         : Unused, _
 		  TokenTypes.Greater           : BinaryOperator(Precedences.Comparison), _
 		  TokenTypes.GreaterEqual      : BinaryOperator(Precedences.Comparison), _
@@ -516,7 +562,7 @@ Protected Class Parser
 		  TokenTypes.MinusMinus        : Postfix, _
 		  TokenTypes.MinusEqual        : Unused, _
 		  TokenTypes.NotEqual          : BinaryOperator(Precedences.Equality), _
-		  TokenTypes.Nothing           : Unused, _
+		  TokenTypes.Nothing           : Prefix(New LiteralParselet), _
 		  TokenTypes.Not_              : Prefix(New UnaryParselet), _
 		  TokenTypes.Number            : Prefix(New LiteralParselet), _
 		  TokenTypes.Or_               : BinaryOperator(Precedences.LogicalOr), _

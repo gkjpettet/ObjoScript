@@ -4,6 +4,7 @@ Implements ObjoScript.Value
 	#tag Method, Flags = &h0
 		Sub Constructor(name As String)
 		  Self.Name = name
+		  Self.Constructors = New Dictionary
 		  Self.Methods = ParseJSON("{}") // HACK: Case sensitive.
 		  Self.Setters = ParseJSON("{}") // HACK: Case sensitive.
 		  
@@ -44,6 +45,10 @@ Implements ObjoScript.Value
 		End Function
 	#tag EndMethod
 
+
+	#tag Property, Flags = &h0, Description = 54686520636C61737320636F6E7374727563746F727320284B6579203D20636F6E7374727563746F722061726974792C2056616C7565203D204F626A6F5363726970742E46756E63292E
+		Constructors As Dictionary
+	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 54686520726567756C617220286E6F6E2D7365747465722920636C617373206D6574686F647320284B6579203D206D6574686F64206E616D652C2056616C7565203D204F626A6F5363726970742E46756E63292E
 		Methods As Dictionary

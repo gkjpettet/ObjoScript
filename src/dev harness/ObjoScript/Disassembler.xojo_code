@@ -351,6 +351,9 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_SET_FIELD_LONG
 		    Return ConstantInstruction(opcode, chunk, offset)
 		    
+		  Case ObjoScript.VM.OP_CONSTRUCTOR
+		    Return TwoByteInstruction("OP_CONSTRUCTOR", chunk, offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
