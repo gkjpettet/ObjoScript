@@ -454,6 +454,28 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitStaticField(expr As ObjoScript.StaticFieldExpr) As Variant
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  Return New TreeViewNode("Static field: " + expr.Name)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5669736974696E67206120737461746963206669656C642061737369676E6D656E742E
+		Function VisitStaticFieldAssignment(expr As ObjoScript.StaticFieldAssignmentExpr) As Variant
+		  /// Visiting a static field assignment.
+		  
+		  Var node As New TreeViewNode("Assign to static field `" + expr.Name + "`")
+		  
+		  node.AppendNode(expr.Value.Accept(Self))
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitString(expr As ObjoScript.StringLiteral) As Variant
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  

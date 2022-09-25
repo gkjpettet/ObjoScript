@@ -66,6 +66,18 @@ Protected Interface ExprVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E67206120737461746963206669656C642E20546869732069732061206C6F6F6B7570206F7065726174696F6E2E
+		Function VisitStaticField(expr As ObjoScript.StaticFieldExpr) As Variant
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E67206120737461746963206669656C642061737369676E6D656E742E
+		Function VisitStaticFieldAssignment(expr As ObjoScript.StaticFieldAssignmentExpr) As Variant
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E67206120737472696E67206C69746572616C2E
 		Function VisitString(expr As ObjoScript.StringLiteral) As Variant
 		  

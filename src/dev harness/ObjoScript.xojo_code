@@ -259,6 +259,9 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.Static_
 		    Return "static"
 		    
+		  Case ObjoScript.TokenTypes.StaticFieldIdentifier
+		    Return "static field identifier"
+		    
 		  Case ObjoScript.TokenTypes.String_
 		    Return "string"
 		    
@@ -458,6 +461,7 @@ Protected Module ObjoScript
 		  Star
 		  StarEqual
 		  Static_
+		  StaticFieldIdentifier
 		  String_
 		  Super_
 		  This

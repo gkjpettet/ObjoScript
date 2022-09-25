@@ -17,8 +17,12 @@ Protected Class Lexer
 		    lexeme.Add(Advance)
 		  Wend
 		  
-		  Var t As ObjoScript.Token = MakeToken(ObjoScript.TokenTypes.FieldIdentifier, String.FromArray(lexeme, ""))
-		  t.IsStatic = isStatic
+		  Var t As ObjoScript.Token
+		  If isStatic Then
+		    t = MakeToken(ObjoScript.TokenTypes.StaticFieldIdentifier, String.FromArray(lexeme, ""))
+		  Else
+		    t = MakeToken(ObjoScript.TokenTypes.FieldIdentifier, String.FromArray(lexeme, ""))
+		  End If
 		  
 		  mTokens.Add(t)
 		  

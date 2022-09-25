@@ -1194,8 +1194,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Push the field on to the stack.
 		  EmitIndexedOpcode(ObjoScript.VM.OP_GET_FIELD, ObjoScript.VM.OP_GET_FIELD_LONG, index)
-		  Return Nil
-		  
 		  
 		End Function
 	#tag EndMethod
@@ -1492,6 +1490,47 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  End If
 		  
 		  EmitByte(ObjoScript.VM.OP_RETURN, r.Location)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C652072657472696576696E67206120737461746963206669656C642E
+		Function VisitStaticField(expr As ObjoScript.StaticFieldExpr) As Variant
+		  /// Compile retrieving a static field.
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		    Error("Static fields can only be accessed from within a method or a constructor.")
+		  End If
+		  
+		  // Add the name of the field to the constant pool and get its index.
+		  Var index As Integer = AddConstant(expr.Name)
+		  
+		  // Push the field on to the stack.
+		  EmitIndexedOpcode(ObjoScript.VM.OP_GET_STATIC_FIELD, ObjoScript.VM.OP_GET_STATIC_FIELD_LONG, index)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C65206120737461746963206669656C642061737369676E6D656E742E
+		Function VisitStaticFieldAssignment(expr As ObjoScript.StaticFieldAssignmentExpr) As Variant
+		  /// Compile a static field assignment.
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  // Evaluate the value to assign, leaving it on the top of the stack.
+		  Call expr.Value.Accept(Self)
+		  
+		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		    Error("Static fields can only be accessed from within a method or constructor.")
+		  End If
+		  
+		  // Add the name of the field to the constant pool and get its index.
+		  Var index As Integer = AddConstant(expr.Name)
+		  
+		  // Emit the set static field instruction.
+		  EmitIndexedOpcode(ObjoScript.VM.OP_SET_STATIC_FIELD, ObjoScript.VM.OP_SET_STATIC_FIELD_LONG, index)
 		  
 		End Function
 	#tag EndMethod

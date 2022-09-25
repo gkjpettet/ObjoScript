@@ -319,12 +319,12 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 526574726965766573207468652076616C7565206F662061206669656C64206E616D656420606E616D6560206F6E2074686520696E7374616E63652063757272656E746C79206F6E2074686520746F70206F662074686520737461636B20616E64207468656E20707573686573206974206F6E20746F2074686520746F70206F662074686520737461636B2E
+	#tag Method, Flags = &h21, Description = 526574726965766573207468652076616C7565206F6620616E20696E7374616E6365206669656C64206E616D656420606E616D6560206F6E2074686520696E7374616E63652063757272656E746C79206F6E2074686520746F70206F662074686520737461636B20616E64207468656E20707573686573206974206F6E20746F2074686520746F70206F662074686520737461636B2E
 		Private Sub GetField(name As String)
-		  /// Retrieves the value of a field named `name` on the instance currently on the top of the 
+		  /// Retrieves the value of an instance field named `name` on the instance currently on the top of the 
 		  /// stack and then pushes it on to the top of the stack.
 		  
-		  // Since fields can only be retrieved from within a method we can safely assume that `this` should be in the 
+		  // Since instance fields can only be retrieved from within a method we can safely assume that `this` should be in the 
 		  // method callframe's slot 0 (it should have been placed there by `CallValue()`).
 		  Var instance As ObjoScript.Instance
 		  If Stack(CurrentFrame.StackBase) IsA ObjoScript.Instance Then
@@ -341,8 +341,43 @@ Protected Class VM
 		  // Get the value of the field from the instance.
 		  Var value As Variant = instance.Fields.Lookup(name, Nil)
 		  
+		  // If the field doesn't exist then we create it.
 		  If value = Nil Then
-		    Error("Undefined field `" + name + "` on class `" + instance.Klass.Name + "`.")
+		    instance.Fields.Value(name) = Nothing
+		    value = Nothing
+		  End If
+		  
+		  // Push the value on to the stack.
+		  Push(value)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 526574726965766573207468652076616C7565206F66206120737461746963206669656C64206E616D656420606E616D6560206F6E2074686520696E7374616E6365206F7220636C6173732063757272656E746C79206F6E2074686520746F70206F662074686520737461636B20616E64207468656E20707573686573206974206F6E20746F2074686520746F70206F662074686520737461636B2E
+		Private Sub GetStaticField(name As String)
+		  /// Retrieves the value of a static field named `name` on the instance or class currently on the top of the 
+		  /// stack and then pushes it on to the top of the stack.
+		  
+		  // The compiler guarantees that static fields can only be retrieved from within an instance 
+		  // method/constructor or a static method, we can safely assume that either `this` or the class 
+		  // should be in the method callframe's slot 0 (it should have been placed there by `CallValue()`).
+		  Var tmp As Variant = Stack(CurrentFrame.StackBase)
+		  Var receiver As ObjoScript.Klass
+		  If tmp IsA ObjoScript.Klass Then
+		    receiver = tmp
+		  ElseIf tmp IsA ObjoScript.Instance Then
+		    receiver = ObjoScript.Instance(tmp).Klass
+		  Else
+		    Error("Only classes and instances have static fields.")
+		  End If
+		  
+		  // Get the value of the static field from the receiver.
+		  Var value As Variant = receiver.StaticFields.Lookup(name, Nil)
+		  
+		  // If the static field doesn't exist then we create it.
+		  If value = Nil Then
+		    receiver.StaticFields.Value(name) = Nothing
+		    value = Nothing
 		  End If
 		  
 		  // Push the value on to the stack.
@@ -1004,6 +1039,18 @@ Protected Class VM
 		    Case OP_STATIC_METHOD_LONG
 		      DefineMethod(ReadConstantLong, ReadByte, True)
 		      
+		    Case OP_GET_STATIC_FIELD
+		      GetStaticField(ReadConstant)
+		      
+		    Case OP_GET_STATIC_FIELD_LONG
+		      GetStaticField(ReadConstantLong)
+		      
+		    Case OP_SET_STATIC_FIELD
+		      SetStaticField(ReadConstant)
+		      
+		    Case OP_SET_STATIC_FIELD_LONG
+		      SetStaticField(ReadConstantLong)
+		      
 		    End Select
 		  Wend
 		  
@@ -1041,6 +1088,41 @@ Protected Class VM
 		  // Push the value back on the stack (since this is an expression).
 		  Push(value)
 		  
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 53657473206120737461746963206669656C64206E616D656420606E616D6560206F6E2074686520636C61737320286F7220696E7374616E6365277320636C617373292074686174206973206F6E652066726F6D2074686520746F70206F662074686520737461636B20746F207468652076616C7565206F6E2074686520746F70206F662074686520737461636B2E
+		Private Sub SetStaticField(name As String)
+		  /// Sets a static field named `name` on the class (or instance's class) that is one from the top of the 
+		  /// stack to the value on the top of the stack.
+		  ///
+		  /// |
+		  /// | ValueToAssign       <-- top of the stack
+		  /// | class or instance   <-- should have the static field named `name`.
+		  /// |
+		  
+		  // The compiler guarantees that static fields can only be set from within a method or constructor 
+		  // so we can safely assume that `this` should be in the 
+		  // method callframe's slot 0/StackBase (it should have been placed there by `CallValue()`).
+		  Var tmp As Variant = Stack(CurrentFrame.StackBase)
+		  Var receiver As ObjoScript.Klass
+		  If tmp IsA ObjoScript.Klass Then
+		    receiver = ObjoScript.Klass(tmp)
+		  ElseIf tmp IsA ObjoScript.Instance Then
+		    receiver = ObjoScript.Instance(tmp).Klass
+		  Else
+		    // Error.
+		    Error("Only classes and instances have static fields.")
+		  End If
+		  
+		  // Set the static field to the value on the top of the stack and pop it off.
+		  // If the static field has never been assigned to before then we create it.
+		  Var value As Variant = Pop
+		  receiver.StaticFields.Value(name) = value
+		  
+		  // Push the value back on the stack (since this is an expression).
+		  Push(value)
 		  
 		End Sub
 	#tag EndMethod
@@ -1200,7 +1282,7 @@ Protected Class VM
 		      Return ObjoScript.Value(v).ToString
 		      
 		    ElseIf v IsA ObjoScript.Nothing Then
-		      Return "Nothing"
+		      Return "nothing"
 		      
 		    ElseIf v IsA Pair Then
 		      // Ranges are stored internally as pairs of doubles (lower : upper)
@@ -1296,6 +1378,10 @@ Protected Class VM
 		69: OP_SUPER_INVOKE_LONG (3)
 		70: OP_STATIC_METHOD (2)
 		71: OP_STATIC_METHOD_LONG (3)
+		72: OP_GET_STATIC_FIELD (1)
+		73: OP_GET_STATIC_FIELD_LONG (2)
+		74: OP_SET_STATIC_FIELD (1)
+		75: OP_SET_STATIC_FIELD_LONG (2)
 	#tag EndNote
 
 
@@ -1331,78 +1417,82 @@ Protected Class VM
 		#tag Getter
 			Get
 			  Static d As New Dictionary( _
-			  OP_RETURN             : 0, _
-			  OP_CONSTANT           : 1, _
-			  OP_CONSTANT_LONG      : 2, _
-			  OP_NEGATE             : 0, _
-			  OP_ADD                : 0, _
-			  OP_SUBTRACT           : 0, _
-			  OP_DIVIDE             : 0, _
-			  OP_MULTIPLY           : 0, _
-			  OP_MODULO             : 0, _
-			  OP_NOT                : 0, _
-			  OP_EQUAL              : 0 , _
-			  OP_GREATER            : 0, _
-			  OP_LESS               : 0, _
-			  OP_LESS_EQUAL         : 0, _
-			  OP_GREATER_EQUAL      : 0, _
-			  OP_NOT_EQUAL          : 0, _
-			  OP_TRUE               : 0, _
-			  OP_FALSE              : 0, _
-			  OP_NOTHING            : 0, _
-			  OP_POP                : 0, _
-			  OP_SHIFT_LEFT         : 0, _
-			  OP_SHIFT_RIGHT        : 0, _
-			  OP_BITWISE_AND        : 0, _
-			  OP_BITWISE_OR         : 0, _
-			  OP_BITWISE_XOR        : 0, _
-			  OP_LOAD_1             : 0, _
-			  OP_LOAD_0             : 0, _
-			  OP_LOAD_MINUS1        : 0, _
-			  OP_PRINT              : 0, _
-			  OP_ASSERT             : 0, _
-			  OP_DEFINE_GLOBAL      : 1, _
-			  OP_DEFINE_GLOBAL_LONG : 2, _
-			  OP_GET_GLOBAL         : 1, _
-			  OP_GET_GLOBAL_LONG    : 2, _
-			  OP_SET_GLOBAL         : 1, _
-			  OP_SET_GLOBAL_LONG    : 2, _
-			  OP_POP_N              : 1, _
-			  OP_GET_LOCAL          : 1, _
-			  OP_SET_LOCAL          : 1, _
-			  OP_JUMP_IF_FALSE      : 2, _
-			  OP_JUMP               : 2, _
-			  OP_JUMP_IF_TRUE       : 2, _
-			  OP_LOGICAL_XOR        : 0, _
-			  OP_LOOP               : 2, _
-			  OP_INCLUSIVE_RANGE    : 0, _
-			  OP_EXCLUSIVE_RANGE    : 0, _
-			  OP_EXIT               : 0, _
-			  OP_CALL               : 1, _
-			  OP_CLASS              : 1, _
-			  OP_CLASS_LONG         : 2, _ 
-			  OP_METHOD             : 2, _
-			  OP_METHOD_LONG        : 3, _
-			  OP_SETTER             : 1, _
-			  OP_SETTER_LONG        : 2, _
-			  OP_GETTER             : 1, _
-			  OP_GETTER_LONG        : 2, _
-			  OP_GET_FIELD          : 1, _
-			  OP_GET_FIELD_LONG     : 2, _
-			  OP_SET_FIELD          : 1, _
-			  OP_SET_FIELD_LONG     : 2, _
-			  OP_CONSTRUCTOR        : 1, _
-			  OP_INVOKE             : 2, _
-			  OP_INVOKE_LONG        : 3, _
-			  OP_INHERIT            : 0, _
-			  OP_SUPER_GETTER       : 1, _
-			  OP_SUPER_GETTER_LONG  : 2, _
-			  OP_SUPER_SETTER       : 1, _
-			  OP_SUPER_SETTER_LONG  : 2, _
-			  OP_SUPER_INVOKE       : 2, _
-			  OP_SUPER_INVOKE_LONG  : 3, _
-			  OP_STATIC_METHOD      : 2, _
-			  OP_STATIC_METHOD_LONG : 3 _
+			  OP_RETURN               : 0, _
+			  OP_CONSTANT             : 1, _
+			  OP_CONSTANT_LONG        : 2, _
+			  OP_NEGATE               : 0, _
+			  OP_ADD                  : 0, _
+			  OP_SUBTRACT             : 0, _
+			  OP_DIVIDE               : 0, _
+			  OP_MULTIPLY             : 0, _
+			  OP_MODULO               : 0, _
+			  OP_NOT                  : 0, _
+			  OP_EQUAL                : 0 , _
+			  OP_GREATER              : 0, _
+			  OP_LESS                 : 0, _
+			  OP_LESS_EQUAL           : 0, _
+			  OP_GREATER_EQUAL        : 0, _
+			  OP_NOT_EQUAL            : 0, _
+			  OP_TRUE                 : 0, _
+			  OP_FALSE                : 0, _
+			  OP_NOTHING              : 0, _
+			  OP_POP                  : 0, _
+			  OP_SHIFT_LEFT           : 0, _
+			  OP_SHIFT_RIGHT          : 0, _
+			  OP_BITWISE_AND          : 0, _
+			  OP_BITWISE_OR           : 0, _
+			  OP_BITWISE_XOR          : 0, _
+			  OP_LOAD_1               : 0, _
+			  OP_LOAD_0               : 0, _
+			  OP_LOAD_MINUS1          : 0, _
+			  OP_PRINT                : 0, _
+			  OP_ASSERT               : 0, _
+			  OP_DEFINE_GLOBAL        : 1, _
+			  OP_DEFINE_GLOBAL_LONG   : 2, _
+			  OP_GET_GLOBAL           : 1, _
+			  OP_GET_GLOBAL_LONG      : 2, _
+			  OP_SET_GLOBAL           : 1, _
+			  OP_SET_GLOBAL_LONG      : 2, _
+			  OP_POP_N                : 1, _
+			  OP_GET_LOCAL            : 1, _
+			  OP_SET_LOCAL            : 1, _
+			  OP_JUMP_IF_FALSE        : 2, _
+			  OP_JUMP                 : 2, _
+			  OP_JUMP_IF_TRUE         : 2, _
+			  OP_LOGICAL_XOR          : 0, _
+			  OP_LOOP                 : 2, _
+			  OP_INCLUSIVE_RANGE      : 0, _
+			  OP_EXCLUSIVE_RANGE      : 0, _
+			  OP_EXIT                 : 0, _
+			  OP_CALL                 : 1, _
+			  OP_CLASS                : 1, _
+			  OP_CLASS_LONG           : 2, _ 
+			  OP_METHOD               : 2, _
+			  OP_METHOD_LONG          : 3, _
+			  OP_SETTER               : 1, _
+			  OP_SETTER_LONG          : 2, _
+			  OP_GETTER               : 1, _
+			  OP_GETTER_LONG          : 2, _
+			  OP_GET_FIELD            : 1, _
+			  OP_GET_FIELD_LONG       : 2, _
+			  OP_SET_FIELD            : 1, _
+			  OP_SET_FIELD_LONG       : 2, _
+			  OP_CONSTRUCTOR          : 1, _
+			  OP_INVOKE               : 2, _
+			  OP_INVOKE_LONG          : 3, _
+			  OP_INHERIT              : 0, _
+			  OP_SUPER_GETTER         : 1, _
+			  OP_SUPER_GETTER_LONG    : 2, _
+			  OP_SUPER_SETTER         : 1, _
+			  OP_SUPER_SETTER_LONG    : 2, _
+			  OP_SUPER_INVOKE         : 2, _
+			  OP_SUPER_INVOKE_LONG    : 3, _
+			  OP_STATIC_METHOD        : 2, _
+			  OP_STATIC_METHOD_LONG   : 3, _
+			  OP_GET_STATIC_FIELD     : 1, _
+			  OP_GET_STATIC_FIELD_LONG: 2, _
+			  OP_SET_STATIC_FIELD     : 1, _
+			  OP_SET_STATIC_FIELD_LONG: 2 _
 			  )
 			  
 			  Return d
@@ -1500,6 +1590,12 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_GET_LOCAL, Type = Double, Dynamic = False, Default = \"37", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_GET_STATIC_FIELD, Type = Double, Dynamic = False, Default = \"72", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_GET_STATIC_FIELD_LONG, Type = Double, Dynamic = False, Default = \"73", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_GREATER, Type = Double, Dynamic = False, Default = \"11", Scope = Public
@@ -1605,6 +1701,12 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SET_LOCAL, Type = Double, Dynamic = False, Default = \"38", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SET_STATIC_FIELD, Type = Double, Dynamic = False, Default = \"74", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SET_STATIC_FIELD_LONG, Type = Double, Dynamic = False, Default = \"75", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SHIFT_LEFT, Type = Double, Dynamic = False, Default = \"20", Scope = Public

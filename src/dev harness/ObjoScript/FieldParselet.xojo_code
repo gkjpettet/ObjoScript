@@ -9,14 +9,23 @@ Implements ObjoScript.PrefixParselet
 		  /// Part of the ObjoScript.PrefixParselet interface.
 		  
 		  Var identifier As ObjoScript.Token = parser.Previous
+		  Var isStatic As Boolean = If(identifier.Type = ObjoScript.TokenTypes.StaticFieldIdentifier, True, False)
 		  
 		  If canAssign And parser.Match(ObjoScript.TokenTypes.Equal) Then
 		    // This is an assignment to the field named `identifier.Lexeme`.
 		    Var expression As ObjoScript.Expr = parser.Expression
-		    Return New FieldAssignmentExpr(identifier, expression)
+		    If isStatic Then
+		      Return New StaticFieldAssignmentExpr(identifier, expression)
+		    Else
+		      Return New FieldAssignmentExpr(identifier, expression)
+		    End If
 		  Else
 		    // This is the lookup of a field named `identifier.Lexeme`.
-		    Return New FieldExpr(identifier)
+		    If isStatic Then
+		      Return New StaticFieldExpr(identifier)
+		    Else
+		      Return New FieldExpr(identifier)
+		    End If
 		  End If
 		  
 		End Function

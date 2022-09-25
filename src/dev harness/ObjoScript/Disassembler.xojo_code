@@ -127,6 +127,16 @@ Protected Class Disassembler
 		    newOffset = offset + 3
 		    name = "SUPER_SETTER_LONG"
 		    
+		  Case ObjoScript.VM.OP_GET_STATIC_FIELD
+		    constantIndex = chunk.ReadByte(offset + 1)
+		    newOffset = offset + 2
+		    name = "GET_STATIC_FIELD"
+		    
+		  Case ObjoScript.VM.OP_GET_STATIC_FIELD_LONG
+		    constantIndex = chunk.ReadUInt16(offset + 1)
+		    newOffset = offset + 3
+		    name = "GET_STATIC_FIELD_LONG"
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown constant opcode.")
 		  End Select
@@ -403,6 +413,9 @@ Protected Class Disassembler
 		    
 		  Case ObjoScript.VM.OP_STATIC_METHOD, ObjoScript.VM.OP_STATIC_METHOD_LONG
 		    Return MethodInstruction(opcode, chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_GET_STATIC_FIELD, ObjoScript.VM.OP_GET_STATIC_FIELD_LONG
+		    Return ConstantInstruction(opcode, chunk, offset)
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")

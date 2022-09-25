@@ -529,81 +529,82 @@ Protected Class Parser
 		  /// Initialises the parser's grammar rules.
 		  
 		  mRules = New Dictionary( _
-		  TokenTypes.Ampersand         : BinaryOperator(Precedences.BitwiseAnd), _
-		  TokenTypes.And_              : BinaryOperator(Precedences.LogicalAnd), _
-		  TokenTypes.Assert            : Unused, _
-		  TokenTypes.As_               : Unused, _
-		  TokenTypes.Boolean_          : Prefix(New LiteralParselet), _
-		  TokenTypes.Breakpoint        : Unused, _
-		  TokenTypes.Caret             : BinaryOperator(Precedences.BitwiseXor), _
-		  TokenTypes.Class_            : Unused, _
-		  TokenTypes.Colon             : Unused, _
-		  TokenTypes.Comma             : Unused, _
-		  TokenTypes.Constructor       : Unused, _
-		  TokenTypes.Continue_         : Unused, _
-		  TokenTypes.Dot               : NewRule(Nil, New DotParselet, Precedences.Call_), _
-		  TokenTypes.DotDot            : BinaryOperator(Precedences.Range), _
-		  TokenTypes.DotDotDot         : BinaryOperator(Precedences.Range), _
-		  TokenTypes.Else_             : Unused, _
-		  TokenTypes.EOF               : Unused, _
-		  TokenTypes.EOL               : Unused, _
-		  TokenTypes.Equal             : Unused, _
-		  TokenTypes.EqualEqual        : BinaryOperator(Precedences.Equality), _
-		  TokenTypes.Exit_             : Unused, _
-		  TokenTypes.Export            : Unused, _
-		  TokenTypes.FieldIdentifier   : Prefix(New FieldParselet), _
-		  TokenTypes.Foreign           : Unused, _
-		  TokenTypes.ForwardSlash      : BinaryOperator(Precedences.Factor), _
-		  TokenTypes.ForwardSlashEqual : Unused, _
-		  TokenTypes.For_              : Unused, _
-		  TokenTypes.ForEach           : Unused, _
-		  TokenTypes.Function_         : Unused, _
-		  TokenTypes.Greater           : BinaryOperator(Precedences.Comparison), _
-		  TokenTypes.GreaterEqual      : BinaryOperator(Precedences.Comparison), _
-		  TokenTypes.GreaterGreater    : BinaryOperator(Precedences.BitwiseShift), _
-		  TokenTypes.Identifier        : Prefix(New VariableParselet), _
-		  TokenTypes.If_               : Unused, _
-		  TokenTypes.Import            : Unused, _
-		  TokenTypes.In_               : Unused, _
-		  TokenTypes.Is_               : BinaryOperator(Precedences.Is_), _
-		  TokenTypes.LCurly            : Unused, _
-		  TokenTypes.Less              : BinaryOperator(Precedences.Comparison), _
-		  TokenTypes.LessEqual         : BinaryOperator(Precedences.Comparison), _
-		  TokenTypes.LessLess          : BinaryOperator(Precedences.BitwiseShift), _
-		  TokenTypes.LParen            : NewRule(New GroupParselet,  New CallParselet, Precedences.Call_), _
-		  TokenTypes.LSquare           : Unused, _
-		  TokenTypes.Minus             : Operator, _
-		  TokenTypes.MinusMinus        : Postfix, _
-		  TokenTypes.MinusEqual        : Unused, _
-		  TokenTypes.NotEqual          : BinaryOperator(Precedences.Equality), _
-		  TokenTypes.Nothing           : Prefix(New LiteralParselet), _
-		  TokenTypes.Not_              : Prefix(New UnaryParselet), _
-		  TokenTypes.Number            : Prefix(New LiteralParselet), _
-		  TokenTypes.Or_               : BinaryOperator(Precedences.LogicalOr), _
-		  TokenTypes.Percent           : BinaryOperator(Precedences.Factor), _
-		  TokenTypes.Pipe              : BinaryOperator(Precedences.BitwiseOr), _
-		  TokenTypes.Plus              : BinaryOperator(Precedences.Term), _
-		  TokenTypes.PlusEqual         : Unused, _
-		  TokenTypes.PlusPlus          : Postfix, _
-		  TokenTypes.Print             : Unused, _
-		  TokenTypes.Query             : Unused, _
-		  TokenTypes.RCurly            : Unused, _
-		  TokenTypes.Return_           : Unused, _
-		  TokenTypes.RParen            : Unused, _
-		  TokenTypes.RSquare           : Unused, _
-		  TokenTypes.Semicolon         : Unused, _
-		  TokenTypes.Star              : BinaryOperator(Precedences.Factor), _
-		  TokenTypes.StarEqual         : Unused, _
-		  TokenTypes.Static_           : Unused, _
-		  TokenTypes.String_           : Prefix(New LiteralParselet), _
-		  TokenTypes.Super_            : Prefix(New SuperParselet), _
-		  TokenTypes.Then_             : Unused, _
-		  TokenTypes.This              : Prefix(New ThisParselet), _
-		  TokenTypes.Tilde             : NewRule(New UnaryParselet, Nil, Precedences.None), _
-		  TokenTypes.Underscore        : Unused, _
-		  TokenTypes.Var_              : Unused, _
-		  TokenTypes.While_            : Unused, _
-		  TokenTypes.Xor_              : BinaryOperator(Precedences.LogicalXor) _
+		  TokenTypes.Ampersand            : BinaryOperator(Precedences.BitwiseAnd), _
+		  TokenTypes.And_                 : BinaryOperator(Precedences.LogicalAnd), _
+		  TokenTypes.Assert               : Unused, _
+		  TokenTypes.As_                  : Unused, _
+		  TokenTypes.Boolean_             : Prefix(New LiteralParselet), _
+		  TokenTypes.Breakpoint           : Unused, _
+		  TokenTypes.Caret                : BinaryOperator(Precedences.BitwiseXor), _
+		  TokenTypes.Class_               : Unused, _
+		  TokenTypes.Colon                : Unused, _
+		  TokenTypes.Comma                : Unused, _
+		  TokenTypes.Constructor          : Unused, _
+		  TokenTypes.Continue_            : Unused, _
+		  TokenTypes.Dot                  : NewRule(Nil, New DotParselet, Precedences.Call_), _
+		  TokenTypes.DotDot               : BinaryOperator(Precedences.Range), _
+		  TokenTypes.DotDotDot            : BinaryOperator(Precedences.Range), _
+		  TokenTypes.Else_                : Unused, _
+		  TokenTypes.EOF                  : Unused, _
+		  TokenTypes.EOL                  : Unused, _
+		  TokenTypes.Equal                : Unused, _
+		  TokenTypes.EqualEqual           : BinaryOperator(Precedences.Equality), _
+		  TokenTypes.Exit_                : Unused, _
+		  TokenTypes.Export               : Unused, _
+		  TokenTypes.FieldIdentifier      : Prefix(New FieldParselet), _
+		  TokenTypes.Foreign              : Unused, _
+		  TokenTypes.ForwardSlash         : BinaryOperator(Precedences.Factor), _
+		  TokenTypes.ForwardSlashEqual    : Unused, _
+		  TokenTypes.For_                 : Unused, _
+		  TokenTypes.ForEach              : Unused, _
+		  TokenTypes.Function_            : Unused, _
+		  TokenTypes.Greater              : BinaryOperator(Precedences.Comparison), _
+		  TokenTypes.GreaterEqual         : BinaryOperator(Precedences.Comparison), _
+		  TokenTypes.GreaterGreater       : BinaryOperator(Precedences.BitwiseShift), _
+		  TokenTypes.Identifier           : Prefix(New VariableParselet), _
+		  TokenTypes.If_                  : Unused, _
+		  TokenTypes.Import               : Unused, _
+		  TokenTypes.In_                  : Unused, _
+		  TokenTypes.Is_                  : BinaryOperator(Precedences.Is_), _
+		  TokenTypes.LCurly               : Unused, _
+		  TokenTypes.Less                 : BinaryOperator(Precedences.Comparison), _
+		  TokenTypes.LessEqual            : BinaryOperator(Precedences.Comparison), _
+		  TokenTypes.LessLess             : BinaryOperator(Precedences.BitwiseShift), _
+		  TokenTypes.LParen               : NewRule(New GroupParselet,  New CallParselet, Precedences.Call_), _
+		  TokenTypes.LSquare              : Unused, _
+		  TokenTypes.Minus                : Operator, _
+		  TokenTypes.MinusMinus           : Postfix, _
+		  TokenTypes.MinusEqual           : Unused, _
+		  TokenTypes.NotEqual             : BinaryOperator(Precedences.Equality), _
+		  TokenTypes.Nothing              : Prefix(New LiteralParselet), _
+		  TokenTypes.Not_                 : Prefix(New UnaryParselet), _
+		  TokenTypes.Number               : Prefix(New LiteralParselet), _
+		  TokenTypes.Or_                  : BinaryOperator(Precedences.LogicalOr), _
+		  TokenTypes.Percent              : BinaryOperator(Precedences.Factor), _
+		  TokenTypes.Pipe                 : BinaryOperator(Precedences.BitwiseOr), _
+		  TokenTypes.Plus                 : BinaryOperator(Precedences.Term), _
+		  TokenTypes.PlusEqual            : Unused, _
+		  TokenTypes.PlusPlus             : Postfix, _
+		  TokenTypes.Print                : Unused, _
+		  TokenTypes.Query                : Unused, _
+		  TokenTypes.RCurly               : Unused, _
+		  TokenTypes.Return_              : Unused, _
+		  TokenTypes.RParen               : Unused, _
+		  TokenTypes.RSquare              : Unused, _
+		  TokenTypes.Semicolon            : Unused, _
+		  TokenTypes.Star                 : BinaryOperator(Precedences.Factor), _
+		  TokenTypes.StarEqual            : Unused, _
+		  TokenTypes.Static_              : Unused, _
+		  TokenTypes.StaticFieldIdentifier: Prefix(New FieldParselet), _
+		  TokenTypes.String_              : Prefix(New LiteralParselet), _
+		  TokenTypes.Super_               : Prefix(New SuperParselet), _
+		  TokenTypes.Then_                : Unused, _
+		  TokenTypes.This                 : Prefix(New ThisParselet), _
+		  TokenTypes.Tilde                : NewRule(New UnaryParselet, Nil, Precedences.None), _
+		  TokenTypes.Underscore           : Unused, _
+		  TokenTypes.Var_                 : Unused, _
+		  TokenTypes.While_               : Unused, _
+		  TokenTypes.Xor_                 : BinaryOperator(Precedences.LogicalXor) _
 		  )
 		  
 		End Sub
