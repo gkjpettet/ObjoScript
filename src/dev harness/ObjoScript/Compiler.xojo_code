@@ -1377,9 +1377,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C65732061206D6574686F6420696E766F636174696F6E2E
+	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120676574746572206D6574686F6420696E766F636174696F6E2E
 		Function VisitMethodInvocation(m As ObjoScript.MethodInvocationExpr) As Variant
-		  /// Compiles a method invocation.
+		  /// Compiles a getter method invocation.
 		  ///
 		  /// E.g: operand.method(arg1, arg2)
 		  /// The OP_INVOKE instruction is a fusion of OP_GETTER and OP_CALL.
@@ -1539,6 +1539,41 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    // Emit the `super` getter instruction with the index in the constant pool of the method name to invoke.
 		    EmitIndexedOpcode(ObjoScript.VM.OP_SUPER_GETTER, ObjoScript.VM.OP_SUPER_GETTER_LONG, index)
 		  End If
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120676574746572206D6574686F6420696E766F636174696F6E206F6E20607375706572602E
+		Function VisitSuperMethodInvocation(s As ObjoScript.SuperMethodInvocationExpr) As Variant
+		  /// Compiles a getter method invocation on `super`.
+		  ///
+		  /// E.g: super.method(arg1, arg2)
+		  /// The OP_SUPER_INVOKE instruction is a fusion of OP_SUPER_GETTER and OP_CALL.
+		  /// This is an optimisation for the runtime.
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  mLocation = s.Location
+		  
+		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		    Error("`super` can only be used within a method or constructor.")
+		  End If
+		  
+		  // Push `this` onto the stack. It's always at slot 0 of the call frame.
+		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		  
+		  // Load the method's name into the constant pool.
+		  Var index As Integer = AddConstant(s.MethodName)
+		  
+		  // Compile the arguments.
+		  For Each arg As ObjoScript.Expr In s.Arguments
+		    Call arg.Accept(Self)
+		  Next arg
+		  
+		  // Emit the OP_SUPER_INVOKE instruction and the index of the method's name in the constant pool
+		  EmitIndexedOpcode(ObjoScript.VM.OP_SUPER_INVOKE, ObjoScript.VM.OP_SUPER_INVOKE_LONG, index, s.Location)
+		  
+		  // Emit the argument count.
+		  EmitByte(s.Arguments.Count, s.Location)
 		  
 		End Function
 	#tag EndMethod

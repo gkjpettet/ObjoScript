@@ -344,8 +344,8 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 496E766F6B65732061206D6574686F64206F6E20616E20696E7374616E63652E2054686520696E7374616E636520636F6E7461696E696E6720746865206D6574686F642073686F756C64206265206F6E2074686520737461636B20616C6F6E67207769746820616E7920617267756D656E74732069742072657175697265732E
-		Private Sub Invoke(methodName As String, argCount As Integer)
-		  /// Invokes a method on an instance. The instance containing the method should be on the stack
+		Private Sub Invoke(methodName As String, argCount As Integer, onSuper As Boolean)
+		  /// Invokes a method on an instance or its super. The instance containing the method should be on the stack
 		  /// along with any arguments it requires.
 		  ///
 		  /// |
@@ -359,7 +359,18 @@ Protected Class VM
 		    Error("Only instances have methods.")
 		  End If
 		  
-		  InvokeFromClass(ObjoScript.Instance(receiver).Klass, methodName, argCount)
+		  // Is this a call to a method on the receiver's superclass?
+		  If onSuper Then
+		    If ObjoScript.Instance(receiver).Klass.Superclass = Nil Then
+		      Error("`" + ObjoScript.Instance(receiver).Klass.ToString + "` does not have a superclass.")
+		    End If
+		    InvokeFromClass(ObjoScript.Instance(receiver).Klass.Superclass, methodName, argCount)
+		    
+		  Else
+		    // The method is directly on the instance.
+		    InvokeFromClass(ObjoScript.Instance(receiver).Klass, methodName, argCount)
+		  End If
+		  
 		End Sub
 	#tag EndMethod
 
@@ -907,10 +918,10 @@ Protected Class VM
 		      DefineConstructor(ReadByte)
 		      
 		    Case VM.OP_INVOKE
-		      Invoke(ReadConstant, ReadByte)
+		      Invoke(ReadConstant, ReadByte, False)
 		      
 		    Case VM.OP_INVOKE_LONG
-		      Invoke(ReadConstantLong, ReadByte)
+		      Invoke(ReadConstantLong, ReadByte, False)
 		      
 		    Case OP_INHERIT
 		      Inherit
@@ -926,6 +937,12 @@ Protected Class VM
 		      
 		    Case OP_SUPER_SETTER_LONG
 		      Setter(ReadConstantLong, True)
+		      
+		    Case OP_SUPER_INVOKE
+		      Invoke(ReadConstant, ReadByte, True)
+		      
+		    Case OP_SUPER_INVOKE_LONG
+		      Invoke(ReadConstantLong, ReadByte, True)
 		      
 		    End Select
 		  Wend
@@ -1193,6 +1210,8 @@ Protected Class VM
 		65: OP_SUPER_GETTER_LONG
 		66: OP_SUPER_SETTER
 		67: OP_SUPER_SETTER_LONG
+		68: OP_SUPER_INVOKE
+		69: OP_SUPER_INVOKE_LONG
 	#tag EndNote
 
 
@@ -1492,6 +1511,12 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SUPER_GETTER_LONG, Type = Double, Dynamic = False, Default = \"65", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SUPER_INVOKE, Type = Double, Dynamic = False, Default = \"68", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SUPER_INVOKE_LONG, Type = Double, Dynamic = False, Default = \"69", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SUPER_SETTER, Type = Double, Dynamic = False, Default = \"66", Scope = Public

@@ -395,6 +395,12 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_SETTER_LONG
 		    Return ConstantInstruction(opcode, chunk, offset)
 		    
+		  Case ObjoScript.VM.OP_SUPER_INVOKE
+		    Return InvokeInstruction(opcode, chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_SUPER_INVOKE_LONG
+		    Return InvokeInstruction(opcode, chunk, offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
@@ -402,9 +408,9 @@ Protected Class Disassembler
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 5072696E747320746865206E616D65206F662061206A756D7020696E737472756374696F6E202855496E743136206F706572616E642920616E642072657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E20496620606E6567617469766560207468656E20746869732069732061206261636B7761726473206A756D702E
+	#tag Method, Flags = &h0, Description = 5072696E74732074686520696E766F6B652F73757065725F696E766F6B6520696E737472756374696F6E20616E642072657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
 		Function InvokeInstruction(opcode As UInt8, chunk As ObjoScript.Chunk, offset As Integer) As Integer
-		  /// Prints the invoke jump instruction and returns the offset for the next instruction.
+		  /// Prints the invoke/super_invoke instruction and returns the offset for the next instruction.
 		  ///
 		  /// Format:
 		  /// OFFSET  LINE  (OPTIONAL SCRIPT ID)  OPCODE  METHOD_NAME_INDEX  METHOD_NAME  ARGCOUNT
@@ -418,8 +424,20 @@ Protected Class Disassembler
 		    argCount = chunk.ReadByte(offset + 2)
 		    newOffset = offset + 3
 		    
-		  Case ObjoScript.VM.OP_INVOKE
+		  Case ObjoScript.VM.OP_INVOKE_LONG
 		    instructionName = "OP_INVOKE_LONG"
+		    index = chunk.ReadUInt16(offset + 1)
+		    argCount = chunk.ReadByte(offset + 3)
+		    newOffset = offset + 4
+		    
+		  Case ObjoScript.VM.OP_SUPER_INVOKE
+		    instructionName = "OP_SUPER_INVOKE"
+		    index = chunk.ReadByte(offset + 1)
+		    argCount = chunk.ReadByte(offset + 2)
+		    newOffset = offset + 3
+		    
+		  Case ObjoScript.VM.OP_SUPER_INVOKE_LONG
+		    instructionName = "OP_SUPER_INVOKE_LONG"
 		    index = chunk.ReadUInt16(offset + 1)
 		    argCount = chunk.ReadByte(offset + 3)
 		    newOffset = offset + 4
