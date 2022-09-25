@@ -1034,8 +1034,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.StmtVisitor interface.
 		  /// To define a new constructor, the VM needs two things:
-		  ///  1. The function that is the method body.
-		  ///  2. The class to bind the method to.
+		  ///  1. The function that is the constructor's body.
+		  ///  2. The class to bind the constructor to.
 		  
 		  mLocation = c.Location
 		  
@@ -1242,7 +1242,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  mLocation = funcDecl.Location
 		  
 		  // Since we don't support closures, we only allow functions to be declared
-		  // at the top level of a script (i.e. not within other functions).
+		  // at the top level of a script (i.e. not within other functions, methods, class declarations, etc).
 		  If Self.Type <> ObjoScript.FunctionTypes.TopLevel Then
 		    Error("Functions can only be declared within the top level of a script.")
 		  End If
@@ -1342,6 +1342,36 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    EmitByte(If(m.IsSetter, 1, 0))
 		  End If
 		  
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732061206D6574686F6420696E766F636174696F6E2E
+		Function VisitMethodInvocation(m As ObjoScript.MethodInvocationExpr) As Variant
+		  /// Compiles a method invocation.
+		  ///
+		  /// E.g: operand.method(arg1, arg2)
+		  /// The OP_INVOKE instruction is a fusion of OP_GETTER and OP_CALL.
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  mLocation = m.Location
+		  
+		  // Compile the operand to put it on the stack.
+		  Call m.Operand.Accept(Self)
+		  
+		  // Load the method's name into the constant pool.
+		  Var index As Integer = AddConstant(m.MethodName)
+		  
+		  // Compile the arguments.
+		  For Each arg As ObjoScript.Expr In m.Arguments
+		    Call arg.Accept(Self)
+		  Next arg
+		  
+		  // Emit the OP_INVOKE instruction and the index of the method's name in the constant pool
+		  EmitIndexedOpcode(ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_INVOKE_LONG, index, m.Location)
+		  
+		  // Emit the argument count.
+		  EmitByte(m.Arguments.Count, m.Location)
 		  
 		End Function
 	#tag EndMethod
@@ -1452,8 +1482,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
-		  #Pragma Warning "CHECK: Is this call to get_local correct. I think it is"
-		  
 		  mLocation = this.Location
 		  
 		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
@@ -1463,15 +1491,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // `this` is always at slot 0 of the call frame.
 		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
 		  
-		  ' DeclareVariable(this.Location)
-		  ' 
-		  ' Var index As Integer = -1 // -1 is a deliberate invalid index.
-		  ' If ScopeDepth = 0 Then
-		  ' // Global variable declaration. Add the name of the variable to the constant pool and get its index.
-		  ' index = AddConstant(this.Location.Lexeme)
-		  ' End If
-		  ' 
-		  ' DefineVariable(index)
 		End Function
 	#tag EndMethod
 

@@ -354,9 +354,61 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_CONSTRUCTOR
 		    Return TwoByteInstruction("OP_CONSTRUCTOR", chunk, offset)
 		    
+		  Case ObjoScript.VM.OP_INVOKE
+		    Return InvokeInstruction(opcode, chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_INVOKE_LONG
+		    Return InvokeInstruction(opcode, chunk, offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5072696E747320746865206E616D65206F662061206A756D7020696E737472756374696F6E202855496E743136206F706572616E642920616E642072657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E20496620606E6567617469766560207468656E20746869732069732061206261636B7761726473206A756D702E
+		Function InvokeInstruction(opcode As UInt8, chunk As ObjoScript.Chunk, offset As Integer) As Integer
+		  /// Prints the invoke jump instruction and returns the offset for the next instruction.
+		  ///
+		  /// Format:
+		  /// OFFSET  LINE  (OPTIONAL SCRIPT ID)  OPCODE  METHOD_NAME_INDEX  METHOD_NAME  ARGCOUNT
+		  
+		  Var instructionName As String
+		  Var index, newOffset, argCount As Integer
+		  Select Case opcode
+		  Case ObjoScript.VM.OP_INVOKE
+		    instructionName = "OP_INVOKE"
+		    index = chunk.ReadByte(offset + 1)
+		    argCount = chunk.ReadByte(offset + 2)
+		    newOffset = offset + 3
+		    
+		  Case ObjoScript.VM.OP_INVOKE
+		    instructionName = "OP_INVOKE_LONG"
+		    index = chunk.ReadUInt16(offset + 1)
+		    argCount = chunk.ReadByte(offset + 3)
+		    newOffset = offset + 4
+		    
+		  Else
+		    Raise New UnsupportedOperationException("Unknown invoke opcode.")
+		  End Select
+		  
+		  // Print the instruction name.
+		  Print(instructionName.JustifyLeft(2 * COL_WIDTH))
+		  
+		  // Print the index.
+		  Var indexCol As String = index.ToString(Locale.Current, "#####")
+		  Print(indexCol.JustifyLeft(COL_WIDTH))
+		  
+		  // Print the method's name.
+		  Var methodNameValue As Variant = chunk.Constants(index)
+		  Var methodName As String = ObjoScript.VM.ValueToString(methodNameValue)
+		  Print(methodName.JustifyLeft(2 * COL_WIDTH))
+		  
+		  // Print the argument count.
+		  Print(argCount.ToString.JustifyLeft(2 * COL_WIDTH))
+		  
+		  Return newOffset
 		  
 		End Function
 	#tag EndMethod
@@ -388,7 +440,7 @@ Protected Class Disassembler
 		  /// Prints the instruction's name, the index of the method's name in the constant pool, the method name and if it's a setter or not.
 		  /// Returns the offset for the next instruction.
 		  ///
-		  /// The METHOD instructiona takes a two or three byte operands (1/2 for the index of the name in the constant pool and one specifying if the
+		  /// The METHOD instruction takes two or three byte operands (1/2 for the index of the name in the constant pool and one specifying if the
 		  /// the method is a setter (1) or a regular method (0).
 		  /// Format:
 		  /// OFFSET  LINE  (OPTIONAL SCRIPT ID)  OPCODE  POOL_INDEX  METHOD_NAME   SETTER?

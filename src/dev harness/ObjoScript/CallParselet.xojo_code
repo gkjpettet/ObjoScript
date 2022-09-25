@@ -19,7 +19,7 @@ Implements ObjoScript.InfixParselet
 		    Loop Until Not parser.Match(ObjoScript.TokenTypes.Comma)
 		  End If
 		  
-		  parser.Consume(ObjoScript.TokenTypes.RParen, "Expected a `)` after the call's argument's.")
+		  parser.Consume(ObjoScript.TokenTypes.RParen, "Expected a `)` after the call's arguments.")
 		  
 		  Return New CallExpr(left, arguments, lparen)
 		  

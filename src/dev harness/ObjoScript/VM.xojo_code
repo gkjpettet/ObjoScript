@@ -145,6 +145,8 @@ Protected Class VM
 		    Error("Can only call functions, classes and methods.")
 		  End Select
 		  
+		  // Update the current call frame.
+		  CurrentFrame = Frames(FrameCount - 1)
 		End Sub
 	#tag EndMethod
 
@@ -293,6 +295,49 @@ Protected Class VM
 		  
 		  // Push the value on to the stack.
 		  Push(value)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 496E766F6B65732061206D6574686F64206F6E20616E20696E7374616E63652E2054686520696E7374616E636520636F6E7461696E696E6720746865206D6574686F642073686F756C64206265206F6E2074686520737461636B20616C6F6E67207769746820616E7920617267756D656E74732069742072657175697265732E
+		Private Sub Invoke(methodName As String, argCount As Integer)
+		  /// Invokes a method on an instance. The instance containing the method should be on the stack
+		  /// along with any arguments it requires.
+		  ///
+		  /// |
+		  /// | argN <-- top of stack
+		  /// | arg1
+		  /// | instance
+		  
+		  // Grab the receiver from the stack. It should be beneath any arguments to the invocation.
+		  Var receiver As Variant = Peek(argCount)
+		  If receiver IsA ObjoScript.Instance = False Then
+		    Error("Only instances have methods.")
+		  End If
+		  
+		  InvokeFromClass(ObjoScript.Instance(receiver).Klass, methodName, argCount)
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 4469726563746C7920696E766F6B65732061206D6574686F642063616C6C656420606D6574686F644E616D6560206F6E20606B6C617373602E20417373756D6573207468617420616E20696E7374616E6365206F6620606B6C6173736020616E642074686520726571756972656420617267756D656E74732061726520616C7265616479206F6E2074686520737461636B2E
+		Private Sub InvokeFromClass(klass As ObjoScript.Klass, methodName As String, argCount As Integer)
+		  /// Directly invokes a method called `methodName` on `klass`. Assumes that an instance of `klass` and the required
+		  /// arguments are already on the stack.
+		  ///
+		  /// |
+		  /// | argN <-- top of stack
+		  /// | arg1
+		  /// | instance
+		  
+		  Var method As Variant = klass.Methods.Lookup(methodName, Nil)
+		  If method = Nil Then
+		    Error("There is no method named `" + methodName + "` on `" + klass.ToString + "`.")
+		  End If
+		  
+		  CallFunction(method, argCount)
+		  
+		  // Update the current call frame.
+		  CurrentFrame = Frames(FrameCount - 1)
 		  
 		End Sub
 	#tag EndMethod
@@ -776,9 +821,6 @@ Protected Class VM
 		      Var argcount As Integer = ReadByte
 		      Call CallValue(Peek(argcount), argcount)
 		      
-		      // Update the current call frame (as a new call frame will have been created by the `CallValue` method).
-		      CurrentFrame = Frames(FrameCount - 1)
-		      
 		    Case OP_CLASS
 		      Var className As String = ReadConstant
 		      Push(New ObjoScript.Klass(className))
@@ -819,6 +861,12 @@ Protected Class VM
 		      
 		    Case OP_CONSTRUCTOR
 		      DefineConstructor(ReadByte)
+		      
+		    Case VM.OP_INVOKE
+		      Invoke(ReadConstant, ReadByte)
+		      
+		    Case VM.OP_INVOKE_LONG
+		      Invoke(ReadConstantLong, ReadByte)
 		      
 		    End Select
 		  Wend
@@ -897,8 +945,6 @@ Protected Class VM
 		  // Call the method.
 		  CallValue(bound, 1)
 		  
-		  // Update the current call frame (as a new call frame will have been created by the `CallValue` method).
-		  CurrentFrame = Frames(FrameCount - 1)
 		End Sub
 	#tag EndMethod
 
@@ -1066,6 +1112,8 @@ Protected Class VM
 		58: OP_SET_FIELD
 		59: OP_SET_FIELD_LONG
 		60: OP_CONSTRUCTOR
+		61: OP_INVOKE
+		62: OP_INVOKE_LONG
 	#tag EndNote
 
 
@@ -1254,6 +1302,12 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_INCLUSIVE_RANGE, Type = Double, Dynamic = False, Default = \"44", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_INVOKE, Type = Double, Dynamic = False, Default = \"61", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_INVOKE_LONG, Type = Double, Dynamic = False, Default = \"62", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_JUMP, Type = Double, Dynamic = False, Default = \"40", Scope = Public

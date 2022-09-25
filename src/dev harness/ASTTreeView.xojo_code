@@ -359,6 +359,32 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitMethodInvocation(m As ObjoScript.MethodInvocationExpr) As Variant
+		  Var node As New TreeViewNode("Method invocation")
+		  
+		  node.AppendNode(New TreeViewNode("Method name: " + m.MethodName))
+		  
+		  Var operandNode As New TreeViewNode("Operand")
+		  operandNode.AppendNode(m.Operand.Accept(Self))
+		  node.AppendNode(operandNode)
+		  
+		  // Optional arguments.
+		  If m.Arguments.Count = 0 Then
+		    node.AppendNode(New TreeViewNode("No arguments"))
+		  Else
+		    Var argNode As New TreeViewNode("Arguments")
+		    For Each arg As ObjoScript.Expr In m.Arguments
+		      argNode.AppendNode(arg.Accept(Self))
+		    Next arg
+		    node.AppendNode(argNode)
+		  End If
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitNothing(expr As ObjoScript.NothingLiteral) As Variant
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
