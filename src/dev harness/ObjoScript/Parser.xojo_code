@@ -205,6 +205,8 @@ Protected Class Parser
 		  /// If the current token matches `expected` then it's consumed.
 		  /// If not, we raise an exception with `message`.
 		  
+		  #Pragma BreakOnExceptions False
+		  
 		  If Current.Type <> expected Then
 		    message = If(message = "", "Expected " + expected.ToString + " but got " + Current.Type.ToString + " instead.", message)
 		    Raise New ObjoScript.ParserException(message, Current)
@@ -219,6 +221,8 @@ Protected Class Parser
 		Function Consume(expected As ObjoScript.TokenTypes, message As String = "") As ObjoScript.Token
 		  /// If the current token matches `expected` then it's consumed and returned.
 		  /// If not, we raise an exception with `message`.
+		  
+		  #Pragma BreakOnExceptions False
 		  
 		  If Current.Type <> expected Then
 		    message = If(message = "", "Expected " + expected.ToString + " but got " + Current.Type.ToString + " instead.", message)
@@ -832,7 +836,7 @@ Protected Class Parser
 		    returnValue = New ObjoScript.NothingLiteral(returnKeyword)
 		  Else
 		    returnValue = Expression
-		    If Not Check(ObjoScript.TokenTypes.RParen) Then
+		    If Not Check(ObjoScript.TokenTypes.RParen, ObjoScript.TokenTypes.RCurly) Then
 		      ConsumeNewLine("Expected a new line or closing brace after the return statement value.")
 		    End If
 		  End If
