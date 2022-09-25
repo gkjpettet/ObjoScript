@@ -1005,8 +1005,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.StmtVisitor interface.
 		  
-		  #Pragma Warning "TODO: Handle superclasses - scope? Popping the superclass??"
-		  
 		  mLocation = c.Location
 		  
 		  If Self.Type <> ObjoScript.FunctionTypes.TopLevel Then

@@ -886,10 +886,10 @@ Protected Class VM
 		      BindMethod(ReadConstantLong, False)
 		      
 		    Case OP_SETTER
-		      Setter(ReadConstant)
+		      Setter(ReadConstant, False)
 		      
 		    Case OP_SETTER_LONG
-		      Setter(ReadConstantLong)
+		      Setter(ReadConstantLong, False)
 		      
 		    Case OP_GET_FIELD
 		      GetField(ReadConstant)
@@ -922,10 +922,10 @@ Protected Class VM
 		      BindMethod(ReadConstantLong, True)
 		      
 		    Case OP_SUPER_SETTER
-		      #Pragma Warning "TODO"
+		      Setter(ReadConstant, True)
 		      
 		    Case OP_SUPER_SETTER_LONG
-		      #Pragma Warning "TODO"
+		      Setter(ReadConstantLong, True)
 		      
 		    End Select
 		  Wend
@@ -964,14 +964,16 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 43616C6C73207468652073657474657220666F722074686520696E7374616E6365206F6E652066726F6D2074686520746F70206F662074686520737461636B2C2070617373696E6720696E207468652076616C7565206F6E2074686520746F70206F662074686520737461636B2061732074686520706172616D657465722E
-		Private Sub Setter(name As String)
+		Private Sub Setter(name As String, onSuper As Boolean)
 		  /// Calls the setter for the instance one from the top of the stack, passing in the 
 		  /// value on the top of the stack as the parameter.
 		  ///
 		  /// |
 		  /// | ValueToAssign   <-- top of the stack
 		  /// | Instance
-		  /// |
+		  ///
+		  /// If `onSuper` is True then we look for the method on the instance's superclass, otherwise
+		  /// we look on the instance's class.
 		  
 		  // Check we have an instance in the correct place.
 		  Var instance As ObjoScript.Instance
@@ -984,9 +986,22 @@ Protected Class VM
 		  // Get the value to assign. This will be the parameter to the setter method.
 		  Var value As Variant = Pop
 		  
-		  Var setter As ObjoScript.Func = instance.klass.Setters.Lookup(name, Nil)
-		  If setter = Nil Then
-		    Error("Undefined setter `" + name + "` on " + instance.klass.ToString + ".")
+		  // Get the correct method. It's either on the instance's class or its superclass.
+		  Var setter As ObjoScript.Func
+		  If onSuper Then
+		    If instance.Klass.Superclass = Nil Then
+		      Error("`" + instance.Klass.ToString + "` does not have a superclass.")
+		    Else
+		      setter = instance.Klass.Superclass.Setters.Lookup(name, Nil)
+		    End If
+		    If setter = Nil Then
+		      Error("Undefined setter `" + name + "` on " + instance.klass.Superclass.ToString + ".")
+		    End If
+		  Else
+		    setter = instance.klass.Setters.Lookup(name, Nil)
+		    If setter = Nil Then
+		      Error("Undefined setter `" + name + "` on " + instance.klass.ToString + ".")
+		    End If
 		  End If
 		  
 		  // Bind this method to the instance which is currently on the top of the stack.
