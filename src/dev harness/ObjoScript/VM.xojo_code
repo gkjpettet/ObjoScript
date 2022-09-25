@@ -33,9 +33,12 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 42696E6473206120726567756C6172202867657474657229206D6574686F64206E616D656420606E616D656020746F2074686520696E7374616E6365206F6E2074686520746F70206F662074686520737461636B2E20417373657274732074686520746F70206F662074686520737461636B20697320616E20696E7374616E63652E
-		Private Sub BindMethod(name As String)
+		Private Sub BindMethod(name As String, onSuper As Boolean)
 		  /// Binds a regular (getter) method named `name` to the instance on the top of the stack.
 		  /// Asserts the top of the stack is an instance.
+		  ///
+		  /// If `onSuper` is True then we look for the method on the instance's superclass, otherwise
+		  /// we look on the instance's class.
 		  
 		  // Check we have an instance on the top of the stack.
 		  Var instance As ObjoScript.Instance
@@ -45,10 +48,22 @@ Protected Class VM
 		    Error("Methods can only be invoked on instances.")
 		  End If
 		  
-		  Var method As ObjoScript.Func = instance.klass.Methods.Lookup(name, Nil)
-		  
-		  If method = Nil Then
-		    Error("Undefined method `" + name + "` on " + instance.klass.ToString + ".")
+		  // Get the correct method. It's either on the instance's class or its superclass.
+		  Var method As ObjoScript.Func
+		  If onSuper Then
+		    If instance.Klass.Superclass = Nil Then
+		      Error("`" + instance.Klass.ToString + "` does not have a superclass.")
+		    Else
+		      method = instance.Klass.Superclass.Methods.Lookup(name, Nil)
+		    End If
+		    If method = Nil Then
+		      Error("Undefined method `" + name + "` on " + instance.klass.Superclass.ToString + ".")
+		    End If
+		  Else
+		    method = instance.klass.Methods.Lookup(name, Nil)
+		    If method = Nil Then
+		      Error("Undefined method `" + name + "` on " + instance.klass.ToString + ".")
+		    End If
 		  End If
 		  
 		  // Bind this method to the instance which is currently on the top of the stack.
@@ -295,6 +310,35 @@ Protected Class VM
 		  
 		  // Push the value on to the stack.
 		  Push(value)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 48616E646C657320746865204F505F494E484552495420696E737472756374696F6E2E
+		Private Sub Inherit()
+		  /// Handles the OP_INHERIT instruction.
+		  ///
+		  /// The compiler ensures that the stack looks like this when a class declaration specifies
+		  /// the class has a superclass.
+		  ///
+		  /// | superclass  <-- top of the stack.
+		  /// | subclass
+		  
+		  // Make sure the top of the stack is a class to inherit from.
+		  If Peek(0) IsA ObjoScript.Klass = False Then
+		    Error("Can only inherit from other classes.")
+		  End If
+		  
+		  Var superclass As ObjoScript.Klass = Peek(0)
+		  Var subclass As ObjoScript.Klass = Peek(1)
+		  
+		  // At this point, no methods have been defined on the subclass (since this
+		  // opcode should only occur within a class declaration). Therefore, copy all the 
+		  // superclass' methods to the class on the stack.
+		  subclass.Methods = superclass.Methods.Clone
+		  
+		  // This class should keep a reference to its superclass. Do this and pop it off the stack.
+		  subclass.Superclass = Pop
 		  
 		End Sub
 	#tag EndMethod
@@ -836,10 +880,10 @@ Protected Class VM
 		      DefineMethod(ReadConstantLong, ReadByte)
 		      
 		    Case OP_GETTER
-		      BindMethod(ReadConstant)
+		      BindMethod(ReadConstant, False)
 		      
 		    Case OP_GETTER_LONG
-		      BindMethod(ReadConstantLong)
+		      BindMethod(ReadConstantLong, False)
 		      
 		    Case OP_SETTER
 		      Setter(ReadConstant)
@@ -867,6 +911,21 @@ Protected Class VM
 		      
 		    Case VM.OP_INVOKE_LONG
 		      Invoke(ReadConstantLong, ReadByte)
+		      
+		    Case OP_INHERIT
+		      Inherit
+		      
+		    Case OP_SUPER_GETTER
+		      BindMethod(ReadConstant, True)
+		      
+		    Case OP_SUPER_GETTER_LONG
+		      BindMethod(ReadConstantLong, True)
+		      
+		    Case OP_SUPER_SETTER
+		      #Pragma Warning "TODO"
+		      
+		    Case OP_SUPER_SETTER_LONG
+		      #Pragma Warning "TODO"
 		      
 		    End Select
 		  Wend
@@ -1114,6 +1173,11 @@ Protected Class VM
 		60: OP_CONSTRUCTOR
 		61: OP_INVOKE
 		62: OP_INVOKE_LONG
+		63: OP_INHERIT
+		64: OP_SUPER_GETTER
+		65: OP_SUPER_GETTER_LONG
+		66: OP_SUPER_SETTER
+		67: OP_SUPER_SETTER_LONG
 	#tag EndNote
 
 
@@ -1304,6 +1368,9 @@ Protected Class VM
 	#tag Constant, Name = OP_INCLUSIVE_RANGE, Type = Double, Dynamic = False, Default = \"44", Scope = Public
 	#tag EndConstant
 
+	#tag Constant, Name = OP_INHERIT, Type = Double, Dynamic = False, Default = \"63", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = OP_INVOKE, Type = Double, Dynamic = False, Default = \"61", Scope = Public
 	#tag EndConstant
 
@@ -1404,6 +1471,18 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SUBTRACT, Type = Double, Dynamic = False, Default = \"5", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SUPER_GETTER, Type = Double, Dynamic = False, Default = \"64", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SUPER_GETTER_LONG, Type = Double, Dynamic = False, Default = \"65", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SUPER_SETTER, Type = Double, Dynamic = False, Default = \"66", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SUPER_SETTER_LONG, Type = Double, Dynamic = False, Default = \"67", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_TRUE, Type = Double, Dynamic = False, Default = \"16", Scope = Public

@@ -262,6 +262,9 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.String_
 		    Return "string"
 		    
+		  Case ObjoScript.TokenTypes.Super_
+		    Return "super"
+		    
 		  Case ObjoScript.TokenTypes.Then_
 		    Return "then"
 		    
@@ -456,6 +459,7 @@ Protected Module ObjoScript
 		  StarEqual
 		  Static_
 		  String_
+		  Super_
 		  This
 		  Tilde
 		  Underscore

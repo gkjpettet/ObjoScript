@@ -107,6 +107,26 @@ Protected Class Disassembler
 		    newOffset = offset + 3
 		    name = "GET_FIELD_LONG"
 		    
+		  Case ObjoScript.VM.OP_SUPER_GETTER
+		    constantIndex = chunk.ReadByte(offset + 1)
+		    newOffset = offset + 2
+		    name = "SUPER_GETTER"
+		    
+		  Case ObjoScript.VM.OP_SUPER_GETTER_LONG
+		    constantIndex = chunk.ReadUInt16(offset + 1)
+		    newOffset = offset + 3
+		    name = "SUPER_GETTER_LONG"
+		    
+		  Case ObjoScript.VM.OP_SUPER_SETTER
+		    constantIndex = chunk.ReadByte(offset + 1)
+		    newOffset = offset + 2
+		    name = "SUPER_SETTER"
+		    
+		  Case ObjoScript.VM.OP_SUPER_SETTER_LONG
+		    constantIndex = chunk.ReadUInt16(offset + 1)
+		    newOffset = offset + 3
+		    name = "SUPER_SETTER_LONG"
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown constant opcode.")
 		  End Select
@@ -359,6 +379,21 @@ Protected Class Disassembler
 		    
 		  Case ObjoScript.VM.OP_INVOKE_LONG
 		    Return InvokeInstruction(opcode, chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_INHERIT
+		    Return SimpleInstruction("OP_INHERIT", offset)
+		    
+		  Case ObjoScript.VM.OP_SUPER_GETTER
+		    Return ConstantInstruction(opcode, chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_GETTER_LONG
+		    Return ConstantInstruction(opcode, chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_SUPER_SETTER
+		    Return ConstantInstruction(opcode, chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_SETTER_LONG
+		    Return ConstantInstruction(opcode, chunk, offset)
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")

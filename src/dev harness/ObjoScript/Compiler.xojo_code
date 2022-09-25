@@ -627,6 +627,25 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 436F6D70696C65732072657472696576696E672061207661726961626C65206E616D656420606E616D65602E
+		Private Sub NamedVariable(name As String)
+		  /// Compiles retrieving a variable named `name`.
+		  
+		  Var arg As Integer = ResolveLocal(name)
+		  If arg <> -1 Then
+		    // Retrieve a local variable.
+		    EmitBytes(ObjoScript.VM.OP_GET_LOCAL, arg)
+		  Else
+		    // Retrieve a global variable.
+		    // Add the name of the variable to the constant pool and get its index.
+		    Var index As Integer = AddConstant(name)
+		    // Push the variable on to the stack.
+		    EmitGetGlobal(index)
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E7320746865206E756D626572206F66206279746573207573656420666F72206F706572616E647320666F7220606F70636F6465602E
 		Private Function OperandByteCountForOpcode(opcode As Integer) As Integer
 		  /// Returns the number of bytes used for operands for `opcode`.
@@ -986,10 +1005,16 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.StmtVisitor interface.
 		  
+		  #Pragma Warning "TODO: Handle superclasses - scope? Popping the superclass??"
+		  
 		  mLocation = c.Location
 		  
 		  If Self.Type <> ObjoScript.FunctionTypes.TopLevel Then
 		    Error("Classes can only be declared within the top level of a script.")
+		  End If
+		  
+		  If c.HasSuperclass And c.Name.Compare(c.Superclass, ComparisonOptions.CaseSensitive) = 0 Then
+		    Error("A class cannot inherit from itself.")
 		  End If
 		  
 		  DeclareVariable(c.Identifier)
@@ -1011,6 +1036,14 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Push the class back on to the stack so the methods can find it.
 		  EmitGetGlobal(index)
+		  
+		  If c.HasSuperclass Then
+		    // Look up the superclass and push it on to the stack.
+		    NamedVariable(c.Superclass)
+		    // Tell the VM that this class inherits from the class on the stack.
+		    // The VM will pop the superclass off the stack when its done handling the inheritance.
+		    EmitByte(ObjoScript.VM.OP_INHERIT, c.Location)
+		  End If
 		  
 		  // Compile any constructors.
 		  For Each constructor As ObjoScript.ConstructorDeclStmt In c.Constructors
@@ -1476,6 +1509,42 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120607375706572602065787072657373696F6E2E
+		Function VisitSuper(s As ObjoScript.SuperExpr) As Variant
+		  /// Compiles a `super` expression.
+		  ///
+		  /// The runtime needs three things to execute a `super` expression.
+		  ///  1. The instance.
+		  ///  2. The superclass.
+		  ///  3. The name of the method to invoke.
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  mLocation = s.Location
+		  
+		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		    Error("`super` can only be used within a method or constructor.")
+		  End If
+		  
+		  // Push `this` onto the stack. It's always at slot 0 of the call frame.
+		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		  
+		  // Load the method's name into the constant pool.
+		  Var index As Integer = AddConstant(s.Identifier.Lexeme)
+		  
+		  If s.IsSetter Then
+		    // Compile the value to assign.
+		    Call s.ValueToAssign.Accept(Self)
+		    // Emit the `super` setter instruction with the index in the constant pool of the method name to invoke.
+		    EmitIndexedOpcode(ObjoScript.VM.OP_SUPER_SETTER, ObjoScript.VM.OP_SUPER_SETTER_LONG, index)
+		  Else
+		    // Emit the `super` getter instruction with the index in the constant pool of the method name to invoke.
+		    EmitIndexedOpcode(ObjoScript.VM.OP_SUPER_GETTER, ObjoScript.VM.OP_SUPER_GETTER_LONG, index)
+		  End If
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D70696C65732061206074686973602065787072657373696F6E2E
 		Function VisitThis(this As ObjoScript.ThisExpr) As Variant
 		  /// Compiles a `this` expression.
@@ -1557,23 +1626,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C652072657472696576696E672061206E616D6564207661726961626C652E
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732072657472696576696E672061206E616D6564207661726961626C652E
 		Function VisitVariable(expr As ObjoScript.VariableExpr) As Variant
-		  /// Compile retrieving a named variable.
+		  /// Compiles retrieving a named variable.
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
-		  Var arg As Integer = ResolveLocal(expr.Name)
-		  If arg <> -1 Then
-		    // Retrieve a local variable.
-		    EmitBytes(ObjoScript.VM.OP_GET_LOCAL, arg)
-		  Else
-		    // Retrieve a global variable.
-		    // Add the name of the variable to the constant pool and get its index.
-		    Var index As Integer = AddConstant(expr.Name)
-		    // Push the variable on to the stack.
-		    EmitGetGlobal(index)
-		  End If
+		  NamedVariable(expr.Name)
 		  
 		End Function
 	#tag EndMethod

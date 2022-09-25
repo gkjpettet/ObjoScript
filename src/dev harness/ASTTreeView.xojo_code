@@ -465,6 +465,15 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitSuper(s As ObjoScript.SuperExpr) As Variant
+		  #Pragma Unused s
+		  
+		  Return New TreeViewNode("Super")
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitThis(this As ObjoScript.ThisExpr) As Variant
 		  #Pragma Unused this
 		  

@@ -122,6 +122,12 @@ Protected Class Parser
 		  Var identifier As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier, "Expected a class name.")
 		  Var className As String = identifier.Lexeme
 		  
+		  // Optional superclass.
+		  Var superClass As String = ""
+		  If Match(ObjoScript.TokenTypes.Is_) Then
+		    superClass = Consume(ObjoScript.TokenTypes.Identifier, "Expected a superclass name.").Lexeme
+		  End If
+		  
 		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the class name.")
 		  
 		  // Optional new line.
@@ -150,7 +156,7 @@ Protected Class Parser
 		  
 		  Consume(ObjoScript.TokenTypes.RCurly, "Expected a `}` after the class body.")
 		  
-		  Return New ObjoScript.ClassDeclStmt(identifier, constructors, methods, classKeyword)
+		  Return New ObjoScript.ClassDeclStmt(superClass, identifier, constructors, methods, classKeyword)
 		  
 		End Function
 	#tag EndMethod
@@ -582,6 +588,7 @@ Protected Class Parser
 		  TokenTypes.StarEqual         : Unused, _
 		  TokenTypes.Static_           : Unused, _
 		  TokenTypes.String_           : Prefix(New LiteralParselet), _
+		  TokenTypes.Super_            : Prefix(New SuperParselet), _
 		  TokenTypes.Then_             : Unused, _
 		  TokenTypes.This              : Prefix(New ThisParselet), _
 		  TokenTypes.Tilde             : NewRule(New UnaryParselet, Nil, Precedences.None), _

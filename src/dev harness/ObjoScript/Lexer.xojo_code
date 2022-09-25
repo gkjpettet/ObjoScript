@@ -399,6 +399,7 @@ Protected Class Lexer
 		  d.Value("print")       = ObjoScript.TokenTypes.Print
 		  d.Value("return")      = ObjoScript.TokenTypes.Return_
 		  d.Value("static")      = ObjoScript.TokenTypes.Static_
+		  d.Value("super")       = ObjoScript.TokenTypes.Super_
 		  d.Value("then")        = ObjoScript.TokenTypes.Then_
 		  d.Value("this")        = ObjoScript.TokenTypes.This
 		  d.Value("true")        = ObjoScript.TokenTypes.Boolean_

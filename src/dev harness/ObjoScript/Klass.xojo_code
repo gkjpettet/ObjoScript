@@ -62,6 +62,10 @@ Implements ObjoScript.Value
 		Setters As Dictionary
 	#tag EndProperty
 
+	#tag Property, Flags = &h0, Description = 5468697320636C61737327207375706572636C6173732E204D6179206265204E696C2E
+		Superclass As ObjoScript.Klass
+	#tag EndProperty
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

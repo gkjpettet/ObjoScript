@@ -10,7 +10,8 @@ Implements ObjoScript.Stmt
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(identifier As ObjoScript.Token, constructors() As ObjoScript.ConstructorDeclStmt, methods() As ObjoScript.MethodDeclStmt, classKeyword As ObjoScript.Token)
+		Sub Constructor(superclass As String, identifier As ObjoScript.Token, constructors() As ObjoScript.ConstructorDeclStmt, methods() As ObjoScript.MethodDeclStmt, classKeyword As ObjoScript.Token)
+		  Self.Superclass = superclass
 		  Self.Identifier = identifier
 		  Self.Constructors = constructors
 		  Self.Methods = methods
@@ -34,6 +35,16 @@ Implements ObjoScript.Stmt
 		Constructors() As ObjoScript.ConstructorDeclStmt
 	#tag EndProperty
 
+	#tag ComputedProperty, Flags = &h0, Description = 54727565206966207468697320636C617373206861732061207375706572636C6173732E
+		#tag Getter
+			Get
+			  Return Superclass <> ""
+			  
+			End Get
+		#tag EndGetter
+		HasSuperclass As Boolean
+	#tag EndComputedProperty
+
 	#tag Property, Flags = &h0, Description = 54686520636C61737327206E616D6520746F6B656E2E
 		Identifier As ObjoScript.Token
 	#tag EndProperty
@@ -55,6 +66,10 @@ Implements ObjoScript.Stmt
 		#tag EndGetter
 		Name As String
 	#tag EndComputedProperty
+
+	#tag Property, Flags = &h0, Description = 5468697320636C61737327207375706572636C6173732E202222206966206E6F6E652E
+		Superclass As String
+	#tag EndProperty
 
 
 	#tag ViewBehavior
