@@ -473,7 +473,8 @@ Protected Module ObjoScript
 		Func
 		  Klass
 		  Instance
-		BoundMethod
+		  BoundMethod
+		BoundStaticMethod
 	#tag EndEnum
 
 

@@ -1048,7 +1048,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Call constructor.Accept(Self)
 		  Next constructor
 		  
-		  // Compile any methods.
+		  // Compile any static methods.
+		  For Each sm As ObjoScript.MethodDeclStmt In c.StaticMethods
+		    Call sm.Accept(Self)
+		  Next sm
+		  
+		  // Compile any instance emethods.
 		  For Each m As ObjoScript.MethodDeclStmt In c.Methods
 		    Call m.Accept(Self)
 		  Next m
@@ -1360,19 +1365,15 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // and push it on to the stack.
 		  Call EmitConstant(body)
 		  
-		  // Emit the "declare method" opcode (which one depends on the index in the constant pool).
+		  // Emit the "declare method" or "declare static method" opcode.
 		  // The operands are the index of the method's name in the constants pool and whether
 		  // this is a setter (1) or regular method (0).
-		  If index <= 255 Then
-		    EmitByte(ObjoScript.VM.OP_METHOD)
-		    EmitByte(index)
-		    EmitByte(If(m.IsSetter, 1, 0))
+		  If m.IsStatic Then
+		    EmitIndexedOpcode(ObjoScript.VM.OP_STATIC_METHOD, ObjoScript.VM.OP_STATIC_METHOD_LONG, index)
 		  Else
-		    EmitByte(ObjoScript.VM.OP_METHOD_LONG)
-		    EmitUInt16(index)
-		    EmitByte(If(m.IsSetter, 1, 0))
+		    EmitIndexedOpcode(ObjoScript.VM.OP_METHOD, ObjoScript.VM.OP_METHOD_LONG, index)
 		  End If
-		  
+		  EmitByte(If(m.IsSetter, 1, 0))
 		  
 		End Function
 	#tag EndMethod

@@ -11,10 +11,11 @@ Implements ObjoScript.Stmt
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(className As String, identifier As ObjoScript.Token, isSetter As Boolean, params() As ObjoScript.Token, body As ObjoScript.BlockStmt)
+		Sub Constructor(className As String, identifier As ObjoScript.Token, isSetter As Boolean, isStatic As Boolean, params() As ObjoScript.Token, body As ObjoScript.BlockStmt)
 		  Self.ClassName = className
 		  mIdentifier = identifier
 		  Self.IsSetter = isSetter
+		  Self.IsStatic = isStatic
 		  Self.Parameters = params
 		  Self.Body = body
 		  
@@ -42,6 +43,10 @@ Implements ObjoScript.Stmt
 
 	#tag Property, Flags = &h0, Description = 576865746865722074686973206D6574686F64206973206120736574746572206F72206120726567756C6172206D6574686F642E
 		IsSetter As Boolean = False
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 547275652069662074686973206973206120737461746963206D6574686F64206465636C61726174696F6E2E
+		IsStatic As Boolean = False
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 546865206964656E74696669657220746F6B656E20666F722074686973206D6574686F6420696E20746865206F726967696E616C20746F6B656E2073747265616D2E
@@ -110,6 +115,14 @@ Implements ObjoScript.Stmt
 			Group="Behavior"
 			InitialValue=""
 			Type="String"
+			EditorType="MultiLineEditor"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="IsSetter"
+			Visible=false
+			Group="Behavior"
+			InitialValue="False"
+			Type="Boolean"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

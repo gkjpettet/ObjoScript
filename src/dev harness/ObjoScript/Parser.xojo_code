@@ -134,7 +134,7 @@ Protected Class Parser
 		  Call Match(ObjoScript.TokenTypes.EOL)
 		  
 		  // Optional constructors/methods.
-		  Var methods() As ObjoScript.MethodDeclStmt
+		  Var methods(), staticMethods() As ObjoScript.MethodDeclStmt
 		  Var constructors(), cdecl As ObjoScript.ConstructorDeclStmt
 		  Var constructorArities As New Dictionary // Key = arity: Value = Nil
 		  While Not Check(ObjoScript.TokenTypes.RCurly, ObjoScript.TokenTypes.EOF)
@@ -146,8 +146,12 @@ Protected Class Parser
 		      Else
 		        constructors.Add(cdecl)
 		      End If
+		      
+		    ElseIf Match(ObjoScript.TokenTypes.Static_) Then
+		      staticMethods.Add(MethodDeclaration(className, True))
+		      
 		    Else
-		      methods.Add(MethodDeclaration(className))
+		      methods.Add(MethodDeclaration(className, False))
 		    End If
 		    
 		    // Optional new line.
@@ -156,7 +160,7 @@ Protected Class Parser
 		  
 		  Consume(ObjoScript.TokenTypes.RCurly, "Expected a `}` after the class body.")
 		  
-		  Return New ObjoScript.ClassDeclStmt(superClass, identifier, constructors, methods, classKeyword)
+		  Return New ObjoScript.ClassDeclStmt(superClass, identifier, constructors, staticMethods, methods, classKeyword)
 		  
 		End Function
 	#tag EndMethod
@@ -620,9 +624,9 @@ Protected Class Parser
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Function MethodDeclaration(className As String) As ObjoScript.MethodDeclStmt
-		  /// Parses a class method declaration.
+	#tag Method, Flags = &h21, Description = 506172736573206120636C617373206D6574686F64206465636C61726174696F6E2028696E7374616E6365206F7220737461746963292E
+		Private Function MethodDeclaration(className As String, isStatic As Boolean) As ObjoScript.MethodDeclStmt
+		  /// Parses a class method declaration (instance or static).
 		  ///
 		  /// There are two types of methods: regular and setters.
 		  /// Regular methods may or may not return values and can accept any number of arguments.
@@ -630,6 +634,7 @@ Protected Class Parser
 		  /// ```
 		  /// age=(value){} // Note the `=` to denote it's a setter.
 		  /// ```
+		  /// If `isStatic` is True then this is a static method declaration.
 		  
 		  Var identifier As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier)
 		  
@@ -657,7 +662,7 @@ Protected Class Parser
 		  
 		  Var body As ObjoScript.BlockStmt = ObjoScript.BlockStmt(Block)
 		  
-		  Return New MethodDeclStmt(className, identifier, isSetter, params, body)
+		  Return New MethodDeclStmt(className, identifier, isSetter, isStatic, params, body)
 		  
 		End Function
 	#tag EndMethod

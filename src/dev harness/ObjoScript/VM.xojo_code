@@ -32,44 +32,59 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 42696E6473206120726567756C6172202867657474657229206D6574686F64206E616D656420606E616D656020746F2074686520696E7374616E6365206F6E2074686520746F70206F662074686520737461636B2E20417373657274732074686520746F70206F662074686520737461636B20697320616E20696E7374616E63652E
+	#tag Method, Flags = &h21, Description = 42696E6473206120726567756C6172202867657474657229206D6574686F64206E616D656420606E616D656020746F2074686520636C617373206F7220696E7374616E6365206F6E2074686520746F70206F662074686520737461636B2E20417373657274732074686520746F70206F662074686520737461636B20697320616E20696E7374616E6365206F7220636C6173732E
 		Private Sub BindMethod(name As String, onSuper As Boolean)
-		  /// Binds a regular (getter) method named `name` to the instance on the top of the stack.
-		  /// Asserts the top of the stack is an instance.
+		  /// Binds a regular (getter) method named `name` to the class or instance on the top of the stack.
+		  /// Asserts the top of the stack is an instance or class.
 		  ///
 		  /// If `onSuper` is True then we look for the method on the instance's superclass, otherwise
 		  /// we look on the instance's class.
 		  
-		  // Check we have an instance on the top of the stack.
-		  Var instance As ObjoScript.Instance
-		  If Peek(0) IsA ObjoScript.Instance Then
-		    instance = Peek(0)
-		  Else
-		    Error("Methods can only be invoked on instances.")
+		  // Check we have an instance or a class on the top of the stack.
+		  Var receiver As Variant = Peek(0)
+		  Var isStatic As Boolean = False
+		  If receiver IsA ObjoScript.Klass Then
+		    isStatic = True
+		  ElseIf receiver IsA ObjoScript.Instance = False Then
+		    Error("Methods can only be invoked on class and instances.")
 		  End If
 		  
-		  // Get the correct method. It's either on the instance's class or its superclass.
+		  // Get the correct method. It's either on the instance's class or its superclass
+		  // or it'll be a static method on the class on the top of the stack.
 		  Var method As ObjoScript.Func
-		  If onSuper Then
-		    If instance.Klass.Superclass = Nil Then
-		      Error("`" + instance.Klass.ToString + "` does not have a superclass.")
+		  If onSuper And Not isStatic Then
+		    If ObjoScript.Instance(receiver).Klass.Superclass = Nil Then
+		      Error("`" + ObjoScript.Instance(receiver).Klass.ToString + "` does not have a superclass.")
 		    Else
-		      method = instance.Klass.Superclass.Methods.Lookup(name, Nil)
+		      method = ObjoScript.Instance(receiver).Klass.Superclass.Methods.Lookup(name, Nil)
 		    End If
 		    If method = Nil Then
-		      Error("Undefined method `" + name + "` on " + instance.klass.Superclass.ToString + ".")
+		      Error("Undefined instance method `" + name + "` on " + ObjoScript.Instance(receiver).klass.Superclass.ToString + ".")
 		    End If
+		    
+		  ElseIf isStatic Then
+		    method = ObjoScript.Klass(receiver).StaticMethods.Lookup(name, Nil)
+		    If method = Nil Then
+		      Error("Undefined static method `" + name + "` on " + ObjoScript.Klass(receiver).ToString + ".")
+		    End If
+		    
 		  Else
-		    method = instance.klass.Methods.Lookup(name, Nil)
+		    method = ObjoScript.Instance(receiver).klass.Methods.Lookup(name, Nil)
 		    If method = Nil Then
-		      Error("Undefined method `" + name + "` on " + instance.klass.ToString + ".")
+		      Error("Undefined instance method `" + name + "` on " + ObjoScript.Instance(receiver).klass.ToString + ".")
 		    End If
 		  End If
 		  
-		  // Bind this method to the instance which is currently on the top of the stack.
-		  Var bound As New ObjoScript.BoundMethod(instance, method)
+		  Var bound As Variant
+		  If isStatic Then
+		    // Bind this method to the class which is currently on the top of the stack.
+		    bound = New ObjoScript.BoundStaticMethod(receiver, method)
+		  Else
+		    // Bind this method to the instance which is currently on the top of the stack.
+		    bound = New ObjoScript.BoundMethod(receiver, method)
+		  End If
 		  
-		  // Pop off of the instance.
+		  // Pop off of the instance or class.
 		  Call Pop
 		  
 		  // Push the bound method on to the stack.
@@ -156,6 +171,13 @@ Protected Class VM
 		    // Call the bound method.
 		    CallFunction(ObjoScript.BoundMethod(v).Method, argCount)
 		    
+		  Case ObjoScript.ValueTypes.BoundStaticMethod
+		    // Put the receiver of the call (the class before the dot) in slot 0 for the upcoming call frame.
+		    Stack(StackTop - argCount - 1) = ObjoScript.BoundStaticMethod(v).Receiver
+		    
+		    // Call the bound static method.
+		    CallFunction(ObjoScript.BoundStaticMethod(v).Method, argCount)
+		    
 		  Else
 		    Error("Can only call functions, classes and methods.")
 		  End Select
@@ -209,7 +231,7 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 446566696E65732061206D6574686F64206E616D656420606E616D6560206F6E2074686520636C617373206A7573742062656C6F7720746865206D6574686F64277320626F6479206F6E2074686520737461636B2E
-		Private Sub DefineMethod(name As String, setter As UInt8)
+		Private Sub DefineMethod(name As String, setter As UInt8, isStatic As Boolean)
 		  /// Defines a method named `name` on the class just below the method's body on the stack.
 		  ///
 		  /// The method's body should be on the top of the stack with its class just beneath it.
@@ -218,12 +240,22 @@ Protected Class VM
 		  Var method As ObjoScript.Func = Peek(0)
 		  Var klass As ObjoScript.Klass = Peek(1)
 		  
-		  If setter = 0 Then
-		    // Regular method.
-		    klass.Methods.Value(name) = method
+		  If isStatic Then
+		    If setter = 0 Then
+		      // Regular static method.
+		      klass.StaticMethods.Value(name) = method
+		    Else
+		      // Static setter.
+		      klass.StaticSetters.Value(name) = method
+		    End If
 		  Else
-		    // Setter.
-		    klass.Setters.Value(name) = method
+		    If setter = 0 Then
+		      // Regular method.
+		      klass.Methods.Value(name) = method
+		    Else
+		      // Setter.
+		      klass.Setters.Value(name) = method
+		    End If
 		  End If
 		  
 		  // Pop the method's body off the stack.
@@ -298,7 +330,12 @@ Protected Class VM
 		  If Stack(CurrentFrame.StackBase) IsA ObjoScript.Instance Then
 		    instance = Stack(CurrentFrame.StackBase)
 		  Else
-		    Error("Only instances have fields.")
+		    // Error.
+		    If Stack(CurrentFrame.StackBase) IsA ObjoScript.Klass Then
+		      Error("You cannot access an instance field from a static method.")
+		    Else
+		      Error("Only instances have fields.")
+		    End If
 		  End If
 		  
 		  // Get the value of the field from the instance.
@@ -335,7 +372,9 @@ Protected Class VM
 		  // At this point, no methods have been defined on the subclass (since this
 		  // opcode should only occur within a class declaration). Therefore, copy all the 
 		  // superclass' methods to the class on the stack.
+		  // NB: We **don't** inherit static methods and setters or constructors.
 		  subclass.Methods = superclass.Methods.Clone
+		  subclass.Setters = superclass.Setters.Clone
 		  
 		  // This class should keep a reference to its superclass. Do this and pop it off the stack.
 		  subclass.Superclass = Pop
@@ -343,50 +382,65 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 496E766F6B65732061206D6574686F64206F6E20616E20696E7374616E63652E2054686520696E7374616E636520636F6E7461696E696E6720746865206D6574686F642073686F756C64206265206F6E2074686520737461636B20616C6F6E67207769746820616E7920617267756D656E74732069742072657175697265732E
+	#tag Method, Flags = &h21, Description = 496E766F6B65732061206D6574686F64206F6E20616E20696E7374616E636520286F722069747320737570657229206F72206120636C6173732E2054686520726563656976657220636F6E7461696E696E6720746865206D6574686F642073686F756C64206265206F6E2074686520737461636B20616C6F6E67207769746820616E7920617267756D656E74732069742072657175697265732E
 		Private Sub Invoke(methodName As String, argCount As Integer, onSuper As Boolean)
-		  /// Invokes a method on an instance or its super. The instance containing the method should be on the stack
+		  /// Invokes a method on an instance (or its super) or a class. The receiver containing the method should be on the stack
 		  /// along with any arguments it requires.
 		  ///
 		  /// |
 		  /// | argN <-- top of stack
 		  /// | arg1
-		  /// | instance
+		  /// | instance/class
 		  
 		  // Grab the receiver from the stack. It should be beneath any arguments to the invocation.
 		  Var receiver As Variant = Peek(argCount)
-		  If receiver IsA ObjoScript.Instance = False Then
-		    Error("Only instances have methods.")
+		  Var isStatic As Boolean = False
+		  If receiver IsA ObjoScript.Klass Then
+		    isStatic = True
+		  ElseIf receiver IsA ObjoScript.Instance = False Then
+		    Error("Only classes and instances have methods.")
 		  End If
 		  
 		  // Is this a call to a method on the receiver's superclass?
-		  If onSuper Then
+		  If onSuper And Not isStatic Then
 		    If ObjoScript.Instance(receiver).Klass.Superclass = Nil Then
 		      Error("`" + ObjoScript.Instance(receiver).Klass.ToString + "` does not have a superclass.")
 		    End If
-		    InvokeFromClass(ObjoScript.Instance(receiver).Klass.Superclass, methodName, argCount)
+		    InvokeFromClass(ObjoScript.Instance(receiver).Klass.Superclass, methodName, argCount, False)
+		    
+		  ElseIf isStatic Then
+		    // This is a static method invocation.
+		    InvokeFromClass(ObjoScript.Klass(receiver), methodName, argCount, True)
 		    
 		  Else
 		    // The method is directly on the instance.
-		    InvokeFromClass(ObjoScript.Instance(receiver).Klass, methodName, argCount)
+		    InvokeFromClass(ObjoScript.Instance(receiver).Klass, methodName, argCount, False)
 		  End If
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 4469726563746C7920696E766F6B65732061206D6574686F642063616C6C656420606D6574686F644E616D6560206F6E20606B6C617373602E20417373756D6573207468617420616E20696E7374616E6365206F6620606B6C6173736020616E642074686520726571756972656420617267756D656E74732061726520616C7265616479206F6E2074686520737461636B2E
-		Private Sub InvokeFromClass(klass As ObjoScript.Klass, methodName As String, argCount As Integer)
-		  /// Directly invokes a method called `methodName` on `klass`. Assumes that an instance of `klass` and the required
-		  /// arguments are already on the stack.
+	#tag Method, Flags = &h21, Description = 4469726563746C7920696E766F6B65732061206D6574686F642063616C6C656420606D6574686F644E616D6560206F6E20606B6C617373602E20417373756D65732065697468657220606B6C61737360206F7220616E20696E7374616E6365206F6620606B6C6173736020616E642074686520726571756972656420617267756D656E74732061726520616C7265616479206F6E2074686520737461636B2E
+		Private Sub InvokeFromClass(klass As ObjoScript.Klass, methodName As String, argCount As Integer, isStatic As Boolean)
+		  /// Directly invokes a method called `methodName` on `klass`. Assumes either `klass` or an instance 
+		  /// of `klass` and the required arguments are already on the stack.
 		  ///
 		  /// |
 		  /// | argN <-- top of stack
 		  /// | arg1
-		  /// | instance
+		  /// | instance or class
 		  
-		  Var method As Variant = klass.Methods.Lookup(methodName, Nil)
-		  If method = Nil Then
-		    Error("There is no method named `" + methodName + "` on `" + klass.ToString + "`.")
+		  Var method As Variant
+		  If isStatic Then
+		    method = klass.StaticMethods.Lookup(methodName, Nil)
+		    If method = Nil Then
+		      Error("There is no static method named `" + methodName + "` on `" + klass.ToString + "`.")
+		    End If
+		  Else
+		    method = klass.Methods.Lookup(methodName, Nil)
+		    If method = Nil Then
+		      Error("There is no instance method named `" + methodName + "` on `" + klass.ToString + "`.")
+		    End If
 		  End If
 		  
 		  CallFunction(method, argCount)
@@ -885,10 +939,10 @@ Protected Class VM
 		      Push(New ObjoScript.Klass(className))
 		      
 		    Case OP_METHOD
-		      DefineMethod(ReadConstant, ReadByte)
+		      DefineMethod(ReadConstant, ReadByte, False)
 		      
 		    Case OP_METHOD_LONG
-		      DefineMethod(ReadConstantLong, ReadByte)
+		      DefineMethod(ReadConstantLong, ReadByte, False)
 		      
 		    Case OP_GETTER
 		      BindMethod(ReadConstant, False)
@@ -944,6 +998,12 @@ Protected Class VM
 		    Case OP_SUPER_INVOKE_LONG
 		      Invoke(ReadConstantLong, ReadByte, True)
 		      
+		    Case OP_STATIC_METHOD
+		      DefineMethod(ReadConstant, ReadByte, True)
+		      
+		    Case OP_STATIC_METHOD_LONG
+		      DefineMethod(ReadConstantLong, ReadByte, True)
+		      
 		    End Select
 		  Wend
 		  
@@ -965,7 +1025,12 @@ Protected Class VM
 		  If Stack(CurrentFrame.StackBase) IsA ObjoScript.Instance Then
 		    instance = Stack(CurrentFrame.StackBase)
 		  Else
-		    Error("Only instances have fields.")
+		    // Error.
+		    If Stack(CurrentFrame.StackBase) IsA ObjoScript.Klass Then
+		      Error("You cannot set an instance field from a static method.")
+		    Else
+		      Error("Only instances have fields.")
+		    End If
 		  End If
 		  
 		  // Set the field to the value on the top of the stack and pop it off.
@@ -982,49 +1047,64 @@ Protected Class VM
 
 	#tag Method, Flags = &h21, Description = 43616C6C73207468652073657474657220666F722074686520696E7374616E6365206F6E652066726F6D2074686520746F70206F662074686520737461636B2C2070617373696E6720696E207468652076616C7565206F6E2074686520746F70206F662074686520737461636B2061732074686520706172616D657465722E
 		Private Sub Setter(name As String, onSuper As Boolean)
-		  /// Calls the setter for the instance one from the top of the stack, passing in the 
+		  /// Calls the setter for the instance or class one from the top of the stack, passing in the 
 		  /// value on the top of the stack as the parameter.
 		  ///
 		  /// |
 		  /// | ValueToAssign   <-- top of the stack
-		  /// | Instance
+		  /// | instance or class
 		  ///
 		  /// If `onSuper` is True then we look for the method on the instance's superclass, otherwise
 		  /// we look on the instance's class.
 		  
-		  // Check we have an instance in the correct place.
-		  Var instance As ObjoScript.Instance
-		  If Peek(1) IsA ObjoScript.Instance Then
-		    instance = Peek(1)
-		  Else
-		    Error("Setters can only be invoked on instances.")
+		  // Check we have a class or instance in the correct place.
+		  Var receiver As Variant = Peek(1)
+		  Var isStatic As Boolean = False
+		  If receiver IsA ObjoScript.Klass Then
+		    isStatic = True
+		  ElseIf receiver IsA ObjoScript.Instance = False Then
+		    Error("Setters can only be invoked on classes or instances.")
 		  End If
 		  
 		  // Get the value to assign. This will be the parameter to the setter method.
 		  Var value As Variant = Pop
 		  
-		  // Get the correct method. It's either on the instance's class or its superclass.
+		  // Get the correct method. It's either on the instance or its superclass or is 
+		  // a static setter on a class.
 		  Var setter As ObjoScript.Func
-		  If onSuper Then
-		    If instance.Klass.Superclass = Nil Then
-		      Error("`" + instance.Klass.ToString + "` does not have a superclass.")
+		  If onSuper And Not isStatic Then
+		    If ObjoScript.Instance(receiver).Klass.Superclass = Nil Then
+		      Error("`" + ObjoScript.Instance(receiver).Klass.ToString + "` does not have a superclass.")
 		    Else
-		      setter = instance.Klass.Superclass.Setters.Lookup(name, Nil)
+		      setter = ObjoScript.Instance(receiver).Klass.Superclass.Setters.Lookup(name, Nil)
 		    End If
 		    If setter = Nil Then
-		      Error("Undefined setter `" + name + "` on " + instance.klass.Superclass.ToString + ".")
+		      Error("Undefined instance setter `" + name + "` on " + ObjoScript.Instance(receiver).klass.Superclass.ToString + ".")
 		    End If
+		    
+		  ElseIf isStatic Then
+		    setter = ObjoScript.Klass(receiver).StaticSetters.Lookup(name, Nil)
+		    If setter = Nil Then
+		      Error("Undefined static setter `" + name + "` on " + ObjoScript.Klass(receiver).ToString + ".")
+		    End If
+		    
 		  Else
-		    setter = instance.klass.Setters.Lookup(name, Nil)
+		    setter = ObjoScript.Instance(receiver).klass.Setters.Lookup(name, Nil)
 		    If setter = Nil Then
-		      Error("Undefined setter `" + name + "` on " + instance.klass.ToString + ".")
+		      Error("Undefined instance setter `" + name + "` on " + ObjoScript.Instance(receiver).klass.ToString + ".")
 		    End If
 		  End If
 		  
-		  // Bind this method to the instance which is currently on the top of the stack.
-		  Var bound As New ObjoScript.BoundMethod(instance, setter)
+		  Var bound As Variant
+		  If isStatic Then
+		    // Bind this static method to the class which is currently on the top of the stack.
+		    bound = New ObjoScript.BoundStaticMethod(receiver, setter)
+		  Else
+		    // Bind this method to the instance which is currently on the top of the stack.
+		    bound = New ObjoScript.BoundMethod(receiver, setter)
+		  End If
 		  
-		  // Pop off of the instance.
+		  // Pop off of the class/instance
 		  Call Pop
 		  
 		  // Push the bound method on to the stack.
@@ -1214,6 +1294,8 @@ Protected Class VM
 		67: OP_SUPER_SETTER_LONG (2)
 		68: OP_SUPER_INVOKE (2)
 		69: OP_SUPER_INVOKE_LONG (3)
+		70: OP_STATIC_METHOD (2)
+		71: OP_STATIC_METHOD_LONG (3)
 	#tag EndNote
 
 
@@ -1318,7 +1400,9 @@ Protected Class VM
 			  OP_SUPER_SETTER       : 1, _
 			  OP_SUPER_SETTER_LONG  : 2, _
 			  OP_SUPER_INVOKE       : 2, _
-			  OP_SUPER_INVOKE_LONG  : 3 _
+			  OP_SUPER_INVOKE_LONG  : 3, _
+			  OP_STATIC_METHOD      : 2, _
+			  OP_STATIC_METHOD_LONG : 3 _
 			  )
 			  
 			  Return d
@@ -1527,6 +1611,12 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SHIFT_RIGHT, Type = Double, Dynamic = False, Default = \"21", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_STATIC_METHOD, Type = Double, Dynamic = False, Default = \"70", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_STATIC_METHOD_LONG, Type = Double, Dynamic = False, Default = \"71", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SUBTRACT, Type = Double, Dynamic = False, Default = \"5", Scope = Public

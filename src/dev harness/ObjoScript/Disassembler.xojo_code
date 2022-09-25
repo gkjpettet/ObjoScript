@@ -401,6 +401,9 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_SUPER_INVOKE_LONG
 		    Return InvokeInstruction(opcode, chunk, offset)
 		    
+		  Case ObjoScript.VM.OP_STATIC_METHOD, ObjoScript.VM.OP_STATIC_METHOD_LONG
+		    Return MethodInstruction(opcode, chunk, offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
@@ -508,12 +511,25 @@ Protected Class Disassembler
 		    newOffset = offset + 3
 		    name = "METHOD"
 		    
+		  Case ObjoScript.VM.OP_STATIC_METHOD
+		    constantIndex = chunk.ReadByte(offset + 1)
+		    isSetter = chunk.ReadByte(offset + 2)
+		    newOffset = offset + 3
+		    name = "STATIC_METHOD"
+		    
 		  Case ObjoScript.VM.OP_METHOD_LONG
 		    // Two byte operand.
 		    constantIndex = chunk.ReadUInt16(offset + 1)
 		    isSetter = chunk.ReadByte(offset + 3)
 		    newOffset = offset + 4
 		    name = "METHOD_LONG"
+		    
+		  Case ObjoScript.VM.OP_STATIC_METHOD_LONG
+		    // Two byte operand.
+		    constantIndex = chunk.ReadUInt16(offset + 1)
+		    isSetter = chunk.ReadByte(offset + 3)
+		    newOffset = offset + 4
+		    name = "STATIC_METHOD_LONG"
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown constant opcode.")
@@ -531,7 +547,7 @@ Protected Class Disassembler
 		  Print(methodName.JustifyLeft(2 * COL_WIDTH))
 		  
 		  // Setter?
-		  PrintLine(If(isSetter = 0, "False", "True"))
+		  PrintLine(If(isSetter = 0, "Getter", "Setter"))
 		  
 		  Return newOffset
 		  
