@@ -117,6 +117,9 @@ Protected Class Parser
 		  /// Parses a class declaration statement.
 		  /// Assumes the parser has just consumed the `class` keyword token.
 		  
+		  #Pragma Warning "TODO: Support foreign static and instance methods"
+		  #Pragma Warning "TODO: Support foreign classes"
+		  
 		  Var classKeyword As ObjoScript.Token = Previous
 		  
 		  Var identifier As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier, "Expected a class name.")
@@ -799,17 +802,13 @@ Protected Class Parser
 		  ///
 		  /// Format:
 		  /// ```objo
-		  /// print(EXPRESSION)
+		  /// print EXPRESSION
 		  /// ```
 		  
 		  // Store the location of the print keyword.
 		  Var location As ObjoScript.Token = Previous
 		  
-		  Consume(ObjoScript.TokenTypes.LParen, "Expected an opening parenthesis after the `print` keyword.")
-		  
 		  Var expr As ObjoScript.Expr = Expression
-		  
-		  Consume(ObjoScript.TokenTypes.RParen, "Expected a closing parenthesis after the print expression.")
 		  
 		  ConsumeNewLine("Expected a new line EOL after the print statement.")
 		  
