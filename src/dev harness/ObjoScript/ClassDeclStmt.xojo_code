@@ -10,12 +10,13 @@ Implements ObjoScript.Stmt
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(superclass As String, identifier As ObjoScript.Token, constructors() As ObjoScript.ConstructorDeclStmt, staticMethods() As ObjoScript.MethodDeclStmt, methods() As ObjoScript.MethodDeclStmt, classKeyword As ObjoScript.Token)
+		Sub Constructor(superclass As String, identifier As ObjoScript.Token, constructors() As ObjoScript.ConstructorDeclStmt, staticMethods() As ObjoScript.MethodDeclStmt, methods() As ObjoScript.MethodDeclStmt, foreignMethods() As ObjoScript.ForeignMethodDeclStmt, classKeyword As ObjoScript.Token)
 		  Self.Superclass = superclass
 		  Self.Identifier = identifier
 		  Self.Constructors = constructors
 		  Self.StaticMethods = staticMethods
 		  Self.Methods = methods
+		  Self.ForeignMethods = foreignMethods
 		  mClassKeyword = classKeyword
 		End Sub
 	#tag EndMethod
@@ -34,6 +35,10 @@ Implements ObjoScript.Stmt
 
 	#tag Property, Flags = &h0, Description = 5468697320636C6173732720636F6E7374727563746F72206465636C61726174696F6E732E204D617920626520656D7074792E
 		Constructors() As ObjoScript.ConstructorDeclStmt
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 5468697320636C6173732720666F726569676E206D6574686F64206465636C61726174696F6E732E204D617920626520656D7074792E
+		ForeignMethods() As ObjoScript.ForeignMethodDeclStmt
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0, Description = 54727565206966207468697320636C617373206861732061207375706572636C6173732E

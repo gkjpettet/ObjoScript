@@ -49,9 +49,10 @@ Protected Class VM
 		    Error("Methods can only be invoked on class and instances.")
 		  End If
 		  
-		  // Get the correct method. It's either on the instance's class or its superclass
+		  // Get the correct method. It might be Objo native or foreign.
+		  // It's either on the instance's class or its superclass
 		  // or it'll be a static method on the class on the top of the stack.
-		  Var method As ObjoScript.Func
+		  Var method As Variant
 		  If onSuper And Not isStatic Then
 		    If ObjoScript.Instance(receiver).Klass.Superclass = Nil Then
 		      Error("`" + ObjoScript.Instance(receiver).Klass.ToString + "` does not have a superclass.")
@@ -75,16 +76,17 @@ Protected Class VM
 		    End If
 		  End If
 		  
+		  // Bind this method to the class/instance which is currently on the top of the stack.
 		  Var bound As Variant
-		  If isStatic Then
-		    // Bind this method to the class which is currently on the top of the stack.
-		    bound = New ObjoScript.BoundStaticMethod(receiver, method)
+		  If method IsA ObjoScript.Func Then
+		    bound = New ObjoScript.BoundMethod(receiver, method, isStatic)
+		  ElseIf method IsA ObjoScript.ForeignMethod Then
+		    bound = New ObjoScript.BoundForeignMethod(receiver, method, isStatic)
 		  Else
-		    // Bind this method to the instance which is currently on the top of the stack.
-		    bound = New ObjoScript.BoundMethod(receiver, method)
+		    Error("Expected either a compiled function or a foreign method.")
 		  End If
 		  
-		  // Pop off of the instance or class.
+		  // Pop off the class/instance.
 		  Call Pop
 		  
 		  // Push the bound method on to the stack.
@@ -111,9 +113,43 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 43616C6C7320612066756E6374696F6E2E2060617267436F756E746020697320746865206E756D626572206F6620617267756D656E7473206F6E2074686520737461636B20666F7220746869732066756E6374696F6E2063616C6C2E
+	#tag Method, Flags = &h21, Description = 43616C6C73206120666F726569676E206D6574686F64206F6E2074686520636C6173732F696E7374616E6365206F6E2074686520746F70206F662074686520737461636B2E
+		Private Sub CallForeignMethod(fm As ObjoScript.ForeignMethod, argCount As Integer)
+		  /// Calls a foreign method.
+		  ///
+		  /// At this moment, the stack looks like this:
+		  ///
+		  /// |           <--- StackTop
+		  /// | argN      
+		  /// | arg1
+		  /// | receiver
+		  
+		  // Check we have the correct number of arguments.
+		  If argCount <> fm.Arity Then
+		    Error("Expected " + fm.Arity.ToString + " arguments but " + _
+		    "got " + argCount.ToString + ".")
+		  End If
+		  
+		  // Move the receiver and arguments from the stack to the API slots.
+		  // The receiver will always be in slot 0 with the arguments following in their declared order.
+		  // Note that the APISlots array will contain nonsense data outside the bounds of the arguments.
+		  For i As Integer = argCount DownTo 0
+		    APISlots(i) = Pop
+		  Next i
+		  
+		  // Push nothing on to the stack in case the method doesn't set a return value.
+		  Push(Nothing)
+		  
+		  // Call the foreign method.
+		  fm.Method.Invoke(Self)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 43616C6C73206120636F6D70696C65642066756E6374696F6E2E2060617267436F756E746020697320746865206E756D626572206F6620617267756D656E7473206F6E2074686520737461636B20666F7220746869732066756E6374696F6E2063616C6C2E
 		Private Sub CallFunction(f As ObjoScript.Func, argCount As Integer)
-		  /// Calls a function. `argCount` is the number of arguments on the stack for this function call.
+		  /// Calls a compiled function.
+		  /// `argCount` is the number of arguments on the stack for this function call.
 		  
 		  #Pragma DisableBoundsChecking
 		  #Pragma NilObjectChecking False
@@ -171,12 +207,15 @@ Protected Class VM
 		    // Call the bound method.
 		    CallFunction(ObjoScript.BoundMethod(v).Method, argCount)
 		    
-		  Case ObjoScript.ValueTypes.BoundStaticMethod
-		    // Put the receiver of the call (the class before the dot) in slot 0 for the upcoming call frame.
-		    Stack(StackTop - argCount - 1) = ObjoScript.BoundStaticMethod(v).Receiver
+		  Case ObjoScript.ValueTypes.BoundForeignMethod
+		    // Put the receiver of the call (the instance before the dot) in slot 0 for the upcoming call frame.
+		    Stack(StackTop - argCount - 1) = ObjoScript.BoundMethod(v).Receiver
 		    
-		    // Call the bound static method.
-		    CallFunction(ObjoScript.BoundStaticMethod(v).Method, argCount)
+		    // Call the foreign method.
+		    CallForeignMethod(ObjoScript.BoundForeignMethod(v).Method, argCount)
+		    
+		  Case ObjoScript.ValueTypes.ForeignMethod
+		    CallForeignMethod(ObjoScript.ForeignMethod(v), argCount)
 		    
 		  Else
 		    Error("Can only call functions, classes and methods.")
@@ -226,6 +265,42 @@ Protected Class VM
 		  
 		  // Pop the constructor's body off the stack.
 		  Call Pop
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 446566696E65732061206D6574686F64206E616D656420606E616D656020776974682060617269747960206F6E2074686520636C617373206F6E2074686520746F70206F662074686520737461636B2E
+		Private Sub DefineForeignMethod(methodName As String, arity As UInt8, isStatic As Boolean, isSetter As Boolean)
+		  /// Defines a method named `methodName` with `arity` on the class on the top of the stack.
+		  
+		  Var klass As ObjoScript.Klass = Peek(0)
+		  
+		  // Ask the host for the delegate to use.
+		  Var fmd As ObjoScript.ForeignMethodDelegate = RaiseEvent BindForeignMethod(klass.Name, methodName, arity, isStatic, isSetter)
+		  If fmd = Nil Then
+		    Error("The host application failed to return a foreign method delegate for " + klass.Name + "." + methodName + ".")
+		  End If
+		  
+		  // Create the foreign method.
+		  Var method As New ObjoScript.ForeignMethod(methodName, arity, fmd)
+		  
+		  If isStatic Then
+		    If isSetter Then
+		      // Static setter.
+		      klass.StaticSetters.Value(methodName) = method
+		    Else
+		      // Static method.
+		      klass.StaticMethods.Value(methodName) = method
+		    End If
+		  Else
+		    If isSetter Then
+		      // Instance setter.
+		      klass.Setters.Value(methodName) = method
+		    Else
+		      // Instance method.
+		      klass.Methods.Value(methodName) = method
+		    End If
+		  End If
 		  
 		End Sub
 	#tag EndMethod
@@ -353,6 +428,28 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 52657475726E732074686520646F75626C6520696E2060736C6F74602E20526169736573206120564D457863657074696F6E206966207468652076616C756520696E2060736C6F7460206973206E6F74206120646F75626C652E
+		Function GetSlotDouble(slot As Integer) As Double
+		  /// Returns the double in `slot`.
+		  /// Raises a VMException if the value in `slot` is not a double.
+		  
+		  Return APISlots(slot).DoubleValue
+		  
+		  Exception e1 As OutOfBoundsException
+		    Error("The host application requested an invalid slot index (" + slot.ToString + ").")
+		    
+		  Exception e2 As RuntimeException
+		    Var type As String
+		    If APISlots(slot) IsA ObjoScript.Value Then
+		      type = ObjoScript.Value(APISlots(slot)).ToString
+		    Else
+		      type = APISlots(slot).StringValue
+		    End If
+		    Error("The host application requested a double from slot " + slot.ToString + " but it's a " + type + ".")
+		    
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 526574726965766573207468652076616C7565206F66206120737461746963206669656C64206E616D656420606E616D6560206F6E2074686520696E7374616E6365206F7220636C6173732063757272656E746C79206F6E2074686520746F70206F662074686520737461636B20616E64207468656E20707573686573206974206F6E20746F2074686520746F70206F662074686520737461636B2E
 		Private Sub GetStaticField(name As String)
 		  /// Retrieves the value of a static field named `name` on the instance or class currently on the top of the 
@@ -478,10 +575,8 @@ Protected Class VM
 		    End If
 		  End If
 		  
-		  CallFunction(method, argCount)
+		  CallValue(method, argCount)
 		  
-		  // Update the current call frame.
-		  CurrentFrame = Frames(FrameCount - 1)
 		  
 		End Sub
 	#tag EndMethod
@@ -629,6 +724,13 @@ Protected Class VM
 		  
 		  Nothing = New ObjoScript.Nothing
 		  Self.Globals = ParseJSON("{}") // HACK: Case sensitive.
+		  
+		  APISlots.ResizeTo(-1)
+		  APISlots.ResizeTo(MAX_SLOTS)
+		  For i As Integer = 0 To APISlots.LastIndex
+		    APISlots(i) = Nothing
+		  Next i
+		  
 		End Sub
 	#tag EndMethod
 
@@ -1051,6 +1153,14 @@ Protected Class VM
 		    Case OP_SET_STATIC_FIELD_LONG
 		      SetStaticField(ReadConstantLong)
 		      
+		    Case OP_FOREIGN_METHOD
+		      DefineForeignMethod(ReadConstant, ReadByte, _
+		      If(ReadByte = 1, True, False), If(ReadByte = 1, True, False))
+		      
+		    Case OP_FOREIGN_METHOD_LONG
+		      DefineForeignMethod(ReadConstantLong, ReadByte, _
+		      If(ReadByte = 1, True, False), If(ReadByte = 1, True, False))
+		      
 		    End Select
 		  Wend
 		  
@@ -1088,6 +1198,18 @@ Protected Class VM
 		  // Push the value back on the stack (since this is an expression).
 		  Push(value)
 		  
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 53657473207468652072657475726E2076616C7565206F66206120666F726569676E206D6574686F6420746F206120646F75626C652076616C7565206064602E
+		Sub SetReturn(d As Double)
+		  /// Sets the return value of a foreign method to a double value `d`.
+		  ///
+		  /// Before a foreign method is called the VM has cleared the call frame stack and pushed nothing on to it.
+		  /// Setting a return value just requires us to replace the pushed nothing object with `d`.
+		  
+		  Stack(StackTop - 1) = d
 		  
 		End Sub
 	#tag EndMethod
@@ -1139,7 +1261,7 @@ Protected Class VM
 		  /// If `onSuper` is True then we look for the method on the instance's superclass, otherwise
 		  /// we look on the instance's class.
 		  
-		  // Check we have a class or instance in the correct place.
+		  // Check we have a class/instance in the correct place.
 		  Var receiver As Variant = Peek(1)
 		  Var isStatic As Boolean = False
 		  If receiver IsA ObjoScript.Klass Then
@@ -1153,7 +1275,7 @@ Protected Class VM
 		  
 		  // Get the correct method. It's either on the instance or its superclass or is 
 		  // a static setter on a class.
-		  Var setter As ObjoScript.Func
+		  Var setter As Variant
 		  If onSuper And Not isStatic Then
 		    If ObjoScript.Instance(receiver).Klass.Superclass = Nil Then
 		      Error("`" + ObjoScript.Instance(receiver).Klass.ToString + "` does not have a superclass.")
@@ -1178,12 +1300,13 @@ Protected Class VM
 		  End If
 		  
 		  Var bound As Variant
-		  If isStatic Then
-		    // Bind this static method to the class which is currently on the top of the stack.
-		    bound = New ObjoScript.BoundStaticMethod(receiver, setter)
+		  // Bind this method to the instance which is currently on the top of the stack.
+		  If setter IsA ObjoScript.Func Then
+		    bound = New ObjoScript.BoundMethod(receiver, setter, isStatic)
+		  ElseIf setter IsA ObjoScript.ForeignMethod Then
+		    bound = New ObjoScript.BoundForeignMethod(receiver, setter, isStatic)
 		  Else
-		    // Bind this method to the instance which is currently on the top of the stack.
-		    bound = New ObjoScript.BoundMethod(receiver, setter)
+		    Error("Expected either a compiled function or a foreign method.")
 		  End If
 		  
 		  // Pop off of the class/instance
@@ -1298,6 +1421,10 @@ Protected Class VM
 	#tag EndMethod
 
 
+	#tag Hook, Flags = &h0, Description = 54686520564D2069732072657175657374696E67207468652064656C656761746520746F20757365207768656E2063616C6C696E67207468652073706563696669656420666F726569676E206D6574686F64206F6E206120636C6173732E205468697320697320706572666F726D6564206F6E636520666F72206561636820666F726569676E206D6574686F642C207768656E2074686520636C617373206973206669727374206465636C617265642E
+		Event BindForeignMethod(className As String, methodName As String, arity As Integer, isStatic As Boolean, isSetter As Boolean) As ObjoScript.ForeignMethodDelegate
+	#tag EndHook
+
 	#tag Hook, Flags = &h0, Description = 6073602069732074686520726573756C74206F66206576616C756174696E67206120607072696E74602065787072657373696F6E2E
 		Event Print(s As String)
 	#tag EndHook
@@ -1382,8 +1509,14 @@ Protected Class VM
 		73: OP_GET_STATIC_FIELD_LONG (2)
 		74: OP_SET_STATIC_FIELD (1)
 		75: OP_SET_STATIC_FIELD_LONG (2)
+		76: OP_FOREIGN_METHOD (3)
+		77: OP_FOREIGN_METHOD_LONG (4)
 	#tag EndNote
 
+
+	#tag Property, Flags = &h21, Description = 54686520736C6F742061727261792E205573656420746F20706173732064617461206265747765656E2074686520564D20616E642074686520686F737420586F6A6F206170706C69636174696F6E2E
+		Private APISlots(-1) As Variant
+	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 5468652063757272656E742063616C6C206672616D652E
 		Private CurrentFrame As ObjoScript.CallFrame
@@ -1492,7 +1625,9 @@ Protected Class VM
 			  OP_GET_STATIC_FIELD     : 1, _
 			  OP_GET_STATIC_FIELD_LONG: 2, _
 			  OP_SET_STATIC_FIELD     : 1, _
-			  OP_SET_STATIC_FIELD_LONG: 2 _
+			  OP_SET_STATIC_FIELD_LONG: 2, _
+			  OP_FOREIGN_METHOD       : 3, _
+			  OP_FOREIGN_METHOD_LONG  : 4 _
 			  )
 			  
 			  Return d
@@ -1512,6 +1647,9 @@ Protected Class VM
 
 
 	#tag Constant, Name = MAX_FRAMES, Type = Double, Dynamic = False, Default = \"63", Scope = Public, Description = 54686520757070657220626F756E6473206F66207468652063616C6C206672616D6520737461636B2E
+	#tag EndConstant
+
+	#tag Constant, Name = MAX_SLOTS, Type = Double, Dynamic = False, Default = \"255", Scope = Public, Description = 54686520757070657220626F756E6473206F66207468652041504920736C6F742061727261792E204C696D6974656420746F2032353520617267756D656E74732073696E63652074686520617267756D656E7420636F756E7420666F72206D616E79206F70636F64657320697320612073696E676C6520627974652E
 	#tag EndConstant
 
 	#tag Constant, Name = MAX_STACK, Type = Double, Dynamic = False, Default = \"255", Scope = Public, Description = 54686520757070657220626F756E6473206F662074686520737461636B2E
@@ -1569,6 +1707,12 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_FALSE, Type = Double, Dynamic = False, Default = \"17", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_FOREIGN_METHOD, Type = Double, Dynamic = False, Default = \"76", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_FOREIGN_METHOD_LONG, Type = Double, Dynamic = False, Default = \"77", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_GETTER, Type = Double, Dynamic = False, Default = \"54", Scope = Public

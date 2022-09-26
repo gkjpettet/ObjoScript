@@ -1,5 +1,9 @@
 #tag Module
 Protected Module ObjoScript
+	#tag DelegateDeclaration, Flags = &h1
+		Protected Delegate Sub ForeignMethodDelegate(vm As ObjoScript.VM)
+	#tag EndDelegateDeclaration
+
 	#tag Method, Flags = &h0, Description = 52657475726E73207468652068617368206F66207468697320646F75626C652E
 		Function Hash(Extends d As Double) As Integer
 		  /// Returns the hash of this double.
@@ -310,8 +314,14 @@ Protected Module ObjoScript
 		  Case ObjoScript.ValueTypes.Instance
 		    Return "Instance"
 		    
+		  Case ObjoScript.ValueTypes.ForeignMethod
+		    Return "Foreign method"
+		    
 		  Case ObjoScript.ValueTypes.BoundMethod
 		    Return "Bound method"
+		    
+		  Case ObjoScript.ValueTypes.BoundForeignMethod
+		    Return "Bound foreign method"
 		    
 		  Else
 		    Raise New InvalidArgumentException("Unknown value type.")
@@ -320,6 +330,14 @@ Protected Module ObjoScript
 		End Function
 	#tag EndMethod
 
+
+	#tag Note, Name = About
+		Foreign methods call Xojo methods with this delegate's signature when they are invoked.
+		
+		The receiver of the method (an ObjoScript instance, if a static method, class) will be placed into the VM's API slot 0.
+		The arguments to the method can be found in the VM's slot array sequentially from slot 1 onwards.
+		
+	#tag EndNote
 
 	#tag Note, Name = Values
 		The VM's stack is a Variant array. Values on the stack are stored as follows:
@@ -477,8 +495,9 @@ Protected Module ObjoScript
 		Func
 		  Klass
 		  Instance
+		  ForeignMethod
 		  BoundMethod
-		BoundStaticMethod
+		BoundForeignMethod
 	#tag EndEnum
 
 

@@ -2,23 +2,12 @@
 Protected Class BoundMethod
 Implements ObjoScript.Value
 	#tag Method, Flags = &h0
-		Sub Constructor(receiver As ObjoScript.Instance, method As ObjoScript.Func)
+		Sub Constructor(receiver As Variant, method As ObjoScript.Func, isStatic As Boolean)
 		  Self.Receiver = receiver
 		  Self.Method = method
+		  Self.IsStatic = isStatic
 		  
 		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = 52657475726E73206120756E6971756520696E74656765722068617368206F662074686973206F626A6563742E
-		Function Hash() As Integer
-		  /// Returns a unique integer hash of this object. 
-		  ///
-		  /// Part of the ObjoScript.Value interface.
-		  
-		  Var v As Variant = Self
-		  Return v.Hash
-		  
-		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F66207468697320626F756E64206D6574686F642E
@@ -42,12 +31,16 @@ Implements ObjoScript.Value
 	#tag EndMethod
 
 
-	#tag Property, Flags = &h0, Description = 54686520636F6D70696C6564206D6574686F642E
+	#tag Property, Flags = &h0, Description = 547275652069662074686973206973206120737461746963206D6574686F642E
+		IsStatic As Boolean = False
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 54686520636F6D70696C656420626F756E64206D6574686F642E
 		Method As ObjoScript.Func
 	#tag EndProperty
 
-	#tag Property, Flags = &h0, Description = 54686520696E7374616E63652074686973206D6574686F6420697320626F756E6420746F2E
-		Receiver As ObjoScript.Instance
+	#tag Property, Flags = &h0, Description = 54686520636C617373206F7220696E7374616E63652074686973206D6574686F6420697320626F756E6420746F2E
+		Receiver As Variant
 	#tag EndProperty
 
 
@@ -89,14 +82,6 @@ Implements ObjoScript.Value
 			Visible=true
 			Group="Position"
 			InitialValue="0"
-			Type="Integer"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Method"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
 			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty

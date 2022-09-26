@@ -117,7 +117,6 @@ Protected Class Parser
 		  /// Parses a class declaration statement.
 		  /// Assumes the parser has just consumed the `class` keyword token.
 		  
-		  #Pragma Warning "TODO: Support foreign static and instance methods"
 		  #Pragma Warning "TODO: Support foreign classes"
 		  
 		  Var classKeyword As ObjoScript.Token = Previous
@@ -138,6 +137,7 @@ Protected Class Parser
 		  
 		  // Optional constructors/methods.
 		  Var methods(), staticMethods() As ObjoScript.MethodDeclStmt
+		  Var foreignMethods() As ObjoScript.ForeignMethodDeclStmt
 		  Var constructors(), cdecl As ObjoScript.ConstructorDeclStmt
 		  Var constructorArities As New Dictionary // Key = arity: Value = Nil
 		  While Not Check(ObjoScript.TokenTypes.RCurly, ObjoScript.TokenTypes.EOF)
@@ -153,6 +153,13 @@ Protected Class Parser
 		    ElseIf Match(ObjoScript.TokenTypes.Static_) Then
 		      staticMethods.Add(MethodDeclaration(className, True))
 		      
+		    ElseIf Match(ObjoScript.TokenTypes.Foreign) Then
+		      If Match(ObjoScript.TokenTypes.Static_) Then
+		        foreignMethods.Add(ForeignMethodDeclaration(className, True))
+		      Else
+		        foreignMethods.Add(ForeignMethodDeclaration((className, False)))
+		      End If
+		      
 		    Else
 		      methods.Add(MethodDeclaration(className, False))
 		    End If
@@ -163,7 +170,7 @@ Protected Class Parser
 		  
 		  Consume(ObjoScript.TokenTypes.RCurly, "Expected a `}` after the class body.")
 		  
-		  Return New ObjoScript.ClassDeclStmt(superClass, identifier, constructors, staticMethods, methods, classKeyword)
+		  Return New ObjoScript.ClassDeclStmt(superClass, identifier, constructors, staticMethods, methods, foreignMethods, classKeyword)
 		  
 		End Function
 	#tag EndMethod
@@ -387,6 +394,47 @@ Protected Class Parser
 		  /// ```
 		  
 		  #Pragma Warning "TODO: Implement foreach statements"
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 506172736573206120666F726569676E20636C617373206D6574686F64206465636C61726174696F6E2028696E7374616E6365206F7220737461746963292E
+		Private Function ForeignMethodDeclaration(className As String, isStatic As Boolean) As ObjoScript.ForeignMethodDeclStmt
+		  /// Parses a foreign class method declaration (instance or static).
+		  ///
+		  /// Like native Wren methods, there are two types of foreign methods: regular and setters.
+		  /// Regular methods may or may not return values and can accept any number of arguments.
+		  /// Setters do not return a value and must have one argument. Format:
+		  /// ```
+		  /// age=(value){} // Note the `=` to denote it's a setter.
+		  /// ```
+		  /// If `isStatic` is True then this is a static method declaration.
+		  
+		  Var identifier As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier)
+		  
+		  // Setter?
+		  Var isSetter As Boolean = Match(ObjoScript.TokenTypes.Equal)
+		  
+		  Consume(ObjoScript.TokenTypes.LParen, "Expected an opening parenthesis after the method's name.")
+		  
+		  // Optional parameters.
+		  Var params() As ObjoScript.Token
+		  If Not Check(ObjoScript.TokenTypes.RParen) Then
+		    Do
+		      params.Add(Consume(ObjoScript.TokenTypes.Identifier, "Expected parameter name."))
+		    Loop Until Not Match(ObjoScript.TokenTypes.Comma)
+		  End If
+		  
+		  // Setters must have exactly one parameter.
+		  If isSetter And params.Count <> 1 Then
+		    Error("Setters must have exactly one parameter.", identifier)
+		  End If
+		  
+		  Consume(ObjoScript.TokenTypes.RParen, "Expected a closing parenthesis after method parameters.")
+		  
+		  Consume(ObjoScript.TokenTypes.EOL, "Expected a new line after foreign method declaration.")
+		  
+		  Return New ForeignMethodDeclStmt(className, identifier, isSetter, isStatic, params)
 		  
 		End Function
 	#tag EndMethod

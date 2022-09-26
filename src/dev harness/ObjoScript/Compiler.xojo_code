@@ -1043,6 +1043,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    EmitByte(ObjoScript.VM.OP_INHERIT, c.Location)
 		  End If
 		  
+		  // Compile any foreign method declarations.
+		  For Each fmd As ObjoScript.ForeignMethodDeclStmt In c.ForeignMethods
+		    Call fmd.Accept(Self)
+		  Next fmd
+		  
 		  // Compile any constructors.
 		  For Each constructor As ObjoScript.ConstructorDeclStmt In c.Constructors
 		    Call constructor.Accept(Self)
@@ -1053,7 +1058,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Call sm.Accept(Self)
 		  Next sm
 		  
-		  // Compile any instance emethods.
+		  // Compile any instance methods.
 		  For Each m As ObjoScript.MethodDeclStmt In c.Methods
 		    Call m.Accept(Self)
 		  Next m
@@ -1216,6 +1221,34 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Emit the set field instruction.
 		  EmitIndexedOpcode(ObjoScript.VM.OP_SET_FIELD, ObjoScript.VM.OP_SET_FIELD_LONG, index)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120666F726569676E206D6574686F64206465636C61726174696F6E2E
+		Function VisitForeignMethodDeclaration(fmd As ObjoScript.ForeignMethodDeclStmt) As Variant
+		  /// Compiles a foreign method declaration.
+		  ///
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  /// To define a new foreign method, the VM needs three things:
+		  ///  1. The name of the method.
+		  ///  2. The arity of the method.
+		  /// At runtime, the class to bind to should be on the top of the stack.
+		  
+		  mLocation = fmd.Location
+		  
+		  // Add the name of the method to the function's constants pool.
+		  Var index As Integer = AddConstant(fmd.Name)
+		  
+		  // Emit the "declare foreign method" opcode.
+		  // The operands are the index of the method's name in the constants pool, 
+		  // the number of arguments the method expects, 
+		  // if it's an instance (0) or static (1) method and whether
+		  // this is a regular method (0) or a setter (1).
+		  EmitIndexedOpcode(ObjoScript.VM.OP_FOREIGN_METHOD, ObjoScript.VM.OP_FOREIGN_METHOD_LONG, index)
+		  EmitByte(fmd.Arity)
+		  EmitByte(If(fmd.IsStatic, 1, 0))
+		  EmitByte(If(fmd.IsSetter, 1, 0))
 		  
 		End Function
 	#tag EndMethod

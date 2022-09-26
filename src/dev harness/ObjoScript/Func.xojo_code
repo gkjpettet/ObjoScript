@@ -29,19 +29,6 @@ Implements ObjoScript.Value
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 4120756E6971756520696E7465676572206861736820726570726573656E74696E6720746869732076616C75652E
-		Function Hash() As Integer
-		  /// A unique integer hash representing this value.
-		  ///
-		  /// Part of the ObjoScript.Value interface.
-		  
-		  Var v As Variant = Self
-		  Return v.Hash
-		  
-		  
-		End Function
-	#tag EndMethod
-
 	#tag Method, Flags = &h0
 		Function ToString() As String
 		  /// Returns a string representation of this function.
@@ -152,6 +139,14 @@ Implements ObjoScript.Value
 			Group="Behavior"
 			InitialValue=""
 			Type="String"
+			EditorType="MultiLineEditor"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="IsSetter"
+			Visible=false
+			Group="Behavior"
+			InitialValue="False"
+			Type="Boolean"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

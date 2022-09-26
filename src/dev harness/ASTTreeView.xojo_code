@@ -226,6 +226,37 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitForeignMethodDeclaration(fmd As ObjoScript.ForeignMethodDeclStmt) As Variant
+		  Var node As New TreeViewNode("Foreign method declaration")
+		  
+		  node.AppendNode(New TreeViewNode("Name: " + fmd.Name))
+		  
+		  node.AppendNode(New TreeViewNode("Class: " + fmd.ClassName))
+		  
+		  node.AppendNode(New TreeViewNode("Is setter: " + If(fmd.IsSetter, "True", "False")))
+		  
+		  // Parameters.
+		  Var paramsNode As TreeViewNode
+		  If fmd.Parameters.Count = 0 Then
+		    paramsNode = New TreeViewNode("No parameters")
+		  Else
+		    Var params As String
+		    For i As Integer = 0 To fmd.Parameters.LastIndex
+		      params = params + fmd.Parameters(i).Lexeme
+		      If i < fmd.Parameters.LastIndex Then
+		        params = params + ", "
+		      End If
+		    Next i
+		    paramsNode = New TreeViewNode("Parameters: " + params)
+		  End If
+		  node.AppendNode(paramsNode)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitForStmt(stmt As ObjoScript.ForStmt) As Variant
 		  Var node As New TreeViewNode("For Loop")
 		  

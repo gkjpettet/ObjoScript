@@ -1,34 +1,23 @@
 #tag Class
-Protected Class BoundStaticMethod
+Protected Class ForeignMethod
 Implements ObjoScript.Value
 	#tag Method, Flags = &h0
-		Sub Constructor(receiver As ObjoScript.Klass, method As ObjoScript.Func)
-		  Self.Receiver = receiver
+		Sub Constructor(name As String, arity As Integer, method As ObjoScript.ForeignMethodDelegate)
+		  Self.Name = name
+		  Self.Arity = arity
+		  mToString = "foreign " + ObjoScript.Func.ComputeSignature(name, arity)
 		  Self.Method = method
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 52657475726E73206120756E6971756520696E74656765722068617368206F662074686973206F626A6563742E
-		Function Hash() As Integer
-		  /// Returns a unique integer hash of this object. 
-		  ///
-		  /// Part of the ObjoScript.Value interface.
-		  
-		  Var v As Variant = Self
-		  Return v.Hash
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F66207468697320626F756E64206D6574686F642E
+	#tag Method, Flags = &h0, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F66207468697320666F726569676E206D6574686F642E
 		Function ToString() As String
-		  /// Returns a string representation of this bound method.
+		  /// Returns a string representation of this foreign method.
 		  ///
 		  /// Part of the ObjoScript.Value interface.
 		  
-		  Return "static " + Method.ToString
-		  
+		  Return mToString
 		End Function
 	#tag EndMethod
 
@@ -36,18 +25,26 @@ Implements ObjoScript.Value
 		Function Type() As ObjoScript.ValueTypes
 		  /// Part of the ObjoScript.Value interface.
 		  
-		  Return ObjoScript.ValueTypes.BoundStaticMethod
+		  Return ObjoScript.ValueTypes.ForeignMethod
 		  
 		End Function
 	#tag EndMethod
 
 
-	#tag Property, Flags = &h0, Description = 54686520636F6D70696C6564206D6574686F642E
-		Method As ObjoScript.Func
+	#tag Property, Flags = &h0, Description = 546865206E756D626572206F6620617267756D656E7473207468697320666F726569676E206D6574686F642072657175697265732E
+		Arity As Integer = 0
 	#tag EndProperty
 
-	#tag Property, Flags = &h0, Description = 54686520636C617373207468697320737461746963206D6574686F6420697320626F756E6420746F2E
-		Receiver As ObjoScript.Klass
+	#tag Property, Flags = &h0, Description = 54686520586F6A6F206D6574686F642028617320612064656C65676174652920746F20696E766F6B65207768656E207468697320666F726569676E206D6574686F642069732063616C6C65642E
+		Method As ObjoScript.ForeignMethodDelegate
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 507265636F6D70757465642076616C756520666F722060546F537472696E672829602E
+		Private mToString As String
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 5468697320666F726569676E206D6574686F642773206E616D652E
+		Name As String
 	#tag EndProperty
 
 

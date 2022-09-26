@@ -417,6 +417,9 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_GET_STATIC_FIELD, ObjoScript.VM.OP_GET_STATIC_FIELD_LONG
 		    Return ConstantInstruction(opcode, chunk, offset)
 		    
+		  Case ObjoScript.VM.OP_FOREIGN_METHOD, ObjoScript.VM.OP_FOREIGN_METHOD_LONG
+		    Return MethodInstruction(opcode, chunk, offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
@@ -511,23 +514,28 @@ Protected Class Disassembler
 		  ///
 		  /// The METHOD instruction takes two or three byte operands (1/2 for the index of the name in the constant pool and one specifying if the
 		  /// the method is a setter (1) or a regular method (0).
+		  /// The FOREIGN_METHOD instruction takes three or four byte operands (1/2 for the index of the name in the constant pool, one specifying if the
+		  /// the method is a setter (1) or a regular method (0) and one specifying static (1) or instance (0).
 		  /// Format:
-		  /// OFFSET  LINE  (OPTIONAL SCRIPT ID)  OPCODE  POOL_INDEX  METHOD_NAME   SETTER?
+		  /// OFFSET  LINE  (OPTIONAL SCRIPT ID)  OPCODE  POOL_INDEX  METHOD_NAME   STATIC/INSTANCE?  SETTER?
 		  
 		  // Get and print the index in the constant pool.
 		  Var constantIndex, newOffset, isSetter As Integer
+		  Var isStatic As Boolean
 		  Var name As String
 		  Select Case opcode
 		  Case ObjoScript.VM.OP_METHOD
 		    constantIndex = chunk.ReadByte(offset + 1)
 		    isSetter = chunk.ReadByte(offset + 2)
 		    newOffset = offset + 3
+		    isStatic = False
 		    name = "METHOD"
 		    
 		  Case ObjoScript.VM.OP_STATIC_METHOD
 		    constantIndex = chunk.ReadByte(offset + 1)
 		    isSetter = chunk.ReadByte(offset + 2)
 		    newOffset = offset + 3
+		    isStatic = True
 		    name = "STATIC_METHOD"
 		    
 		  Case ObjoScript.VM.OP_METHOD_LONG
@@ -535,6 +543,7 @@ Protected Class Disassembler
 		    constantIndex = chunk.ReadUInt16(offset + 1)
 		    isSetter = chunk.ReadByte(offset + 3)
 		    newOffset = offset + 4
+		    isStatic = False
 		    name = "METHOD_LONG"
 		    
 		  Case ObjoScript.VM.OP_STATIC_METHOD_LONG
@@ -542,7 +551,22 @@ Protected Class Disassembler
 		    constantIndex = chunk.ReadUInt16(offset + 1)
 		    isSetter = chunk.ReadByte(offset + 3)
 		    newOffset = offset + 4
+		    isStatic = True
 		    name = "STATIC_METHOD_LONG"
+		    
+		  Case ObjoScript.VM.OP_FOREIGN_METHOD
+		    constantIndex = chunk.ReadByte(offset + 1)
+		    isStatic = If(chunk.ReadByte(offset + 2) = 1, True, False)
+		    isSetter = chunk.ReadByte(offset + 3)
+		    newOffset = offset + 4
+		    name = "FOREIGN_METHOD"
+		    
+		  Case ObjoScript.VM.OP_FOREIGN_METHOD_LONG
+		    constantIndex = chunk.ReadUInt16(offset + 1)
+		    isStatic = If(chunk.ReadByte(offset + 3) = 1, True, False)
+		    isSetter = chunk.ReadByte(offset + 4)
+		    newOffset = offset + 5
+		    name = "FOREIGN_METHOD_LONG"
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown constant opcode.")
@@ -557,7 +581,11 @@ Protected Class Disassembler
 		  // Print the method's name.
 		  Var methodNameValue As Variant = chunk.Constants(constantIndex)
 		  Var methodName As String = ObjoScript.VM.ValueToString(methodNameValue)
-		  Print(methodName.JustifyLeft(2 * COL_WIDTH))
+		  Print(methodName.JustifyLeft(COL_WIDTH))
+		  
+		  // Static or instance?
+		  Var type As String = If(isStatic, "Static", "Instance")
+		  Print(type.JustifyLeft(COL_WIDTH))
 		  
 		  // Setter?
 		  PrintLine(If(isSetter = 0, "Getter", "Setter"))
