@@ -1218,10 +1218,38 @@ End
 		    
 		    // Call the handle.
 		    VM.InvokeHandle(gameEngineUpdate)
-		    
-		    ' // The return value from the method call gets placed in the API's slot 0 by the OP_RETURN instruction.
-		    ' Output.Text = Output.Text + VM.ValueToString(VM.GetSlotAsString(0)) + EndOfLine
 		  Next i
+		  
+		  // Put the "Person" class into slot 0.
+		  VM.PutGlobalVariable("Person", 0)
+		  
+		  // Create a handle to the Person's constructor(_) method.
+		  Var newPerson1 As ObjoScript.CallHandle = VM.CreateHandle("constructor(_)", 1)
+		  // And to the constructor(_,_) method.
+		  Var newPerson2 As ObjoScript.CallHandle = VM.CreateHandle("constructor(_,_)", 2)
+		  
+		  // Create a new person called "Maebh".
+		  VM.SetSlot(1, "Maebh")
+		  VM.InvokeHandle(newPerson1)
+		  
+		  // Get the instance created.
+		  Var maebh As ObjoScript.Instance = VM.GetSlotValue(0)
+		  
+		  // Create a new person called "Aoife Pettet".
+		  VM.SetSlot(1, "Aoife")
+		  VM.SetSlot(2, "Pettet")
+		  VM.InvokeHandle(newPerson2)
+		  
+		  // Get the instance created.
+		  Var aoife As ObjoScript.Instance = VM.GetSlotValue(0)
+		  
+		  #Pragma Unused maebh
+		  #Pragma Unused aoife
+		  
+		  Break
+		  
+		  Exception e
+		    MessageBox(e.Message)
 		End Sub
 	#tag EndEvent
 #tag EndEvents

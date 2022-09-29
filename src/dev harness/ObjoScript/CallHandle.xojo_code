@@ -1,10 +1,10 @@
 #tag Class
 Protected Class CallHandle
 	#tag Method, Flags = &h0
-		Sub Constructor(index As Integer, argCount As Integer)
+		Sub Constructor(index As Integer, argCount As Integer, isConstructor As Boolean)
 		  mIndex = index
 		  mArgCount = argCount
-		  
+		  mIsConstructor = isconstructor
 		End Sub
 	#tag EndMethod
 
@@ -27,12 +27,25 @@ Protected Class CallHandle
 		Index As Integer
 	#tag EndComputedProperty
 
+	#tag ComputedProperty, Flags = &h0, Description = 54727565206966207468697320612068616E646C6520746F206120636C61737320636F6E7374727563746F722E
+		#tag Getter
+			Get
+			  Return mIsConstructor
+			End Get
+		#tag EndGetter
+		IsConstructor As Boolean
+	#tag EndComputedProperty
+
 	#tag Property, Flags = &h21
 		Private mArgCount As Integer = 0
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
 		Private mIndex As Integer = -1
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mIsConstructor As Boolean = False
 	#tag EndProperty
 
 
@@ -78,10 +91,10 @@ Protected Class CallHandle
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="mIndex"
+			Name="ArgCount"
 			Visible=false
 			Group="Behavior"
-			InitialValue="-1"
+			InitialValue=""
 			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty

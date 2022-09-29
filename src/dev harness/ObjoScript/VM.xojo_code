@@ -95,9 +95,10 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 2243616C6C7322206120636C6173732E20457373656E7469616C6C79207468697320637265617465732061206E657720696E7374616E63652E
+	#tag Method, Flags = &h21, Description = 2243616C6C7322206120636C6173732E20457373656E7469616C6C79207468697320637265617465732061206E657720696E7374616E63652E20446F6573202A2A6E6F742A2A20757064617465206043757272656E744672616D65602E
 		Private Sub CallClass(klass As ObjoScript.Klass, argCount As Integer)
 		  /// "Calls" a class. Essentially this creates a new instance.
+		  /// Does **not** update `CurrentFrame`. 
 		  
 		  Stack(StackTop - argCount - 1) = New ObjoScript.Instance(klass)
 		  
@@ -181,9 +182,10 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 506572666F726D7320612063616C6C206F6E20607660207768696368206578706563747320746F2066696E642060617267436F756E746020617267756D656E747320696E207468652063616C6C20737461636B2E
+	#tag Method, Flags = &h21, Description = 506572666F726D7320612063616C6C206F6E20607660207768696368206578706563747320746F2066696E642060617267436F756E746020617267756D656E747320696E207468652063616C6C20737461636B2E2055706461746573206043757272656E744672616D65602E
 		Private Sub CallValue(v As Variant, argCount As Integer)
 		  /// Performs a call on `v` which expects to find `argCount` arguments in the call stack.
+		  /// Updates `CurrentFrame`.
 		  
 		  #Pragma DisableBoundsChecking
 		  #Pragma NilObjectChecking False
@@ -239,23 +241,37 @@ Protected Class VM
 		  ///
 		  /// The method can then be called again in the future using `VM.InvokeHandle()`.
 		  
+		  #Pragma Warning "TODO: Deduce argCount from `signature` so the user doesn't have to pass it in"
+		  
 		  // Check we have an instance or a class in slot 0.
 		  Var receiver As Variant = APISlots(0)
 		  Var isStatic As Boolean = False
+		  Var isConstructor As Boolean = False
 		  If receiver IsA ObjoScript.Klass Then
-		    isStatic = True
+		    If signature.Left(11).Compare("constructor") = 0 Then
+		      isConstructor = True
+		    Else
+		      isStatic = True
+		    End If
 		  ElseIf receiver IsA ObjoScript.Instance = False Then
 		    Error("Methods can only be invoked on classes and instances.")
 		  End If
 		  
 		  // Get the correct method. It might be Objo native or foreign.
 		  // It's either on the instance's class or its superclass
-		  // or it'll be a static method on the class on the top of the stack.
+		  // or it'll be a method on the class on the top of the stack.
 		  Var method As Variant
 		  If isStatic Then
 		    method = ObjoScript.Klass(receiver).StaticMethods.Lookup(signature, Nil)
 		    If method = Nil Then
 		      Error("Undefined static method `" + signature + "` on " + ObjoScript.Klass(receiver).ToString + ".")
+		    End If
+		    
+		  ElseIf isConstructor Then
+		    #Pragma Warning "TODO: Stop storing constructors by arity - use their signature instead"
+		    method = ObjoScript.Klass(receiver).Constructors.Lookup(argCount, Nil)
+		    If method = Nil Then
+		      Error("Undefined constructor `" + signature + "` on " + ObjoScript.Klass(receiver).ToString + ".")
 		    End If
 		    
 		  Else
@@ -275,7 +291,8 @@ Protected Class VM
 		  
 		  // Add this bound method to the VM's cache of call handles and return it.
 		  CallHandles.Add(bound)
-		  Return New ObjoScript.CallHandle(CallHandles.LastIndex, argCount)
+		  Return New ObjoScript.CallHandle(CallHandles.LastIndex, argCount, isConstructor)
+		  
 		End Function
 	#tag EndMethod
 
@@ -300,6 +317,8 @@ Protected Class VM
 		  /// The constructor's body should be on the top of the stack with its class just beneath it.
 		  /// Since the compiler guarantees that there will never be two constructors with the same arity, 
 		  /// we use the constructor's arity as the key in the class' `Constructor` dictonary to store it.
+		  
+		  #Pragma Warning "TODO: Stop storing constructors by their arity. Use their signature instead"
 		  
 		  Var constructor As ObjoScript.Func = Peek(0)
 		  Var klass As ObjoScript.Klass = Peek(1)
@@ -645,23 +664,28 @@ Protected Class VM
 		  /// Set the stack up like this:
 		  /// | argN         <-- top
 		  /// | arg1
-		  /// | bound method
+		  /// | method (or klass if handle.IsConstructor)
 		  
-		  ' // Retrieve the bound method and push it on to the stack.
-		  ' Push(CallHandles(handle.Index))
+		  Var bound As ObjoScript.BoundMethod = CallHandles(handle.Index)
 		  
-		  // Push the arguments (starting at slot 1).
+		  If handle.IsConstructor Then
+		    // We need to push the handle's receiver (which we're assuming is a klass) on to the stack
+		    // before the arguments because that is the arrangement `CallClass()` expects.
+		    Push(bound.Receiver)
+		  End If
+		  
+		  // Push the arguments from APISlots (starting at slot 1).
 		  For i As Integer = 1 To handle.ArgCount
 		    Push(APISlots(i))
 		  Next i
 		  
-		  ' // Call the bound method stored in `CallHandles()`.
-		  ' CallValue(CallHandles(handle.Index), handle.ArgCount)
-		  ' 
-		  ' Run
-		  
-		  Var bound As ObjoScript.BoundMethod = CallHandles(handle.Index)
-		  InvokeFromClass(bound.Receiver, bound.Method.Signature, handle.ArgCount, bound.IsStatic)
+		  If handle.IsConstructor Then
+		    CallClass(bound.Receiver, handle.ArgCount)
+		    // Update the current call frame (since CallClass doesn't do this for us).
+		    CurrentFrame = Frames(FrameCount - 1)
+		  Else
+		    InvokeFromClass(bound.Receiver, bound.Method.Signature, handle.ArgCount, bound.IsStatic)
+		  End If
 		  
 		  Run
 		  
