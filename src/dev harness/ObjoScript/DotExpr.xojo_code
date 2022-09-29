@@ -15,6 +15,7 @@ Implements ObjoScript.Expr
 		  Self.Operand = operand
 		  Self.Identifier = identifer
 		  Self.ValueToAssign = valueToAssign
+		  mSignature = ObjoScript.Func.ComputeSignature(identifier.Lexeme, If(valueToAssign = Nil, 0, 1), If(valueToAssign = Nil, False, True))
 		End Sub
 	#tag EndMethod
 
@@ -44,9 +45,23 @@ Implements ObjoScript.Expr
 		IsSetter As Boolean
 	#tag EndComputedProperty
 
+	#tag Property, Flags = &h21, Description = 4120707265636F6D7075746564207369676E617475726520666F72207468697320736574746572206F72206765747465722E
+		Private mSignature As String
+	#tag EndProperty
+
 	#tag Property, Flags = &h0, Description = 546865206F706572616E642074686520646F7420697320616374696E672075706F6E2E
 		Operand As ObjoScript.Expr
 	#tag EndProperty
+
+	#tag ComputedProperty, Flags = &h0, Description = 546865207369676E61747572652E
+		#tag Getter
+			Get
+			  Return mSignature
+			  
+			End Get
+		#tag EndGetter
+		Signature As String
+	#tag EndComputedProperty
 
 	#tag Property, Flags = &h0, Description = 4966207468697320697320612073657474657220696E766F636174696F6E2C2074686973206973207468652076616C756520746F2061737369676E2E204D6179206265204E696C2E
 		ValueToAssign As ObjoScript.Expr

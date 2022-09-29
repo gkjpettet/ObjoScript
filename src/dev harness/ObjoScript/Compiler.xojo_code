@@ -1129,8 +1129,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Compile the operand to put it on the stack.
 		  Call dot.Operand.Accept(Self)
 		  
-		  // Load the method's name into the constant pool.
-		  Var index As Integer = AddConstant(dot.Identifier.Lexeme)
+		  // Load the signature into the constant pool.
+		  Var index As Integer = AddConstant(dot.Signature)
 		  
 		  If dot.IsSetter Then
 		    // Compile the value to assign.
@@ -1384,8 +1384,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = m.Location
 		  
-		  // Add the name of the method to the function's constants pool.
-		  Var index As Integer = AddConstant(m.Name)
+		  // Add the signature of the method to the function's constants pool.
+		  Var index As Integer = AddConstant(m.Signature)
 		  
 		  // Compile the body.
 		  Var compiler As New ObjoScript.Compiler
@@ -1397,7 +1397,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Call EmitConstant(body)
 		  
 		  // Emit the "declare method" or "declare static method" opcode.
-		  // The operands are the index of the method's name in the constants pool and whether
+		  // The operands are the index of the method's signature in the constants pool and whether
 		  // this is a setter (1) or regular method (0).
 		  If m.IsStatic Then
 		    EmitIndexedOpcode(ObjoScript.VM.OP_STATIC_METHOD, ObjoScript.VM.OP_STATIC_METHOD_LONG, index)
@@ -1422,15 +1422,15 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Compile the operand to put it on the stack.
 		  Call m.Operand.Accept(Self)
 		  
-		  // Load the method's name into the constant pool.
-		  Var index As Integer = AddConstant(m.MethodName)
+		  // Load the method's signature into the constant pool.
+		  Var index As Integer = AddConstant(m.Signature)
 		  
 		  // Compile the arguments.
 		  For Each arg As ObjoScript.Expr In m.Arguments
 		    Call arg.Accept(Self)
 		  Next arg
 		  
-		  // Emit the OP_INVOKE instruction and the index of the method's name in the constant pool
+		  // Emit the OP_INVOKE instruction and the index of the method's signature in the constant pool
 		  EmitIndexedOpcode(ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_INVOKE_LONG, index, m.Location)
 		  
 		  // Emit the argument count.

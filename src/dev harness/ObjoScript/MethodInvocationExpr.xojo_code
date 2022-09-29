@@ -14,6 +14,7 @@ Implements ObjoScript.Expr
 		  Self.Operand = operand
 		  Self.Arguments = arguments
 		  mIdentifier = identifier
+		  mSignature = ObjoScript.Func.ComputeSignature(identifier.Lexeme, arguments.Count, False)
 		End Sub
 	#tag EndMethod
 
@@ -45,9 +46,23 @@ Implements ObjoScript.Expr
 		Private mIdentifier As ObjoScript.Token
 	#tag EndProperty
 
+	#tag Property, Flags = &h21
+		Private mSignature As String
+	#tag EndProperty
+
 	#tag Property, Flags = &h0, Description = 546865206F706572616E6420746865206D6574686F642062656C6F6E677320746F202873686F756C64206576616C7561746520746F20616E20696E7374616E6365206F7220636C617373292E
 		Operand As ObjoScript.Expr
 	#tag EndProperty
+
+	#tag ComputedProperty, Flags = &h0, Description = 546865207369676E6174757265206F6620746865206D6574686F6420746F20696E766F6B652E
+		#tag Getter
+			Get
+			  Return mSignature
+			  
+			End Get
+		#tag EndGetter
+		Signature As String
+	#tag EndComputedProperty
 
 
 	#tag ViewBehavior

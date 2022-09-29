@@ -351,8 +351,8 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 446566696E65732061206D6574686F64206E616D656420606E616D6560206F6E2074686520636C617373206A7573742062656C6F7720746865206D6574686F64277320626F6479206F6E2074686520737461636B2E
-		Private Sub DefineMethod(name As String, setter As UInt8, isStatic As Boolean)
-		  /// Defines a method named `name` on the class just below the method's body on the stack.
+		Private Sub DefineMethod(signature As String, setter As UInt8, isStatic As Boolean)
+		  /// Defines a method with `signature` on the class just below the method's body on the stack.
 		  ///
 		  /// The method's body should be on the top of the stack with its class just beneath it.
 		  /// This is a setter method if setter = 1, otherwise it's a regular method.
@@ -363,18 +363,18 @@ Protected Class VM
 		  If isStatic Then
 		    If setter = 0 Then
 		      // Regular static method.
-		      klass.StaticMethods.Value(name) = method
+		      klass.StaticMethods.Value(signature) = method
 		    Else
 		      // Static setter.
-		      klass.StaticSetters.Value(name) = method
+		      klass.StaticSetters.Value(signature) = method
 		    End If
 		  Else
 		    If setter = 0 Then
 		      // Regular method.
-		      klass.Methods.Value(name) = method
+		      klass.Methods.Value(signature) = method
 		    Else
 		      // Setter.
-		      klass.Setters.Value(name) = method
+		      klass.Setters.Value(signature) = method
 		    End If
 		  End If
 		  
@@ -588,7 +588,7 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 496E766F6B65732061206D6574686F64206F6E20616E20696E7374616E636520286F722069747320737570657229206F72206120636C6173732E2054686520726563656976657220636F6E7461696E696E6720746865206D6574686F642073686F756C64206265206F6E2074686520737461636B20616C6F6E67207769746820616E7920617267756D656E74732069742072657175697265732E
-		Private Sub Invoke(methodName As String, argCount As Integer, onSuper As Boolean)
+		Private Sub Invoke(signature As String, argCount As Integer, onSuper As Boolean)
 		  /// Invokes a method on an instance (or its super) or a class. The receiver containing the method should be on the stack
 		  /// along with any arguments it requires.
 		  ///
@@ -611,23 +611,23 @@ Protected Class VM
 		    If ObjoScript.Instance(receiver).Klass.Superclass = Nil Then
 		      Error("`" + ObjoScript.Instance(receiver).Klass.ToString + "` does not have a superclass.")
 		    End If
-		    InvokeFromClass(ObjoScript.Instance(receiver).Klass.Superclass, methodName, argCount, False)
+		    InvokeFromClass(ObjoScript.Instance(receiver).Klass.Superclass, signature, argCount, False)
 		    
 		  ElseIf isStatic Then
 		    // This is a static method invocation.
-		    InvokeFromClass(ObjoScript.Klass(receiver), methodName, argCount, True)
+		    InvokeFromClass(ObjoScript.Klass(receiver), signature, argCount, True)
 		    
 		  Else
 		    // The method is directly on the instance.
-		    InvokeFromClass(ObjoScript.Instance(receiver).Klass, methodName, argCount, False)
+		    InvokeFromClass(ObjoScript.Instance(receiver).Klass, signature, argCount, False)
 		  End If
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 4469726563746C7920696E766F6B65732061206D6574686F642063616C6C656420606D6574686F644E616D6560206F6E20606B6C617373602E20417373756D65732065697468657220606B6C61737360206F7220616E20696E7374616E6365206F6620606B6C6173736020616E642074686520726571756972656420617267756D656E74732061726520616C7265616479206F6E2074686520737461636B2E
-		Private Sub InvokeFromClass(klass As ObjoScript.Klass, methodName As String, argCount As Integer, isStatic As Boolean)
-		  /// Directly invokes a method called `methodName` on `klass`. Assumes either `klass` or an instance 
+	#tag Method, Flags = &h21, Description = 4469726563746C7920696E766F6B65732061206D6574686F64207769746820607369676E617475726560206F6E20606B6C617373602E20417373756D65732065697468657220606B6C61737360206F7220616E20696E7374616E6365206F6620606B6C6173736020616E642074686520726571756972656420617267756D656E74732061726520616C7265616479206F6E2074686520737461636B2E
+		Private Sub InvokeFromClass(klass As ObjoScript.Klass, signature As String, argCount As Integer, isStatic As Boolean)
+		  /// Directly invokes a method with `signature` on `klass`. Assumes either `klass` or an instance 
 		  /// of `klass` and the required arguments are already on the stack.
 		  ///
 		  /// |
@@ -637,19 +637,18 @@ Protected Class VM
 		  
 		  Var method As Variant
 		  If isStatic Then
-		    method = klass.StaticMethods.Lookup(methodName, Nil)
+		    method = klass.StaticMethods.Lookup(signature, Nil)
 		    If method = Nil Then
-		      Error("There is no static method named `" + methodName + "` on `" + klass.ToString + "`.")
+		      Error("There is no static method with signature `" +signature + "` on `" + klass.ToString + "`.")
 		    End If
 		  Else
-		    method = klass.Methods.Lookup(methodName, Nil)
+		    method = klass.Methods.Lookup(signature, Nil)
 		    If method = Nil Then
-		      Error("There is no instance method named `" + methodName + "` on `" + klass.ToString + "`.")
+		      Error("There is no instance method with signature `" + signature + "` on `" + klass.ToString + "`.")
 		    End If
 		  End If
 		  
 		  CallValue(method, argCount)
-		  
 		  
 		End Sub
 	#tag EndMethod
