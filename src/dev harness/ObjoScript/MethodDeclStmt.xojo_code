@@ -18,7 +18,7 @@ Implements ObjoScript.Stmt
 		  Self.IsStatic = isStatic
 		  Self.Parameters = params
 		  Self.Body = body
-		  
+		  mSignature = ObjoScript.Func.ComputeSignature(Self.Name, Self.Parameters.Count, isSetter)
 		End Sub
 	#tag EndMethod
 
@@ -53,6 +53,10 @@ Implements ObjoScript.Stmt
 		Private mIdentifier As ObjoScript.Token
 	#tag EndProperty
 
+	#tag Property, Flags = &h21
+		Private mSignature As String
+	#tag EndProperty
+
 	#tag ComputedProperty, Flags = &h0, Description = 546865206E616D65206F6620746865206D6574686F642E
 		#tag Getter
 			Get
@@ -66,6 +70,15 @@ Implements ObjoScript.Stmt
 	#tag Property, Flags = &h0, Description = 54686973206D6574686F64277320706172616D657465727320617320746865206964656E7469666965727320696E20746865206F726967696E616C20746F6B656E2073747265616D2E
 		Parameters() As ObjoScript.Token
 	#tag EndProperty
+
+	#tag ComputedProperty, Flags = &h0, Description = 54686973206D6574686F642773207369676E61747572652E
+		#tag Getter
+			Get
+			  Return mSignature
+			End Get
+		#tag EndGetter
+		Signature As String
+	#tag EndComputedProperty
 
 
 	#tag ViewBehavior

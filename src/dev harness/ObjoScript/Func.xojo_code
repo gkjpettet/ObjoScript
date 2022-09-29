@@ -2,12 +2,16 @@
 Protected Class Func
 Implements ObjoScript.Value
 	#tag Method, Flags = &h0, Description = 436F6D707574657320612066756E6374696F6E2F6D6574686F64207369676E617475726520676976656E20697473206E616D6520616E642061726974792E
-		Shared Function ComputeSignature(name As String, arity As Integer) As String
+		Shared Function ComputeSignature(name As String, arity As Integer, isSetter As Boolean) As String
 		  /// Computes a function/method signature given its name and arity.
+		  
+		  If isSetter And arity <> 1 Then
+		    Raise New InvalidArgumentException("Setters must have exactly one parameter.")
+		  End If
 		  
 		  If arity = 0 Then Return name + "()"
 		  
-		  Var sig As String = name + "("
+		  Var sig As String = name + If(isSetter, "=", "") + "("
 		  
 		  For i As Integer = 1 To arity
 		    sig = sig + "_"
@@ -24,8 +28,8 @@ Implements ObjoScript.Value
 		  Self.Name = name
 		  Self.Arity = arity
 		  Self.Chunk = New ObjoScript.Chunk
-		  mSignature = ComputeSignature(name, arity)
 		  Self.IsSetter = isSetter
+		  mSignature = ComputeSignature(name, arity, isSetter)
 		End Sub
 	#tag EndMethod
 

@@ -2,11 +2,12 @@
 Protected Class ForeignMethod
 Implements ObjoScript.Value
 	#tag Method, Flags = &h0
-		Sub Constructor(name As String, arity As Integer, method As ObjoScript.ForeignMethodDelegate)
+		Sub Constructor(name As String, arity As Integer, method As ObjoScript.ForeignMethodDelegate, isSetter As Boolean)
 		  Self.Name = name
 		  Self.Arity = arity
-		  mToString = "foreign " + ObjoScript.Func.ComputeSignature(name, arity)
 		  Self.Method = method
+		  mToString = "foreign " + ObjoScript.Func.ComputeSignature(name, arity, isSetter)
+		  Self.IsSetter = isSetter
 		  
 		End Sub
 	#tag EndMethod
@@ -35,7 +36,11 @@ Implements ObjoScript.Value
 		Arity As Integer = 0
 	#tag EndProperty
 
-	#tag Property, Flags = &h0, Description = 54686520586F6A6F206D6574686F642028617320612064656C65676174652920746F20696E766F6B65207768656E207468697320666F726569676E206D6574686F642069732063616C6C65642E
+	#tag Property, Flags = &h0, Description = 5472756520696620746869732069732061207365747465722E
+		IsSetter As Boolean = False
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 54686520586F6A6F206D6574686F6420746F20696E766F6B65207768656E207468697320666F726569676E206D6574686F642069732063616C6C65642E
 		Method As ObjoScript.ForeignMethodDelegate
 	#tag EndProperty
 
