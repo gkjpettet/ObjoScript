@@ -1,6 +1,6 @@
 #tag Class
 Protected Class Func
-Implements ObjoScript.Value
+Implements ObjoScript.Value, ObjoScript.Method
 	#tag Method, Flags = &h0, Description = 436F6D707574657320612066756E6374696F6E2F6D6574686F64207369676E617475726520676976656E20697473206E616D6520616E642061726974792E
 		Shared Function ComputeSignature(name As String, arity As Integer, isSetter As Boolean) As String
 		  /// Computes a function/method signature given its name and arity.
@@ -31,6 +31,16 @@ Implements ObjoScript.Value
 		  Self.IsSetter = isSetter
 		  mSignature = ComputeSignature(name, arity, isSetter)
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 546869732066756E6374696F6E2773207369676E61747572652E
+		Function Signature() As String
+		  /// This function's signature.
+		  ///
+		  /// Part of the ObjoScript.Method interface.
+		  
+		  Return mSignature
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
@@ -77,15 +87,6 @@ Implements ObjoScript.Value
 	#tag Property, Flags = &h0, Description = 546869732066756E6374696F6E2773206E616D652E
 		Name As String
 	#tag EndProperty
-
-	#tag ComputedProperty, Flags = &h0, Description = 546869732066756E6374696F6E2773207369676E61747572652E
-		#tag Getter
-			Get
-			  Return mSignature
-			End Get
-		#tag EndGetter
-		Signature As String
-	#tag EndComputedProperty
 
 
 	#tag ViewBehavior
@@ -136,14 +137,6 @@ Implements ObjoScript.Value
 			InitialValue="0"
 			Type="Integer"
 			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Signature"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
-			Type="String"
-			EditorType="MultiLineEditor"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="IsSetter"

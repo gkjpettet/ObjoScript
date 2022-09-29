@@ -1,15 +1,25 @@
 #tag Class
 Protected Class ForeignMethod
-Implements ObjoScript.Value
+Implements ObjoScript.Value, ObjoScript.Method
 	#tag Method, Flags = &h0
 		Sub Constructor(signature As String, arity As Integer, method As ObjoScript.ForeignMethodDelegate)
-		  Self.Signature = signature
+		  mSignature = signature
+		  mToString = "foreign " + Signature
 		  Self.Arity = arity
 		  Self.Method = method
-		  mToString = "foreign " + Signature
-		  
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5468697320666F726569676E206D6574686F642773207369676E61747572652E
+		Function Signature() As String
+		  /// This foreign method's signature.
+		  ///
+		  /// Part of the ObjoScript.Method interface.
+		  
+		  Return mSignature
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F66207468697320666F726569676E206D6574686F642E
@@ -40,12 +50,12 @@ Implements ObjoScript.Value
 		Method As ObjoScript.ForeignMethodDelegate
 	#tag EndProperty
 
-	#tag Property, Flags = &h21, Description = 507265636F6D70757465642076616C756520666F722060546F537472696E672829602E
-		Private mToString As String
+	#tag Property, Flags = &h21
+		Private mSignature As String
 	#tag EndProperty
 
-	#tag Property, Flags = &h0, Description = 5468697320666F726569676E206D6574686F642773207369676E61747572652E
-		Signature As String
+	#tag Property, Flags = &h21, Description = 507265636F6D70757465642076616C756520666F722060546F537472696E672829602E
+		Private mToString As String
 	#tag EndProperty
 
 
@@ -57,14 +67,6 @@ Implements ObjoScript.Value
 			InitialValue=""
 			Type="String"
 			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Signature"
-			Visible=true
-			Group="ID"
-			InitialValue=""
-			Type="String"
-			EditorType="MultiLineEditor"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Index"
@@ -94,6 +96,14 @@ Implements ObjoScript.Value
 			Name="Top"
 			Visible=true
 			Group="Position"
+			InitialValue="0"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Arity"
+			Visible=false
+			Group="Behavior"
 			InitialValue="0"
 			Type="Integer"
 			EditorType=""

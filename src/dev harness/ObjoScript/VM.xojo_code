@@ -206,9 +206,9 @@ Protected Class VM
 		    
 		    // Call the bound method.
 		    If ObjoScript.BoundMethod(v).IsForeign Then
-		      CallForeignMethod(ObjoScript.BoundMethod(v).Method, argCount)
+		      CallForeignMethod(ObjoScript.ForeignMethod(ObjoScript.BoundMethod(v).Method), argCount)
 		    Else
-		      CallFunction(ObjoScript.BoundMethod(v).Method, argCount)
+		      CallFunction(ObjoScript.Func(ObjoScript.BoundMethod(v).Method), argCount)
 		    End If
 		    
 		  Case ObjoScript.ValueTypes.ForeignMethod
@@ -238,8 +238,6 @@ Protected Class VM
 		  /// Returns a reusable handle to a call a method with `signature` on the class/instance currently in slot 0.
 		  ///
 		  /// The method can then be called again in the future using `VM.InvokeHandle()`.
-		  
-		  #Pragma Warning "TODO"
 		  
 		  // Check we have an instance or a class in slot 0.
 		  Var receiver As Variant = APISlots(0)
@@ -452,64 +450,20 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 5265747269657665732074686520676C6F62616C207661726961626C65206E616D656420606E616D656020616E64207075747320697420696E20415049536C6F742060736C6F74602E20526169736573206120564D20657863657074696F6E20696620746865207661726961626C652063616E6E6F7420626520666F756E642E
-		Sub GetGlobalVariable(name As String, slot As Integer)
-		  /// Retrieves the global variable named `name` and puts it in APISlot `slot`.
-		  /// Raises a VM exception if the variable cannot be found.
-		  
-		  Var variable As Variant = Globals.Lookup(name, Nil)
-		  If variable <> Nil Then
-		    APISlots(slot) = variable
-		  Else
-		    Error("API error. There is no global variable `" + name + "`.")
-		  End If
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = 52657475726E732074686520646F75626C6520696E2060736C6F74602E20526169736573206120564D457863657074696F6E206966207468652076616C756520696E2060736C6F7460206973206E6F74206120646F75626C652E
-		Function GetSlotDouble(slot As Integer) As Double
-		  /// Returns the double in `slot`.
-		  /// Raises a VMException if the value in `slot` is not a double.
-		  
-		  Return APISlots(slot).DoubleValue
-		  
-		  Exception e As RuntimeException
-		    Var type As String
-		    If APISlots(slot) IsA ObjoScript.Value Then
-		      type = ObjoScript.Value(APISlots(slot)).ToString
-		    Else
-		      type = APISlots(slot).StringValue
-		    End If
-		    Error("The host application requested a double from slot " + slot.ToString + " but it's a " + type + ".")
-		    
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = 52657475726E7320746865206B6C61737320696E2060736C6F74602E20526169736573206120564D457863657074696F6E206966207468652076616C756520696E2060736C6F7460206973206E6F742061206B6C6173732E
-		Function GetSlotKlass(slot As Integer) As ObjoScript.Klass
-		  /// Returns the klass in `slot`.
-		  /// Raises a VMException if the value in `slot` is not a klass.
-		  
-		  Return APISlots(slot)
-		  
-		  Exception e As IllegalCastException
-		    Var type As String
-		    If APISlots(slot) IsA ObjoScript.Value Then
-		      type = ObjoScript.Value(APISlots(slot)).ToString
-		    Else
-		      type = APISlots(slot).StringValue
-		    End If
-		    Error("The host application requested a klass from slot " + slot.ToString + " but it's a " + type + ".")
-		    
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = 52657475726E732074686520737472696E6720696E2060736C6F74602E204966206E6F74206120737472696E67207468656E2069747320737472696E6720726570726573656E746174696F6E2069732072657475726E65642E
-		Function GetSlotString(slot As Integer) As String
-		  /// Returns the string in `slot`. If not a string then its string representation is returned.
+	#tag Method, Flags = &h0, Description = 52657475726E732074686520737472696E6720726570726573656E746174696F6E206F66207468652076616C756520696E2060736C6F74602E
+		Function GetSlotAsString(slot As Integer) As String
+		  /// Returns the string representation of the value in `slot`.
 		  
 		  Return ValueToString(APISlots(slot))
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 52657475726E73207468652076616C756520696E2060736C6F74602E204974206D6179206265206120646F75626C652C20737472696E67206F7220616E20604F626A6F5363726970742E56616C7565602E
+		Function GetSlotValue(slot As Integer) As Variant
+		  /// Returns the value in `slot`. It may be a double, string or an `ObjoScript.Value`.
+		  
+		  Return APISlots(slot)
 		  
 		End Function
 	#tag EndMethod
@@ -693,16 +647,21 @@ Protected Class VM
 		  /// | arg1
 		  /// | bound method
 		  
-		  // Retrieve the bound method and push it on to the stack.
-		  Push(CallHandles(handle.Index))
+		  ' // Retrieve the bound method and push it on to the stack.
+		  ' Push(CallHandles(handle.Index))
 		  
 		  // Push the arguments (starting at slot 1).
 		  For i As Integer = 1 To handle.ArgCount
 		    Push(APISlots(i))
 		  Next i
 		  
-		  // Call the bound method stored in `CallHandles()`.
-		  CallValue(CallHandles(handle.Index), handle.ArgCount)
+		  ' // Call the bound method stored in `CallHandles()`.
+		  ' CallValue(CallHandles(handle.Index), handle.ArgCount)
+		  ' 
+		  ' Run
+		  
+		  Var bound As ObjoScript.BoundMethod = CallHandles(handle.Index)
+		  InvokeFromClass(bound.Receiver, bound.Method.Signature, handle.ArgCount, bound.IsStatic)
 		  
 		  Run
 		  
@@ -777,6 +736,21 @@ Protected Class VM
 		  
 		  Stack(StackTop) = value
 		  StackTop = StackTop + 1
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5265747269657665732074686520676C6F62616C207661726961626C65206E616D656420606E616D656020616E64207075747320697420696E20415049536C6F742060736C6F74602E20526169736573206120564D20657863657074696F6E20696620746865207661726961626C652063616E6E6F7420626520666F756E642E
+		Sub PutGlobalVariable(name As String, slot As Integer)
+		  /// Retrieves the global variable named `name` and puts it in APISlot `slot`.
+		  /// Raises a VM exception if the variable cannot be found.
+		  
+		  Var variable As Variant = Globals.Lookup(name, Nil)
+		  If variable <> Nil Then
+		    APISlots(slot) = variable
+		  Else
+		    Error("API error. There is no global variable `" + name + "`.")
+		  End If
 		  
 		End Sub
 	#tag EndMethod
@@ -886,11 +860,15 @@ Protected Class VM
 		      // Get the return value off the stack.
 		      Var result As Variant = Pop
 		      
+		      // We always put the return value in slot 0 of `APISlots` so the host application can access it.
+		      APISlots(0) = result
+		      
 		      FrameCount = FrameCount - 1
 		      
 		      If FrameCount = 0 Then
 		        // Exit the VM.
 		        Call Pop
+		        StackTop = 0
 		        Return
 		      End If
 		      

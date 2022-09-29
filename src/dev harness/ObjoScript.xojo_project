@@ -91,6 +91,7 @@ Class=SuperMethodInvocationExpr;ObjoScript/SuperMethodInvocationExpr.xojo_code;&
 Class=ForeignMethod;ObjoScript/ForeignMethod.xojo_code;&h00000000426BBFFF;&h000000004D1497FF;false
 Module=ObjoSystem;StandardLibrary/ObjoSystem.xojo_code;&h000000005F90F7FF;&h00000000051AC7FF;false
 Class=CallHandle;ObjoScript/CallHandle.xojo_code;&h00000000606DF7FF;&h000000004D1497FF;false
+Interface=Method;ObjoScript/Method.xojo_code;&h0000000061B2E7FF;&h000000004D1497FF;false
 DefaultWindow=WindowTest
 AppMenuBar=MainMenuBar
 MajorVersion=1

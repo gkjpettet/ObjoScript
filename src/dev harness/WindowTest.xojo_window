@@ -1207,16 +1207,21 @@ End
 		  // Assumes the source code has been compiled and run once.
 		  
 		  // Put the "GameEngine" class into slot 0.
-		  VM.GetGlobalVariable("GameEngine", 0)
+		  VM.PutGlobalVariable("GameEngine", 0)
 		  
 		  // Create a handle to the game engine's update(_) method.
 		  Var gameEngineUpdate As ObjoScript.CallHandle = VM.CreateHandle("update(_)", 1)
 		  
 		  For i As Integer = 1 To 10
+		    // Put the argument in slot 1.
 		    VM.SetSlot(1, i)
+		    
+		    // Call the handle.
 		    VM.InvokeHandle(gameEngineUpdate)
+		    
+		    ' // The return value from the method call gets placed in the API's slot 0 by the OP_RETURN instruction.
+		    ' Output.Text = Output.Text + VM.ValueToString(VM.GetSlotAsString(0)) + EndOfLine
 		  Next i
-		  
 		End Sub
 	#tag EndEvent
 #tag EndEvents

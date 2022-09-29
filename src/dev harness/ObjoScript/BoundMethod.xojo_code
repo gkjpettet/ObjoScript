@@ -49,7 +49,7 @@ Implements ObjoScript.Value
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 4966204973466F726569676E207468656E207468697320697320612060466F726569676E4D6574686F64602C206F746865727769736520697427732061206046756E63602E
-		Method As Variant
+		Method As ObjoScript.Method
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 54686520636C617373206F7220696E7374616E63652074686973206D6574686F6420697320626F756E6420746F2E
@@ -96,6 +96,22 @@ Implements ObjoScript.Value
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="IsForeign"
+			Visible=false
+			Group="Behavior"
+			InitialValue="False"
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="IsStatic"
+			Visible=false
+			Group="Behavior"
+			InitialValue="False"
+			Type="Boolean"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
