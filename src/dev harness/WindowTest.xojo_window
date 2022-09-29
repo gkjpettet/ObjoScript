@@ -723,6 +723,37 @@ Begin DesktopWindow WindowTest
       Visible         =   True
       Width           =   80
    End
+   Begin DesktopButton ButtonTest
+      AllowAutoDeactivate=   True
+      Bold            =   False
+      Cancel          =   False
+      Caption         =   "Test"
+      Default         =   False
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      Height          =   20
+      Index           =   -2147483648
+      Italic          =   False
+      Left            =   727
+      LockBottom      =   True
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   False
+      MacButtonStyle  =   0
+      Scope           =   0
+      TabIndex        =   17
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   687
+      Transparent     =   False
+      Underline       =   False
+      Visible         =   True
+      Width           =   80
+   End
 End
 #tag EndDesktopWindow
 
@@ -897,13 +928,16 @@ End
 		  Compiler = New ObjoScript.Compiler
 		  Func = Nil
 		  
+		  // Remove associated handlers.
 		  If VM <> Nil Then
 		    RemoveHandler VM.Print, AddressOf VMPrintDelegate
 		    RemoveHandler VM.BindForeignMethod, AddressOf VMBindForeignMethodDelegate
 		  End If
+		  
 		  VM = New ObjoScript.VM
 		  AddHandler VM.Print, AddressOf VMPrintDelegate
 		  AddHandler VM.BindForeignMethod, AddressOf VMBindForeignMethodDelegate
+		  
 		End Sub
 	#tag EndMethod
 
@@ -917,7 +951,7 @@ End
 		  
 		  Try
 		    Var watch As New ObjoScript.StopWatch(True)
-		    VM.Run(Func)
+		    VM.Interpret(Func)
 		    watch.Stop
 		    Info.Text = "Compile: " + Compiler.CompileTime.ToString(Locale.Current, "#.#") + " ms. Execute: " + watch.ElapsedMilliseconds.ToString + " ms"
 		  Catch e As ObjoScript.VMException
@@ -1164,6 +1198,25 @@ End
 		  /// Compile and run the source code in `Code`.
 		  
 		  Run
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ButtonTest
+	#tag Event
+		Sub Pressed()
+		  // Assumes the source code has been compiled and run once.
+		  
+		  // Put the "GameEngine" class into slot 0.
+		  VM.GetGlobalVariable("GameEngine", 0)
+		  
+		  // Create a handle to the game engine's update(_) method.
+		  Var gameEngineUpdate As ObjoScript.CallHandle = VM.CreateHandle("update(_)", 1)
+		  
+		  For i As Integer = 1 To 10
+		    VM.SetSlot(1, i)
+		    VM.InvokeHandle(gameEngineUpdate)
+		  Next i
+		  
 		End Sub
 	#tag EndEvent
 #tag EndEvents

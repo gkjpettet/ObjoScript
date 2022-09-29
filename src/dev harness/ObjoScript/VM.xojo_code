@@ -233,51 +233,51 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 52657475726E732061207265757361626C652068616E646C6520746F20612063616C6C2061206D6574686F64206F6E2074686520636C6173732F696E7374616E63652063757272656E746C7920696E20736C6F7420302E
-		Function CreateHandle(methodName As String, argCount As Integer, isSetter As Boolean) As ObjoScript.CallHandle
-		  /// Returns a reusable handle to a call a method on the class/instance currently in slot 0.
+	#tag Method, Flags = &h0, Description = 52657475726E732061207265757361626C652068616E646C6520746F20612063616C6C2061206D6574686F64207769746820607369676E617475726560206F6E2074686520636C6173732F696E7374616E63652063757272656E746C7920696E20736C6F7420302E
+		Function CreateHandle(signature As String, argCount As Integer) As ObjoScript.CallHandle
+		  /// Returns a reusable handle to a call a method with `signature` on the class/instance currently in slot 0.
 		  ///
 		  /// The method can then be called again in the future using `VM.InvokeHandle()`.
 		  
 		  #Pragma Warning "TODO"
 		  
-		  ' // Check we have an instance or a class in slot 0.
-		  ' Var receiver As Variant = APISlots(0)
-		  ' Var isStatic As Boolean = False
-		  ' If receiver IsA ObjoScript.Klass Then
-		  ' isStatic = True
-		  ' ElseIf receiver IsA ObjoScript.Instance = False Then
-		  ' Error("Methods can only be invoked on classes and instances.")
-		  ' End If
-		  ' 
-		  ' // Get the correct method. It might be Objo native or foreign.
-		  ' // It's either on the instance's class or its superclass
-		  ' // or it'll be a static method on the class on the top of the stack.
-		  ' Var method As Variant
-		  ' If isStatic Then
-		  ' method = ObjoScript.Klass(receiver).StaticMethods.Lookup(name, Nil)
-		  ' If method = Nil Then
-		  ' APIError("Undefined static method `" + name + "` on " + ObjoScript.Klass(receiver).ToString + ".")
-		  ' End If
-		  ' 
-		  ' Else
-		  ' method = ObjoScript.Instance(receiver).klass.Methods.Lookup(name, Nil)
-		  ' If method = Nil Then
-		  ' APIError("Undefined instance method `" + name + "` on " + ObjoScript.Instance(receiver).klass.ToString + ".")
-		  ' End If
-		  ' End If
-		  ' 
-		  ' // Bind this method to the class/instance which is currently on the top of the stack.
-		  ' Var bound As Variant
-		  ' If method IsA ObjoScript.Func Then
-		  ' bound = New ObjoScript.BoundMethod(receiver, method, isStatic, False)
-		  ' ElseIf method IsA ObjoScript.ForeignMethod Then
-		  ' bound = New ObjoScript.BoundMethod(receiver, method, isStatic, True)
-		  ' End If
-		  ' 
-		  ' // Add this bound method to the VM's cache of call handles.
-		  ' CallHandles.Add(bound)
-		  ' Return New ObjoScript.CallHandle(CallHandles.LastIndex, argCount)
+		  // Check we have an instance or a class in slot 0.
+		  Var receiver As Variant = APISlots(0)
+		  Var isStatic As Boolean = False
+		  If receiver IsA ObjoScript.Klass Then
+		    isStatic = True
+		  ElseIf receiver IsA ObjoScript.Instance = False Then
+		    Error("Methods can only be invoked on classes and instances.")
+		  End If
+		  
+		  // Get the correct method. It might be Objo native or foreign.
+		  // It's either on the instance's class or its superclass
+		  // or it'll be a static method on the class on the top of the stack.
+		  Var method As Variant
+		  If isStatic Then
+		    method = ObjoScript.Klass(receiver).StaticMethods.Lookup(signature, Nil)
+		    If method = Nil Then
+		      Error("Undefined static method `" + signature + "` on " + ObjoScript.Klass(receiver).ToString + ".")
+		    End If
+		    
+		  Else
+		    method = ObjoScript.Instance(receiver).klass.Methods.Lookup(signature, Nil)
+		    If method = Nil Then
+		      Error("Undefined instance method `" + signature + "` on " + ObjoScript.Instance(receiver).klass.ToString + ".")
+		    End If
+		  End If
+		  
+		  // Bind this method to the class/instance which is currently on the top of the stack.
+		  Var bound As Variant
+		  If method IsA ObjoScript.Func Then
+		    bound = New ObjoScript.BoundMethod(receiver, method, isStatic, False)
+		  ElseIf method IsA ObjoScript.ForeignMethod Then
+		    bound = New ObjoScript.BoundMethod(receiver, method, isStatic, True)
+		  End If
+		  
+		  // Add this bound method to the VM's cache of call handles and return it.
+		  CallHandles.Add(bound)
+		  Return New ObjoScript.CallHandle(CallHandles.LastIndex, argCount)
 		End Function
 	#tag EndMethod
 
@@ -452,6 +452,21 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 5265747269657665732074686520676C6F62616C207661726961626C65206E616D656420606E616D656020616E64207075747320697420696E20415049536C6F742060736C6F74602E20526169736573206120564D20657863657074696F6E20696620746865207661726961626C652063616E6E6F7420626520666F756E642E
+		Sub GetGlobalVariable(name As String, slot As Integer)
+		  /// Retrieves the global variable named `name` and puts it in APISlot `slot`.
+		  /// Raises a VM exception if the variable cannot be found.
+		  
+		  Var variable As Variant = Globals.Lookup(name, Nil)
+		  If variable <> Nil Then
+		    APISlots(slot) = variable
+		  Else
+		    Error("API error. There is no global variable `" + name + "`.")
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 52657475726E732074686520646F75626C6520696E2060736C6F74602E20526169736573206120564D457863657074696F6E206966207468652076616C756520696E2060736C6F7460206973206E6F74206120646F75626C652E
 		Function GetSlotDouble(slot As Integer) As Double
 		  /// Returns the double in `slot`.
@@ -459,10 +474,7 @@ Protected Class VM
 		  
 		  Return APISlots(slot).DoubleValue
 		  
-		  Exception e1 As OutOfBoundsException
-		    Error("The host application requested an invalid slot index (" + slot.ToString + ").")
-		    
-		  Exception e2 As RuntimeException
+		  Exception e As RuntimeException
 		    Var type As String
 		    If APISlots(slot) IsA ObjoScript.Value Then
 		      type = ObjoScript.Value(APISlots(slot)).ToString
@@ -474,15 +486,31 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 52657475726E7320746865206B6C61737320696E2060736C6F74602E20526169736573206120564D457863657074696F6E206966207468652076616C756520696E2060736C6F7460206973206E6F742061206B6C6173732E
+		Function GetSlotKlass(slot As Integer) As ObjoScript.Klass
+		  /// Returns the klass in `slot`.
+		  /// Raises a VMException if the value in `slot` is not a klass.
+		  
+		  Return APISlots(slot)
+		  
+		  Exception e As IllegalCastException
+		    Var type As String
+		    If APISlots(slot) IsA ObjoScript.Value Then
+		      type = ObjoScript.Value(APISlots(slot)).ToString
+		    Else
+		      type = APISlots(slot).StringValue
+		    End If
+		    Error("The host application requested a klass from slot " + slot.ToString + " but it's a " + type + ".")
+		    
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 52657475726E732074686520737472696E6720696E2060736C6F74602E204966206E6F74206120737472696E67207468656E2069747320737472696E6720726570726573656E746174696F6E2069732072657475726E65642E
 		Function GetSlotString(slot As Integer) As String
 		  /// Returns the string in `slot`. If not a string then its string representation is returned.
 		  
 		  Return ValueToString(APISlots(slot))
 		  
-		  Exception e1 As OutOfBoundsException
-		    Error("The host application requested an invalid slot index (" + slot.ToString + ").")
-		    
 		End Function
 	#tag EndMethod
 
@@ -562,6 +590,29 @@ Protected Class VM
 		  // This class should keep a reference to its superclass. Do this and pop it off the stack.
 		  subclass.Superclass = Pop
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 496E697469616C697365732074686520564D20616E6420696E7465727072657473206066756E63602E20557365207468697320746F20696E74657270726574206120746F70206C6576656C206675756E6374696F6E2E
+		Sub Interpret(func As ObjoScript.Func)
+		  /// Initialises the VM and interprets `func`. Use this to interpret a top level fuunction.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
+		  Reset
+		  
+		  // Push the function to run onto the stack as a runtime value.
+		  Push(func)
+		  
+		  // Call the passed function.
+		  CallFunction(func, 0)
+		  
+		  // The current call frame is the first one.
+		  CurrentFrame = Frames(0)
+		  
+		  Run
 		End Sub
 	#tag EndMethod
 
@@ -652,6 +703,8 @@ Protected Class VM
 		  
 		  // Call the bound method stored in `CallHandles()`.
 		  CallValue(CallHandles(handle.Index), handle.ArgCount)
+		  
+		  Run
 		  
 		End Sub
 	#tag EndMethod
@@ -782,7 +835,7 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 5265736574732074686520564D2E
-		Sub Reset(resetGlobals As Boolean = True)
+		Sub Reset()
 		  /// Resets the VM.
 		  
 		  StackTop = 0
@@ -799,9 +852,7 @@ Protected Class VM
 		  
 		  Nothing = New ObjoScript.Nothing
 		  
-		  If resetGlobals Then
-		    Self.Globals = ParseJSON("{}") // HACK: Case sensitive.
-		  End If
+		  Self.Globals = ParseJSON("{}") // HACK: Case sensitive.
 		  
 		  CallHandles.ResizeTo(-1)
 		  
@@ -814,24 +865,9 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 52756E7320612066756E6374696F6E2E
-		Sub Run(func As ObjoScript.Func)
-		  /// Runs a function.
-		  
-		  #Pragma DisableBoundsChecking
-		  #Pragma NilObjectChecking False
-		  #Pragma StackOverflowChecking False
-		  
-		  Reset
-		  
-		  // Push the function to run onto the stack as a runtime value.
-		  Push(func)
-		  
-		  // Call the passed function.
-		  CallFunction(func, 0)
-		  
-		  // The current call frame is the first one.
-		  CurrentFrame = Frames(0)
+	#tag Method, Flags = &h0, Description = 52756E732074686520696E7465727072657465722E20417373756D657320697420686173206265656E20696E697469616C69736564207072696F7220746F207468697320616E642068617320612076616C69642063616C6C206672616D6520746F20657865637574652E
+		Sub Run()
+		  /// Runs the interpreter. Assumes it has been initialised prior to this and has a valid call frame to execute.
 		  
 		  While True
 		    // Disassemble each instruction if requested.
@@ -1292,11 +1328,38 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 536574732060736C6F746020746F2074686520646F75626C652076616C7565206064602E
-		Sub SetSlotDouble(slot As Integer, d As Double)
-		  /// Sets `slot` to the double value `d`.
+	#tag Method, Flags = &h0, Description = 536574732060736C6F746020746F20646F75626C652076616C7565206064602E
+		Sub SetSlot(slot As Integer, d As Double)
+		  /// Sets `slot` to double value `d`.
 		  
 		  APISlots(slot) = d
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 536574732060736C6F746020746F2060696E7374616E6365602E
+		Sub SetSlot(slot As Integer, instance As ObjoScript.Instance)
+		  /// Sets `slot` to `instance`.
+		  
+		  APISlots(slot) = instance
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 536574732060736C6F746020746F20606B6C617373602E
+		Sub SetSlot(slot As Integer, klass As ObjoScript.Klass)
+		  /// Sets `slot` to `klass`.
+		  
+		  APISlots(slot) = klass
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 536574732060736C6F746020746F20737472696E672076616C7565206073602E
+		Sub SetSlot(slot As Integer, s As String)
+		  /// Sets `slot` to string value `s`.
+		  
+		  APISlots(slot) = s
 		  
 		End Sub
 	#tag EndMethod
@@ -1306,15 +1369,6 @@ Protected Class VM
 		  /// Sets `slot` to `nothing`.
 		  
 		  APISlots(slot) = Nothing
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = 536574732060736C6F746020746F2074686520737472696E672076616C7565206061602E
-		Sub SetSlotString(slot As Integer, s As String)
-		  /// Sets `slot` to the string value `a`.
-		  
-		  APISlots(slot) = s
 		  
 		End Sub
 	#tag EndMethod
