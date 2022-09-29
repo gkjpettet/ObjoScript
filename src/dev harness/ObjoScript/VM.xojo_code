@@ -314,68 +314,47 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 446566696E65732061206D6574686F64206E616D656420606E616D656020776974682060617269747960206F6E2074686520636C617373206F6E2074686520746F70206F662074686520737461636B2E
-		Private Sub DefineForeignMethod(methodName As String, arity As UInt8, isStatic As Boolean, isSetter As Boolean)
-		  /// Defines a method named `methodName` with `arity` on the class on the top of the stack.
+	#tag Method, Flags = &h21, Description = 446566696E65732061206D6574686F64207769746820607369676E61747572656020616E642060617269747960206F6E2074686520636C617373206F6E2074686520746F70206F662074686520737461636B2E
+		Private Sub DefineForeignMethod(signature As String, arity As UInt8, isStatic As Boolean)
+		  /// Defines a method with `signature` and `arity` on the class on the top of the stack.
 		  
 		  Var klass As ObjoScript.Klass = Peek(0)
 		  
 		  // Ask the host for the delegate to use.
-		  Var fmd As ObjoScript.ForeignMethodDelegate = RaiseEvent BindForeignMethod(klass.Name, methodName, arity, isStatic, isSetter)
+		  Var fmd As ObjoScript.ForeignMethodDelegate = RaiseEvent BindForeignMethod(klass.Name, signature, isStatic)
 		  If fmd = Nil Then
-		    Error("The host application failed to return a foreign method delegate for " + klass.Name + "." + methodName + ".")
+		    Error("The host application failed to return a foreign method delegate for " + klass.Name + "." + signature + ".")
 		  End If
 		  
 		  // Create the foreign method.
-		  Var method As New ObjoScript.ForeignMethod(methodName, arity, fmd, isSetter)
+		  Var method As New ObjoScript.ForeignMethod(signature, arity, fmd)
 		  
 		  If isStatic Then
-		    If isSetter Then
-		      // Static setter.
-		      klass.StaticSetters.Value(methodName) = method
-		    Else
-		      // Static method.
-		      klass.StaticMethods.Value(methodName) = method
-		    End If
+		    // Static method.
+		    klass.StaticMethods.Value(signature) = method
 		  Else
-		    If isSetter Then
-		      // Instance setter.
-		      klass.Setters.Value(methodName) = method
-		    Else
-		      // Instance method.
-		      klass.Methods.Value(methodName) = method
-		    End If
+		    // Instance method.
+		    klass.Methods.Value(signature) = method
 		  End If
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 446566696E65732061206D6574686F64206E616D656420606E616D6560206F6E2074686520636C617373206A7573742062656C6F7720746865206D6574686F64277320626F6479206F6E2074686520737461636B2E
-		Private Sub DefineMethod(signature As String, setter As UInt8, isStatic As Boolean)
+		Private Sub DefineMethod(signature As String, isStatic As Boolean)
 		  /// Defines a method with `signature` on the class just below the method's body on the stack.
 		  ///
 		  /// The method's body should be on the top of the stack with its class just beneath it.
-		  /// This is a setter method if setter = 1, otherwise it's a regular method.
 		  
 		  Var method As ObjoScript.Func = Peek(0)
 		  Var klass As ObjoScript.Klass = Peek(1)
 		  
 		  If isStatic Then
-		    If setter = 0 Then
-		      // Regular static method.
-		      klass.StaticMethods.Value(signature) = method
-		    Else
-		      // Static setter.
-		      klass.StaticSetters.Value(signature) = method
-		    End If
+		    // Static method.
+		    klass.StaticMethods.Value(signature) = method
 		  Else
-		    If setter = 0 Then
-		      // Regular method.
-		      klass.Methods.Value(signature) = method
-		    Else
-		      // Setter.
-		      klass.Setters.Value(signature) = method
-		    End If
+		    // Instance method.
+		    klass.Methods.Value(signature) = method
 		  End If
 		  
 		  // Pop the method's body off the stack.
@@ -579,7 +558,6 @@ Protected Class VM
 		  // superclass' methods to the class on the stack.
 		  // NB: We **don't** inherit static methods and setters or constructors.
 		  subclass.Methods = superclass.Methods.Clone
-		  subclass.Setters = superclass.Setters.Clone
 		  
 		  // This class should keep a reference to its superclass. Do this and pop it off the stack.
 		  subclass.Superclass = Pop
@@ -1178,10 +1156,10 @@ Protected Class VM
 		      Push(New ObjoScript.Klass(className))
 		      
 		    Case OP_METHOD
-		      DefineMethod(ReadConstant, ReadByte, False)
+		      DefineMethod(ReadConstant, False)
 		      
 		    Case OP_METHOD_LONG
-		      DefineMethod(ReadConstantLong, ReadByte, False)
+		      DefineMethod(ReadConstantLong, False)
 		      
 		    Case OP_GETTER
 		      BindMethod(ReadConstant, False)
@@ -1238,10 +1216,10 @@ Protected Class VM
 		      Invoke(ReadConstantLong, ReadByte, True)
 		      
 		    Case OP_STATIC_METHOD
-		      DefineMethod(ReadConstant, ReadByte, True)
+		      DefineMethod(ReadConstant, True)
 		      
 		    Case OP_STATIC_METHOD_LONG
-		      DefineMethod(ReadConstantLong, ReadByte, True)
+		      DefineMethod(ReadConstantLong, True)
 		      
 		    Case OP_GET_STATIC_FIELD
 		      GetStaticField(ReadConstant)
@@ -1256,12 +1234,10 @@ Protected Class VM
 		      SetStaticField(ReadConstantLong)
 		      
 		    Case OP_FOREIGN_METHOD
-		      DefineForeignMethod(ReadConstant, ReadByte, _
-		      If(ReadByte = 1, True, False), If(ReadByte = 1, True, False))
+		      DefineForeignMethod(ReadConstant, ReadByte, If(ReadByte = 1, True, False))
 		      
 		    Case OP_FOREIGN_METHOD_LONG
-		      DefineForeignMethod(ReadConstantLong, ReadByte, _
-		      If(ReadByte = 1, True, False), If(ReadByte = 1, True, False))
+		      DefineForeignMethod(ReadConstantLong, ReadByte, If(ReadByte = 1, True, False))
 		      
 		    End Select
 		  Wend
@@ -1379,7 +1355,7 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 43616C6C73207468652073657474657220666F722074686520696E7374616E6365206F6E652066726F6D2074686520746F70206F662074686520737461636B2C2070617373696E6720696E207468652076616C7565206F6E2074686520746F70206F662074686520737461636B2061732074686520706172616D657465722E
-		Private Sub Setter(name As String, onSuper As Boolean)
+		Private Sub Setter(signature As String, onSuper As Boolean)
 		  /// Calls the setter for the instance or class one from the top of the stack, passing in the 
 		  /// value on the top of the stack as the parameter.
 		  ///
@@ -1402,29 +1378,28 @@ Protected Class VM
 		  // Get the value to assign. This will be the parameter to the setter method.
 		  Var value As Variant = Pop
 		  
-		  // Get the correct method. It's either on the instance or its superclass or is 
-		  // a static setter on a class.
+		  // Get the correct method. It's either on the instance, the instance's super or a class.
 		  Var setter As Variant
 		  If onSuper And Not isStatic Then
 		    If ObjoScript.Instance(receiver).Klass.Superclass = Nil Then
 		      Error("`" + ObjoScript.Instance(receiver).Klass.ToString + "` does not have a superclass.")
 		    Else
-		      setter = ObjoScript.Instance(receiver).Klass.Superclass.Setters.Lookup(name, Nil)
+		      setter = ObjoScript.Instance(receiver).Klass.Superclass.Methods.Lookup(signature, Nil)
 		    End If
 		    If setter = Nil Then
-		      Error("Undefined instance setter `" + name + "` on " + ObjoScript.Instance(receiver).klass.Superclass.ToString + ".")
+		      Error("Undefined instance setter `" + signature + "` on " + ObjoScript.Instance(receiver).klass.Superclass.ToString + ".")
 		    End If
 		    
 		  ElseIf isStatic Then
-		    setter = ObjoScript.Klass(receiver).StaticSetters.Lookup(name, Nil)
+		    setter = ObjoScript.Klass(receiver).StaticMethods.Lookup(signature, Nil)
 		    If setter = Nil Then
-		      Error("Undefined static setter `" + name + "` on " + ObjoScript.Klass(receiver).ToString + ".")
+		      Error("Undefined static setter `" + signature + "` on " + ObjoScript.Klass(receiver).ToString + ".")
 		    End If
 		    
 		  Else
-		    setter = ObjoScript.Instance(receiver).klass.Setters.Lookup(name, Nil)
+		    setter = ObjoScript.Instance(receiver).klass.Methods.Lookup(signature, Nil)
 		    If setter = Nil Then
-		      Error("Undefined instance setter `" + name + "` on " + ObjoScript.Instance(receiver).klass.ToString + ".")
+		      Error("Undefined instance setter `" + signature + "` on " + ObjoScript.Instance(receiver).klass.ToString + ".")
 		    End If
 		  End If
 		  
@@ -1551,7 +1526,7 @@ Protected Class VM
 
 
 	#tag Hook, Flags = &h0, Description = 54686520564D2069732072657175657374696E67207468652064656C656761746520746F20757365207768656E2063616C6C696E67207468652073706563696669656420666F726569676E206D6574686F64206F6E206120636C6173732E205468697320697320706572666F726D6564206F6E636520666F72206561636820666F726569676E206D6574686F642C207768656E2074686520636C617373206973206669727374206465636C617265642E
-		Event BindForeignMethod(className As String, methodName As String, arity As Integer, isStatic As Boolean, isSetter As Boolean) As ObjoScript.ForeignMethodDelegate
+		Event BindForeignMethod(className As String, methodSignature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
 	#tag EndHook
 
 	#tag Hook, Flags = &h0, Description = 6073602069732074686520726573756C74206F66206576616C756174696E67206120607072696E74602065787072657373696F6E2E
@@ -1612,8 +1587,8 @@ Protected Class VM
 		47: OP_CALL (1)
 		48: OP_CLASS (1)
 		49: OP_CLASS_LONG (2)
-		50: OP_METHOD (2)
-		51: OP_METHOD_LONG (3)
+		50: OP_METHOD (1)
+		51: OP_METHOD_LONG (2)
 		52: OP_SETTER (1)
 		53: OP_SETTER_LONG (2)
 		54: OP_GETTER (1)
@@ -1632,14 +1607,14 @@ Protected Class VM
 		67: OP_SUPER_SETTER_LONG (2)
 		68: OP_SUPER_INVOKE (2)
 		69: OP_SUPER_INVOKE_LONG (3)
-		70: OP_STATIC_METHOD (2)
-		71: OP_STATIC_METHOD_LONG (3)
+		70: OP_STATIC_METHOD (1)
+		71: OP_STATIC_METHOD_LONG (2)
 		72: OP_GET_STATIC_FIELD (1)
 		73: OP_GET_STATIC_FIELD_LONG (2)
 		74: OP_SET_STATIC_FIELD (1)
 		75: OP_SET_STATIC_FIELD_LONG (2)
-		76: OP_FOREIGN_METHOD (3)
-		77: OP_FOREIGN_METHOD_LONG (4)
+		76: OP_FOREIGN_METHOD (2)
+		77: OP_FOREIGN_METHOD_LONG (3)
 	#tag EndNote
 
 
@@ -1732,9 +1707,9 @@ Protected Class VM
 			  OP_EXIT                 : 0, _
 			  OP_CALL                 : 1, _
 			  OP_CLASS                : 1, _
-			  OP_CLASS_LONG           : 2, _ 
-			  OP_METHOD               : 2, _
-			  OP_METHOD_LONG          : 3, _
+			  OP_CLASS_LONG           : 2, _
+			  OP_METHOD               : 1, _
+			  OP_METHOD_LONG          : 2, _
 			  OP_SETTER               : 1, _
 			  OP_SETTER_LONG          : 2, _
 			  OP_GETTER               : 1, _
@@ -1753,14 +1728,14 @@ Protected Class VM
 			  OP_SUPER_SETTER_LONG    : 2, _
 			  OP_SUPER_INVOKE         : 2, _
 			  OP_SUPER_INVOKE_LONG    : 3, _
-			  OP_STATIC_METHOD        : 2, _
-			  OP_STATIC_METHOD_LONG   : 3, _
+			  OP_STATIC_METHOD        : 1, _
+			  OP_STATIC_METHOD_LONG   : 2, _
 			  OP_GET_STATIC_FIELD     : 1, _
 			  OP_GET_STATIC_FIELD_LONG: 2, _
 			  OP_SET_STATIC_FIELD     : 1, _
 			  OP_SET_STATIC_FIELD_LONG: 2, _
-			  OP_FOREIGN_METHOD       : 3, _
-			  OP_FOREIGN_METHOD_LONG  : 4 _
+			  OP_FOREIGN_METHOD       : 2, _
+			  OP_FOREIGN_METHOD_LONG  : 3 _
 			  )
 			  
 			  Return d

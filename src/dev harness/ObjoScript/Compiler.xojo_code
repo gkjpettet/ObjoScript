@@ -1237,18 +1237,17 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = fmd.Location
 		  
-		  // Add the name of the method to the function's constants pool.
-		  Var index As Integer = AddConstant(fmd.Name)
+		  // Add the signature of the method to the function's constants pool.
+		  Var index As Integer = AddConstant(fmd.Signature)
 		  
 		  // Emit the "declare foreign method" opcode.
-		  // The operands are the index of the method's name in the constants pool, 
+		  // The operands are the index of the method's signature in the constants pool, 
 		  // the number of arguments the method expects, 
-		  // if it's an instance (0) or static (1) method and whether
-		  // this is a regular method (0) or a setter (1).
+		  // and if it's an instance (0) or static (1) method.
 		  EmitIndexedOpcode(ObjoScript.VM.OP_FOREIGN_METHOD, ObjoScript.VM.OP_FOREIGN_METHOD_LONG, index)
 		  EmitByte(fmd.Arity)
 		  EmitByte(If(fmd.IsStatic, 1, 0))
-		  EmitByte(If(fmd.IsSetter, 1, 0))
+		  
 		  
 		End Function
 	#tag EndMethod
@@ -1397,14 +1396,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Call EmitConstant(body)
 		  
 		  // Emit the "declare method" or "declare static method" opcode.
-		  // The operands are the index of the method's signature in the constants pool and whether
-		  // this is a setter (1) or regular method (0).
+		  // The operand is the index of the method's signature in the constants pool.
 		  If m.IsStatic Then
 		    EmitIndexedOpcode(ObjoScript.VM.OP_STATIC_METHOD, ObjoScript.VM.OP_STATIC_METHOD_LONG, index)
 		  Else
 		    EmitIndexedOpcode(ObjoScript.VM.OP_METHOD, ObjoScript.VM.OP_METHOD_LONG, index)
 		  End If
-		  EmitByte(If(m.IsSetter, 1, 0))
 		  
 		End Function
 	#tag EndMethod
@@ -1949,6 +1946,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 				"0 - TopLevel"
 				"1 - Func"
 				"2 - Method"
+				"3 - Constructor"
 			#tag EndEnumValues
 		#tag EndViewProperty
 	#tag EndViewBehavior

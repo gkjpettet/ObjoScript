@@ -2,12 +2,12 @@
 Protected Class ForeignMethod
 Implements ObjoScript.Value
 	#tag Method, Flags = &h0
-		Sub Constructor(name As String, arity As Integer, method As ObjoScript.ForeignMethodDelegate, isSetter As Boolean)
-		  Self.Name = name
+		Sub Constructor(signature As String, arity As Integer, method As ObjoScript.ForeignMethodDelegate)
+		  Self.Signature = signature
 		  Self.Arity = arity
 		  Self.Method = method
-		  mToString = "foreign " + ObjoScript.Func.ComputeSignature(name, arity, isSetter)
-		  Self.IsSetter = isSetter
+		  mToString = "foreign " + Signature
+		  
 		  
 		End Sub
 	#tag EndMethod
@@ -36,10 +36,6 @@ Implements ObjoScript.Value
 		Arity As Integer = 0
 	#tag EndProperty
 
-	#tag Property, Flags = &h0, Description = 5472756520696620746869732069732061207365747465722E
-		IsSetter As Boolean = False
-	#tag EndProperty
-
 	#tag Property, Flags = &h0, Description = 54686520586F6A6F206D6574686F6420746F20696E766F6B65207768656E207468697320666F726569676E206D6574686F642069732063616C6C65642E
 		Method As ObjoScript.ForeignMethodDelegate
 	#tag EndProperty
@@ -48,8 +44,8 @@ Implements ObjoScript.Value
 		Private mToString As String
 	#tag EndProperty
 
-	#tag Property, Flags = &h0, Description = 5468697320666F726569676E206D6574686F642773206E616D652E
-		Name As String
+	#tag Property, Flags = &h0, Description = 5468697320666F726569676E206D6574686F642773207369676E61747572652E
+		Signature As String
 	#tag EndProperty
 
 
@@ -61,6 +57,14 @@ Implements ObjoScript.Value
 			InitialValue=""
 			Type="String"
 			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Signature"
+			Visible=true
+			Group="ID"
+			InitialValue=""
+			Type="String"
+			EditorType="MultiLineEditor"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Index"

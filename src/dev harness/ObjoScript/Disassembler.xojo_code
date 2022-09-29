@@ -512,59 +512,54 @@ Protected Class Disassembler
 		  /// Prints the instruction's name, the index of the method's name in the constant pool, the method name and if it's a setter or not.
 		  /// Returns the offset for the next instruction.
 		  ///
-		  /// The METHOD instruction takes two or three byte operands (1/2 for the index of the name in the constant pool and one specifying if the
-		  /// the method is a setter (1) or a regular method (0).
-		  /// The FOREIGN_METHOD instruction takes three or four byte operands (1/2 for the index of the name in the constant pool, one specifying if the
-		  /// the method is a setter (1) or a regular method (0) and one specifying static (1) or instance (0).
+		  /// The METHOD and STATIC_METHOD instructions take one or two byte operands (1/2 for the index of the method's signature in the constant pool).
+		  /// The FOREIGN_METHOD instruction takes two or three byte operands (1/2 for the index of the signature in the constant pool 
+		  /// and one specifying if the method is static (1) or instance (0)).
 		  /// Format:
-		  /// OFFSET  LINE  (OPTIONAL SCRIPT ID)  OPCODE  POOL_INDEX  METHOD_NAME   STATIC/INSTANCE?  SETTER?
+		  /// OFFSET  LINE  (OPTIONAL SCRIPT ID)  OPCODE  POOL_INDEX  METHOD_NAME   STATIC/INSTANCE?
 		  
 		  // Get and print the index in the constant pool.
-		  Var constantIndex, newOffset, isSetter As Integer
+		  Var constantIndex, newOffset As Integer
 		  Var isStatic As Boolean
 		  Var name As String
 		  Select Case opcode
 		  Case ObjoScript.VM.OP_METHOD
 		    constantIndex = chunk.ReadByte(offset + 1)
-		    isSetter = chunk.ReadByte(offset + 2)
-		    newOffset = offset + 3
+		    newOffset = offset + 2
 		    isStatic = False
 		    name = "METHOD"
 		    
 		  Case ObjoScript.VM.OP_STATIC_METHOD
 		    constantIndex = chunk.ReadByte(offset + 1)
-		    isSetter = chunk.ReadByte(offset + 2)
-		    newOffset = offset + 3
+		    newOffset = offset + 2
 		    isStatic = True
 		    name = "STATIC_METHOD"
 		    
 		  Case ObjoScript.VM.OP_METHOD_LONG
 		    // Two byte operand.
 		    constantIndex = chunk.ReadUInt16(offset + 1)
-		    isSetter = chunk.ReadByte(offset + 3)
-		    newOffset = offset + 4
+		    newOffset = offset + 3
 		    isStatic = False
 		    name = "METHOD_LONG"
 		    
 		  Case ObjoScript.VM.OP_STATIC_METHOD_LONG
 		    // Two byte operand.
 		    constantIndex = chunk.ReadUInt16(offset + 1)
-		    isSetter = chunk.ReadByte(offset + 3)
-		    newOffset = offset + 4
+		    newOffset = offset + 3
 		    isStatic = True
 		    name = "STATIC_METHOD_LONG"
 		    
 		  Case ObjoScript.VM.OP_FOREIGN_METHOD
 		    constantIndex = chunk.ReadByte(offset + 1)
-		    isStatic = If(chunk.ReadByte(offset + 2) = 1, True, False)
-		    isSetter = chunk.ReadByte(offset + 3)
+		    Call chunk.ReadByte(offset + 2) // The method's arity. We won't print this.
+		    isStatic = If(chunk.ReadByte(offset + 3) = 1, True, False)
 		    newOffset = offset + 4
 		    name = "FOREIGN_METHOD"
 		    
 		  Case ObjoScript.VM.OP_FOREIGN_METHOD_LONG
 		    constantIndex = chunk.ReadUInt16(offset + 1)
-		    isStatic = If(chunk.ReadByte(offset + 3) = 1, True, False)
-		    isSetter = chunk.ReadByte(offset + 4)
+		    Call chunk.ReadByte(offset + 3) // The method's arity. We won't print this.
+		    isStatic = If(chunk.ReadByte(offset + 4) = 1, True, False)
 		    newOffset = offset + 5
 		    name = "FOREIGN_METHOD_LONG"
 		    
@@ -585,10 +580,7 @@ Protected Class Disassembler
 		  
 		  // Static or instance?
 		  Var type As String = If(isStatic, "Static", "Instance")
-		  Print(type.JustifyLeft(COL_WIDTH))
-		  
-		  // Setter?
-		  PrintLine(If(isSetter = 0, "Getter", "Setter"))
+		  PrintLine(type.JustifyLeft(COL_WIDTH))
 		  
 		  Return newOffset
 		  
