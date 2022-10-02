@@ -102,9 +102,22 @@ Protected Class VM
 		  
 		  Stack(StackTop - argCount - 1) = New ObjoScript.Instance(klass)
 		  
-		  // Invoke the constructor (if defined). 
+		  // Invoke the constructor (if defined).
+		  // Since constructors are stored by signature and there are predictble, we have a few precomputed
+		  // onses to save a call to `ObjoScript.Func.ComputeSignature()`.
+		  Var constructor As ObjoScript.Func
+		  Select Case argCount
+		  Case 0
+		    constructor  = klass.Constructors.Lookup(CONSTRUCTOR_SIG_0, Nil)
+		  Case 1
+		    constructor = klass.Constructors.Lookup(CONSTRUCTOR_SIG_1, Nil)
+		  Case 2
+		    constructor = klass.Constructors.Lookup(CONSTRUCTOR_SIG_2, Nil)
+		  Else
+		    constructor = klass.Constructors.Lookup(ObjoScript.Func.ComputeSignature("constructor", argCount, False), Nil)
+		  End Select
+		  
 		  // We allow a class to omit providing a default (zero parameter) constructor.
-		  Var constructor As ObjoScript.Func = klass.Constructors.Lookup(argCount, Nil)
 		  If constructor <> Nil Then
 		    CallFunction(constructor, argCount)
 		  ElseIf argCount <> 0 Then
@@ -268,8 +281,7 @@ Protected Class VM
 		    End If
 		    
 		  ElseIf isConstructor Then
-		    #Pragma Warning "TODO: Stop storing constructors by arity - use their signature instead"
-		    method = ObjoScript.Klass(receiver).Constructors.Lookup(argCount, Nil)
+		    method = ObjoScript.Klass(receiver).Constructors.Lookup(signature, Nil)
 		    If method = Nil Then
 		      Error("Undefined constructor `" + signature + "` on " + ObjoScript.Klass(receiver).ToString + ".")
 		    End If
@@ -311,19 +323,17 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 446566696E6573206120636F6E7374727563746F72206F6E2074686520636C617373206A7573742062656C6F772074686520636F6E7374727563746F72277320626F6479206F6E2074686520737461636B2E
-		Private Sub DefineConstructor(arity As Integer)
+		Private Sub DefineConstructor(signature As String)
 		  /// Defines a constructor on the class just below the constructor's body on the stack.
 		  ///
 		  /// The constructor's body should be on the top of the stack with its class just beneath it.
-		  /// Since the compiler guarantees that there will never be two constructors with the same arity, 
-		  /// we use the constructor's arity as the key in the class' `Constructor` dictonary to store it.
 		  
-		  #Pragma Warning "TODO: Stop storing constructors by their arity. Use their signature instead"
+		  #Pragma Warning "TODO: Store arity in SigParams dictionary"
 		  
 		  Var constructor As ObjoScript.Func = Peek(0)
 		  Var klass As ObjoScript.Klass = Peek(1)
 		  
-		  klass.Constructors.Value(arity) = constructor
+		  klass.Constructors.Value(signature) = constructor
 		  
 		  // Pop the constructor's body off the stack.
 		  Call Pop
@@ -334,6 +344,8 @@ Protected Class VM
 	#tag Method, Flags = &h21, Description = 446566696E65732061206D6574686F64207769746820607369676E61747572656020616E642060617269747960206F6E2074686520636C617373206F6E2074686520746F70206F662074686520737461636B2E
 		Private Sub DefineForeignMethod(signature As String, arity As UInt8, isStatic As Boolean)
 		  /// Defines a method with `signature` and `arity` on the class on the top of the stack.
+		  
+		  #Pragma Warning "TODO: Store arity in SigParams dictionary"
 		  
 		  Var klass As ObjoScript.Klass = Peek(0)
 		  
@@ -362,6 +374,8 @@ Protected Class VM
 		  /// Defines a method with `signature` on the class just below the method's body on the stack.
 		  ///
 		  /// The method's body should be on the top of the stack with its class just beneath it.
+		  
+		  #Pragma Warning "TODO: Store arity in SigParams dictionary"
 		  
 		  Var method As ObjoScript.Func = Peek(0)
 		  Var klass As ObjoScript.Klass = Peek(1)
@@ -1224,7 +1238,10 @@ Protected Class VM
 		      SetField(ReadConstantLong)
 		      
 		    Case OP_CONSTRUCTOR
-		      DefineConstructor(ReadByte)
+		      DefineConstructor(ReadConstant)
+		      
+		    Case OP_CONSTRUCTOR_LONG
+		      DefineConstructor(ReadConstantLong)
 		      
 		    Case VM.OP_INVOKE
 		      Invoke(ReadConstant, ReadByte, False)
@@ -1671,6 +1688,7 @@ Protected Class VM
 		75: OP_SET_STATIC_FIELD_LONG (2)
 		76: OP_FOREIGN_METHOD (2)
 		77: OP_FOREIGN_METHOD_LONG (3)
+		78: OP_CONSTRUCTOR_LONG (2)
 	#tag EndNote
 
 
@@ -1775,6 +1793,7 @@ Protected Class VM
 			  OP_SET_FIELD            : 1, _
 			  OP_SET_FIELD_LONG       : 2, _
 			  OP_CONSTRUCTOR          : 1, _
+			  OP_CONSTRUCTOR_LONG     : 2, _
 			  OP_INVOKE               : 2, _
 			  OP_INVOKE_LONG          : 3, _
 			  OP_INHERIT              : 0, _
@@ -1809,6 +1828,15 @@ Protected Class VM
 		Private StackTop As Integer = 0
 	#tag EndProperty
 
+
+	#tag Constant, Name = CONSTRUCTOR_SIG_0, Type = String, Dynamic = False, Default = \"constructor()", Scope = Private, Description = 507265636F6D7075746564207369676E617475726520666F722061207A65726F20617267756D656E7420636F6E7374727563746F72207369676E61747572652E
+	#tag EndConstant
+
+	#tag Constant, Name = CONSTRUCTOR_SIG_1, Type = String, Dynamic = False, Default = \"constructor(_)", Scope = Private, Description = 507265636F6D7075746564207369676E617475726520666F7220612073696E676C6520617267756D656E7420636F6E7374727563746F72207369676E61747572652E
+	#tag EndConstant
+
+	#tag Constant, Name = CONSTRUCTOR_SIG_2, Type = String, Dynamic = False, Default = \"constructor(_\x2C_)", Scope = Private, Description = 507265636F6D7075746564207369676E617475726520666F7220612074776F20617267756D656E7420636F6E7374727563746F72207369676E61747572652E
+	#tag EndConstant
 
 	#tag Constant, Name = MAX_FRAMES, Type = Double, Dynamic = False, Default = \"63", Scope = Public, Description = 54686520757070657220626F756E6473206F66207468652063616C6C206672616D6520737461636B2E
 	#tag EndConstant
@@ -1850,6 +1878,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_CONSTRUCTOR, Type = Double, Dynamic = False, Default = \"60", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_CONSTRUCTOR_LONG, Type = Double, Dynamic = False, Default = \"78", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_DEFINE_GLOBAL, Type = Double, Dynamic = False, Default = \"30", Scope = Public

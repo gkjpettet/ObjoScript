@@ -2,7 +2,8 @@
 Protected Class Disassembler
 	#tag Method, Flags = &h0, Description = 5072696E74732074686520636F6E7374616E7420696E737472756374696F6E2773206E616D652C2074686520636F6E7374616E74277320696E64657820696E2074686520636F6E7374616E7420706F6F6C20616E64206120726570726573656E746174696F6E206F66207468652076616C7565206F66207468617420636F6E7374616E742E2052657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
 		Function ConstantInstruction(opcode As UInt8, chunk As ObjoScript.Chunk, offset As Integer) As Integer
-		  /// Prints the constant instruction's name, the constant's index in the constant pool and a representation of the value of that constant.
+		  /// Prints the constant instruction's name, the constant's index in the constant pool and 
+		  /// a representation of the value of that constant.
 		  /// Returns the offset for the next instruction.
 		  ///
 		  /// The constant instruction takes a single byte operand (the index of the constant in the constant pool).
@@ -66,6 +67,16 @@ Protected Class Disassembler
 		    constantIndex = chunk.ReadUInt16(offset + 1)
 		    newOffset = offset + 3
 		    name = "CLASS_LONG"
+		    
+		  Case ObjoScript.VM.OP_CONSTRUCTOR
+		    constantIndex = chunk.ReadByte(offset + 1)
+		    newOffset = offset + 2
+		    name = "CONSTRUCTOR"
+		    
+		  Case ObjoScript.VM.OP_CONSTRUCTOR_LONG
+		    constantIndex = chunk.ReadUInt16(offset + 1)
+		    newOffset = offset + 3
+		    name = "CONSTRUCTOR_LONG"
 		    
 		  Case ObjoScript.VM.OP_GETTER
 		    constantIndex = chunk.ReadByte(offset + 1)
@@ -381,8 +392,8 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_SET_FIELD_LONG
 		    Return ConstantInstruction(opcode, chunk, offset)
 		    
-		  Case ObjoScript.VM.OP_CONSTRUCTOR
-		    Return TwoByteInstruction("OP_CONSTRUCTOR", chunk, offset)
+		  Case ObjoScript.VM.OP_CONSTRUCTOR, ObjoScript.VM.OP_CONSTRUCTOR_LONG
+		    Return ConstantInstruction(opcode, chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_INVOKE
 		    Return InvokeInstruction(opcode, chunk, offset)

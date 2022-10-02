@@ -1074,11 +1074,15 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles a class constructor.
 		  ///
 		  /// Part of the ObjoScript.StmtVisitor interface.
-		  /// To define a new constructor, the VM needs two things:
-		  ///  1. The function that is the constructor's body.
-		  ///  2. The class to bind the constructor to.
+		  /// To define a new constructor, the VM needs three things:
+		  ///  1. The constructor's signature.
+		  ///  2. The function that is the constructor's body.
+		  ///  3. The class to bind the constructor to.
 		  
 		  mLocation = c.Location
+		  
+		  // Add the constructor's signature to the function's constants pool.
+		  Var index As Integer = AddConstant(c.Signature)
 		  
 		  // Compile the body.
 		  Var compiler As New ObjoScript.Compiler
@@ -1089,9 +1093,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Call EmitConstant(body)
 		  
 		  // Emit the "declare constructor" opcode (which one depends on the index in the constant pool).
-		  // The operand is the arity of the constructor. This will be the key in the class' `Constructors` dictionary
-		  // at runtime.
-		  EmitBytes(ObjoScript.VM.OP_CONSTRUCTOR, c.Arity, c.Location)
+		  // The operand is the index of the constructor's signature in the constants pool.
+		  EmitIndexedOpcode(VM.OP_CONSTRUCTOR, VM.OP_CONSTRUCTOR_LONG, index, c.Location)
 		  
 		End Function
 	#tag EndMethod
