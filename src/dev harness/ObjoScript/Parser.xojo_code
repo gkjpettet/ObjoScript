@@ -388,7 +388,7 @@ Protected Class Parser
 		  /// Syntax:
 		  ///
 		  /// ```objo
-		  /// forEach i in RANGE {
+		  /// foreach i in RANGE {
 		  ///  statements
 		  /// }
 		  /// ```
