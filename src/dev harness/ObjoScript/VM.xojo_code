@@ -1208,9 +1208,6 @@ Protected Class VM
 		      Push(New ObjoScript.Klass(className))
 		      
 		    Case OP_METHOD
-		      DefineMethod(ReadConstant, False)
-		      
-		    Case OP_METHOD_LONG
 		      DefineMethod(ReadConstantLong, False)
 		      
 		    Case OP_GETTER
@@ -1657,8 +1654,8 @@ Protected Class VM
 		47: OP_CALL (1)
 		48: OP_CLASS (1)
 		49: OP_CLASS_LONG (2)
-		50: OP_METHOD (1)
-		51: OP_METHOD_LONG (2)
+		50: OP_METHOD (2)
+		51: **Unused**
 		52: OP_SETTER (1)
 		53: OP_SETTER_LONG (2)
 		54: OP_GETTER (1)
@@ -1778,8 +1775,7 @@ Protected Class VM
 			  OP_CALL                 : 1, _
 			  OP_CLASS                : 1, _
 			  OP_CLASS_LONG           : 2, _
-			  OP_METHOD               : 1, _
-			  OP_METHOD_LONG          : 2, _
+			  OP_METHOD               : 2, _
 			  OP_SETTER               : 1, _
 			  OP_SETTER_LONG          : 2, _
 			  OP_GETTER               : 1, _
@@ -1978,9 +1974,6 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_METHOD, Type = Double, Dynamic = False, Default = \"50", Scope = Public
-	#tag EndConstant
-
-	#tag Constant, Name = OP_METHOD_LONG, Type = Double, Dynamic = False, Default = \"51", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_MODULO, Type = Double, Dynamic = False, Default = \"8", Scope = Public
