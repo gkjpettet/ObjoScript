@@ -249,6 +249,25 @@ Protected Class Parser
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 4966207468652063757272656E7420746F6B656E206D61746368657320616E79206F662074686520746F6B656E7320696E20606578706563746564282960207468656E206974277320636F6E73756D656420616E642072657475726E65642E204966206E6F742C20776520726169736520616E20657863657074696F6E207769746820606D657373616765602E
+		Function Consume(message As String, ParamArray expected() As ObjoScript.TokenTypes) As ObjoScript.Token
+		  /// If the current token matches any of the tokens in `expected()` then it's consumed and returned.
+		  /// If not, we raise an exception with `message`.
+		  
+		  #Pragma BreakOnExceptions False
+		  
+		  For Each type As ObjoScript.TokenTypes In expected
+		    If Current.Type = type Then
+		      Advance
+		      Return Previous
+		    End If
+		  Next type
+		  
+		  Raise New ObjoScript.ParserException(message, Current)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 417373657274732074686174207468652063757272656E7420746F6B656E20697320616E20454F4C2E20496620736F20697420697320636F6E73756D65642E204F746865727769736520616E206572726F72207769746820746865206F7074696F6E616C20606D6573736167656020697320637265617465642E
 		Private Sub ConsumeNewLine(message As String = "")
 		  /// Asserts that the current token is an EOL. If so it is consumed. 
@@ -616,7 +635,7 @@ Protected Class Parser
 		  TokenTypes.If_                  : Unused, _
 		  TokenTypes.Import               : Unused, _
 		  TokenTypes.In_                  : Unused, _
-		  TokenTypes.Is_                  : BinaryOperator(Precedences.Is_), _
+		  TokenTypes.Is_                  : NewRule(Nil, New IsParselet, Precedences.Is_), _
 		  TokenTypes.LCurly               : Unused, _
 		  TokenTypes.Less                 : BinaryOperator(Precedences.Comparison), _
 		  TokenTypes.LessEqual            : BinaryOperator(Precedences.Comparison), _

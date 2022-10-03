@@ -1,7 +1,7 @@
 #tag Module
 Protected Module ObjoScript
 	#tag DelegateDeclaration, Flags = &h1
-		Protected Delegate Sub ForeignMethodDelegate(vm As ObjoScript.VM)
+		Protected Delegate Sub ForeignMethodDelegate(vm As ObjoScript . VM)
 	#tag EndDelegateDeclaration
 
 	#tag Method, Flags = &h0, Description = 52657475726E73207468652068617368206F66207468697320646F75626C652E
@@ -242,6 +242,9 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.RCurly
 		    Return "rcurly"
 		    
+		  Case ObjoScript.TokenTypes.ReservedType
+		    Return "reserved type"
+		    
 		  Case ObjoScript.TokenTypes.Return_
 		    Return "return"
 		    
@@ -472,6 +475,7 @@ Protected Module ObjoScript
 		  Print
 		  Query
 		  RCurly
+		  ReservedType
 		  Return_
 		  RParen
 		  RSquare

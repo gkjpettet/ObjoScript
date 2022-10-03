@@ -423,6 +423,9 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_FOREIGN_METHOD, ObjoScript.VM.OP_FOREIGN_METHOD_LONG
 		    Return MethodInstruction(opcode, chunk, offset)
 		    
+		  Case ObjoScript.VM.OP_IS
+		    Return SimpleInstruction("OP_IS", offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select

@@ -1282,6 +1282,14 @@ Protected Class VM
 		    Case OP_FOREIGN_METHOD_LONG
 		      DefineForeignMethod(ReadConstantLong, ReadByte, If(ReadByte = 1, True, False))
 		      
+		    Case OP_IS
+		      // value `is` type
+		      Var type As Variant = Pop
+		      If type.Type <> Variant.TypeString Then
+		        Error("The `is` operator expects a type name as its second operand. Instead got `" + ValueToString(type) + "`.")
+		      End If
+		      Push(ValueIsType(Pop, type))
+		      
 		    End Select
 		  Wend
 		  
@@ -1489,6 +1497,54 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 52657475726E73205472756520696620746865204F626A6F53637269707420737461636B206076616C756560206973206F66206074797065602E
+		Shared Function ValueIsType(value As Variant, type As String) As Boolean
+		  /// Returns True if the ObjoScript stack `value` is of `type`.
+		  ///
+		  /// `value` should be one of the following:
+		  /// 1. Double.
+		  /// 2. String.
+		  /// 3. Boolean.
+		  /// 4. Klass.
+		  /// 5. Instance.
+		  /// 6. nothing.
+		  /// 7. Func.
+		  
+		  If value = Nil Then Return False
+		  
+		  If value.Type = Variant.TypeDouble And type.Compare("Number", ComparisonOptions.CaseSensitive) = 0 Then
+		    Return True
+		  End If
+		  
+		  If value.Type = Variant.TypeString And type.Compare("String", ComparisonOptions.CaseSensitive) = 0 Then
+		    Return True
+		  End If
+		  
+		  If value.Type = Variant.TypeBoolean And type.Compare("Boolean", ComparisonOptions.CaseSensitive) = 0 Then
+		    Return True
+		  End If
+		  
+		  If value IsA ObjoScript.Klass And ObjoScript.Klass(value).Name.Compare(type, ComparisonOptions.CaseSensitive) = 0 Then
+		    Return True
+		  End If
+		  
+		  If value IsA ObjoScript.Instance And ObjoScript.Instance(value).Klass.Name.Compare(type, ComparisonOptions.CaseSensitive) = 0 Then
+		    Return True
+		  End If
+		  
+		  If value IsA ObjoScript.Nothing And type.Compare("nothing", ComparisonOptions.CaseSensitive) = 0 Then
+		    Return True
+		  End If
+		  
+		  If value IsA ObjoScript.Func And type.Compare("Function", ComparisonOptions.CaseSensitive) = 0 Then
+		    Return True
+		  End If
+		  
+		  Return False
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 547275652069662076616C7565732060616020616E64206062602061726520636F6E7369646572656420657175616C2062792074686520564D2E
 		Private Function ValuesEqual(a As Variant, b As Variant) As Boolean
 		  /// True if values `a` and `b` are considered equal by the VM.
@@ -1649,7 +1705,7 @@ Protected Class VM
 		48: OP_CLASS (1)
 		49: OP_CLASS_LONG (2)
 		50: OP_METHOD (3)
-		51: **Unused**
+		51: OP_IS (0)
 		52: OP_SETTER (1)
 		53: OP_SETTER_LONG (2)
 		54: OP_GETTER (1)
@@ -1793,7 +1849,8 @@ Protected Class VM
 			  OP_SET_STATIC_FIELD     : 1, _
 			  OP_SET_STATIC_FIELD_LONG: 2, _
 			  OP_FOREIGN_METHOD       : 2, _
-			  OP_FOREIGN_METHOD_LONG  : 3 _
+			  OP_FOREIGN_METHOD_LONG  : 3, _
+			  OP_IS                   : 0 _
 			  )
 			  
 			  Return d
@@ -1933,6 +1990,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_INVOKE_LONG, Type = Double, Dynamic = False, Default = \"62", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_IS, Type = Double, Dynamic = False, Default = \"51", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_JUMP, Type = Double, Dynamic = False, Default = \"40", Scope = Public

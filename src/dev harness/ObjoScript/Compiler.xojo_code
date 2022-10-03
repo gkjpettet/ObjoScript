@@ -303,7 +303,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag Method, Flags = &h21, Description = 41646473206076616C75656020746F207468652063757272656E74206368756E6B277320636F6E7374616E7420706F6F6C206174207468652063757272656E74206C6F636174696F6E2E2052657475726E732074686520696E64657820696E2074686520636F6E7374616E7420706F6F6C206F7220602D31602069662068617320646564696361746564206F70636F6465206163636573736F722E20507573686573206076616C756560206F6E20746F2074686520737461636B2E
 		Private Function EmitConstant(value As Variant, location As ObjoScript.Token = Nil) As Integer
 		  /// Adds `value` to the current chunk's constant pool at the current location.
-		  /// Returns the index in the constant pool or `-1` if has dedicated opcode accessor.
+		  /// Returns the index in the constant pool or `-1` if the value has a dedicated opcode accessor.
 		  /// Pushes `value` on to the stack.
 		  
 		  If location = Nil Then location = mLocation
@@ -635,6 +635,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  If arg <> -1 Then
 		    // Retrieve a local variable.
 		    EmitBytes(ObjoScript.VM.OP_GET_LOCAL, arg)
+		    
+		    #Pragma Warning "TODO: In debug mode, add the variable name to the constant pool and include its index"
+		    ' We'll only emit the name when the chunk is compiled in "debug mode" since it adds processing overhead
+		    ' to the VM that we don't want/need for production chunks.
+		    ' Maybe replace the above OP_GET_LOCAL with a new OP_GET_LOCAL_DEBUG instruction that provides the
+		    ' stack location of the local variable and its name so we can show it in a debugger. 
+		    
 		  Else
 		    // Retrieve a global variable.
 		    // Add the name of the variable to the constant pool and get its index.
@@ -649,6 +656,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag Method, Flags = &h21, Description = 52657475726E7320746865206E756D626572206F66206279746573207573656420666F72206F706572616E647320666F7220606F70636F6465602E
 		Private Function OperandByteCountForOpcode(opcode As Integer) As Integer
 		  /// Returns the number of bytes used for operands for `opcode`.
+		  
+		  #Pragma Warning "TODO: Handle variadic operand counts"
 		  
 		  If ObjoScript.VM.OpcodeOperandMap.HasKey(opcode) Then
 		    Return ObjoScript.VM.OpcodeOperandMap.Value(opcode)
@@ -917,10 +926,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    
 		  Case ObjoScript.TokenTypes.DotDotDot
 		    EmitByte(ObjoScript.VM.OP_EXCLUSIVE_RANGE)
-		    
-		  Case ObjoScript.TokenTypes.Is_
-		    #Pragma Warning "TODO: Implement IS operator"
-		    Error("The `is` operator has not yet been implemented.")
 		    
 		  Case ObjoScript.TokenTypes.Or_
 		    LogicalOr(expr)
@@ -1370,6 +1375,26 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  End If
 		  
 		  PatchJump(elseJump)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C657320616E20606973602065787072657373696F6E2E
+		Function VisitIs(expr As ObjoScript.IsExpr) As Variant
+		  /// Compiles an `is` expression.
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  mLocation = expr.Location
+		  
+		  // Compile the value operand - this will leave it on the stack.
+		  Call expr.Value.Accept(Self)
+		  
+		  // Add the type name to the constants pool and load it onto the stack.
+		  Call EmitConstant(expr.Type.Lexeme, expr.Type)
+		  
+		  // Emit the instruction.
+		  EmitByte(VM.OP_IS, expr.Location)
 		  
 		End Function
 	#tag EndMethod

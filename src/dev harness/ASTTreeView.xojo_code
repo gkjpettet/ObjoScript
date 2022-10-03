@@ -354,6 +354,25 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitIs(expr As ObjoScript.IsExpr) As Variant
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  Var node As New TreeViewNode("Is")
+		  
+		  Var value As TreeViewNode = expr.Value.Accept(Self)
+		  value.Text = "Value: " + value.Text
+		  
+		  Var type As New TreeViewNode("Type: " + expr.Type.Lexeme)
+		  
+		  node.AppendNode(value)
+		  node.AppendNode(type)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitMethodDeclaration(m As ObjoScript.MethodDeclStmt) As Variant
 		  Var node As New TreeViewNode("Method declaration")
 		  

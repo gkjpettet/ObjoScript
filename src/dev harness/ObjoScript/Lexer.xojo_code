@@ -101,7 +101,8 @@ Protected Class Lexer
 		  Var type As ObjoScript.TokenTypes = ReservedWords.Lookup(lexeme, ObjoScript.TokenTypes.Identifier)
 		  
 		  Select Case type
-		  Case ObjoScript.TokenTypes.Identifier, ObjoScript.TokenTypes.Boolean_
+		  Case ObjoScript.TokenTypes.Identifier, ObjoScript.TokenTypes.Boolean_,  _
+		    ObjoScript.TokenTypes.ReservedType
 		    mTokens.Add(MakeToken(type, lexeme))
 		  Case ObjoScript.TokenTypes.This
 		    mTokens.Add(MakeToken(type, "this"))
@@ -409,7 +410,11 @@ Protected Class Lexer
 		  d.Value("true")        = ObjoScript.TokenTypes.Boolean_
 		  d.Value("var")         = ObjoScript.TokenTypes.Var_
 		  d.Value("while")       = ObjoScript.TokenTypes.While_
-		  d.Value("xor")         =  ObjoScript.TokenTypes.Xor_
+		  d.Value("xor")         = ObjoScript.TokenTypes.Xor_
+		  d.Value("Boolean")     = ObjoScript.TokenTypes.ReservedType
+		  d.Value("Number")      = ObjoScript.TokenTypes.ReservedType
+		  d.Value("String")      = ObjoScript.TokenTypes.ReservedType
+		  d.Value("Function")    = ObjoScript.TokenTypes.ReservedType
 		  
 		  Return d
 		  
