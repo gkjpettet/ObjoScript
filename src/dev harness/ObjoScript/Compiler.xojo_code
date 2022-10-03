@@ -1398,15 +1398,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // and push it on to the stack.
 		  Call EmitConstant(body)
 		  
-		  // Emit the "declare method" or "declare static method" opcode.
-		  // The operand is the index of the method's signature in the constants pool.
-		  If m.IsStatic Then
-		    EmitByte(VM.OP_STATIC_METHOD, m.Location)
-		  Else
-		    EmitByte(VM.OP_METHOD, m.Location)
-		  End If
+		  // Emit the "declare method" opcode.
+		  // The first (two byte) operand is the index of the method's signature in the constants pool,
+		  // the second operand is `1` if this is a static method or `0` if it's an instance method.
+		  EmitByte(VM.OP_METHOD, m.Location)
 		  EmitUInt16(index)
-		  
+		  EmitByte(If(m.IsStatic, 1, 0))
 		End Function
 	#tag EndMethod
 

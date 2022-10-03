@@ -1208,7 +1208,7 @@ Protected Class VM
 		      Push(New ObjoScript.Klass(className))
 		      
 		    Case OP_METHOD
-		      DefineMethod(ReadConstantLong, False)
+		      DefineMethod(ReadConstantLong, If(ReadByte = 0, False, True))
 		      
 		    Case OP_GETTER
 		      BindMethod(ReadConstant, False)
@@ -1263,9 +1263,6 @@ Protected Class VM
 		      
 		    Case OP_SUPER_INVOKE_LONG
 		      Invoke(ReadConstantLong, ReadByte, True)
-		      
-		    Case OP_STATIC_METHOD
-		      DefineMethod(ReadConstantLong, True)
 		      
 		    Case OP_GET_STATIC_FIELD
 		      GetStaticField(ReadConstant)
@@ -1651,7 +1648,7 @@ Protected Class VM
 		47: OP_CALL (1)
 		48: OP_CLASS (1)
 		49: OP_CLASS_LONG (2)
-		50: OP_METHOD (2)
+		50: OP_METHOD (3)
 		51: **Unused**
 		52: OP_SETTER (1)
 		53: OP_SETTER_LONG (2)
@@ -1671,7 +1668,7 @@ Protected Class VM
 		67: OP_SUPER_SETTER_LONG (2)
 		68: OP_SUPER_INVOKE (2)
 		69: OP_SUPER_INVOKE_LONG (3)
-		70: OP_STATIC_METHOD (2)
+		70: **Unused**
 		71: **Unused**
 		72: OP_GET_STATIC_FIELD (1)
 		73: OP_GET_STATIC_FIELD_LONG (2)
@@ -1772,7 +1769,7 @@ Protected Class VM
 			  OP_CALL                 : 1, _
 			  OP_CLASS                : 1, _
 			  OP_CLASS_LONG           : 2, _
-			  OP_METHOD               : 2, _
+			  OP_METHOD               : 3, _
 			  OP_SETTER               : 1, _
 			  OP_SETTER_LONG          : 2, _
 			  OP_GETTER               : 1, _
@@ -1791,7 +1788,6 @@ Protected Class VM
 			  OP_SUPER_SETTER_LONG    : 2, _
 			  OP_SUPER_INVOKE         : 2, _
 			  OP_SUPER_INVOKE_LONG    : 3, _
-			  OP_STATIC_METHOD        : 2, _
 			  OP_GET_STATIC_FIELD     : 1, _
 			  OP_GET_STATIC_FIELD_LONG: 2, _
 			  OP_SET_STATIC_FIELD     : 1, _
@@ -2033,9 +2029,6 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SHIFT_RIGHT, Type = Double, Dynamic = False, Default = \"21", Scope = Public
-	#tag EndConstant
-
-	#tag Constant, Name = OP_STATIC_METHOD, Type = Double, Dynamic = False, Default = \"70", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SUBTRACT, Type = Double, Dynamic = False, Default = \"5", Scope = Public
