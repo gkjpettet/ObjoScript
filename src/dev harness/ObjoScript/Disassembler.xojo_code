@@ -417,7 +417,7 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_SUPER_INVOKE_LONG
 		    Return InvokeInstruction(opcode, chunk, offset)
 		    
-		  Case ObjoScript.VM.OP_STATIC_METHOD, ObjoScript.VM.OP_STATIC_METHOD_LONG
+		  Case ObjoScript.VM.OP_STATIC_METHOD
 		    Return MethodInstruction(opcode, chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_GET_STATIC_FIELD, ObjoScript.VM.OP_GET_STATIC_FIELD_LONG
@@ -529,12 +529,6 @@ Protected Class Disassembler
 		  Var isStatic As Boolean
 		  Var name As String
 		  Select Case opcode
-		  Case ObjoScript.VM.OP_STATIC_METHOD
-		    constantIndex = chunk.ReadByte(offset + 1)
-		    newOffset = offset + 2
-		    isStatic = True
-		    name = "STATIC_METHOD"
-		    
 		  Case ObjoScript.VM.OP_METHOD
 		    // Two byte operand.
 		    constantIndex = chunk.ReadUInt16(offset + 1)
@@ -542,12 +536,12 @@ Protected Class Disassembler
 		    isStatic = False
 		    name = "METHOD"
 		    
-		  Case ObjoScript.VM.OP_STATIC_METHOD_LONG
+		  Case ObjoScript.VM.OP_STATIC_METHOD
 		    // Two byte operand.
 		    constantIndex = chunk.ReadUInt16(offset + 1)
 		    newOffset = offset + 3
 		    isStatic = True
-		    name = "STATIC_METHOD_LONG"
+		    name = "STATIC_METHOD"
 		    
 		  Case ObjoScript.VM.OP_FOREIGN_METHOD
 		    constantIndex = chunk.ReadByte(offset + 1)

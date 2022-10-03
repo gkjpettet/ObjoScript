@@ -1401,11 +1401,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Emit the "declare method" or "declare static method" opcode.
 		  // The operand is the index of the method's signature in the constants pool.
 		  If m.IsStatic Then
-		    EmitIndexedOpcode(ObjoScript.VM.OP_STATIC_METHOD, ObjoScript.VM.OP_STATIC_METHOD_LONG, index)
+		    EmitByte(VM.OP_STATIC_METHOD, m.Location)
 		  Else
 		    EmitByte(VM.OP_METHOD, m.Location)
-		    EmitUInt16(index)
 		  End If
+		  EmitUInt16(index)
 		  
 		End Function
 	#tag EndMethod

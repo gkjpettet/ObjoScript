@@ -1265,9 +1265,6 @@ Protected Class VM
 		      Invoke(ReadConstantLong, ReadByte, True)
 		      
 		    Case OP_STATIC_METHOD
-		      DefineMethod(ReadConstant, True)
-		      
-		    Case OP_STATIC_METHOD_LONG
 		      DefineMethod(ReadConstantLong, True)
 		      
 		    Case OP_GET_STATIC_FIELD
@@ -1674,8 +1671,8 @@ Protected Class VM
 		67: OP_SUPER_SETTER_LONG (2)
 		68: OP_SUPER_INVOKE (2)
 		69: OP_SUPER_INVOKE_LONG (3)
-		70: OP_STATIC_METHOD (1)
-		71: OP_STATIC_METHOD_LONG (2)
+		70: OP_STATIC_METHOD (2)
+		71: **Unused**
 		72: OP_GET_STATIC_FIELD (1)
 		73: OP_GET_STATIC_FIELD_LONG (2)
 		74: OP_SET_STATIC_FIELD (1)
@@ -1794,8 +1791,7 @@ Protected Class VM
 			  OP_SUPER_SETTER_LONG    : 2, _
 			  OP_SUPER_INVOKE         : 2, _
 			  OP_SUPER_INVOKE_LONG    : 3, _
-			  OP_STATIC_METHOD        : 1, _
-			  OP_STATIC_METHOD_LONG   : 2, _
+			  OP_STATIC_METHOD        : 2, _
 			  OP_GET_STATIC_FIELD     : 1, _
 			  OP_GET_STATIC_FIELD_LONG: 2, _
 			  OP_SET_STATIC_FIELD     : 1, _
@@ -2040,9 +2036,6 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_STATIC_METHOD, Type = Double, Dynamic = False, Default = \"70", Scope = Public
-	#tag EndConstant
-
-	#tag Constant, Name = OP_STATIC_METHOD_LONG, Type = Double, Dynamic = False, Default = \"71", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SUBTRACT, Type = Double, Dynamic = False, Default = \"5", Scope = Public
