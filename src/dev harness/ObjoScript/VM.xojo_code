@@ -1238,9 +1238,6 @@ Protected Class VM
 		      SetField(ReadConstantLong)
 		      
 		    Case OP_CONSTRUCTOR
-		      DefineConstructor(ReadConstant)
-		      
-		    Case OP_CONSTRUCTOR_LONG
 		      DefineConstructor(ReadConstantLong)
 		      
 		    Case VM.OP_INVOKE
@@ -1670,7 +1667,7 @@ Protected Class VM
 		57: OP_GET_FIELD_LONG (2)
 		58: OP_SET_FIELD (1)
 		59: OP_SET_FIELD_LONG (2)
-		60: OP_CONSTRUCTOR (1)
+		60: OP_CONSTRUCTOR (2)
 		61: OP_INVOKE (2)
 		62: OP_INVOKE_LONG (3)
 		63: OP_INHERIT (0)
@@ -1688,7 +1685,6 @@ Protected Class VM
 		75: OP_SET_STATIC_FIELD_LONG (2)
 		76: OP_FOREIGN_METHOD (2)
 		77: OP_FOREIGN_METHOD_LONG (3)
-		78: OP_CONSTRUCTOR_LONG (2)
 	#tag EndNote
 
 
@@ -1792,8 +1788,7 @@ Protected Class VM
 			  OP_GET_FIELD_LONG       : 2, _
 			  OP_SET_FIELD            : 1, _
 			  OP_SET_FIELD_LONG       : 2, _
-			  OP_CONSTRUCTOR          : 1, _
-			  OP_CONSTRUCTOR_LONG     : 2, _
+			  OP_CONSTRUCTOR          : 2, _
 			  OP_INVOKE               : 2, _
 			  OP_INVOKE_LONG          : 3, _
 			  OP_INHERIT              : 0, _
@@ -1878,9 +1873,6 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_CONSTRUCTOR, Type = Double, Dynamic = False, Default = \"60", Scope = Public
-	#tag EndConstant
-
-	#tag Constant, Name = OP_CONSTRUCTOR_LONG, Type = Double, Dynamic = False, Default = \"78", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_DEFINE_GLOBAL, Type = Double, Dynamic = False, Default = \"30", Scope = Public

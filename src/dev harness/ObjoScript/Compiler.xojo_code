@@ -1092,9 +1092,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // and push it on to the stack.
 		  Call EmitConstant(body)
 		  
-		  // Emit the "declare constructor" opcode (which one depends on the index in the constant pool).
-		  // The operand is the index of the constructor's signature in the constants pool.
-		  EmitIndexedOpcode(VM.OP_CONSTRUCTOR, VM.OP_CONSTRUCTOR_LONG, index, c.Location)
+		  // Emit the "declare constructor" opcode, the operand is the index of the constructor's signature in the constants pool.
+		  EmitByte(VM.OP_CONSTRUCTOR, c.Location)
+		  EmitUInt16(index, c.Location)
 		  
 		End Function
 	#tag EndMethod

@@ -69,14 +69,9 @@ Protected Class Disassembler
 		    name = "CLASS_LONG"
 		    
 		  Case ObjoScript.VM.OP_CONSTRUCTOR
-		    constantIndex = chunk.ReadByte(offset + 1)
-		    newOffset = offset + 2
-		    name = "CONSTRUCTOR"
-		    
-		  Case ObjoScript.VM.OP_CONSTRUCTOR_LONG
 		    constantIndex = chunk.ReadUInt16(offset + 1)
 		    newOffset = offset + 3
-		    name = "CONSTRUCTOR_LONG"
+		    name = "CONSTRUCTOR"
 		    
 		  Case ObjoScript.VM.OP_GETTER
 		    constantIndex = chunk.ReadByte(offset + 1)
@@ -392,7 +387,7 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_SET_FIELD_LONG
 		    Return ConstantInstruction(opcode, chunk, offset)
 		    
-		  Case ObjoScript.VM.OP_CONSTRUCTOR, ObjoScript.VM.OP_CONSTRUCTOR_LONG
+		  Case ObjoScript.VM.OP_CONSTRUCTOR
 		    Return ConstantInstruction(opcode, chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_INVOKE
