@@ -1280,15 +1280,13 @@ Protected Class VM
 		      DefineForeignMethod(ReadConstant, ReadByte, If(ReadByte = 1, True, False))
 		      
 		    Case OP_FOREIGN_METHOD_LONG
+		      #Pragma Warning "TODO: Remove this opcode and consolidate with OP_FOREIGN_METHOD"
 		      DefineForeignMethod(ReadConstantLong, ReadByte, If(ReadByte = 1, True, False))
 		      
 		    Case OP_IS
 		      // value `is` type
-		      Var type As Variant = Pop
-		      If type.Type <> Variant.TypeString Then
-		        Error("The `is` operator expects a type name as its second operand. Instead got `" + ValueToString(type) + "`.")
-		      End If
-		      Push(ValueIsType(Pop, type))
+		      // The compiler will have ensured that `type` is a string.
+		      Push(ValueIsType(Pop, Pop))
 		      
 		    End Select
 		  Wend
@@ -1498,7 +1496,7 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 52657475726E73205472756520696620746865204F626A6F53637269707420737461636B206076616C756560206973206F66206074797065602E
-		Shared Function ValueIsType(value As Variant, type As String) As Boolean
+		Shared Function ValueIsType(type As String, value As Variant) As Boolean
 		  /// Returns True if the ObjoScript stack `value` is of `type`.
 		  ///
 		  /// `value` should be one of the following:
