@@ -330,8 +330,6 @@ Protected Class VM
 		  ///
 		  /// The constructor's body should be on the top of the stack with its class just beneath it.
 		  
-		  #Pragma Warning "TODO: Store arity in SigParams dictionary"
-		  
 		  Var constructor As ObjoScript.Func = Peek(0)
 		  Var klass As ObjoScript.Klass = Peek(1)
 		  
@@ -346,8 +344,6 @@ Protected Class VM
 	#tag Method, Flags = &h21, Description = 446566696E65732061206D6574686F64207769746820607369676E61747572656020616E642060617269747960206F6E2074686520636C617373206F6E2074686520746F70206F662074686520737461636B2E
 		Private Sub DefineForeignMethod(signature As String, arity As UInt8, isStatic As Boolean)
 		  /// Defines a method with `signature` and `arity` on the class on the top of the stack.
-		  
-		  #Pragma Warning "TODO: Store arity in SigParams dictionary"
 		  
 		  Var klass As ObjoScript.Klass = Peek(0)
 		  
@@ -376,8 +372,6 @@ Protected Class VM
 		  /// Defines a method with `signature` on the class just below the method's body on the stack.
 		  ///
 		  /// The method's body should be on the top of the stack with its class just beneath it.
-		  
-		  #Pragma Warning "TODO: Store arity in SigParams dictionary"
 		  
 		  Var method As ObjoScript.Func = Peek(0)
 		  Var klass As ObjoScript.Klass = Peek(1)
@@ -2170,6 +2164,14 @@ Protected Class VM
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="DebugMode"
+			Visible=false
+			Group="Behavior"
+			InitialValue="False"
+			Type="Boolean"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

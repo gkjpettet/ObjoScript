@@ -701,8 +701,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Private Function OperandByteCountForOpcode(opcode As Integer) As Integer
 		  /// Returns the number of bytes used for operands for `opcode`.
 		  
-		  #Pragma Warning "TODO: Handle variadic operand counts"
-		  
 		  If ObjoScript.VM.OpcodeOperandMap.HasKey(opcode) Then
 		    Return ObjoScript.VM.OpcodeOperandMap.Value(opcode)
 		  Else
@@ -1803,6 +1801,36 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Emit the argument count.
 		  EmitByte(s.Arguments.Count, s.Location)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732061207465726E61727920636F6E646974696F6E616C2065787072657373696F6E2E
+		Function VisitTernary(t As ObjoScript.TernaryExpr) As Variant
+		  /// Compiles a ternary conditional expression.
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  // Compile the condition - this will leave the result on the top of the stack at runtime.
+		  Call t.Condition.Accept(Self)
+		  
+		  // Emit the "jump if false" instruction. We'll patch this with the proper offset to jump
+		  // if condition = false _after_ we've compiled the "then branch".
+		  Var thenJump As Integer = EmitJump(ObjoScript.VM.OP_JUMP_IF_FALSE, t.Location)
+		  
+		  // Compile the "then branch" statement(s).
+		  Call t.ThenBranch.Accept(Self)
+		  
+		  // Emit the "unconditional jump" instruction. We'll patch this with the proper offset to jump
+		  // if condition = true _after_ we've compiled the "else branch".
+		  Var elseJump As Integer = EmitJump(ObjoScript.VM.OP_JUMP, t.Location)
+		  
+		  PatchJump(thenJump)
+		  
+		  // Compile the "else" branch.
+		  Call t.ElseBranch.Accept(Self)
+		  
+		  PatchJump(elseJump)
 		  
 		End Function
 	#tag EndMethod

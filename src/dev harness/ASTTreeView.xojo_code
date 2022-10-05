@@ -587,6 +587,27 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitTernary(t As ObjoScript.TernaryExpr) As Variant
+		  Var node As New TreeViewNode("Ternary conditional")
+		  
+		  Var condition As TreeViewNode = New TreeViewNode("Condition")
+		  condition.AppendNode(t.Condition.Accept(Self))
+		  node.AppendNode(condition)
+		  
+		  Var thenBranch As New TreeViewNode("Then")
+		  thenBranch.AppendNode(t.ThenBranch.Accept(Self))
+		  node.AppendNode(thenBranch)
+		  
+		  Var elseBranch As New TreeViewNode("Else")
+		  elseBranch.AppendNode(t.ElseBranch.Accept(Self))
+		  node.AppendNode(elseBranch)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitThis(this As ObjoScript.ThisExpr) As Variant
 		  #Pragma Unused this
 		  

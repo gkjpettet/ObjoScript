@@ -672,7 +672,7 @@ Protected Class Parser
 		  TokenTypes.PlusEqual            : Unused, _
 		  TokenTypes.PlusPlus             : Postfix, _
 		  TokenTypes.Print                : Unused, _
-		  TokenTypes.Query                : Unused, _
+		  TokenTypes.Query                : NewRule(Nil, New ConditionalParselet, Precedences.Assignment), _
 		  TokenTypes.RCurly               : Unused, _
 		  TokenTypes.Return_              : Unused, _
 		  TokenTypes.RParen               : Unused, _

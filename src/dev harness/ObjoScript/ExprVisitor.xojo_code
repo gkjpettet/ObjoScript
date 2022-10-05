@@ -102,6 +102,12 @@ Protected Interface ExprVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E672061207465726E61727920636F6E646974696F6E616C2065787072657373696F6E2E
+		Function VisitTernary(t As ObjoScript.TernaryExpr) As Variant
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E67206120607468697360206C6F6F6B75702E
 		Function VisitThis(this As ObjoScript.ThisExpr) As Variant
 		  
