@@ -245,8 +245,6 @@ Protected Class VM
 	#tag Method, Flags = &h0
 		Sub Constructor()
 		  Disassembler = New ObjoScript.Disassembler
-		  AddHandler Disassembler.Print, AddressOf DisassemblerPrintDelegate
-		  AddHandler Disassembler.PrintLine, AddressOf DisassemblerPrintLineDelegate
 		  
 		  Reset
 		End Sub
@@ -622,7 +620,11 @@ Protected Class VM
 		  Var isStatic As Boolean = False
 		  If receiver IsA ObjoScript.Klass Then
 		    isStatic = True
-		  ElseIf receiver IsA ObjoScript.Instance = False Then
+		    
+		  ElseIf receiver IsA ObjoScript.Instance Then
+		    // Ignore. We obviously allow method invocations on instances.
+		    
+		  Else
 		    Error("Only classes and instances have methods.")
 		  End If
 		  
@@ -1189,6 +1191,7 @@ Protected Class VM
 		      CurrentFrame.IP = CurrentFrame.IP - offset
 		      
 		    Case OP_INCLUSIVE_RANGE
+		      #Pragma Warning "TODO: Ranges need to be actual instances. Foreign class?"
 		      Var upper As Variant = Pop
 		      Var lower As Variant = Pop
 		      AssertNumbers(lower, upper)
@@ -1196,6 +1199,7 @@ Protected Class VM
 		      Push(lower : upper)
 		      
 		    Case OP_EXCLUSIVE_RANGE
+		      #Pragma Warning "TODO: Ranges need to be actual instances. Foreign class?"
 		      Var upper As Variant = Pop
 		      Var lower As Variant = Pop
 		      AssertNumbers(lower, upper)

@@ -226,6 +226,25 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitForEachStmt(stmt As ObjoScript.ForEachStmt) As Variant
+		  Var node As New TreeViewNode("ForEach `" + stmt.LoopCounter.Lexeme + "`")
+		  
+		  // Range.
+		  Var rangeNode As New TreeViewNode("Range:")
+		  rangeNode.AppendNode(stmt.Range.Accept(Self))
+		  node.AppendNode(rangeNode)
+		  
+		  // Body.
+		  Var body As New TreeViewNode("Body")
+		  body.AppendNode(stmt.Body.Accept(Self))
+		  node.AppendNode(body)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitForeignMethodDeclaration(fmd As ObjoScript.ForeignMethodDeclStmt) As Variant
 		  Var node As New TreeViewNode("Foreign method declaration")
 		  

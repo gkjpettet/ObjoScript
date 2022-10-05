@@ -1,7 +1,7 @@
 #tag Class
 Protected Class Disassembler
-	#tag Method, Flags = &h0, Description = 5072696E74732074686520636F6E7374616E7420696E737472756374696F6E2773206E616D652C2074686520636F6E7374616E74277320696E64657820696E2074686520636F6E7374616E7420706F6F6C20616E64206120726570726573656E746174696F6E206F66207468652076616C7565206F66207468617420636F6E7374616E742E2052657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
-		Function ConstantInstruction(opcode As UInt8, chunk As ObjoScript.Chunk, offset As Integer) As Integer
+	#tag Method, Flags = &h21, Description = 5072696E74732074686520636F6E7374616E7420696E737472756374696F6E2773206E616D652C2074686520636F6E7374616E74277320696E64657820696E2074686520636F6E7374616E7420706F6F6C20616E64206120726570726573656E746174696F6E206F66207468652076616C7565206F66207468617420636F6E7374616E742E2052657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
+		Private Function ConstantInstruction(opcode As UInt8, chunk As ObjoScript.Chunk, offset As Integer) As Integer
 		  /// Prints the constant instruction's name, the constant's index in the constant pool and 
 		  /// a representation of the value of that constant.
 		  /// Returns the offset for the next instruction.
@@ -163,10 +163,12 @@ Protected Class Disassembler
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 446973617373656D626C65732074686520606368756E6B60206E616D656420606368756E6B4E616D656020696E746F20612068756D616E2D7265616461626C6520737472696E672E
-		Sub Disassemble(chunk As ObjoScript.Chunk, chunkName As String, displayScriptID As Boolean = False)
+		Function Disassemble(chunk As ObjoScript.Chunk, chunkName As String, displayScriptID As Boolean = False) As String
 		  /// Disassembles the `chunk` named `chunkName` into a human-readable string.
 		  ///
 		  /// If `displayScriptID` is True then the scriptID stored for each byte is also displayed.
+		  
+		  mBuffer = ""
 		  
 		  PrintLine("== " + chunkName + " ==")
 		  
@@ -179,11 +181,12 @@ Protected Class Disassembler
 		    previousScriptID = chunk.ScriptIDForOffset(previousOffset)
 		  Wend
 		  
-		End Sub
+		  Return mBuffer
+		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 446973617373656D626C657320612073696E676C6520696E737472756374696F6E2077697468696E20606368756E6B6020617420606F6666736574602E2052657475726E7320746865206F6666736574206F6620746865205F6E6578745F20696E737472756374696F6E2E
-		Function DisassembleInstruction(previousLine As Integer, previousScriptID As Integer, chunk As ObjoScript.Chunk, offset As Integer, displayScriptID As Boolean = False) As Integer
+	#tag Method, Flags = &h21, Description = 446973617373656D626C657320612073696E676C6520696E737472756374696F6E2077697468696E20606368756E6B6020617420606F6666736574602E2052657475726E7320746865206F6666736574206F6620746865205F6E6578745F20696E737472756374696F6E2E
+		Private Function DisassembleInstruction(previousLine As Integer, previousScriptID As Integer, chunk As ObjoScript.Chunk, offset As Integer, displayScriptID As Boolean = False) As Integer
 		  /// Disassembles a single instruction within `chunk` at `offset`. Returns the offset of the _next_ instruction.
 		  ///
 		  /// If `displayScriptID` is True then we also display the script ID associated with each byte.
@@ -436,8 +439,8 @@ Protected Class Disassembler
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 5072696E747320746865204F505F4745545F4C4F43414C5F4E414D4520696E737472756374696F6E20616E642072657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
-		Function GetLocalNameInstruction(chunk As ObjoScript.Chunk, offset As Integer) As Integer
+	#tag Method, Flags = &h21, Description = 5072696E747320746865204F505F4745545F4C4F43414C5F4E414D4520696E737472756374696F6E20616E642072657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
+		Private Function GetLocalNameInstruction(chunk As ObjoScript.Chunk, offset As Integer) As Integer
 		  /// Prints the OP_GET_LOCAL_NAME instruction and returns the offset for the next instruction.
 		  ///
 		  /// Format:
@@ -466,8 +469,8 @@ Protected Class Disassembler
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 5072696E74732074686520696E766F6B652F73757065725F696E766F6B6520696E737472756374696F6E20616E642072657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
-		Function InvokeInstruction(opcode As UInt8, chunk As ObjoScript.Chunk, offset As Integer) As Integer
+	#tag Method, Flags = &h21, Description = 5072696E74732074686520696E766F6B652F73757065725F696E766F6B6520696E737472756374696F6E20616E642072657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
+		Private Function InvokeInstruction(opcode As UInt8, chunk As ObjoScript.Chunk, offset As Integer) As Integer
 		  /// Prints the invoke/super_invoke instruction and returns the offset for the next instruction.
 		  ///
 		  /// Format:
@@ -524,8 +527,8 @@ Protected Class Disassembler
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 5072696E747320746865206E616D65206F662061206A756D7020696E737472756374696F6E202855496E743136206F706572616E642920616E642072657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E20496620606E6567617469766560207468656E20746869732069732061206261636B7761726473206A756D702E
-		Function JumpInstruction(name As String, negative As Boolean, chunk As ObjoScript.Chunk, offset As Integer) As Integer
+	#tag Method, Flags = &h21, Description = 5072696E747320746865206E616D65206F662061206A756D7020696E737472756374696F6E202855496E743136206F706572616E642920616E642072657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E20496620606E6567617469766560207468656E20746869732069732061206261636B7761726473206A756D702E
+		Private Function JumpInstruction(name As String, negative As Boolean, chunk As ObjoScript.Chunk, offset As Integer) As Integer
 		  /// Prints the name of a jump instruction (UInt16 operand) and returns the offset for the next instruction.
 		  /// If `negative` then this is a backwards jump.
 		  ///
@@ -546,8 +549,8 @@ Protected Class Disassembler
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 5072696E74732074686520696E737472756374696F6E2773206E616D652C2074686520696E646578206F6620746865206D6574686F642773206E616D6520696E2074686520636F6E7374616E7420706F6F6C2C20746865206D6574686F64206E616D6520616E642069662069742773206120736574746572206F72206E6F742E2052657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
-		Function MethodInstruction(opcode As UInt8, chunk As ObjoScript.Chunk, offset As Integer) As Integer
+	#tag Method, Flags = &h21, Description = 5072696E74732074686520696E737472756374696F6E2773206E616D652C2074686520696E646578206F6620746865206D6574686F642773206E616D6520696E2074686520636F6E7374616E7420706F6F6C2C20746865206D6574686F64206E616D6520616E642069662069742773206120736574746572206F72206E6F742E2052657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
+		Private Function MethodInstruction(opcode As UInt8, chunk As ObjoScript.Chunk, offset As Integer) As Integer
 		  /// Prints the instruction's name, the index of the method's name in the constant pool, the method name and if it's a setter or not.
 		  /// Returns the offset for the next instruction.
 		  ///
@@ -599,8 +602,20 @@ Protected Class Disassembler
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 5072696E747320746865206E616D65206F6620746869732073696D706C6520696E737472756374696F6E20616E642072657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
-		Function SimpleInstruction(instructionName As String, offset As Integer) As Integer
+	#tag Method, Flags = &h21
+		Private Sub Print(s As String)
+		  mBuffer = mBuffer + s
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub PrintLine(s As String)
+		  mBuffer = mBuffer + s + EndOfLine
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 5072696E747320746865206E616D65206F6620746869732073696D706C6520696E737472756374696F6E20616E642072657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
+		Private Function SimpleInstruction(instructionName As String, offset As Integer) As Integer
 		  /// Prints the name of a simple instruction (single byte, no operands) and returns the offset for the next instruction.
 		  ///
 		  /// Format:
@@ -613,8 +628,8 @@ Protected Class Disassembler
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 5072696E747320746865206E616D65206F6620612074776F206279746520696E737472756374696F6E202873696E676C6520627974652C206F6E65206F706572616E642920616E642072657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
-		Function TwoByteInstruction(name As String, chunk As ObjoScript.Chunk, offset As Integer) As Integer
+	#tag Method, Flags = &h21, Description = 5072696E747320746865206E616D65206F6620612074776F206279746520696E737472756374696F6E202873696E676C6520627974652C206F6E65206F706572616E642920616E642072657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
+		Private Function TwoByteInstruction(name As String, chunk As ObjoScript.Chunk, offset As Integer) As Integer
 		  /// Prints the name of a two byte instruction (single byte, one operand) and returns the offset for the next instruction.
 		  ///
 		  /// Format:
@@ -633,18 +648,56 @@ Protected Class Disassembler
 	#tag EndMethod
 
 
-	#tag Hook, Flags = &h0, Description = 526169736564207768656E657665722074686520646973617373656D626C65722077616E747320746F2061646473206120737472696E6720746F20697473206F75747075742E20417373756D657320746869732077696C6C20626520636F6E636174656E61746564207769746820616E792070726576696F75732063616C6C7320746F20605072696E742829602E
-		Event Print(s As String)
-	#tag EndHook
-
-	#tag Hook, Flags = &h0, Description = 526169736564207768656E657665722074686520646973617373656D626C65722077616E747320746F2061646473206120737472696E6720746F20697473206F757470757420616E64207465726D696E61746520697420776974682061206E65776C696E652E
-		Event PrintLine(s As String)
-	#tag EndHook
+	#tag Property, Flags = &h21
+		Private mBuffer As String
+	#tag EndProperty
 
 
 	#tag Constant, Name = COL_WIDTH, Type = Double, Dynamic = False, Default = \"10", Scope = Private, Description = 5468652077696474682061207374616E6461726420636F6C756D6E20696E2074686520646973617373656D626C79206F75747075742E
 	#tag EndConstant
 
 
+	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Name"
+			Visible=true
+			Group="ID"
+			InitialValue=""
+			Type="String"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Index"
+			Visible=true
+			Group="ID"
+			InitialValue="-2147483648"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Super"
+			Visible=true
+			Group="ID"
+			InitialValue=""
+			Type="String"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Left"
+			Visible=true
+			Group="Position"
+			InitialValue="0"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Top"
+			Visible=true
+			Group="Position"
+			InitialValue="0"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+	#tag EndViewBehavior
 End Class
 #tag EndClass

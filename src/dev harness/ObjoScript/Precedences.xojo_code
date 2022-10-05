@@ -61,7 +61,7 @@ Protected Class Precedences
 	#tag Constant, Name = Primary, Type = Double, Dynamic = False, Default = \"20", Scope = Public
 	#tag EndConstant
 
-	#tag Constant, Name = Range, Type = Double, Dynamic = False, Default = \"14", Scope = Public
+	#tag Constant, Name = Range, Type = Double, Dynamic = False, Default = \"19", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = Term, Type = Double, Dynamic = False, Default = \"15", Scope = Public

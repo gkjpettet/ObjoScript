@@ -793,8 +793,6 @@ End
 		  SwitchToPanel(PANEL_AST)
 		  
 		  Disassembler = New ObjoScript.Disassembler
-		  Addhandler Disassembler.Print, AddressOf DisassemblerPrintDelegate
-		  Addhandler Disassembler.PrintLine, AddressOf DisassemblerPrintLineDelegate
 		  
 		End Sub
 	#tag EndEvent
@@ -820,7 +818,7 @@ End
 		    ASTView.Display(Compiler.AST)
 		    
 		    // Disassemble the chunk.
-		    Disassembler.Disassemble(Func.Chunk, "Test")
+		    DisassemblerOutput.Text = Disassembler.Disassemble(Func.Chunk, "Test")
 		    Info.Text = "Compilation successful (" + Compiler.TotalTime.ToString(Locale.Current, "#.#") + " ms)."
 		    
 		    // Successful compilation.
@@ -868,25 +866,6 @@ End
 		    Return "DejaVu Sans Mono"
 		  #EndIf
 		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Sub DisassemblerPrintDelegate(sender As ObjoScript.Disassembler, s As String)
-		  #Pragma Unused sender
-		  
-		  mDisassemblerOutput.Add(s)
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Sub DisassemblerPrintLineDelegate(sender As ObjoScript.Disassembler, s As String)
-		  #Pragma Unused sender
-		  
-		  mDisassemblerOutput.Add(s)
-		  DisassemblerOutput.Text = DisassemblerOutput.Text + String.FromArray(mDisassemblerOutput) + EndOfLine
-		  mDisassemblerOutput.ResizeTo(-1)
-		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 446973706C6179732064657461696C732061626F7574206120636F6D70696C6572206572726F7220696E2074686520496E666F206C6162656C2E
@@ -954,7 +933,6 @@ End
 		  Info.Text = ""
 		  
 		  DisassemblerOutput.Text = ""
-		  mDisassemblerOutput.ResizeTo(-1)
 		  
 		  Compiler = New ObjoScript.Compiler
 		  Func = Nil
@@ -1131,10 +1109,6 @@ End
 
 	#tag Property, Flags = &h0, Description = 54686520636F6D70696C656420746F702D6C6576656C2066756E6374696F6E2E
 		Func As ObjoScript.Func
-	#tag EndProperty
-
-	#tag Property, Flags = &h21
-		Private mDisassemblerOutput() As String
 	#tag EndProperty
 
 	#tag Property, Flags = &h0

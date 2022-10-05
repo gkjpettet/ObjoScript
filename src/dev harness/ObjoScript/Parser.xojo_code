@@ -412,7 +412,23 @@ Protected Class Parser
 		  /// }
 		  /// ```
 		  
-		  #Pragma Warning "TODO: Implement foreach statements"
+		  Var foreachKeyword As ObjoScript.Token = Previous
+		  
+		  Var loopCounter As ObjoScript.Token = _
+		  Consume(ObjoScript.TokenTypes.Identifier, "Expected a name for the loop counter after `foreach`.")
+		  
+		  Consume(ObjoScript.TokenTypes.In_, "Expected the `in` keyword after the loop counter name.")
+		  
+		  Var rangeExpr As ObjoScript.Expr = Expression
+		  
+		  // Optional newline.
+		  Call Match(ObjoScript.TokenTypes.EOL)
+		  
+		  // Expect a block.
+		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the range expression.")
+		  Var body As ObjoScript.Stmt = Block()
+		  
+		  Return New ForEachStmt(foreachKeyword, loopCounter, rangeExpr, body)
 		  
 		End Function
 	#tag EndMethod

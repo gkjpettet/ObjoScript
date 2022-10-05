@@ -827,6 +827,15 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 52657475726E7320612073796E74686574696320746F6B656E206174206C696E6520302C20706F732030207769746820606C6578656D656020696E20607363726970744944602E
+		Private Function SyntheticToken(lexeme As String, scriptID As Integer = -1) As ObjoScript.Token
+		  /// Returns a synthetic token at line 0, pos 0 with `lexeme` in `scriptID`.
+		  
+		  Return New ObjoScript.Token(ObjoScript.TokenTypes.Identifier, 0, 0, lexeme, scriptID)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 54686520746F6B656E73207468697320636F6D70696C657220697320636F6D70696C696E672E204D617920626520656D7074792069662074686520636F6D70696C65722077617320696E737472756374656420746F20636F6D70696C6520616E20415354206469726563746C792E2053686F756C6420626520636F6E7369646572656420726561642D6F6E6C792E
 		Function Tokens() As ObjoScript.Token()
 		  /// The tokens this compiler is compiling. May be empty if the compiler was instructed to compile an AST directly.
@@ -1243,6 +1252,80 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Emit the set field instruction.
 		  EmitIndexedOpcode(ObjoScript.VM.OP_SET_FIELD, ObjoScript.VM.OP_SET_FIELD_LONG, index)
 		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function VisitForEachStmt(stmt As ObjoScript.ForEachStmt) As Variant
+		  /// Compiles a `foreach` loop.
+		  ///
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  ///
+		  /// This ObjoScript code:
+		  ///
+		  /// ```
+		  /// foreach i in 1..100 {
+		  ///   print i
+		  /// }
+		  ///```
+		  ///
+		  /// Is translated to this:
+		  ///
+		  /// ```
+		  ///  var iter* = nothing
+		  ///  var seq* = 1..100
+		  ///  while (iter* = seq*.iterate(iter*)) {
+		  ///   var i = seq*.iteratorValue(iter*)
+		  ///   print i
+		  ///  }
+		  /// ```
+		  /// Note that `iter*` and `seq*` are invalid variable names are are internally declared by the compiler.
+		  /// Each iteration, it calls `iterate()` on `seq*`, passing in the current iterator value (`iter*`).
+		  /// In the first iteration, it passes in `nothing`). 
+		  /// The job of `seq*` is to take that iterator and advance it to the next element in the sequence.
+		  /// In the case where `iter* = nothing` then `seq*` should advance to the first element. 
+		  /// `seq*` then returns either the new iterator, or `false` to indicate that there are no more elements.
+		  ///
+		  /// If false is returned, the VM exits out of the loop and we’re done. 
+		  /// If anything else is returned, that means that we have advanced to a new valid element. To get that, 
+		  /// The VM then calls `iteratorValue()` on `seq*` and passes in the iterator value that it just got from calling `iterate()`. 
+		  /// The sequence uses that to look up and return the appropriate element.
+		  
+		  #Pragma Warning "TODO: Finish implementing"
+		  
+		  Raise New UnsupportedOperationException("The foreach statement is not yet implemented.")
+		  
+		  BeginScope
+		  
+		  // Track the current location.
+		  mLocation = stmt.Location
+		  
+		  // Declare iter* as nothing.
+		  EmitByte(ObjoScript.VM.OP_NOTHING)
+		  DeclareVariable(SyntheticToken("iter*"))
+		  MarkInitialised
+		  
+		  // Declare seq* equal to `stmt.Range`
+		  Call stmt.Range.Accept(Self)
+		  DeclareVariable(SyntheticToken("seq*"))
+		  MarkInitialised
+		  
+		  StartLoop
+		  
+		  // Compile the condition: iter* = seq*.iterate(iter*)
+		  ' Call stmt.Condition.Accept(Self)
+		  ' 
+		  ' ExitLoopIfFalse
+		  ' 
+		  ' // Declare the loop counter and assign to it the value of `iter*`.
+		  ' 
+		  ' 
+		  ' // Compile the body as defined in the source.
+		  ' LoopBody(stmt.Body)
+		  ' 
+		  ' EndLoop
+		  
+		  EndScope
 		End Function
 	#tag EndMethod
 
