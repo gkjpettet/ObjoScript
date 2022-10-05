@@ -637,13 +637,23 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var arg As Integer = ResolveLocal(name)
 		  If arg <> -1 Then
 		    // Retrieve a local variable.
-		    EmitBytes(ObjoScript.VM.OP_GET_LOCAL, arg)
 		    
-		    #Pragma Warning "TODO: In debug mode, add the variable name to the constant pool and include its index"
-		    ' We'll only emit the name when the chunk is compiled in "debug mode" since it adds processing overhead
-		    ' to the VM that we don't want/need for production chunks.
-		    ' Maybe replace the above OP_GET_LOCAL with a new OP_GET_LOCAL_DEBUG instruction that provides the
-		    ' stack location of the local variable and its name so we can show it in a debugger. 
+		    If Self.DebugMode Then
+		      // First the VM needs to push the value at slot `arg` on to the top of the stack.
+		      // It then needs to know the name of this variable for debugging purposes.
+		      
+		      // Tell the VM the name of the local we've just retrieved.
+		      EmitByte(ObjoScript.VM.OP_GET_LOCAL_NAME)
+		      EmitByte(arg)
+		      
+		      // Add the name of the variable to the constant pool and emit its index.
+		      Var index As Integer = AddConstant(name)
+		      EmitUInt16(index)
+		      
+		    Else
+		      // Just tell the VM to push the value at slot `arg` on to the top of the stack.
+		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL, arg)
+		    End If
 		    
 		  Else
 		    // Retrieve a global variable.

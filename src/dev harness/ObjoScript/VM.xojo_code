@@ -188,6 +188,10 @@ Protected Class VM
 		  Frames(FrameCount).IP = 0
 		  // -1 to skip over local stack slot 0 which contains the function being called.
 		  Frames(FrameCount).StackBase = StackTop - argCount - 1
+		  If Self.DebugMode Then
+		    // Need to clear out any locals previously defined.
+		    Frames(FrameCount).Locals = ParseJSON("{}") // HACK: Case sensitive dictionary
+		  End If
 		  
 		  // Update the call frame counter, thereby essentially pushing the call frame onto the call stack.
 		  FrameCount = FrameCount + 1
@@ -1143,6 +1147,13 @@ Protected Class VM
 		      // Load the value at that index and then push it on to the top of the stack.
 		      Push(Stack(CurrentFrame.StackBase + ReadByte))
 		      
+		    Case OP_GET_LOCAL_NAME
+		      // This is OP_GET_LOCAL followed by the index in the constants pool of the name
+		      // of the local variable.
+		      Var slot As Integer = ReadByte
+		      Push(Stack(CurrentFrame.StackBase + slot))
+		      CurrentFrame.Locals.Value(ReadConstantLong) = slot
+		      
 		    Case OP_SET_LOCAL
 		      // The operand is the stack slot where the local variable lives.
 		      // Store the value at the top of the stack in the stack slot corresponding to the local variable.
@@ -1718,7 +1729,7 @@ Protected Class VM
 		67: OP_SUPER_SETTER_LONG (2)
 		68: OP_SUPER_INVOKE (2)
 		69: OP_SUPER_INVOKE_LONG (3)
-		70: **Unused**
+		70: OP_GET_LOCAL_NAME (3)
 		71: **Unused**
 		72: OP_GET_STATIC_FIELD (1)
 		73: OP_GET_STATIC_FIELD_LONG (2)
@@ -1738,6 +1749,10 @@ Protected Class VM
 
 	#tag Property, Flags = &h21, Description = 5468652063757272656E742063616C6C206672616D652E
 		Private CurrentFrame As ObjoScript.CallFrame
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 49662054727565207468656E2074686520564D20697320696E206C6F7720706572666F726D616E6365206465627567206D6F646520616E642063616E20696E7465726163742077697468206368756E6B7320636F6D70696C656420696E206465627567206D6F646520746F2070726F7669646520646562756767696E6720696E666F726D6174696F6E2E
+		DebugMode As Boolean = False
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
@@ -1842,7 +1857,8 @@ Protected Class VM
 			  OP_SET_STATIC_FIELD     : 1, _
 			  OP_SET_STATIC_FIELD_LONG: 2, _
 			  OP_FOREIGN_METHOD       : 3, _
-			  OP_IS                   : 0 _
+			  OP_IS                   : 0, _
+			  OP_GET_LOCAL_NAME       : 3 _
 			  )
 			  
 			  Return d
@@ -1955,6 +1971,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_GET_LOCAL, Type = Double, Dynamic = False, Default = \"37", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_GET_LOCAL_NAME, Type = Double, Dynamic = False, Default = \"70", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_GET_STATIC_FIELD, Type = Double, Dynamic = False, Default = \"72", Scope = Public

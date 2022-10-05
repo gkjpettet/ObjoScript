@@ -426,9 +426,42 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_IS
 		    Return SimpleInstruction("OP_IS", offset)
 		    
+		  Case ObjoScript.VM.OP_GET_LOCAL_NAME
+		    Return GetLocalNameInstruction(chunk, offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5072696E747320746865204F505F4745545F4C4F43414C5F4E414D4520696E737472756374696F6E20616E642072657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
+		Function GetLocalNameInstruction(chunk As ObjoScript.Chunk, offset As Integer) As Integer
+		  /// Prints the OP_GET_LOCAL_NAME instruction and returns the offset for the next instruction.
+		  ///
+		  /// Format:
+		  /// OFFSET  LINE  (OPTIONAL SCRIPT ID)  OPCODE  VARIABLE_NAME  SLOT
+		  
+		  Var instructionName As String = "GET_LOCAL_NAME"
+		  Var slot, newOffset, index As Integer
+		  
+		  slot = chunk.ReadByte(offset + 1)
+		  index = chunk.ReadUInt16(offset + 2)
+		  newOffset = offset + 4
+		  
+		  // Print the instruction name.
+		  Print(instructionName.JustifyLeft(2 * COL_WIDTH))
+		  
+		  // Print the local variable's name.
+		  Var variableNameValue As Variant = chunk.Constants(index)
+		  Var variableName As String = ObjoScript.VM.ValueToString(variableNameValue)
+		  Print(variableName.JustifyLeft(2 * COL_WIDTH))
+		  
+		  // Print the slot.
+		  Print(slot.ToString.JustifyLeft(2 * COL_WIDTH))
+		  
+		  Return newOffset
 		  
 		End Function
 	#tag EndMethod

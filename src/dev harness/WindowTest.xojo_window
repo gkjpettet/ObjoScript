@@ -754,6 +754,35 @@ Begin DesktopWindow WindowTest
       Visible         =   True
       Width           =   80
    End
+   Begin DesktopCheckBox CheckBoxDebugMode
+      AllowAutoDeactivate=   True
+      Bold            =   False
+      Caption         =   "Debug Mode"
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      Height          =   20
+      Index           =   -2147483648
+      Italic          =   False
+      Left            =   968
+      LockBottom      =   True
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   False
+      Scope           =   0
+      TabIndex        =   18
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   687
+      Transparent     =   False
+      Underline       =   False
+      Visible         =   True
+      VisualState     =   0
+      Width           =   100
+   End
 End
 #tag EndDesktopWindow
 
@@ -778,6 +807,8 @@ End
 		  Reset(False)
 		  
 		  SwitchToPanel(PANEL_DISASSEMBLER_OUTPUT)
+		  
+		  Compiler.DebugMode = CheckBoxDebugMode.Value
 		  
 		  Try
 		    Func = Compiler.Compile(Code.Text)
@@ -948,6 +979,8 @@ End
 		  If Not Compile Then Return
 		  
 		  SwitchToPanel(PANEL_OUTPUT)
+		  
+		  Vm.DebugMode = CheckBoxDebugMode.Value
 		  
 		  Try
 		    Var watch As New ObjoScript.StopWatch(True)
