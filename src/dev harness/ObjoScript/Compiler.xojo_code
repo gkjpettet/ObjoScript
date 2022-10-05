@@ -548,6 +548,37 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 436F6D70696C6573207468652073796E746865736973656420666F726561636820636F6E646974696F6E3A2060697465722A203D207365712A2E6974657261746528697465722A2960
+		Private Sub ForEachCondition()
+		  /// Compiles the synthesised foreach condition: `iter* = seq*.iterate(iter*)`
+		  ///
+		  /// Internally called from within `VisitForEachStmt()`.
+		  
+		  Var iter As New ObjoScript.VariableExpr(SyntheticToken("iter*"))
+		  Var seq As New ObjoScript.VariableExpr(SyntheticToken("seq*"))
+		  Var invocation As New ObjoScript.MethodInvocationExpr(seq, SyntheticToken("iterate"), Array(iter))
+		  Var assign As New AssignmentExpr(SyntheticToken("iter*"), invocation)
+		  
+		  Call assign.Accept(Self)
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 436F6D70696C65732074686520666F7265616368206C6F6F7020636F756E7465722061737369676E6D656E743A2060766172204C4F4F505F434F554E544552203D207365712A2E6974657261746F7256616C756528697465722A2960
+		Private Sub ForEachLoopCounter(loopCounter As ObjoScript.Token)
+		  /// Compiles the foreach loop counter assignment: `var LOOP_COUNTER = seq*.iteratorValue(iter*)`
+		  ///
+		  /// Internally called from within `VisitForEachStmt()`.
+		  
+		  Var iter As New ObjoScript.VariableExpr(SyntheticToken("iter*"))
+		  Var seq As New ObjoScript.VariableExpr(SyntheticToken("seq*"))
+		  Var invocation As New ObjoScript.MethodInvocationExpr(seq, SyntheticToken("iteratorValue"), Array(iter))
+		  Var dec As New ObjoScript.VarDeclStmt(SyntheticToken(loopCounter.Lexeme), invocation, mLocation)
+		  
+		  Call dec.Accept(Self)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 436F6D70696C65732061206C6F676963616C2060616E64602065787072657373696F6E2E
 		Private Sub LogicalAnd(logical As ObjoScript.BinaryExpr)
 		  /// Compiles a logical `and` expression.
@@ -1264,7 +1295,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// This ObjoScript code:
 		  ///
 		  /// ```
-		  /// foreach i in 1..100 {
+		  /// foreach i in iterable {
 		  ///   print i
 		  /// }
 		  ///```
@@ -1273,15 +1304,15 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// ```
 		  ///  var iter* = nothing
-		  ///  var seq* = 1..100
+		  ///  var seq* = iterable
 		  ///  while (iter* = seq*.iterate(iter*)) {
 		  ///   var i = seq*.iteratorValue(iter*)
 		  ///   print i
 		  ///  }
 		  /// ```
-		  /// Note that `iter*` and `seq*` are invalid variable names are are internally declared by the compiler.
-		  /// Each iteration, it calls `iterate()` on `seq*`, passing in the current iterator value (`iter*`).
-		  /// In the first iteration, it passes in `nothing`). 
+		  /// Note that `iter*` and `seq*` are invalid variable names and are internally declared by the compiler.
+		  /// On each iteration, we call `iterate()` on `seq*`, passing in the current iterator value (`iter*`).
+		  /// In the first iteration, we pass in `nothing`. 
 		  /// The job of `seq*` is to take that iterator and advance it to the next element in the sequence.
 		  /// In the case where `iter* = nothing` then `seq*` should advance to the first element. 
 		  /// `seq*` then returns either the new iterator, or `false` to indicate that there are no more elements.
@@ -1290,10 +1321,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// If anything else is returned, that means that we have advanced to a new valid element. To get that, 
 		  /// The VM then calls `iteratorValue()` on `seq*` and passes in the iterator value that it just got from calling `iterate()`. 
 		  /// The sequence uses that to look up and return the appropriate element.
-		  
-		  #Pragma Warning "TODO: Finish implementing"
-		  
-		  Raise New UnsupportedOperationException("The foreach statement is not yet implemented.")
 		  
 		  BeginScope
 		  
@@ -1313,18 +1340,27 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  StartLoop
 		  
 		  // Compile the condition: iter* = seq*.iterate(iter*)
-		  ' Call stmt.Condition.Accept(Self)
-		  ' 
-		  ' ExitLoopIfFalse
-		  ' 
-		  ' // Declare the loop counter and assign to it the value of `iter*`.
-		  ' 
-		  ' 
-		  ' // Compile the body as defined in the source.
-		  ' LoopBody(stmt.Body)
-		  ' 
-		  ' EndLoop
+		  ForEachCondition
 		  
+		  ExitLoopIfFalse
+		  
+		  // Bind the loop variable in its own scope. This ensures we get a fresh
+		  // variable each iteration so that closures for it don't all see the same one.
+		  BeginScope
+		  
+		  // Declare the loop counter and assign to it the value of `iter*`.
+		  // `var LOOP_COUNTER = seq*.iteratorValue(iter*)`
+		  ForEachLoopCounter(stmt.LoopCounter)
+		  
+		  // Compile the body as defined in the source.
+		  LoopBody(stmt.Body)
+		  
+		  // Loop variable scope.
+		  EndScope
+		  
+		  EndLoop
+		  
+		  // Hidden variables
 		  EndScope
 		End Function
 	#tag EndMethod
@@ -2075,6 +2111,14 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 				"2 - Method"
 				"3 - Constructor"
 			#tag EndEnumValues
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="DebugMode"
+			Visible=false
+			Group="Behavior"
+			InitialValue="False"
+			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class
