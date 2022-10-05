@@ -112,7 +112,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320612066756E6374696F6E206465636C61726174696F6E20696E746F20612066756E6374696F6E2E2052616973657320612060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
-		Function Compile(name As String, parameters() As ObjoScript.Token, body As ObjoScript.BlockStmt, type As ObjoScript.FunctionTypes, shouldResetFirst As Boolean = True) As ObjoScript.Func
+		Function Compile(name As String, parameters() As ObjoScript.Token, body As ObjoScript.BlockStmt, type As ObjoScript.FunctionTypes, debugMode As Boolean, shouldResetFirst As Boolean = True) As ObjoScript.Func
 		  /// Compiles a function declaration into a function. Raises a `CompilerException` if an error occurs.
 		  ///
 		  /// Resets by default but if this is being called internally (after the compiler has tokenised and parsed the source) 
@@ -122,7 +122,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  If shouldResetFirst Then Reset
 		  
-		  Func = New ObjoScript.Func(name, parameters.Count)
+		  // Should this compiler compile chunks for production or debugging?
+		  Self.DebugMode = debugMode
+		  
+		  Func = New ObjoScript.Func(name, parameters.Count, False, Self.DebugMode)
 		  Self.Type = type
 		  
 		  If type <> ObjoScript.FunctionTypes.TopLevel Then
@@ -179,7 +182,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Empty parameters.
 		  Var params() As ObjoScript.Token
 		  
-		  Return Compile("", params, New ObjoScript.BlockStmt(body, openingBrace, closingBrace), ObjoScript.FunctionTypes.TopLevel, False)
+		  Return Compile("", params, New ObjoScript.BlockStmt(body, openingBrace, closingBrace), ObjoScript.FunctionTypes.TopLevel, Self.DebugMode, False)
 		  
 		End Function
 	#tag EndMethod
@@ -1091,7 +1094,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Compile the body.
 		  Var compiler As New ObjoScript.Compiler
-		  Var body As ObjoScript.Func = compiler.Compile(c.Signature, c.Parameters, c.Body, ObjoScript.FunctionTypes.Constructor)
+		  Var body As ObjoScript.Func = compiler.Compile(c.Signature, c.Parameters, c.Body, ObjoScript.FunctionTypes.Constructor, Self.DebugMode)
 		  
 		  // Store the compiled constructor body as a constant in this function's constant pool
 		  // and push it on to the stack.
@@ -1252,7 +1255,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // The operands are the index of the method's signature in the constants pool, 
 		  // the number of arguments the method expects, 
 		  // and if it's an instance (0) or static (1) method.
-		  EmitIndexedOpcode(ObjoScript.VM.OP_FOREIGN_METHOD, ObjoScript.VM.OP_FOREIGN_METHOD_LONG, index)
+		  EmitByte(ObjoScript.VM.OP_FOREIGN_METHOD)
+		  EmitUInt16(index)
 		  EmitByte(fmd.Arity)
 		  EmitByte(If(fmd.IsStatic, 1, 0))
 		  
@@ -1325,7 +1329,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Compile the function body.
 		  Var compiler As New ObjoScript.Compiler
-		  Var f As ObjoScript.Func = compiler.Compile(funcDecl.Name.Lexeme, funcDecl.Parameters, funcDecl.Body, ObjoScript.FunctionTypes.Func)
+		  Var f As ObjoScript.Func = compiler.Compile(funcDecl.Name.Lexeme, funcDecl.Parameters, funcDecl.Body, ObjoScript.FunctionTypes.Func, Self.DebugMode)
 		  
 		  // Store the compiled function as a constant in this function's constant pool.
 		  Call EmitConstant(f)
@@ -1416,7 +1420,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Compile the body.
 		  Var compiler As New ObjoScript.Compiler
-		  Var body As ObjoScript.Func = compiler.Compile(m.Name, m.Parameters, m.Body, ObjoScript.FunctionTypes.Method)
+		  Var body As ObjoScript.Func = compiler.Compile(m.Name, m.Parameters, m.Body, ObjoScript.FunctionTypes.Method, Self.DebugMode)
 		  body.IsSetter = m.IsSetter
 		  
 		  // Store the compiled method body as a constant in this function's constant pool
@@ -1802,6 +1806,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 
 	#tag Property, Flags = &h21, Description = 5468652063757272656E7420696E6E65726D6F7374206C6F6F70206265696E6720636F6D70696C65642C206F72204E696C206966206E6F7420696E2061206C6F6F702E
 		Private CurrentLoop As ObjoScript.LoopData
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 49662054727565207468656E2074686520636F6D70696C65722077696C6C20696E636C756465206164646974696F6E616C20646562756767696E6720696E666F726D6174696F6E20696E20636F6D70696C6564206368756E6B732E204465627567206368756E6B7320617265206C65737320706572666F726D616E74207468616E2070726F64756374696F6E206368756E6B732E
+		DebugMode As Boolean = False
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 5468652066756E6374696F6E2063757272656E746C79206265696E6720636F6D70696C65642E

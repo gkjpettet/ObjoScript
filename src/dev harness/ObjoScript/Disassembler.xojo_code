@@ -420,7 +420,7 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_GET_STATIC_FIELD, ObjoScript.VM.OP_GET_STATIC_FIELD_LONG
 		    Return ConstantInstruction(opcode, chunk, offset)
 		    
-		  Case ObjoScript.VM.OP_FOREIGN_METHOD, ObjoScript.VM.OP_FOREIGN_METHOD_LONG
+		  Case ObjoScript.VM.OP_FOREIGN_METHOD
 		    Return MethodInstruction(opcode, chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_IS
@@ -518,8 +518,8 @@ Protected Class Disassembler
 		  /// Prints the instruction's name, the index of the method's name in the constant pool, the method name and if it's a setter or not.
 		  /// Returns the offset for the next instruction.
 		  ///
-		  /// The METHOD and STATIC_METHOD instructions take one or two byte operands (1/2 for the index of the method's signature in the constant pool).
-		  /// The FOREIGN_METHOD instruction takes two or three byte operands (1/2 for the index of the signature in the constant pool 
+		  /// The METHOD instruction takes a two byte operand (for the index of the method's signature in the constant pool).
+		  /// The FOREIGN_METHOD instruction takes three bytes of operands (2 for the index of the signature in the constant pool 
 		  /// and one specifying if the method is static (1) or instance (0)).
 		  /// Format:
 		  /// OFFSET  LINE  (OPTIONAL SCRIPT ID)  OPCODE  POOL_INDEX  METHOD_NAME   STATIC/INSTANCE?
@@ -536,18 +536,11 @@ Protected Class Disassembler
 		    name = "METHOD"
 		    
 		  Case ObjoScript.VM.OP_FOREIGN_METHOD
-		    constantIndex = chunk.ReadByte(offset + 1)
-		    Call chunk.ReadByte(offset + 2) // The method's arity. We won't print this.
-		    isStatic = If(chunk.ReadByte(offset + 3) = 1, True, False)
-		    newOffset = offset + 4
-		    name = "FOREIGN_METHOD"
-		    
-		  Case ObjoScript.VM.OP_FOREIGN_METHOD_LONG
 		    constantIndex = chunk.ReadUInt16(offset + 1)
 		    Call chunk.ReadByte(offset + 3) // The method's arity. We won't print this.
 		    isStatic = If(chunk.ReadByte(offset + 4) = 1, True, False)
 		    newOffset = offset + 5
-		    name = "FOREIGN_METHOD_LONG"
+		    name = "FOREIGN_METHOD"
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown constant opcode.")

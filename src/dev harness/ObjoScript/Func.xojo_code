@@ -1,6 +1,6 @@
 #tag Class
 Protected Class Func
-Implements ObjoScript.Value, ObjoScript.Method
+Implements ObjoScript.Value,ObjoScript.Method
 	#tag Method, Flags = &h0, Description = 436F6D707574657320612066756E6374696F6E2F6D6574686F64207369676E617475726520676976656E20697473206E616D6520616E642061726974792E
 		Shared Function ComputeSignature(name As String, arity As Integer, isSetter As Boolean) As String
 		  /// Computes a function/method signature given its name and arity.
@@ -24,10 +24,10 @@ Implements ObjoScript.Value, ObjoScript.Method
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(name As String, arity As Integer, isSetter As Boolean = False)
+		Sub Constructor(name As String, arity As Integer, isSetter As Boolean, debugMode As Boolean)
 		  Self.Name = name
 		  Self.Arity = arity
-		  Self.Chunk = New ObjoScript.Chunk
+		  Self.Chunk = New ObjoScript.Chunk(debugMode)
 		  Self.IsSetter = isSetter
 		  mSignature = ComputeSignature(name, arity, isSetter)
 		End Sub

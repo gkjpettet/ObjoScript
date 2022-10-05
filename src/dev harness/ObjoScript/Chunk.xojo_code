@@ -12,8 +12,10 @@ Protected Class Chunk
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor()
+		Sub Constructor(isDebug As Boolean)
 		  Constants = New ObjoScript.ValueSet
+		  mIsDebug = isDebug
+		  
 		End Sub
 	#tag EndMethod
 
@@ -102,6 +104,15 @@ Protected Class Chunk
 		Constants As ObjoScript.ValueSet
 	#tag EndProperty
 
+	#tag ComputedProperty, Flags = &h0, Description = 547275652069662074686973206368756E6B2077617320636F6D70696C656420666F7220646562756767696E6720287265647563656420706572666F726D616E636520636F6D706172656420746F2070726F64756374696F6E292E
+		#tag Getter
+			Get
+			  Return mIsDebug
+			End Get
+		#tag EndGetter
+		IsDebug As Boolean
+	#tag EndComputedProperty
+
 	#tag ComputedProperty, Flags = &h0, Description = 546865206E756D626572206F66206279746573206F6620636F646520696E20746865206368756E6B2E
 		#tag Getter
 			Get
@@ -113,6 +124,10 @@ Protected Class Chunk
 
 	#tag Property, Flags = &h21, Description = 53746F72657320746865206C696E65206E756D62657220666F722074686520636F72726573706F6E64696E67206279746520696E2060436F64652829602E20
 		Private Lines() As UInt32
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mIsDebug As Boolean = False
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 53746F726573207468652073637269707420494420666F722074686520636F72726573706F6E64696E67206279746520696E2060436F64652829602E2044656661756C747320746F206030602E

@@ -1277,10 +1277,6 @@ Protected Class VM
 		      SetStaticField(ReadConstantLong)
 		      
 		    Case OP_FOREIGN_METHOD
-		      DefineForeignMethod(ReadConstant, ReadByte, If(ReadByte = 1, True, False))
-		      
-		    Case OP_FOREIGN_METHOD_LONG
-		      #Pragma Warning "TODO: Remove this opcode and consolidate with OP_FOREIGN_METHOD"
 		      DefineForeignMethod(ReadConstantLong, ReadByte, If(ReadByte = 1, True, False))
 		      
 		    Case OP_IS
@@ -1728,8 +1724,7 @@ Protected Class VM
 		73: OP_GET_STATIC_FIELD_LONG (2)
 		74: OP_SET_STATIC_FIELD (1)
 		75: OP_SET_STATIC_FIELD_LONG (2)
-		76: OP_FOREIGN_METHOD (2)
-		77: OP_FOREIGN_METHOD_LONG (3)
+		76: OP_FOREIGN_METHOD (3)
 	#tag EndNote
 
 
@@ -1846,8 +1841,7 @@ Protected Class VM
 			  OP_GET_STATIC_FIELD_LONG: 2, _
 			  OP_SET_STATIC_FIELD     : 1, _
 			  OP_SET_STATIC_FIELD_LONG: 2, _
-			  OP_FOREIGN_METHOD       : 2, _
-			  OP_FOREIGN_METHOD_LONG  : 3, _
+			  OP_FOREIGN_METHOD       : 3, _
 			  OP_IS                   : 0 _
 			  )
 			  
@@ -1940,9 +1934,6 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_FOREIGN_METHOD, Type = Double, Dynamic = False, Default = \"76", Scope = Public
-	#tag EndConstant
-
-	#tag Constant, Name = OP_FOREIGN_METHOD_LONG, Type = Double, Dynamic = False, Default = \"77", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_GETTER, Type = Double, Dynamic = False, Default = \"54", Scope = Public
