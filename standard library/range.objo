@@ -1,0 +1,10 @@
+// The Range class represents an iterable range of numbers 
+// with an upper and lower bounds.
+foreign class Range {
+  constructor(lower, upper) {}
+  
+  foreign iterate(iter)
+  foreign iteratorValue(iter)
+  
+  toString() { return _lower + ":" + _upper }
+}

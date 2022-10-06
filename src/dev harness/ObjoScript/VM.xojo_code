@@ -32,6 +32,40 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 54686520564D2069732072657175657374696E67207468652064656C656761746520746F20757365207768656E2063616C6C696E67207468652073706563696669656420666F726569676E206D6574686F64206F6E206120636C6173732E2054686520686F7374206170706C69636174696F6E2077696C6C2068617665206661696C656420746F2070726F76696465206F6E652E2052657475726E73204E696C206966206E6F6E6520646566696E65642E
+		Private Function BindCoreForeignClass(className As String) As ObjoScript.ForeignClassDelegates
+		  /// The VM is requesting the delegates to use when instantiating a new foreign class and when an instance of a 
+		  /// foreign class is destroyed by the Xojo framework.
+		  ///
+		  /// The host application will have failed to provide one. Returns Nil if none defined.
+		  ///
+		  /// We check our standard libraries.
+		  
+		  If className.CompareCase("Range") Then
+		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.LibraryCore.Range.Allocate, Nil)
+		  End If
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 54686520564D2069732072657175657374696E67207468652064656C656761746520746F20757365207768656E2063616C6C696E67207468652073706563696669656420666F726569676E206D6574686F64206F6E206120636C6173732E2054686520686F7374206170706C69636174696F6E2077696C6C2068617665206661696C656420746F2070726F76696465206F6E652E2052657475726E73204E696C206966206E6F6E6520646566696E65642E
+		Private Function BindCoreForeignMethod(className As String, signature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
+		  /// The VM is requesting the delegate to use when calling the specified foreign method on a class. 
+		  /// The host application will have failed to provide one. Returns Nil if none defined.
+		  ///
+		  /// We check our standard libraries.
+		  
+		  If className.CompareCase("System") Then
+		    Return LibrarySystem.BindForeignMethod(signature, isStatic)
+		    
+		  ElseIf className.CompareCase("Range") Then
+		    Return LibraryCore.Range.BindForeignMethod(signature, isStatic)
+		    
+		  End If
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 42696E6473206120726567756C6172202867657474657229206D6574686F64206E616D656420606E616D656020746F2074686520636C617373206F7220696E7374616E6365206F6E2074686520746F70206F662074686520737461636B2E20417373657274732074686520746F70206F662074686520737461636B20697320616E20696E7374616E6365206F7220636C6173732E
 		Private Sub BindMethod(name As String, onSuper As Boolean)
 		  /// Binds a regular (getter) method named `name` to the class or instance on the top of the stack.
@@ -99,11 +133,18 @@ Protected Class VM
 		Private Sub CallClass(klass As ObjoScript.Klass, argCount As Integer)
 		  /// "Calls" a class. Essentially this creates a new instance.
 		  /// Does **not** update `CurrentFrame`. 
+		  ///
+		  /// At the moment this methid is called, the stack looks like this:
+		  /// |           <--- StackTop
+		  /// | argN      
+		  /// | arg1
+		  /// | klass
 		  
+		  // Replace the class with a new blank instance of that class.
 		  Stack(StackTop - argCount - 1) = New ObjoScript.Instance(klass)
 		  
 		  // Invoke the constructor (if defined).
-		  // Since constructors are stored by signature and there are predictble, we have a few precomputed
+		  // Since constructors are stored by signature and they are predictable, we have a few precomputed
 		  // onses to save a call to `ObjoScript.Func.ComputeSignature()`.
 		  Var constructor As ObjoScript.Func
 		  Select Case argCount
@@ -118,11 +159,22 @@ Protected Class VM
 		  End Select
 		  
 		  // We allow a class to omit providing a default (zero parameter) constructor.
-		  If constructor <> Nil Then
-		    CallFunction(constructor, argCount)
-		  ElseIf argCount <> 0 Then
+		  If constructor = Nil And argCount <> 0 Then
 		    Error("The default `" + klass.Name + "` constructor expected 0 arguments but got " + argCount.ToString + ".")
 		  End If
+		  
+		  // If this is a foreign class, call the allocate delegate so the host can do any additional setup needed.
+		  If klass.IsForeign Then
+		    Var args() As Variant
+		    Var stackBase As Integer = StackTop - argCount - 1
+		    For i As Integer = 1 To argCount
+		      args.Add(Stack(stackBase + i))
+		    Next i
+		    klass.ForeignDelegates.Allocate.Invoke(Self, Stack(stackBase), args)
+		  End If
+		  
+		  // Invoke the constructor if defined.
+		  If constructor <> Nil Then CallFunction(constructor, argCount)
 		  
 		End Sub
 	#tag EndMethod
@@ -341,16 +393,43 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 446566696E6573206120666F726569676E20636C6173732E20417373756D657320746861742074686520636C61737320697320616C7265616479206F6E2074686520746F70206F662074686520737461636B2E
+		Private Sub DefineForeignClass()
+		  /// Defines a foreign class. Assumes that the class is already on the top of the stack.
+		  
+		  Var klass As ObjoScript.Klass = Peek(0)
+		  
+		  // Ask the host for the delegates to use.
+		  Var fcd As ObjoScript.ForeignClassDelegates = RaiseEvent BindForeignClass(klass.Name)
+		  If fcd = Nil Then
+		    // Check if the core libraries have a delegate for this class.
+		    fcd = BindCoreForeignClass(klass.Name)
+		    If fcd = Nil Then
+		      Error("There are no foreign class delegates for `" + klass.Name + "`.")
+		    ElseIf fcd.Allocate = Nil Then
+		      Error("The delegate for foreign class (" + klass.Name + ") allocation is Nil.")
+		    End If
+		  End If
+		  
+		  klass.ForeignDelegates = fcd
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 446566696E65732061206D6574686F64207769746820607369676E61747572656020616E642060617269747960206F6E2074686520636C617373206F6E2074686520746F70206F662074686520737461636B2E
 		Private Sub DefineForeignMethod(signature As String, arity As UInt8, isStatic As Boolean)
 		  /// Defines a method with `signature` and `arity` on the class on the top of the stack.
 		  
 		  Var klass As ObjoScript.Klass = Peek(0)
 		  
-		  // Ask the host for the delegate to use.
+		  // Ask the host for the delegate to use. This overrides any specified by the core libraries.
 		  Var fmd As ObjoScript.ForeignMethodDelegate = RaiseEvent BindForeignMethod(klass.Name, signature, isStatic)
 		  If fmd = Nil Then
-		    Error("The host application failed to return a foreign method delegate for " + klass.Name + "." + signature + ".")
+		    // Check if the core libraries have a delegate for this.
+		    fmd = BindCoreForeignMethod(klass.Name, signature, isStatic)
+		    If fmd = Nil Then
+		      Error("The host application failed to return a foreign method delegate for " + klass.Name + "." + signature + ".")
+		    End If
 		  End If
 		  
 		  // Create the foreign method.
@@ -422,8 +501,8 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 526169736573206120564D457863657074696F6E206174207468652063757272656E742049502028756E6C657373206F746865727769736520737065636966696564292E
-		Private Sub Error(message As String, offset As Integer = -1)
+	#tag Method, Flags = &h0, Description = 526169736573206120564D457863657074696F6E206174207468652063757272656E742049502028756E6C657373206F746865727769736520737065636966696564292E
+		Sub Error(message As String, offset As Integer = -1)
 		  /// Raises a VMException at the current IP (unless otherwise specified).
 		  
 		  #Pragma BreakOnExceptions False
@@ -576,9 +655,9 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 496E697469616C697365732074686520564D20616E6420696E7465727072657473206066756E63602E20557365207468697320746F20696E74657270726574206120746F70206C6576656C206675756E6374696F6E2E
+	#tag Method, Flags = &h0, Description = 496E697469616C697365732074686520564D20616E6420696E7465727072657473206066756E63602E20557365207468697320746F20696E74657270726574206120746F70206C6576656C2066756E6374696F6E2E
 		Sub Interpret(func As ObjoScript.Func)
-		  /// Initialises the VM and interprets `func`. Use this to interpret a top level fuunction.
+		  /// Initialises the VM and interprets `func`. Use this to interpret a top level function.
 		  
 		  #Pragma DisableBoundsChecking
 		  #Pragma NilObjectChecking False
@@ -1209,12 +1288,12 @@ Protected Class VM
 		      Call CallValue(Peek(argcount), argcount)
 		      
 		    Case OP_CLASS
-		      Var className As String = ReadConstant
-		      Push(New ObjoScript.Klass(className))
-		      
-		    Case OP_CLASS_LONG
 		      Var className As String = ReadConstantLong
-		      Push(New ObjoScript.Klass(className))
+		      Var isForeign As Boolean = ReadByte = 1
+		      Push(New ObjoScript.Klass(className, isForeign))
+		      If isForeign Then
+		        DefineForeignClass
+		      End If
 		      
 		    Case OP_METHOD
 		      DefineMethod(ReadConstantLong, If(ReadByte = 0, False, True))
@@ -1334,14 +1413,15 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 53657473207468652072657475726E2076616C7565206F66206120666F726569676E206D6574686F6420746F206120646F75626C652076616C7565206064602E
-		Sub SetReturn(d As Double)
-		  /// Sets the return value of a foreign method to a double value `d`.
+	#tag Method, Flags = &h0, Description = 53657473207468652072657475726E2076616C7565206F66206120666F726569676E206D6574686F6420746F206076616C7565602E20496620796F752077616E7420746F2072657475726E206E6F7468696E672066726F6D2061206D6574686F6420796F7520646F6E2774206E65656420746F2063616C6C20746869732E
+		Sub SetReturn(value As Variant)
+		  /// Sets the return value of a foreign method to `value`.
+		  /// If you want to return nothing from a method you don't need to call this.
 		  ///
 		  /// Before a foreign method is called the VM has cleared the call frame stack and pushed nothing on to it.
-		  /// Setting a return value just requires us to replace the pushed nothing object with `d`.
+		  /// Setting a return value just requires us to replace the pushed nothing object with `value`.
 		  
-		  Stack(StackTop - 1) = d
+		  Stack(StackTop - 1) = value
 		  
 		End Sub
 	#tag EndMethod
@@ -1645,6 +1725,10 @@ Protected Class VM
 	#tag EndMethod
 
 
+	#tag Hook, Flags = &h0, Description = 54686520564D2069732072657175657374696E67207468652064656C65676174657320746F20757365207768656E20696E7374616E74696174696E672061206E657720666F726569676E20636C61737320616E64207768656E20616E20696E7374616E6365206F66206120666F726569676E20636C6173732069732064657374726F7965642062792074686520586F6A6F206672616D65776F726B2E
+		Event BindForeignClass(className As String) As ObjoScript.ForeignClassDelegates
+	#tag EndHook
+
 	#tag Hook, Flags = &h0, Description = 54686520564D2069732072657175657374696E67207468652064656C656761746520746F20757365207768656E2063616C6C696E67207468652073706563696669656420666F726569676E206D6574686F64206F6E206120636C6173732E205468697320697320706572666F726D6564206F6E636520666F72206561636820666F726569676E206D6574686F642C207768656E2074686520636C617373206973206669727374206465636C617265642E
 		Event BindForeignMethod(className As String, methodSignature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
 	#tag EndHook
@@ -1705,8 +1789,8 @@ Protected Class VM
 		45: OP_EXCLUSIVE_RANGE (0)
 		46: OP_EXIT (0)
 		47: OP_CALL (1)
-		48: OP_CLASS (1)
-		49: OP_CLASS_LONG (2)
+		48: OP_CLASS (3)
+		49: *Unused*
 		50: OP_METHOD (3)
 		51: OP_IS (0)
 		52: OP_SETTER (1)
@@ -1829,8 +1913,7 @@ Protected Class VM
 			  OP_EXCLUSIVE_RANGE      : 0, _
 			  OP_EXIT                 : 0, _
 			  OP_CALL                 : 1, _
-			  OP_CLASS                : 1, _
-			  OP_CLASS_LONG           : 2, _
+			  OP_CLASS                : 3, _
 			  OP_METHOD               : 3, _
 			  OP_SETTER               : 1, _
 			  OP_SETTER_LONG          : 2, _
@@ -1912,9 +1995,6 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_CLASS, Type = Double, Dynamic = False, Default = \"48", Scope = Public
-	#tag EndConstant
-
-	#tag Constant, Name = OP_CLASS_LONG, Type = Double, Dynamic = False, Default = \"49", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_CONSTANT, Type = Double, Dynamic = False, Default = \"1", Scope = Public, Description = 5468652061646420636F6E7374616E74206F70636F64652E

@@ -779,6 +779,7 @@ Begin DesktopWindow WindowTest
       Top             =   687
       Transparent     =   False
       Underline       =   False
+      Value           =   False
       Visible         =   True
       VisualState     =   0
       Width           =   100
@@ -940,12 +941,10 @@ End
 		  // Remove associated handlers.
 		  If VM <> Nil Then
 		    RemoveHandler VM.Print, AddressOf VMPrintDelegate
-		    RemoveHandler VM.BindForeignMethod, AddressOf VMBindForeignMethodDelegate
 		  End If
 		  
 		  VM = New ObjoScript.VM
 		  AddHandler VM.Print, AddressOf VMPrintDelegate
-		  AddHandler VM.BindForeignMethod, AddressOf VMBindForeignMethodDelegate
 		  
 		End Sub
 	#tag EndMethod
@@ -1071,23 +1070,6 @@ End
 		    
 		  Next t
 		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = 43616C6C65642062792074686520564D207768656E206974206E65656473206120666F726569676E206D6574686F642064656C65676174652E2049732063616C6C6564206F6E636520666F72206561636820666F726569676E206D6574686F6420647572696E6720636C617373206465636C61726174696F6E2E
-		Function VMBindForeignMethodDelegate(sender As ObjoScript.VM, className As String, methodSignature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
-		  /// Called by the VM when it needs a foreign method delegate. 
-		  /// Is called once for each foreign method during class declaration.
-		  
-		  #Pragma Unused sender
-		  #Pragma Unused isStatic
-		  
-		  If className.Compare("System", ComparisonOptions.CaseSensitive) = 0 Then
-		    If methodSignature.Compare("clock()", ComparisonOptions.CaseSensitive) = 0 Then
-		      Return AddressOf ObjoSystem.Clock
-		    End If
-		  End If
-		  
-		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0

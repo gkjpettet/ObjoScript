@@ -2,13 +2,14 @@
 Protected Class Klass
 Implements ObjoScript.Value
 	#tag Method, Flags = &h0
-		Sub Constructor(name As String)
+		Sub Constructor(name As String, isForeign As Boolean)
 		  Self.Name = name
 		  Self.Constructors = New Dictionary
 		  Self.Methods = ParseJSON("{}") // HACK: Case sensitive.
 		  Self.StaticMethods = ParseJSON("{}") // HACK: Case sensitive.
 		  Self.StaticFields = ParseJSON("{}") // HACK: Case sensitive.
 		  mToString = Name + " class"
+		  Self.IsForeign = isForeign
 		End Sub
 	#tag EndMethod
 
@@ -37,6 +38,14 @@ Implements ObjoScript.Value
 
 	#tag Property, Flags = &h0, Description = 54686520636C61737320636F6E7374727563746F727320284B6579203D20636F6E7374727563746F722773207369676E61747572652C2056616C7565203D204F626A6F5363726970742E46756E63292E
 		Constructors As Dictionary
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 49662074686973206973206120666F726569676E20636C6173732C207468657365206172652074686520636C6173732064656C65676174657320746F207573696E672075706F6E20696E7374616E74696174696F6E20616E64206465737472756374696F6E2E204D6179206265204E696C2E
+		ForeignDelegates As ObjoScript.ForeignClassDelegates
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 547275652069662074686973206973206120666F726569676E20636C6173732E
+		IsForeign As Boolean = False
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 54686520726567756C617220286E6F6E2D7365747465722920636C61737320696E7374616E6365206D6574686F647320284B6579203D206D6574686F64206E616D652C2056616C7565203D206046756E6360206F722060466F726569676E4D6574686F6460292E

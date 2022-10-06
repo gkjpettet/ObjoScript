@@ -82,15 +82,23 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  Reset
 		  
-		  // Tokenise. This may raise a LexerException, therefore aborting compilation.
+		  // Import and tokenise the standard libraries first.
+		  Var standardLibraryTokens() As ObjoScript.Token = TokeniseStandardLibraries
+		  
+		  // Tokenise the user's source code. This may raise a LexerException, therefore aborting compilation.
 		  mStopWatch.Start
 		  mTokens = Lexer.Tokenise(source)
 		  mStopWatch.Stop
 		  mTokeniseTime = mStopWatch.ElapsedMilliseconds
 		  
+		  // Prepend the standard library tokens to the source code tokens.
+		  For i As Integer = standardLibraryTokens.LastIndex DownTo 0
+		    mTokens.AddAt(0, standardLibraryTokens(i))
+		  Next i
+		  
 		  // Parse.
 		  mStopWatch.Start
-		  mAST = Parser.Parse(Tokens)
+		  mAST = Parser.Parse(mTokens)
 		  mStopWatch.Stop
 		  mParseTime = mStopWatch.ElapsedMilliseconds
 		  
@@ -579,6 +587,69 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 4465737567617273206120666F7265616368206C6F6F70207769746820612072616E676520746F2061207374616E646172642060666F7260206C6F6F702061732069742773206661737465722E
+		Private Sub ForEachRange(location As ObjoScript.Token, loopCounter As ObjoScript.Token, range As ObjoScript.RangeExpr, body As ObjoScript.Stmt)
+		  /// Desugars a foreach loop with a range to a standard `for` loop as it's faster.
+		  ///
+		  /// ```
+		  /// foreach loopCounter in range {
+		  ///  body
+		  /// }
+		  /// ```
+		  ///
+		  /// becomes:
+		  ///
+		  /// ```
+		  /// for (var loopCounter = range.lower; loopCounter <= range.upper; loopCounter = loopCounter + 1) {
+		  ///  body
+		  /// }
+		  /// ```
+		  
+		  BeginScope
+		  
+		  // Track the current location.
+		  mLocation = location
+		  
+		  // Compile the initialiser.
+		  // `var loopCounter = range.lower`
+		  Var initialiser As New ObjoScript.VarDeclStmt(loopCounter, range.Lower, location)
+		  Call initialiser.Accept(Self)
+		  
+		  StartLoop
+		  
+		  // Compile the condition.
+		  // Inclusive: `loopCounter <= range.upper`
+		  // Exclusive: `loopCounter < range.upper`
+		  Var operator As ObjoScript.Token
+		  If range.Operator.Type = ObjoScript.TokenTypes.DotDot Then
+		    operator = SyntheticOperatorToken(ObjoScript.TokenTypes.LessEqual)
+		  Else
+		    operator = SyntheticOperatorToken(ObjoScript.TokenTypes.Less)
+		  End If
+		  Var condition As New ObjoScript.BinaryExpr(New ObjoScript.VariableExpr(loopCounter), operator, range.Upper)
+		  Call condition.Accept(Self)
+		  
+		  // Emit code to exit the loop if the condition is falsey.
+		  ExitLoopIfFalse
+		  
+		  // Compile the loop's body.
+		  LoopBody(body)
+		  
+		  // Compile the increment expression. This is inserted after the body of the loop.
+		  Var add As New ObjoScript.BinaryExpr(New ObjoScript.VariableExpr(loopCounter), _
+		  SyntheticOperatorToken(ObjoScript.TokenTypes.Plus), New ObjoScript.NumberLiteral(SyntheticNumberToken(1.0, True)))
+		  Var increment As New ObjoScript.AssignmentExpr(loopCounter, add)
+		  Call increment.Accept(Self)
+		  
+		  // Pop the increment expression result off the stack.
+		  EmitByte(ObjoScript.VM.OP_POP, body.Location)
+		  
+		  EndLoop
+		  
+		  EndScope
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 436F6D70696C65732061206C6F676963616C2060616E64602065787072657373696F6E2E
 		Private Sub LogicalAnd(logical As ObjoScript.BinaryExpr)
 		  /// Compiles a logical `and` expression.
@@ -856,11 +927,59 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 52657475726E7320612073796E746865746963206E756D626572206C69746572616C20746F6B656E2077697468206076616C756560206174206C696E6520302C20706F73203020696E20607363726970744944602E
+		Private Function SyntheticNumberToken(value As Double, isInteger As Boolean, scriptID As Integer = -1) As ObjoScript.Token
+		  /// Returns a synthetic number literal token with `value` at line 0, pos 0 in `scriptID`.
+		  
+		  Var t As New ObjoScript.Token(ObjoScript.TokenTypes.Number, 0, 0, "", scriptID)
+		  t.NumberValue = value
+		  t.IsInteger = isInteger
+		  
+		  Return t
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E7320612073796E74686574696320746F6B656E2077697468206E6F206C6578656D65206174206C696E6520302C20706F73203020776974682060747970656020696E20607363726970744944602E
+		Private Function SyntheticOperatorToken(type As ObjoScript.TokenTypes, scriptID As Integer = -1) As ObjoScript.Token
+		  /// Returns a synthetic token with no lexeme at line 0, pos 0 with `type` in `scriptID`.
+		  
+		  Return New ObjoScript.Token(type, 0, 0, "", scriptID)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E7320612073796E74686574696320746F6B656E206174206C696E6520302C20706F732030207769746820606C6578656D656020696E20607363726970744944602E
 		Private Function SyntheticToken(lexeme As String, scriptID As Integer = -1) As ObjoScript.Token
 		  /// Returns a synthetic token at line 0, pos 0 with `lexeme` in `scriptID`.
 		  
 		  Return New ObjoScript.Token(ObjoScript.TokenTypes.Identifier, 0, 0, lexeme, scriptID)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 546F6B656E6973657320746865207374616E64617264206C69627261727920736F7572636520636F64652E2054686573652077696C6C2062652070726570656E64656420746F207468652075736572277320736F7572636520636F646520746F6B656E732E
+		Private Function TokeniseStandardLibraries() As ObjoScript.Token()
+		  /// Tokenises the standard library source code.
+		  /// These will be prepended to the user's source code tokens.
+		  ///
+		  /// Uses scriptID of -2.
+		  
+		  Var lex As New ObjoScript.Lexer
+		  
+		  Var standardLib As String
+		  
+		  // Get the contents of all standard library source code files and concatenate them.
+		  Var librarySourceFolder As FolderItem = SpecialFolder.Resource("standard library")
+		  For Each sourceFile As FolderItem In librarySourceFolder.Children
+		    If Not sourceFile.IsFolder Then
+		      Var tin As TextInputStream = TextInputStream.Open(sourceFile)
+		      standardLib = standardLib + tin.ReadAll + EndOfLine
+		      tin.Close
+		    End If
+		  Next sourceFile
+		  
+		  Return lex.Tokenise(standardLib, False, -2)
 		  
 		End Function
 	#tag EndMethod
@@ -972,12 +1091,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Case ObjoScript.TokenTypes.Caret
 		    EmitByte(ObjoScript.VM.OP_BITWISE_XOR)
 		    
-		  Case ObjoScript.TokenTypes.DotDot
-		    EmitByte(ObjoScript.VM.OP_INCLUSIVE_RANGE)
-		    
-		  Case ObjoScript.TokenTypes.DotDotDot
-		    EmitByte(ObjoScript.VM.OP_EXCLUSIVE_RANGE)
-		    
 		  Case ObjoScript.TokenTypes.Or_
 		    LogicalOr(expr)
 		    
@@ -1076,14 +1189,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Add the name of the class to the function's constants pool.
 		  Var index As Integer = AddConstant(c.Name)
 		  
-		  // Emit the "declare class" opcode (which one depends on the index in the constant pool).
-		  // This will push the class on to the top of the stack.
-		  If index <= 255 Then
-		    EmitBytes(ObjoScript.VM.OP_CLASS, index, c.Location)
-		  Else
-		    EmitByte(ObjoScript.VM.OP_CLASS_LONG, c.Location)
-		    EmitUInt16(index, c.Location)
-		  End If
+		  // Emit the "declare class" opcode. This will push the class on to the top of the stack.
+		  EmitByte(VM.OP_CLASS, c.Location)
+		  // The first operand is the index of the name of the class.
+		  EmitUInt16(index, c.Location)
+		  // The second operand tells the VM if this is a foreign class (1) or not (0).
+		  EmitByte(If(c.IsForeign, 1, 0))
 		  
 		  // Define the class as a global variable.
 		  DefineVariable(index)
@@ -1319,6 +1430,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// If anything else is returned, that means that we have advanced to a new valid element. To get that, 
 		  /// The VM then calls `iteratorValue()` on `seq*` and passes in the iterator value that it just got from calling `iterate()`. 
 		  /// The sequence uses that to look up and return the appropriate element.
+		  
+		  // For performance reasons, we will handle ranges differently.
+		  If stmt.Range IsA ObjoScript.RangeExpr Then
+		    ForEachRange(stmt.Location, stmt.LoopCounter, ObjoScript.RangeExpr(stmt.Range), stmt.Body)
+		    Return Nil
+		  End If
 		  
 		  BeginScope
 		  
@@ -1649,6 +1766,32 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Call stmt.Expression.Accept(Self)
 		  
 		  EmitByte(ObjoScript.VM.OP_PRINT, printLocation)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C657320616E20696E636C757369766520282E2E29206F72206578636C757369766520282E2E2E292072616E67652065787072657373696F6E2E
+		Function VisitRange(r As ObjoScript.RangeExpr) As Variant
+		  /// Compiles an inclusive (..) or exclusive (...) range expression.
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  mLocation = r.Location
+		  
+		  // Compile the lower and upper operands - this will leave them on the stack.
+		  Call r.Lower.Accept(Self)
+		  Call r.Upper.Accept(Self)
+		  
+		  Select Case r.Operator.Type
+		  Case ObjoScript.TokenTypes.DotDot
+		    EmitByte(VM.OP_INCLUSIVE_RANGE, r.Location)
+		    
+		  Case ObjoScript.TokenTypes.DotDotDot
+		    EmitByte(VM.OP_EXCLUSIVE_RANGE, r.Location)
+		    
+		  Else
+		    Error("Unexpected operator token type (expected `..` or `...`")
+		  End Select
 		  
 		End Function
 	#tag EndMethod

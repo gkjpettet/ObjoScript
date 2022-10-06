@@ -10,7 +10,7 @@ Implements ObjoScript.Stmt
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(superclass As String, identifier As ObjoScript.Token, constructors() As ObjoScript.ConstructorDeclStmt, staticMethods() As ObjoScript.MethodDeclStmt, methods() As ObjoScript.MethodDeclStmt, foreignMethods() As ObjoScript.ForeignMethodDeclStmt, classKeyword As ObjoScript.Token)
+		Sub Constructor(superclass As String, identifier As ObjoScript.Token, constructors() As ObjoScript.ConstructorDeclStmt, staticMethods() As ObjoScript.MethodDeclStmt, methods() As ObjoScript.MethodDeclStmt, foreignMethods() As ObjoScript.ForeignMethodDeclStmt, classKeyword As ObjoScript.Token, isForeign As Boolean)
 		  Self.Superclass = superclass
 		  Self.Identifier = identifier
 		  Self.Constructors = constructors
@@ -18,6 +18,8 @@ Implements ObjoScript.Stmt
 		  Self.Methods = methods
 		  Self.ForeignMethods = foreignMethods
 		  mClassKeyword = classKeyword
+		  Self.IsForeign = isForeign
+		  
 		End Sub
 	#tag EndMethod
 
@@ -53,6 +55,10 @@ Implements ObjoScript.Stmt
 
 	#tag Property, Flags = &h0, Description = 54686520636C61737327206E616D6520746F6B656E2E
 		Identifier As ObjoScript.Token
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 547275652069662074686973206973206120666F726569676E20636C6173732E
+		IsForeign As Boolean = False
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 5468652060636C61737360206B6579776F726420746F6B656E2E
@@ -121,6 +127,22 @@ Implements ObjoScript.Stmt
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="HasSuperclass"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Superclass"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="String"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

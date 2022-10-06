@@ -59,14 +59,10 @@ Protected Class Disassembler
 		    name = "SET_GLOBAL_LONG"
 		    
 		  Case ObjoScript.VM.OP_CLASS
-		    constantIndex = chunk.ReadByte(offset + 1)
-		    newOffset = offset + 2
-		    name = "CLASS"
-		    
-		  Case ObjoScript.VM.OP_CLASS_LONG
 		    constantIndex = chunk.ReadUInt16(offset + 1)
-		    newOffset = offset + 3
-		    name = "CLASS_LONG"
+		    Var isForeign As Boolean = If(chunk.ReadByte(offset + 3) = 1, True, False)
+		    newOffset = offset + 4
+		    name = "CLASS" + If(isForeign, " (foreign)", "")
 		    
 		  Case ObjoScript.VM.OP_CONSTRUCTOR
 		    constantIndex = chunk.ReadUInt16(offset + 1)
@@ -358,9 +354,6 @@ Protected Class Disassembler
 		    Return TwoByteInstruction("OP_CALL", chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_CLASS
-		    Return ConstantInstruction(opcode, chunk, offset)
-		    
-		  Case ObjoScript.VM.OP_CLASS_LONG
 		    Return ConstantInstruction(opcode, chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_METHOD

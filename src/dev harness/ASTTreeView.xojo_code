@@ -105,7 +105,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 
 	#tag Method, Flags = &h0
 		Function VisitClassDeclaration(c As ObjoScript.ClassDeclStmt) As Variant
-		  Var node As New TreeViewNode("Class declaration")
+		  Var node As New TreeViewNode("Class declaration" + If(c.IsForeign, " (foreign)", ""))
 		  
 		  // Class name.
 		  node.AppendNode(New TreeViewNode("Name: " + c.Name))
@@ -506,6 +506,26 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  node.AppendNode(stmt.Expression.Accept(Self))
 		  
 		  Return node
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function VisitRange(r As ObjoScript.RangeExpr) As Variant
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  Var node As New TreeViewNode(If(r.Operator.Type = ObjoScript.TokenTypes.DotDot, "Inclusive", "Exclusive") + " range")
+		  
+		  Var lower As TreeViewNode = r.Lower.Accept(Self)
+		  lower.Text = "Lower: " + lower.Text
+		  
+		  Var upper As TreeViewNode = r.Upper.Accept(Self)
+		  upper.Text = "Upper: " + upper.Text
+		  
+		  node.AppendNode(lower)
+		  node.AppendNode(upper)
+		  
+		  Return node
+		  
 		End Function
 	#tag EndMethod
 

@@ -113,11 +113,9 @@ Protected Class Parser
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 506172736573206120636C617373206465636C61726174696F6E2073746174656D656E742E20417373756D6573207468652070617273657220686173206A75737420636F6E73756D6564207468652060636C61737360206B6579776F726420746F6B656E2E
-		Private Function ClassDeclaration() As ObjoScript.Stmt
+		Private Function ClassDeclaration(isForeign As Boolean) As ObjoScript.Stmt
 		  /// Parses a class declaration statement.
 		  /// Assumes the parser has just consumed the `class` keyword token.
-		  
-		  #Pragma Warning "TODO: Support foreign classes"
 		  
 		  Var classKeyword As ObjoScript.Token = Previous
 		  
@@ -170,7 +168,7 @@ Protected Class Parser
 		  
 		  Consume(ObjoScript.TokenTypes.RCurly, "Expected a `}` after the class body.")
 		  
-		  Return New ObjoScript.ClassDeclStmt(superClass, identifier, constructors, staticMethods, methods, foreignMethods, classKeyword)
+		  Return New ObjoScript.ClassDeclStmt(superClass, identifier, constructors, staticMethods, methods, foreignMethods, classKeyword, isForeign)
 		  
 		End Function
 	#tag EndMethod
@@ -317,7 +315,11 @@ Protected Class Parser
 		    Return FunctionDeclaration
 		    
 		  ElseIf Match(ObjoScript.TokenTypes.Class_) Then
-		    Return ClassDeclaration
+		    Return ClassDeclaration(False)
+		    
+		  ElseIf Match(ObjoScript.TokenTypes.Foreign) Then
+		    Consume(ObjoScript.TokenTypes.Class_, "Expected `class` after the `foreign` keyword.")
+		    Return ClassDeclaration(True)
 		    
 		  Else
 		    Return Statement
@@ -628,8 +630,8 @@ Protected Class Parser
 		  TokenTypes.Constructor          : Unused, _
 		  TokenTypes.Continue_            : Unused, _
 		  TokenTypes.Dot                  : NewRule(Nil, New DotParselet, Precedences.Call_), _
-		  TokenTypes.DotDot               : BinaryOperator(Precedences.Range), _
-		  TokenTypes.DotDotDot            : BinaryOperator(Precedences.Range), _
+		  TokenTypes.DotDot               : NewRule(Nil, New RangeParselet, Precedences.Range), _
+		  TokenTypes.DotDotDot            : NewRule(Nil, New RangeParselet, Precedences.Range), _
 		  TokenTypes.Else_                : Unused, _
 		  TokenTypes.EOF                  : Unused, _
 		  TokenTypes.EOL                  : Unused, _

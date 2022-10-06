@@ -128,6 +128,15 @@ Protected Module StringExtensions
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 506572666F726D73206120636173652073656E73697469766520737472696E6720636F6D70617269736F6E2E2052657475726E7320547275652069662073203D206F746865722E
+		Function CompareCase(Extends s As String, other As String) As Boolean
+		  /// Performs a case sensitive string comparison. Returns True if s = other.
+		  
+		  Return s.Compare(other, ComparisonOptions.CaseSensitive) = 0
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 547275652069662060736020636F6E7461696E73206077686174602E
 		Function Contains(Extends s As String, what As String, caseSensitive As Boolean) As Boolean
 		  /// True if `s` contains `what`.
