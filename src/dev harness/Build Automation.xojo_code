@@ -10,6 +10,14 @@
 					Subdirectory = 
 					FolderItem = Li4vLi4vLi4vc3RhbmRhcmQlMjBsaWJyYXJ5Lw==
 				End
+				Begin CopyFilesBuildStep CopyTestsLinux
+					AppliesTo = 0
+					Architecture = 0
+					Target = 0
+					Destination = 1
+					Subdirectory = 
+					FolderItem = Li4vLi4vLi4vdGVzdHMv
+				End
 			End
 			Begin BuildStepList Mac OS X
 				Begin BuildProjectStep Build
@@ -29,7 +37,6 @@
 					Destination = 1
 					Subdirectory = 
 					FolderItem = Li4vLi4vLi4vdGVzdHMv
-					FolderItem = Li4vLi4vLi4vZXhwZWN0ZWQv
 				End
 				Begin SignProjectStep Sign
 				  DeveloperID=
@@ -45,6 +52,14 @@
 					Destination = 1
 					Subdirectory = 
 					FolderItem = Li4vLi4vLi4vc3RhbmRhcmQlMjBsaWJyYXJ5Lw==
+				End
+				Begin CopyFilesBuildStep CopyTestsWindows
+					AppliesTo = 0
+					Architecture = 0
+					Target = 0
+					Destination = 1
+					Subdirectory = 
+					FolderItem = Li4vLi4vLi4vdGVzdHMv
 				End
 			End
 #tag EndBuildAutomation

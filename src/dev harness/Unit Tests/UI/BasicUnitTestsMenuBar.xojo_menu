@@ -135,5 +135,35 @@ Begin Menu BasicUnitTestsMenuBar
       AutoEnable = True
       Visible = True
    End
+   Begin DesktopMenuItem WindowMenu
+      SpecialMenu = 0
+      Index = -2147483648
+      Text = "Window"
+      AutoEnabled = True
+      AutoEnable = True
+      Visible = True
+      Begin DesktopMenuItem WindowTests
+         SpecialMenu = 0
+         Index = -2147483648
+         Text = "Tests"
+         ShortcutKey = "0"
+         Shortcut = "Cmd+0"
+         MenuModifier = True
+         AutoEnabled = True
+         AutoEnable = True
+         Visible = True
+      End
+      Begin DesktopMenuItem WindowEditor
+         SpecialMenu = 0
+         Index = -2147483648
+         Text = "Editor"
+         ShortcutKey = "1"
+         Shortcut = "Cmd+1"
+         MenuModifier = True
+         AutoEnabled = True
+         AutoEnable = True
+         Visible = True
+      End
+   End
 End
 #tag EndMenu

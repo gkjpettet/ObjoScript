@@ -1,5 +1,5 @@
 #tag DesktopWindow
-Begin DesktopWindow WindowEditor
+Begin DesktopWindow WinEditor
    Backdrop        =   0
    BackgroundColor =   &cFFFFFF
    Composite       =   False

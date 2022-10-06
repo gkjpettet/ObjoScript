@@ -1,6 +1,25 @@
 #tag Class
 Protected Class App
 Inherits DesktopApplication
+	#tag MenuHandler
+		Function WindowEditor() As Boolean Handles WindowEditor.Action
+		  WinEditor.Show
+		  
+		  Return True
+		  
+		End Function
+	#tag EndMenuHandler
+
+	#tag MenuHandler
+		Function WindowTests() As Boolean Handles WindowTests.Action
+		  WinObjoScriptUnitTests.Show
+		  
+		  Return True
+		  
+		End Function
+	#tag EndMenuHandler
+
+
 	#tag Constant, Name = kEditClear, Type = String, Dynamic = False, Default = \"&Delete", Scope = Public
 		#Tag Instance, Platform = Windows, Language = Default, Definition  = \"&Delete"
 		#Tag Instance, Platform = Linux, Language = Default, Definition  = \"&Delete"

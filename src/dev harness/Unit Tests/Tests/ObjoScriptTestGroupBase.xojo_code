@@ -1,13 +1,27 @@
 #tag Class
 Protected Class ObjoScriptTestGroupBase
 Inherits TestGroup
+	#tag Method, Flags = &h0
+		Sub AssertOutputsEqual(testName As String)
+		  /// Compiles the test source for `testName`, runs it and asserts that its output matches the expected output.
+		  ///
+		  /// Expects `testName` to be in the format: topic.subtopic.testName
+		  
+		  Var func As ObjoScript.Func = CompileTest(testName)
+		  Var expected As String = GetExpectedResult(testName)
+		  Var result As String = RunFunc(func)
+		  Assert.AreEqual(result, expected)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 4C6F6164732074686520736F7572636520636F646520666F72207468652074657374206E616D65642060746573744E616D65602C20636F6D70696C65732069742028616C6F6E6720776974682074686520564D2773207374616E64617264206C6962726172792920616E642072657475726E732074686520726573756C74696E672066756E6374696F6E2E
 		Function CompileTest(testName As String) As ObjoScript.Func
 		  /// Loads the source code for the test named `testName`, compiles it (along with the VM's standard library)
 		  /// and returns the resulting function.
 		  ///
 		  /// Expects `testName` to be in the format: topic.subtopic.testName
-		  /// This mirrors the folder structure of the bundled tests (which are in tests/topic/subtopic/)
+		  /// This mirrors the folder structure of the bundled tests (which are in tests/source/topic/subtopic/)
 		  /// NB: We do not expect `.objo` to be appended to testName.
 		  
 		  // Get the required test.
@@ -23,17 +37,21 @@ Inherits TestGroup
 		  If f = Nil Then
 		    Raise New InvalidArgumentException("Unable to retrieve the `tests` folder.")
 		  End If
+		  f = f.Child("source")
+		  If f = Nil Then
+		    Raise New InvalidArgumentException("Unable to retrieve the `tests/source` folder.")
+		  End If
 		  f = f.Child(parts(0)) // topic
 		  If f = Nil Then
-		    Raise New InvalidArgumentException("Unable to retrieve the `tests/`" + parts(0) + " folder.")
+		    Raise New InvalidArgumentException("Unable to retrieve the `tests/source/`" + parts(0) + " folder.")
 		  End If
 		  f = f.Child(parts(1)) // subtopic
 		  If f = Nil Then
-		    Raise New InvalidArgumentException("Unable to retrieve the `tests/`" + parts(0) + "/" + parts(1) + " folder.")
+		    Raise New InvalidArgumentException("Unable to retrieve the `tests/source/`" + parts(0) + "/" + parts(1) + " folder.")
 		  End If
 		  f = f.Child(parts(2)) // test file
 		  If f = Nil Then
-		    Raise New InvalidArgumentException("Unable to retrieve the `tests/`" + parts(0) + "/" + parts(1) + parts(2) + " test file.")
+		    Raise New InvalidArgumentException("Unable to retrieve the `tests/source/`" + parts(0) + "/" + parts(1) + parts(2) + " test file.")
 		  End If
 		  
 		  // Get the source code to compile.
@@ -51,7 +69,7 @@ Inherits TestGroup
 		  /// Returns the expected result from running the test named `testName`.
 		  ///
 		  /// Expects `testName` to be in the format: topic.subtopic.testName
-		  /// This mirrors the folder structure of the bundled tests (which are in expected/topic/subtopic/)
+		  /// This mirrors the folder structure of the bundled tests (which are in tests/expected/topic/subtopic/)
 		  /// NB: We do not expect a file extension to be appended to testName.
 		  
 		  // Get the expected results file.
@@ -63,21 +81,25 @@ Inherits TestGroup
 		  // Add the .txt extension to the test name.
 		  parts(2) = parts(2) + ".txt"
 		  
-		  Var f As FolderItem = SpecialFolder.Resource("expected")
+		  Var f As FolderItem = SpecialFolder.Resource("tests")
 		  If f = Nil Then
-		    Raise New InvalidArgumentException("Unable to retrieve the `expected` folder.")
+		    Raise New InvalidArgumentException("Unable to retrieve the `tests` folder.")
+		  End If
+		  f = f.Child("expected")
+		  If f = Nil Then
+		    Raise New InvalidArgumentException("Unable to retrieve the `tests/expected` folder.")
 		  End If
 		  f = f.Child(parts(0)) // topic
 		  If f = Nil Then
-		    Raise New InvalidArgumentException("Unable to retrieve the `expected/`" + parts(0) + " folder.")
+		    Raise New InvalidArgumentException("Unable to retrieve the `tests/expected/`" + parts(0) + " folder.")
 		  End If
 		  f = f.Child(parts(1)) // subtopic
 		  If f = Nil Then
-		    Raise New InvalidArgumentException("Unable to retrieve the `expected/`" + parts(0) + "/" + parts(1) + " folder.")
+		    Raise New InvalidArgumentException("Unable to retrieve the `tests/expected/`" + parts(0) + "/" + parts(1) + " folder.")
 		  End If
 		  f = f.Child(parts(2)) // test file
 		  If f = Nil Then
-		    Raise New InvalidArgumentException("Unable to retrieve the `expected/`" + parts(0) + "/" + parts(1) + parts(2) + " test file.")
+		    Raise New InvalidArgumentException("Unable to retrieve the `tests/expected/`" + parts(0) + "/" + parts(1) + parts(2) + " test file.")
 		  End If
 		  
 		  // Get the expected result as a string
@@ -91,7 +113,7 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 52756E73206066756E636020696E2061206E657720564D20616E642072657475726E7320616C6C207072696E746564206F7574707574206173206120737472696E672E
-		Function RunTest(func As ObjoScript.Func) As String
+		Function RunFunc(func As ObjoScript.Func) As String
 		  /// Runs `func` in a new VM and returns all printed output as a string.
 		  
 		  var vm As New ObjoScript.VM

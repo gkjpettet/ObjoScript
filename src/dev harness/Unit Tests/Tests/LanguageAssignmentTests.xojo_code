@@ -2,12 +2,15 @@
 Protected Class LanguageAssignmentTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
+		Sub AssociativityTest()
+		  AssertOutputsEqual("language.assignment.associativity")
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub GlobalTest()
-		  Var testName As String = "language.assignment.global"
-		  Var func As ObjoScript.Func = CompileTest(testName)
-		  Var expected As String = GetExpectedResult(testName)
-		  Var result As String = RunTest(func)
-		  Assert.AreEqual(result, expected)
+		  AssertOutputsEqual("language.assignment.global")
 		  
 		End Sub
 	#tag EndMethod
