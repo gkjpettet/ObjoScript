@@ -1,6 +1,62 @@
 #tag Class
 Protected Class Func
 Implements ObjoScript.Value,ObjoScript.Method
+	#tag Method, Flags = &h0, Description = 52657475726E7320746865206172697479206F662061206D6574686F64207769746820607369676E6174757265602E
+		Shared Function ComputeArityFromSignature(signature As String, vm As ObjoScript.VM) As Integer
+		  /// Returns the arity of a method with `signature`.
+		  
+		  // Handle common cases quickly.
+		  If signature.Contains("()") Then
+		    Return 0
+		    
+		  ElseIf signature.Contains("(_)") Then
+		    Return 1
+		    
+		  ElseIf signature.Contains("(_,_)") Then
+		    Return 2
+		  End If
+		  
+		  Var chars() As String = signature.Split("")
+		  Var lparenIndex, rparenIndex As Integer = -1
+		  For i As Integer = 0 To chars.LastIndex
+		    Select Case chars(i)
+		    Case "("
+		      If lparenIndex <> -1 Then
+		        // We've already seen a `(`.
+		        vm.Error("Invalid signature: `" + signature + "`.")
+		      Else
+		        lparenIndex = i
+		      End If
+		      
+		    Case ")"
+		      If rparenIndex <> -1 Then
+		        // We've already seen a `)`.
+		        vm.Error("Invalid signature: `" + signature + "`.")
+		      ElseIf lparenIndex = -1 Then
+		        // We've found a `)` before a `(`.
+		        vm.Error("Invalid signature: `" + signature + "`.")
+		      Else
+		        rparenIndex = i
+		      End If
+		    End Select
+		  Next i
+		  
+		  If lparenIndex = -1 Or rparenIndex = -1 Then
+		    vm.Error("Invalid signature: `" + signature + "`.")
+		  End If
+		  
+		  // Get the contents between the parentheses (e.g. "(_,_,_)" becomes "_,_,_")
+		  Var contents As String = signature.Middle(lparenIndex + 1, rparenIndex - lparenIndex - 1)
+		  
+		  If contents.Contains("_") Then
+		    Return contents.Split("_").Count - 1
+		  Else
+		    Return 0
+		  End If
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D707574657320612066756E6374696F6E2F6D6574686F64207369676E617475726520676976656E20697473206E616D6520616E642061726974792E
 		Shared Function ComputeSignature(name As String, arity As Integer, isSetter As Boolean) As String
 		  /// Computes a function/method signature given its name and arity.
@@ -157,6 +213,14 @@ Implements ObjoScript.Value,ObjoScript.Method
 			Group="Behavior"
 			InitialValue="False"
 			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Dump"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="String"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

@@ -1199,7 +1199,7 @@ End
 		  VM.PutGlobalVariable("GameEngine", 0)
 		  
 		  // Create a handle to the game engine's update(_) method.
-		  Var gameEngineUpdate As ObjoScript.CallHandle = VM.CreateHandle("update(_)", 1)
+		  Var gameEngineUpdate As ObjoScript.CallHandle = VM.CreateHandle("update(_)")
 		  
 		  For i As Integer = 1 To 10
 		    // Put the argument in slot 1.
@@ -1213,9 +1213,9 @@ End
 		  VM.PutGlobalVariable("Person", 0)
 		  
 		  // Create a handle to the Person's constructor(_) method.
-		  Var newPerson1 As ObjoScript.CallHandle = VM.CreateHandle("constructor(_)", 1)
+		  Var newPerson1 As ObjoScript.CallHandle = VM.CreateHandle("constructor(_)")
 		  // And to the constructor(_,_) method.
-		  Var newPerson2 As ObjoScript.CallHandle = VM.CreateHandle("constructor(_,_)", 2)
+		  Var newPerson2 As ObjoScript.CallHandle = VM.CreateHandle("constructor(_,_)")
 		  
 		  // Create a new person called "Maebh".
 		  VM.SetSlot(1, "Maebh")

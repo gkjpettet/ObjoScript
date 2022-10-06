@@ -303,12 +303,12 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 52657475726E732061207265757361626C652068616E646C6520746F20612063616C6C2061206D6574686F64207769746820607369676E617475726560206F6E2074686520636C6173732F696E7374616E63652063757272656E746C7920696E20736C6F7420302E
-		Function CreateHandle(signature As String, argCount As Integer) As ObjoScript.CallHandle
+		Function CreateHandle(signature As String) As ObjoScript.CallHandle
 		  /// Returns a reusable handle to a call a method with `signature` on the class/instance currently in slot 0.
 		  ///
 		  /// The method can then be called again in the future using `VM.InvokeHandle()`.
 		  
-		  #Pragma Warning "TODO: Deduce argCount from `signature` so the user doesn't have to pass it in"
+		  Var argCount As Integer = ObjoScript.Func.ComputeArityFromSignature(signature, Self)
 		  
 		  // Check we have an instance or a class in slot 0.
 		  Var receiver As Variant = APISlots(0)
