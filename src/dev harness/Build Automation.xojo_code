@@ -22,6 +22,15 @@
 					Subdirectory = 
 					FolderItem = Li4vLi4vLi4vc3RhbmRhcmQlMjBsaWJyYXJ5Lw==
 				End
+				Begin CopyFilesBuildStep CopyTestsMac
+					AppliesTo = 0
+					Architecture = 0
+					Target = 0
+					Destination = 1
+					Subdirectory = 
+					FolderItem = Li4vLi4vLi4vdGVzdHMv
+					FolderItem = Li4vLi4vLi4vZXhwZWN0ZWQv
+				End
 				Begin SignProjectStep Sign
 				  DeveloperID=
 				End
