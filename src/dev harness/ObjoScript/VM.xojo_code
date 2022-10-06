@@ -134,7 +134,7 @@ Protected Class VM
 		  /// "Calls" a class. Essentially this creates a new instance.
 		  /// Does **not** update `CurrentFrame`. 
 		  ///
-		  /// At the moment this methid is called, the stack looks like this:
+		  /// At the moment this method is called, the stack looks like this:
 		  /// |           <--- StackTop
 		  /// | argN      
 		  /// | arg1
@@ -1263,21 +1263,10 @@ Protected Class VM
 		      Var offset AS UInt16 = ReadUInt16
 		      CurrentFrame.IP = CurrentFrame.IP - offset
 		      
-		    Case OP_INCLUSIVE_RANGE
-		      #Pragma Warning "TODO: Ranges need to be actual instances. Foreign class?"
-		      Var upper As Variant = Pop
-		      Var lower As Variant = Pop
-		      AssertNumbers(lower, upper)
-		      // Internally, we represent ranges as a pair of doubles.
-		      Push(lower : upper)
-		      
-		    Case OP_EXCLUSIVE_RANGE
-		      #Pragma Warning "TODO: Ranges need to be actual instances. Foreign class?"
-		      Var upper As Variant = Pop
-		      Var lower As Variant = Pop
-		      AssertNumbers(lower, upper)
-		      // Internally, we represent ranges as a pair of doubles.
-		      Push(lower : upper.DoubleValue - 1)
+		    Case OP_RANGE
+		      // The compiler will have placed the Range class, lower and upper bounds on the stack
+		      // (in that order).
+		      Call CallValue(Peek(2), 2)
 		      
 		    Case OP_EXIT
 		      Error("Unexpected `exit` placeholder instruction. The chunk is invalid.")
@@ -1711,11 +1700,6 @@ Protected Class VM
 		    ElseIf v IsA ObjoScript.Value Then
 		      Return ObjoScript.Value(v).ToString
 		      
-		    ElseIf v IsA Pair Then
-		      // Ranges are stored internally as pairs of doubles (lower : upper)
-		      Var vPair As Pair = v
-		      Return vPair.Left.StringValue + " : " + vPair.Right.StringValue
-		      
 		    Else
 		      // This shouldn't happen.
 		      Raise New UnsupportedOperationException("Unable to create a string representation of the value.")
@@ -1785,8 +1769,8 @@ Protected Class VM
 		41: OP_JUMP_IF_TRUE (2)
 		42: OP_LOGICAL_XOR (0)
 		43: OP_LOOP (2)
-		44: OP_INCLUSIVE_RANGE (0)
-		45: OP_EXCLUSIVE_RANGE (0)
+		44: OP_RANGE (0)
+		45: *Unused*
 		46: OP_EXIT (0)
 		47: OP_CALL (1)
 		48: OP_CLASS (3)
@@ -1909,8 +1893,7 @@ Protected Class VM
 			  OP_JUMP_IF_TRUE         : 2, _
 			  OP_LOGICAL_XOR          : 0, _
 			  OP_LOOP                 : 2, _
-			  OP_INCLUSIVE_RANGE      : 0, _
-			  OP_EXCLUSIVE_RANGE      : 0, _
+			  OP_RANGE                : 0, _
 			  OP_EXIT                 : 0, _
 			  OP_CALL                 : 1, _
 			  OP_CLASS                : 3, _
@@ -2018,9 +2001,6 @@ Protected Class VM
 	#tag Constant, Name = OP_EQUAL, Type = Double, Dynamic = False, Default = \"10", Scope = Public
 	#tag EndConstant
 
-	#tag Constant, Name = OP_EXCLUSIVE_RANGE, Type = Double, Dynamic = False, Default = \"45", Scope = Public
-	#tag EndConstant
-
 	#tag Constant, Name = OP_EXIT, Type = Double, Dynamic = False, Default = \"46", Scope = Public
 	#tag EndConstant
 
@@ -2064,9 +2044,6 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_GREATER_EQUAL, Type = Double, Dynamic = False, Default = \"14", Scope = Public
-	#tag EndConstant
-
-	#tag Constant, Name = OP_INCLUSIVE_RANGE, Type = Double, Dynamic = False, Default = \"44", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_INHERIT, Type = Double, Dynamic = False, Default = \"63", Scope = Public
@@ -2139,6 +2116,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_PRINT, Type = Double, Dynamic = False, Default = \"28", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_RANGE, Type = Double, Dynamic = False, Default = \"44", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_RETURN, Type = Double, Dynamic = False, Default = \"0", Scope = Public, Description = 5468652072657475726E206F70636F64652E

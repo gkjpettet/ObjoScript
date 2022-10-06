@@ -466,7 +466,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Sub EndCompiler(location As ObjoScript.Token)
 		  /// Called when the compiler finishes.
 		  
-		  EmitReturn(location)
+		  // Implicitly return an appropriate value if the user did not explictly specify one.
+		  If Func.Chunk.Code.Count = 0 Then
+		    EmitReturn(location)
+		    
+		  ElseIf Func.Chunk.Code(Func.Chunk.Code.LastIndex) <> VM.OP_RETURN Then
+		    EmitReturn(location)
+		  End If
 		  
 		End Sub
 	#tag EndMethod
@@ -1778,20 +1784,23 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = r.Location
 		  
-		  // Compile the lower and upper operands - this will leave them on the stack.
-		  Call r.Lower.Accept(Self)
-		  Call r.Upper.Accept(Self)
+		  // Retrieve the Range class. It should have been defined globally in the standard library.
+		  NamedVariable("Range")
 		  
-		  Select Case r.Operator.Type
-		  Case ObjoScript.TokenTypes.DotDot
-		    EmitByte(VM.OP_INCLUSIVE_RANGE, r.Location)
-		    
-		  Case ObjoScript.TokenTypes.DotDotDot
-		    EmitByte(VM.OP_EXCLUSIVE_RANGE, r.Location)
-		    
+		  // The lower and upper bounds need compiling to leave them on the top of the stack.
+		  // The lower bounds is compiled as is.
+		  Call r.Lower.Accept(Self)
+		  
+		  // For exclusive ranges, we need to subtract 1 from the upper bounds at runtime.
+		  If r.Inclusive Then
+		    Call r.Upper.Accept(Self)
 		  Else
-		    Error("Unexpected operator token type (expected `..` or `...`")
-		  End Select
+		    Var subtract As New ObjoScript.BinaryExpr(r.Upper, _
+		    SyntheticOperatorToken(ObjoScript.TokenTypes.Minus), New ObjoScript.NumberLiteral(SyntheticNumberToken(1.0, True)))
+		    Call subtract.Accept(Self)
+		  End If
+		  
+		  EmitByte(VM.OP_RANGE, r.Location)
 		  
 		End Function
 	#tag EndMethod

@@ -341,11 +341,8 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_LOOP
 		    Return JumpInstruction("OP_LOOP", True, chunk, offset)
 		    
-		  Case ObjoScript.VM.OP_INCLUSIVE_RANGE
-		    Return SimpleInstruction("OP_INCLUSIVE_RANGE", offset)
-		    
-		  Case ObjoScript.VM.OP_EXCLUSIVE_RANGE
-		    Return SimpleInstruction("OP_EXCLUSIVE_RANGE", offset)
+		  Case ObjoScript.VM.OP_RANGE
+		    Return SimpleInstruction("OP_RANGE", offset)
 		    
 		  Case ObjoScript.VM.OP_EXIT
 		    Return SimpleInstruction("OP_EXIT", offset)
