@@ -855,7 +855,7 @@ Protected Class Parser
 		  Wend
 		  
 		  If canAssign And Match(ObjoScript.TokenTypes.Equal) Then
-		    Error("Invalid assigment token.")
+		    Error("Invalid assignment target.")
 		  End If
 		  
 		  Return left

@@ -15,6 +15,31 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C657320746865207465737420736F7572636520666F722060746573744E616D65602C2072756E7320697420616E6420617373657274732074686174206120706172736572206572726F72206F63637572732077686F7365206572726F72206D657373616765206D61746368657320746865207465787420666F756E6420696E206074657374732F65787065637465642F746573744E616D65602E
+		Sub AssertParserError(testName As String)
+		  /// Compiles the test source for `testName`, runs it and asserts that a parser error occurs
+		  /// whose error message matches the text found in `tests/expected/testName`.
+		  ///
+		  /// Expects `testName` to be in the format: topic.subtopic.testName
+		  
+		  // Get the expected parser error message.
+		  Var expected As String = GetExpectedResult(testName)
+		  
+		  Try
+		    Call CompileTest(testName)
+		    Assert.Fail("Expected a parser error.")
+		  Catch e As ObjoScript.ParserException
+		    Var errors() As ObjoScript.ParserException = Compiler.ParserErrors
+		    If errors(0).Message = expected Then
+		      Assert.Pass
+		    Else
+		      Assert.Fail("A parser error occurred but the message did not match. Got """ + errors(0).Message + """ but expected """ + expected + """")
+		    End If
+		  End Try
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 4C6F6164732074686520736F7572636520636F646520666F72207468652074657374206E616D65642060746573744E616D65602C20636F6D70696C65732069742028616C6F6E6720776974682074686520564D2773207374616E64617264206C6962726172792920616E642072657475726E732074686520726573756C74696E672066756E6374696F6E2E
 		Function CompileTest(testName As String) As ObjoScript.Func
 		  /// Loads the source code for the test named `testName`, compiles it (along with the VM's standard library)

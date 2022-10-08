@@ -15,6 +15,18 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub GroupingTest()
+		  AssertParserError("language.assignment.grouping")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub InfixOperatorTest()
+		  AssertParserError("language.assignment.infix_operator")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
