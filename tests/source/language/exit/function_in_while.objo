@@ -1,0 +1,10 @@
+function test(i) {
+	print i
+}
+
+// Expect: "i"
+while true {
+	var i = "i"
+	test(i)
+	exit
+}

@@ -110,6 +110,7 @@ Class=TestResult;Unit Tests/TestFramework/TestResult.xojo_code;&h000000001624A4E
 Class=XojoUnitTestFailedException;Unit Tests/TestFramework/XojoUnitTestFailedException.xojo_code;&h000000000AF4DFFF;&h000000003E1A9B41;false
 Class=ObjoScriptTestController;Unit Tests/Tests/ObjoScriptTestController.xojo_code;&h000000003FC78D4E;&h000000000BB987FF;false
 Class=LanguageAssignmentTests;Unit Tests/Tests/LanguageAssignmentTests.xojo_code;&h0000000064D907FF;&h000000000BB987FF;false
+Class=LanguageExitTests;Unit Tests/Tests/LanguageExitTests.xojo_code;&h000000000195C7FF;&h000000000BB987FF;false
 Folder=UI;Unit Tests/UI;&h0000000003D06FFF;&h000000002516B04D;false
 DesktopWindow=WinObjoScriptUnitTests;Unit Tests/UI/WinObjoScriptUnitTests.xojo_window;&h000000005E851226;&h0000000003D06FFF;false
 MenuBar=BasicUnitTestsMenuBar;Unit Tests/UI/BasicUnitTestsMenuBar.xojo_menu;&h000000002BBD1FFF;&h0000000003D06FFF;false

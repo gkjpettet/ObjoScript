@@ -1,0 +1,10 @@
+function test(i, j) {
+	print i + j
+}
+
+// Expect: 5
+foreach i in 1..3 {
+	var j = 4
+	test(i, j)
+	exit
+}

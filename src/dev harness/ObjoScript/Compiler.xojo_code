@@ -1575,6 +1575,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Error("Functions can only be declared within the top level of a script.")
 		  End If
 		  
+		  // We also don't allow functions to be declared within loops.
+		  If CurrentLoop <> Nil Then
+		    Error("Cannot declare functions within a loop.")
+		  End If
+		  
 		  DeclareVariable(funcDecl.Name, True)
 		  
 		  // Compile the function body.

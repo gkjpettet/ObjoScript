@@ -17,19 +17,19 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub GroupingTest()
-		  AssertParserError("language.assignment.grouping")
+		  AssertCompilerError("language.assignment.grouping")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub InfixOperatorTest()
-		  AssertParserError("language.assignment.infix_operator")
+		  AssertCompilerError("language.assignment.infix_operator")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub IsTest()
-		  AssertParserError("language.assignment.is")
+		  AssertCompilerError("language.assignment.is")
 		End Sub
 	#tag EndMethod
 
@@ -42,7 +42,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub PrefixOperatorTest()
-		  AssertParserError("language.assignment.prefix_operator")
+		  AssertCompilerError("language.assignment.prefix_operator")
 		End Sub
 	#tag EndMethod
 
