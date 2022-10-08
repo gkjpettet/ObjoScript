@@ -27,6 +27,38 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub IsTest()
+		  AssertParserError("language.assignment.is")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub LocalTest()
+		  AssertOutputsEqual("language.assignment.local")
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub PrefixOperatorTest()
+		  AssertParserError("language.assignment.prefix_operator")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub SyntaxTest()
+		  AssertOutputsEqual("language.assignment.syntax")
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub UndefinedTest()
+		  AssertRuntimeError("language.assignment.undefined")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
