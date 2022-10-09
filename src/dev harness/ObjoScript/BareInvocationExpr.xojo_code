@@ -1,11 +1,11 @@
 #tag Class
-Protected Class MethodInvocationOnThisExpr
+Protected Class BareInvocationExpr
 Implements ObjoScript.Expr
 	#tag Method, Flags = &h0
 		Function Accept(visitor As ObjoScript.ExprVisitor) As Variant
 		  /// Part of the ObjoScript.Expr interface.
 		  
-		  Return visitor.VisitMethodInvocationOnThis(Self)
+		  Return visitor.VisitBareInvocationExpr(Self)
 		End Function
 	#tag EndMethod
 

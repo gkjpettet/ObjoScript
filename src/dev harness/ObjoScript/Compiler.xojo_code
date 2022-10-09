@@ -1063,6 +1063,70 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732061206261726520696E766F636174696F6E2E20456974686572206120676C6F62616C2066756E6374696F6E2063616C6C206F722061206C6F63616C206D6574686F6420696E766F636174696F6E2E
+		Function VisitBareInvocationExpr(bi As ObjoScript.BareInvocationExpr) As Variant
+		  /// Compiles a bare invocation. Either a global function call or a local method invocation.
+		  ///
+		  /// Part of the `ExprVisitor` interface.
+		  /// E.g: `someIdentifier()`
+		  
+		  mLocation = bi.Location
+		  
+		  // Could be a method invocation called from within a class method/constructor or
+		  // a global function call.
+		  Var isMethod, isStatic As Boolean = False
+		  If CurrentClass <> Nil Then
+		    If CurrentClass.HasInstanceMethodWithSignature(bi.Signature) Then
+		      isMethod = True
+		    ElseIf CurrentClass.HasStaticMethodWithSignature(bi.Signature) Then
+		      isMethod = True
+		      isStatic = True
+		    End If
+		  End If
+		  
+		  If Not isMethod Then
+		    // Assume global function.
+		    CallGlobalFunction(bi.MethodName, bi.Arguments, bi.Location)
+		    Return Nil
+		    
+		  ElseIf isStatic Then
+		    // This is a call to a static method.
+		    If Self.IsStaticMethod Then
+		      // We're calling a static method from within a static method. Therefore, slot 0 of the call frame will be the class.
+		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		    Else
+		      // We're calling a static method from within an instance method. Therefore, slot 0 of the call frame will be the instance.
+		      // Push its class onto the stack.
+		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL_CLASS, 0)
+		    End If
+		    
+		  Else
+		    // This is a call to an instance method.
+		    If Self.IsStaticMethod Then
+		      Error("Cannot call an instance method from within a static method.")
+		    Else
+		      // Slot 0 of the call frame will be the instance. Push it onto the stack.
+		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		    End If
+		  End If
+		  
+		  // We should now have either the class (if this is a static method) or the instance on the top of the stack.
+		  // Load the method's signature into the constant pool.
+		  Var index As Integer = AddConstant(bi.Signature)
+		  
+		  // Compile the arguments.
+		  For Each arg As ObjoScript.Expr In bi.Arguments
+		    Call arg.Accept(Self)
+		  Next arg
+		  
+		  // Emit the OP_INVOKE instruction and the index of the method's signature in the constant pool
+		  EmitIndexedOpcode(ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_INVOKE_LONG, index, bi.Location)
+		  
+		  // Emit the argument count.
+		  EmitByte(bi.Arguments.Count, bi.Location)
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320612062696E6172792065787072657373696F6E2E
 		Function VisitBinary(expr As ObjoScript.BinaryExpr) As Variant
 		  /// Compiles a binary expression.
@@ -1772,70 +1836,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Emit the argument count.
 		  EmitByte(m.Arguments.Count, m.Location)
 		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = 436F6D70696C65732061206D6574686F642063616C6C206F6E207468652063757272656E7420636C617373206F7220696E7374616E63652E
-		Function VisitMethodInvocationOnThis(mi As ObjoScript.MethodInvocationOnThisExpr) As Variant
-		  /// Compiles a method call on the current class or instance.
-		  ///
-		  /// Part of the `ExprVisitor` interface.
-		  /// E.g: `someMethod()`
-		  
-		  mLocation = mi.Location
-		  
-		  // Could be a method invocation called from within a class method/constructor or
-		  // a global function call.
-		  Var isMethod, isStatic As Boolean = False
-		  If CurrentClass <> Nil Then
-		    If CurrentClass.HasInstanceMethodWithSignature(mi.Signature) Then
-		      isMethod = True
-		    ElseIf CurrentClass.HasStaticMethodWithSignature(mi.Signature) Then
-		      isMethod = True
-		      isStatic = True
-		    End If
-		  End If
-		  
-		  If Not isMethod Then
-		    // Assume global function.
-		    CallGlobalFunction(mi.MethodName, mi.Arguments, mi.Location)
-		    Return Nil
-		    
-		  ElseIf isStatic Then
-		    // This is a call to a static method.
-		    If Self.IsStaticMethod Then
-		      // We're calling a static method from within a static method. Therefore, slot 0 of the call frame will be the class.
-		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
-		    Else
-		      // We're calling a static method from within an instance method. Therefore, slot 0 of the call frame will be the instance.
-		      // Push its class onto the stack.
-		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL_CLASS, 0)
-		    End If
-		    
-		  Else
-		    // This is a call to an instance method.
-		    If Self.IsStaticMethod Then
-		      Error("Cannot call an instance method from within a static method.")
-		    Else
-		      // Slot 0 of the call frame will be the instance. Push it onto the stack.
-		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
-		    End If
-		  End If
-		  
-		  // We should now have either the class (if this is a static method) or the instance on the top of the stack.
-		  // Load the method's signature into the constant pool.
-		  Var index As Integer = AddConstant(mi.Signature)
-		  
-		  // Compile the arguments.
-		  For Each arg As ObjoScript.Expr In mi.Arguments
-		    Call arg.Accept(Self)
-		  Next arg
-		  
-		  // Emit the OP_INVOKE instruction and the index of the method's signature in the constant pool
-		  EmitIndexedOpcode(ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_INVOKE_LONG, index, mi.Location)
-		  
-		  // Emit the argument count.
-		  EmitByte(mi.Arguments.Count, mi.Location)
 		End Function
 	#tag EndMethod
 

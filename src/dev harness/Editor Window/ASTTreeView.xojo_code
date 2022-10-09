@@ -41,6 +41,28 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitBareInvocationExpr(bi As ObjoScript.BareInvocationExpr) As Variant
+		  Var node As New TreeViewNode("Method invocation on `this`")
+		  
+		  node.AppendNode(New TreeViewNode("Method name: " + bi.MethodName))
+		  
+		  // Optional arguments.
+		  If bi.Arguments.Count = 0 Then
+		    node.AppendNode(New TreeViewNode("No arguments"))
+		  Else
+		    Var argNode As New TreeViewNode("Arguments")
+		    For Each arg As ObjoScript.Expr In bi.Arguments
+		      argNode.AppendNode(arg.Accept(Self))
+		    Next arg
+		    node.AppendNode(argNode)
+		  End If
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitBinary(expr As ObjoScript.BinaryExpr) As Variant
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
@@ -465,28 +487,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var operandNode As New TreeViewNode("Operand")
 		  operandNode.AppendNode(m.Operand.Accept(Self))
 		  node.AppendNode(operandNode)
-		  
-		  // Optional arguments.
-		  If m.Arguments.Count = 0 Then
-		    node.AppendNode(New TreeViewNode("No arguments"))
-		  Else
-		    Var argNode As New TreeViewNode("Arguments")
-		    For Each arg As ObjoScript.Expr In m.Arguments
-		      argNode.AppendNode(arg.Accept(Self))
-		    Next arg
-		    node.AppendNode(argNode)
-		  End If
-		  
-		  Return node
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Function VisitMethodInvocationOnThis(m As ObjoScript.MethodInvocationOnThisExpr) As Variant
-		  Var node As New TreeViewNode("Method invocation on `this`")
-		  
-		  node.AppendNode(New TreeViewNode("Method name: " + m.MethodName))
 		  
 		  // Optional arguments.
 		  If m.Arguments.Count = 0 Then

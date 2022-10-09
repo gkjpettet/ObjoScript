@@ -16,7 +16,7 @@ Implements ObjoScript.PrefixParselet
 		    Return New AssignmentExpr(identifier, expression)
 		    
 		  ElseIf parser.Match(ObjoScript.TokenTypes.LParen) Then
-		    // Must be a method invocation on `this` since we're seeing `identifier()`.
+		    // Must be either a global function or local method invocation on `this` since we're seeing `identifier()`.
 		    Var arguments() As ObjoScript.Expr
 		    If Not parser.Check(ObjoScript.TokenTypes.RParen) Then
 		      Do
@@ -24,7 +24,7 @@ Implements ObjoScript.PrefixParselet
 		      Loop Until Not parser.Match(ObjoScript.TokenTypes.Comma)
 		    End If
 		    parser.Consume(ObjoScript.TokenTypes.RParen, "Expected a `)` after the method call's arguments.")
-		    Return New ObjoScript.MethodInvocationOnThisExpr(identifier, arguments)
+		    Return New ObjoScript.BareInvocationExpr(identifier, arguments)
 		  Else
 		    // This is the lookup of a variable named `identifier.Lexeme`.
 		    Return New VariableExpr(identifier)
