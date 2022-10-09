@@ -1,2 +1,0 @@
-static foo method
-instance foo method

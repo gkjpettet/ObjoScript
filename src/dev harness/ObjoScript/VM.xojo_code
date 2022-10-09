@@ -1229,6 +1229,14 @@ Protected Class VM
 		      Push(Stack(CurrentFrame.StackBase + slot))
 		      CurrentFrame.Locals.Value(ReadConstantLong) = slot
 		      
+		    Case OP_GET_LOCAL_CLASS
+		      // The operand is the stack slot where the local variable lives.
+		      // This local variable should be an instance. Load it and then push its
+		      // class onto the stack.
+		      Var instance As ObjoScript.Instance = Stack(CurrentFrame.StackBase + ReadByte)
+		      // Load the value at that index and then push it on to the top of the stack.
+		      Push(instance.Klass)
+		      
 		    Case OP_SET_LOCAL
 		      // The operand is the stack slot where the local variable lives.
 		      // Store the value at the top of the stack in the stack slot corresponding to the local variable.
@@ -1774,7 +1782,7 @@ Protected Class VM
 		46: OP_EXIT (0)
 		47: OP_CALL (1)
 		48: OP_CLASS (3)
-		49: *Unused*
+		49: OP_GET_LOCAL_CLASS (1)
 		50: OP_METHOD (3)
 		51: OP_IS (0)
 		52: OP_SETTER (1)
@@ -1922,7 +1930,8 @@ Protected Class VM
 			  OP_SET_STATIC_FIELD_LONG: 2, _
 			  OP_FOREIGN_METHOD       : 3, _
 			  OP_IS                   : 0, _
-			  OP_GET_LOCAL_NAME       : 3 _
+			  OP_GET_LOCAL_NAME       : 3, _
+			  OP_GET_LOCAL_CLASS      : 1 _
 			  )
 			  
 			  Return d
@@ -2029,6 +2038,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_GET_LOCAL, Type = Double, Dynamic = False, Default = \"37", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_GET_LOCAL_CLASS, Type = Double, Dynamic = False, Default = \"49", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_GET_LOCAL_NAME, Type = Double, Dynamic = False, Default = \"70", Scope = Public

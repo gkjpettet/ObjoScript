@@ -422,6 +422,9 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_GET_LOCAL_NAME
 		    Return GetLocalNameInstruction(chunk, offset)
 		    
+		  Case ObjoScript.VM.OP_GET_LOCAL_CLASS
+		    Return TwoByteInstruction("GET LOCAL CLASS", chunk, offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select

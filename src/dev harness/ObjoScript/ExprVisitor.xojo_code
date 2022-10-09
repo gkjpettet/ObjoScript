@@ -60,6 +60,12 @@ Protected Interface ExprVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E672061206D6574686F6420696E766F636174696F6E2077697468696E206120636C617373206F7220696E7374616E63652E
+		Function VisitMethodInvocationOnThis(m As ObjoScript.MethodInvocationOnThisExpr) As Variant
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E672061206E6F7468696E67206C69746572616C2E
 		Function VisitNothing(expr As ObjoScript.NothingLiteral) As Variant
 		  

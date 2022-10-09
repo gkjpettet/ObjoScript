@@ -75,6 +75,34 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 436F6D70696C657320612063616C6C20746F206120676C6F62616C2066756E6374696F6E2E
+		Private Sub CallGlobalFunction(name As String, arguments() As ObjoScript.Expr, location As ObjoScript.Token)
+		  /// Compiles a call to a global function.
+		  
+		  mLocation = location
+		  
+		  // Add the name of the method to the constant pool and get its index.
+		  Var index As Integer = AddConstant(name)
+		  
+		  // Push the method's name on to the stack.
+		  EmitGetGlobal(index)
+		  
+		  // Check the argument count is within the limit.
+		  If arguments.Count > 255 Then
+		    Error("A call cannot have more than 255 arguments.")
+		  End If
+		  
+		  // Compile the arguments.
+		  For Each arg As ObjoScript.Expr In arguments
+		    Call arg.Accept(Self)
+		  Next arg
+		  
+		  // Emit the call instruction with the number of arguments as its operand.
+		  EmitBytes(ObjoScript.VM.OP_CALL, arguments.Count)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320726177204F626A6F20736F7572636520636F646520696E746F206120746F70206C6576656C2066756E6374696F6E2E204D6179207261697365206120604C65786572457863657074696F6E602C2060506172736572457863657074696F6E60206F722060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
 		Function Compile(source As String) As ObjoScript.Func
 		  /// Compiles raw Objo source code into a top level function. 
@@ -120,7 +148,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320612066756E6374696F6E206465636C61726174696F6E20696E746F20612066756E6374696F6E2E2052616973657320612060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
-		Function Compile(name As String, parameters() As ObjoScript.Token, body As ObjoScript.BlockStmt, type As ObjoScript.FunctionTypes, isStaticMethod As Boolean, debugMode As Boolean, shouldResetFirst As Boolean) As ObjoScript.Func
+		Function Compile(name As String, parameters() As ObjoScript.Token, body As ObjoScript.BlockStmt, type As ObjoScript.FunctionTypes, currentClass As ObjoScript.ClassDeclStmt, isStaticMethod As Boolean, debugMode As Boolean, shouldResetFirst As Boolean) As ObjoScript.Func
 		  /// Compiles a function declaration into a function. Raises a `CompilerException` if an error occurs.
 		  ///
 		  /// Resets by default but if this is being called internally (after the compiler has tokenised and parsed the source) 
@@ -136,6 +164,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Func = New ObjoScript.Func(name, parameters.Count, False, Self.DebugMode)
 		  Self.Type = type
 		  Self.IsStaticMethod = isStaticMethod
+		  Self.CurrentClass = currentClass
 		  
 		  If type <> ObjoScript.FunctionTypes.TopLevel Then
 		    BeginScope
@@ -191,7 +220,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Empty parameters.
 		  Var params() As ObjoScript.Token
 		  
-		  Return Compile("", params, New ObjoScript.BlockStmt(body, openingBrace, closingBrace), ObjoScript.FunctionTypes.TopLevel, False, Self.DebugMode, False)
+		  Return Compile("", params, New ObjoScript.BlockStmt(body, openingBrace, closingBrace), ObjoScript.FunctionTypes.TopLevel, Nil, False, Self.DebugMode, False)
 		  
 		End Function
 	#tag EndMethod
@@ -879,6 +908,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Locals.Add(New ObjoScript.LocalVariable(synthetic, 0))
 		  
 		  CurrentLoop = Nil
+		  CurrentClass = Nil
+		  
 		End Sub
 	#tag EndMethod
 
@@ -1197,6 +1228,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = c.Location
 		  
+		  // Store data about the class we're about to compile.
+		  CurrentClass = c
+		  
 		  If Self.Type <> ObjoScript.FunctionTypes.TopLevel Then
 		    Error("Classes can only be declared within the top level of a script.")
 		  End If
@@ -1232,9 +1266,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  End If
 		  
 		  // Compile any foreign method declarations.
-		  For Each fmd As ObjoScript.ForeignMethodDeclStmt In c.ForeignMethods
+		  For Each entry As DictionaryEntry In c.ForeignMethods
+		    Var fmd As ObjoScript.ForeignMethodDeclStmt = entry.Value
 		    Call fmd.Accept(Self)
-		  Next fmd
+		  Next entry
 		  
 		  // Compile any constructors.
 		  For Each constructor As ObjoScript.ConstructorDeclStmt In c.Constructors
@@ -1242,18 +1277,22 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Next constructor
 		  
 		  // Compile any static methods.
-		  For Each sm As ObjoScript.MethodDeclStmt In c.StaticMethods
+		  For Each entry As DictionaryEntry In c.StaticMethods
+		    Var sm As ObjoScript.MethodDeclStmt = entry.Value
 		    Call sm.Accept(Self)
-		  Next sm
+		  Next entry
 		  
 		  // Compile any instance methods.
-		  For Each m As ObjoScript.MethodDeclStmt In c.Methods
+		  For Each entry As DictionaryEntry In c.Methods
+		    Var m As ObjoScript.MethodDeclStmt = entry.Value
 		    Call m.Accept(Self)
-		  Next m
+		  Next entry
 		  
 		  // Pop the class off the stack.
 		  EmitByte(ObjoScript.VM.OP_POP)
 		  
+		  // We're done compiling this class.
+		  CurrentClass = Nil
 		End Function
 	#tag EndMethod
 
@@ -1274,7 +1313,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Compile the body.
 		  Var compiler As New ObjoScript.Compiler
-		  Var body As ObjoScript.Func = compiler.Compile(c.Signature, c.Parameters, c.Body, ObjoScript.FunctionTypes.Constructor, False, Self.DebugMode, True)
+		  Var body As ObjoScript.Func = compiler.Compile(c.Signature, c.Parameters, c.Body, ObjoScript.FunctionTypes.Constructor, CurrentClass, False, Self.DebugMode, True)
 		  
 		  // Store the compiled constructor body as a constant in this function's constant pool
 		  // and push it on to the stack.
@@ -1599,7 +1638,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Compile the function body.
 		  Var compiler As New ObjoScript.Compiler
-		  Var f As ObjoScript.Func = compiler.Compile(funcDecl.Name.Lexeme, funcDecl.Parameters, funcDecl.Body, ObjoScript.FunctionTypes.Func, False, Self.DebugMode, True)
+		  Var f As ObjoScript.Func = compiler.Compile(funcDecl.Name.Lexeme, funcDecl.Parameters, funcDecl.Body, ObjoScript.FunctionTypes.Func, CurrentClass, False, Self.DebugMode, True)
 		  
 		  // Store the compiled function as a constant in this function's constant pool.
 		  Call EmitConstant(f)
@@ -1690,7 +1729,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Compile the body.
 		  Var compiler As New ObjoScript.Compiler
-		  Var body As ObjoScript.Func = compiler.Compile(m.Name, m.Parameters, m.Body, ObjoScript.FunctionTypes.Method, m.IsStatic, Self.DebugMode, True)
+		  Var body As ObjoScript.Func = compiler.Compile(m.Name, m.Parameters, m.Body, ObjoScript.FunctionTypes.Method, CurrentClass, m.IsStatic, Self.DebugMode, True)
 		  body.IsSetter = m.IsSetter
 		  
 		  // Store the compiled method body as a constant in this function's constant pool
@@ -1733,6 +1772,70 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Emit the argument count.
 		  EmitByte(m.Arguments.Count, m.Location)
 		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732061206D6574686F642063616C6C206F6E207468652063757272656E7420636C617373206F7220696E7374616E63652E
+		Function VisitMethodInvocationOnThis(mi As ObjoScript.MethodInvocationOnThisExpr) As Variant
+		  /// Compiles a method call on the current class or instance.
+		  ///
+		  /// Part of the `ExprVisitor` interface.
+		  /// E.g: `someMethod()`
+		  
+		  mLocation = mi.Location
+		  
+		  // Could be a method invocation called from within a class method/constructor or
+		  // a global function call.
+		  Var isMethod, isStatic As Boolean = False
+		  If CurrentClass <> Nil Then
+		    If CurrentClass.HasInstanceMethodWithSignature(mi.Signature) Then
+		      isMethod = True
+		    ElseIf CurrentClass.HasStaticMethodWithSignature(mi.Signature) Then
+		      isMethod = True
+		      isStatic = True
+		    End If
+		  End If
+		  
+		  If Not isMethod Then
+		    // Assume global function.
+		    CallGlobalFunction(mi.MethodName, mi.Arguments, mi.Location)
+		    Return Nil
+		    
+		  ElseIf isStatic Then
+		    // This is a call to a static method.
+		    If Self.IsStaticMethod Then
+		      // We're calling a static method from within a static method. Therefore, slot 0 of the call frame will be the class.
+		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		    Else
+		      // We're calling a static method from within an instance method. Therefore, slot 0 of the call frame will be the instance.
+		      // Push its class onto the stack.
+		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL_CLASS, 0)
+		    End If
+		    
+		  Else
+		    // This is a call to an instance method.
+		    If Self.IsStaticMethod Then
+		      Error("Cannot call an instance method from within a static method.")
+		    Else
+		      // Slot 0 of the call frame will be the instance. Push it onto the stack.
+		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		    End If
+		  End If
+		  
+		  // We should now have either the class (if this is a static method) or the instance on the top of the stack.
+		  // Load the method's signature into the constant pool.
+		  Var index As Integer = AddConstant(mi.Signature)
+		  
+		  // Compile the arguments.
+		  For Each arg As ObjoScript.Expr In mi.Arguments
+		    Call arg.Accept(Self)
+		  Next arg
+		  
+		  // Emit the OP_INVOKE instruction and the index of the method's signature in the constant pool
+		  EmitIndexedOpcode(ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_INVOKE_LONG, index, mi.Location)
+		  
+		  // Emit the argument count.
+		  EmitByte(mi.Arguments.Count, mi.Location)
 		End Function
 	#tag EndMethod
 
@@ -2136,6 +2239,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		#tag EndGetter
 		CompileTime As Double
 	#tag EndComputedProperty
+
+	#tag Property, Flags = &h21, Description = 49662074686520636F6D70696C65722069732063757272656E746C7920636F6D70696C696E67206120636C6173732C207468697320697320697473206465636C61726174696F6E2E204D6179206265204E696C2E
+		Private CurrentClass As ObjoScript.ClassDeclStmt
+	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 5468652063757272656E7420696E6E65726D6F7374206C6F6F70206265696E6720636F6D70696C65642C206F72204E696C206966206E6F7420696E2061206C6F6F702E
 		Private CurrentLoop As ObjoScript.LoopData

@@ -118,13 +118,34 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Class name.
 		  node.AppendNode(New TreeViewNode("Name: " + c.Name))
 		  
-		  // Methods
+		  // Instance methods
 		  If c.Methods.Count > 0 Then
-		    Var methods As New TreeViewNode("Methods")
-		    For Each m As ObjoScript.MethodDeclStmt In c.Methods
+		    Var methods As New TreeViewNode("Instance methods")
+		    For Each entry As DictionaryEntry In c.Methods
+		      Var m As ObjoScript.MethodDeclStmt = entry.Value
 		      methods.AppendNode(m.Accept(Self))
-		    Next m
+		    Next entry
 		    node.AppendNode(methods)
+		  End If
+		  
+		  // Static methods
+		  If c.StaticMethods.Count > 0 Then
+		    Var staticMethods As New TreeViewNode("Static methods")
+		    For Each entry As DictionaryEntry In c.StaticMethods
+		      Var m As ObjoScript.MethodDeclStmt = entry.Value
+		      staticMethods.AppendNode(m.Accept(Self))
+		    Next entry
+		    node.AppendNode(staticMethods)
+		  End If
+		  
+		  // Foreign methods
+		  If c.ForeignMethods.Count > 0 Then
+		    Var foreignMethods As New TreeViewNode("Foreign methods")
+		    For Each entry As DictionaryEntry In c.ForeignMethods
+		      Var m As ObjoScript.ForeignMethodDeclStmt = entry.Value
+		      foreignMethods.AppendNode(m.Accept(Self))
+		    Next entry
+		    node.AppendNode(foreignMethods)
 		  End If
 		  
 		  Return node
@@ -444,6 +465,28 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var operandNode As New TreeViewNode("Operand")
 		  operandNode.AppendNode(m.Operand.Accept(Self))
 		  node.AppendNode(operandNode)
+		  
+		  // Optional arguments.
+		  If m.Arguments.Count = 0 Then
+		    node.AppendNode(New TreeViewNode("No arguments"))
+		  Else
+		    Var argNode As New TreeViewNode("Arguments")
+		    For Each arg As ObjoScript.Expr In m.Arguments
+		      argNode.AppendNode(arg.Accept(Self))
+		    Next arg
+		    node.AppendNode(argNode)
+		  End If
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function VisitMethodInvocationOnThis(m As ObjoScript.MethodInvocationOnThisExpr) As Variant
+		  Var node As New TreeViewNode("Method invocation on `this`")
+		  
+		  node.AppendNode(New TreeViewNode("Method name: " + m.MethodName))
 		  
 		  // Optional arguments.
 		  If m.Arguments.Count = 0 Then

@@ -1,13 +1,6 @@
 #tag Class
 Protected Class App
 Inherits DesktopApplication
-	#tag Event
-		Function UnhandledException(error As RuntimeException) As Boolean
-		  break
-		End Function
-	#tag EndEvent
-
-
 	#tag MenuHandler
 		Function WindowEditor() As Boolean Handles WindowEditor.Action
 		  WinEditor.Show

@@ -137,8 +137,9 @@ Protected Class Parser
 		  Call Match(ObjoScript.TokenTypes.EOL)
 		  
 		  // Optional constructors/methods.
-		  Var methods(), staticMethods() As ObjoScript.MethodDeclStmt
-		  Var foreignMethods() As ObjoScript.ForeignMethodDeclStmt
+		  Var methods As Dictionary = ParseJSON("{}") // HACK: Case sensitive dictonary.
+		  Var staticMethods As Dictionary = ParseJSON("{}") // HACK: Case sensitive dictonary.
+		  Var foreignMethods As Dictionary = ParseJSON("{}") // HACK: Case sensitive dictonary.
 		  Var constructors(), cdecl As ObjoScript.ConstructorDeclStmt
 		  Var constructorArities As New Dictionary // Key = arity: Value = Nil
 		  While Not Check(ObjoScript.TokenTypes.RCurly, ObjoScript.TokenTypes.EOF)
@@ -152,17 +153,34 @@ Protected Class Parser
 		      End If
 		      
 		    ElseIf Match(ObjoScript.TokenTypes.Static_) Then
-		      staticMethods.Add(MethodDeclaration(className, True))
+		      Var sm As ObjoScript.MethodDeclStmt = MethodDeclaration(className, True)
+		      If staticMethods.HasKey(sm.Signature) Or methods.HasKey(sm.Signature) Or foreignMethods.HasKey(sm.Signature) Then
+		        Error("Duplicate method definition: " + sm.Signature, sm.Location)
+		      Else
+		        staticMethods.Value(sm.Signature) = sm
+		      End If
 		      
 		    ElseIf Match(ObjoScript.TokenTypes.Foreign) Then
+		      Var f As ObjoScript.ForeignMethodDeclStmt
 		      If Match(ObjoScript.TokenTypes.Static_) Then
-		        foreignMethods.Add(ForeignMethodDeclaration(className, True))
+		        f = ForeignMethodDeclaration(className, True)
 		      Else
-		        foreignMethods.Add(ForeignMethodDeclaration((className, False)))
+		        f = ForeignMethodDeclaration(className, False)
+		      End If
+		      
+		      If staticMethods.HasKey(f.Signature) Or methods.HasKey(f.Signature) Or foreignMethods.HasKey(f.Signature) Then
+		        Error("Duplicate method definition: " + f.Signature, f.Location)
+		      Else
+		        foreignMethods.Value(f.Signature) = f
 		      End If
 		      
 		    Else
-		      methods.Add(MethodDeclaration(className, False))
+		      Var m As ObjoScript.MethodDeclStmt = MethodDeclaration(className, False)
+		      If staticMethods.HasKey(m.Signature) Or methods.HasKey(m.Signature) Or foreignMethods.HasKey(m.Signature) Then
+		        Error("Duplicate method definition: " + m.Signature, m.Location)
+		      Else
+		        methods.Value(m.Signature) = m
+		      End If
 		    End If
 		    
 		    // Optional new line.
