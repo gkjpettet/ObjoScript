@@ -48,6 +48,15 @@ Protected Class Token
 		IsInteger As Boolean = False
 	#tag EndProperty
 
+	#tag ComputedProperty, Flags = &h0, Description = 4966207468697320697320616E206964656E74696669657220746F6B656E207468656E2074686973206973205472756520696620697420626567696E73207769746820616E20757070657263617365206C65747465722E
+		#tag Getter
+			Get
+			  Return Type = ObjoScript.TokenTypes.Identifier And Lexeme.Left(1).IsUppercaseASCIILetter
+			End Get
+		#tag EndGetter
+		IsUppercaseIdentifier As Boolean
+	#tag EndComputedProperty
+
 	#tag Property, Flags = &h0, Description = 5468652061637475616C2063686172616374657273206F66207468697320746F6B656E2E204E6F7420657665727920746F6B656E2070726F76696465732061206C6578656D652E
 		Lexeme As String
 	#tag EndProperty
@@ -181,22 +190,24 @@ Protected Class Token
 				"56 - Print"
 				"57 - Query"
 				"58 - RCurly"
-				"59 - Return_"
-				"60 - RParen"
-				"61 - RSquare"
-				"62 - Semicolon"
-				"63 - Star"
-				"64 - StarEqual"
-				"65 - Static_"
-				"66 - String_"
-				"67 - Super_"
-				"68 - This"
-				"69 - Tilde"
-				"70 - Underscore"
-				"71 - Var_"
-				"72 - While_"
-				"73 - Xor_"
-				"74 - Then_"
+				"59 - ReservedType"
+				"60 - Return_"
+				"61 - RParen"
+				"62 - RSquare"
+				"63 - Semicolon"
+				"64 - Star"
+				"65 - StarEqual"
+				"66 - Static_"
+				"67 - StaticFieldIdentifier"
+				"68 - String_"
+				"69 - Super_"
+				"70 - This"
+				"71 - Tilde"
+				"72 - Underscore"
+				"73 - Var_"
+				"74 - While_"
+				"75 - Xor_"
+				"76 - Then_"
 			#tag EndEnumValues
 		#tag EndViewProperty
 		#tag ViewProperty
@@ -253,6 +264,14 @@ Protected Class Token
 			Group="Behavior"
 			InitialValue=""
 			Type="Double"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="IsUppercaseIdentifier"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Boolean"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

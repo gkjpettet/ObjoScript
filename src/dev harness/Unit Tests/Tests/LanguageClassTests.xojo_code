@@ -2,6 +2,20 @@
 Protected Class LanguageClassTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
+		Sub MissingClassAfterForeignTest()
+		  AssertCompilerError("language.class.missing_class_after_foreign")
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub NewLineAfterClassTest()
+		  AssertCompilerError("language.class.newline_after_class")
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub StaticInstanceCaseSensitivityTest()
 		  AssertOutputsEqual("language.class.static_instance_case_sensitivity")
 		  
