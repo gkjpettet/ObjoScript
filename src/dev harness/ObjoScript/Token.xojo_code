@@ -48,15 +48,6 @@ Protected Class Token
 		IsInteger As Boolean = False
 	#tag EndProperty
 
-	#tag ComputedProperty, Flags = &h0, Description = 4966207468697320697320616E206964656E74696669657220746F6B656E207468656E2074686973206973205472756520696620697420626567696E73207769746820616E20757070657263617365206C65747465722E
-		#tag Getter
-			Get
-			  Return Type = ObjoScript.TokenTypes.Identifier And Lexeme.Left(1).IsUppercaseASCIILetter
-			End Get
-		#tag EndGetter
-		IsUppercaseIdentifier As Boolean
-	#tag EndComputedProperty
-
 	#tag Property, Flags = &h0, Description = 5468652061637475616C2063686172616374657273206F66207468697320746F6B656E2E204E6F7420657665727920746F6B656E2070726F76696465732061206C6578656D652E
 		Lexeme As String
 	#tag EndProperty
@@ -264,14 +255,6 @@ Protected Class Token
 			Group="Behavior"
 			InitialValue=""
 			Type="Double"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="IsUppercaseIdentifier"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
-			Type="Boolean"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

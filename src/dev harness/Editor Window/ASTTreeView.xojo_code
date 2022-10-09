@@ -103,6 +103,14 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 50617274206F6620746865204F626A6F5363726970742E4578707256697369746F7220696E746572666163652E
+		Function VisitClass(c As ObjoScript.ClassExpr) As Variant
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  Return New TreeViewNode("Class: " + c.Name)
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Function VisitClassDeclaration(c As ObjoScript.ClassDeclStmt) As Variant
 		  Var node As New TreeViewNode("Class declaration" + If(c.IsForeign, " (foreign)", ""))

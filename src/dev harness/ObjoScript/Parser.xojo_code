@@ -119,13 +119,16 @@ Protected Class Parser
 		  
 		  Var classKeyword As ObjoScript.Token = Previous
 		  
-		  Var identifier As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier, "Expected a class name.")
+		  Var identifier As ObjoScript.Token = Consume(ObjoScript.TokenTypes.UppercaseIdentifier, _
+		  "Expected a class name beginning with an uppercase letter.")
+		  
 		  Var className As String = identifier.Lexeme
 		  
 		  // Optional superclass.
 		  Var superClass As String = ""
 		  If Match(ObjoScript.TokenTypes.Is_) Then
-		    superClass = Consume(ObjoScript.TokenTypes.Identifier, "Expected a superclass name.").Lexeme
+		    superClass = Consume(ObjoScript.TokenTypes.UppercaseIdentifier, _
+		    "Expected a superclass name. Superclasses must begin with an uppercase letter.").Lexeme
 		  End If
 		  
 		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the class name.")
@@ -690,6 +693,7 @@ Protected Class Parser
 		  TokenTypes.This                 : Prefix(New ThisParselet), _
 		  TokenTypes.Tilde                : NewRule(New UnaryParselet, Nil, Precedences.None), _
 		  TokenTypes.Underscore           : Unused, _
+		  TokenTypes.UppercaseIdentifier : Prefix(New ClassParselet), _
 		  TokenTypes.Var_                 : Unused, _
 		  TokenTypes.While_               : Unused, _
 		  TokenTypes.Xor_                 : BinaryOperator(Precedences.LogicalXor) _

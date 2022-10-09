@@ -101,13 +101,18 @@ Protected Class Lexer
 		  Var type As ObjoScript.TokenTypes = ReservedWords.Lookup(lexeme, ObjoScript.TokenTypes.Identifier)
 		  
 		  Select Case type
-		  Case ObjoScript.TokenTypes.Identifier, ObjoScript.TokenTypes.Boolean_,  _
-		    ObjoScript.TokenTypes.ReservedType
+		  Case ObjoScript.TokenTypes.Boolean_, ObjoScript.TokenTypes.ReservedType
 		    mTokens.Add(MakeToken(type, lexeme))
 		  Case ObjoScript.TokenTypes.This
 		    mTokens.Add(MakeToken(type, "this"))
 		  Else
-		    mTokens.Add(MakeToken(type))
+		    If type <> ObjoScript.TokenTypes.Identifier Then
+		      mTokens.Add(MakeToken(type))
+		    ElseIf lexeme.Left(1).IsUppercaseASCIILetter Then
+		      mTokens.Add(MakeToken(ObjoScript.TokenTypes.UppercaseIdentifier, lexeme))
+		    Else
+		      mTokens.Add(MakeToken(ObjoScript.TokenTypes.Identifier, lexeme))
+		    End If
 		  End Select
 		  
 		End Sub

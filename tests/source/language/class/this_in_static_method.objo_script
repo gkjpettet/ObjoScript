@@ -1,4 +1,4 @@
-class foo {
+class Foo {
   constructor() {}
 
   static callFoo() {
@@ -6,4 +6,4 @@ class foo {
   }
 }
 
-foo.callFoo() // `this` cannot be used within a static method.
+Foo.callFoo() // `this` cannot be used within a static method.

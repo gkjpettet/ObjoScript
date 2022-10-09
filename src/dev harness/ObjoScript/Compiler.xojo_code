@@ -1175,6 +1175,20 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732072657472696576696E67206120676C6F62616C20636C6173732E
+		Function VisitClass(c As ObjoScript.ClassExpr) As Variant
+		  /// Compiles retrieving a global class.
+		  
+		  // Classes are always defined globally.
+		  // Add the name of the class to the constant pool and get its index.
+		  Var index As Integer = AddConstant(c.Name)
+		  
+		  // Push the class on to the stack.
+		  EmitGetGlobal(index)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D70696C65206120636C617373206465636C61726174696F6E2E
 		Function VisitClassDeclaration(c As ObjoScript.ClassDeclStmt) As Variant
 		  /// Compile a class declaration.

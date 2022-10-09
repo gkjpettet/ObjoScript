@@ -1,1 +1,1 @@
-Expected a class name.
+Expected a class name beginning with an uppercase letter.
