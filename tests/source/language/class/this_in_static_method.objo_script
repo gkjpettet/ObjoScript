@@ -1,0 +1,9 @@
+class foo {
+  constructor() {}
+
+  static callFoo() {
+	print(this.foo())
+  }
+}
+
+foo.callFoo() // `this` cannot be used within a static method.

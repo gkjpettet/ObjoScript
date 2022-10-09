@@ -82,7 +82,7 @@ Inherits TestGroup
 		  ///
 		  /// Expects `testName` to be in the format: topic.subtopic.testName
 		  /// This mirrors the folder structure of the bundled tests (which are in tests/source/topic/subtopic/)
-		  /// NB: We do not expect `.objo` to be appended to testName.
+		  /// NB: We do not expect `.objo_script` to be appended to testName.
 		  
 		  // Get the required test.
 		  Var parts() As String = testName.Split(".")
@@ -90,8 +90,8 @@ Inherits TestGroup
 		    Raise New InvalidArgumentException("Invalid testName format (" + testName + "). Expected topic.subtopic.testName")
 		  End If
 		  
-		  // Add the .objo extension to the test name.
-		  parts(2) = parts(2) + ".objo"
+		  // Add the .objo_script extension to the test name.
+		  parts(2) = parts(2) + ".objo_script"
 		  
 		  Var f As FolderItem = SpecialFolder.Resource("tests")
 		  If f = Nil Then

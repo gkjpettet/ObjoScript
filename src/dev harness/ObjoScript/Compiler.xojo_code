@@ -120,7 +120,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320612066756E6374696F6E206465636C61726174696F6E20696E746F20612066756E6374696F6E2E2052616973657320612060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
-		Function Compile(name As String, parameters() As ObjoScript.Token, body As ObjoScript.BlockStmt, type As ObjoScript.FunctionTypes, debugMode As Boolean, shouldResetFirst As Boolean = True) As ObjoScript.Func
+		Function Compile(name As String, parameters() As ObjoScript.Token, body As ObjoScript.BlockStmt, type As ObjoScript.FunctionTypes, isStaticMethod As Boolean, debugMode As Boolean, shouldResetFirst As Boolean) As ObjoScript.Func
 		  /// Compiles a function declaration into a function. Raises a `CompilerException` if an error occurs.
 		  ///
 		  /// Resets by default but if this is being called internally (after the compiler has tokenised and parsed the source) 
@@ -135,6 +135,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  Func = New ObjoScript.Func(name, parameters.Count, False, Self.DebugMode)
 		  Self.Type = type
+		  Self.IsStaticMethod = isStaticMethod
 		  
 		  If type <> ObjoScript.FunctionTypes.TopLevel Then
 		    BeginScope
@@ -190,7 +191,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Empty parameters.
 		  Var params() As ObjoScript.Token
 		  
-		  Return Compile("", params, New ObjoScript.BlockStmt(body, openingBrace, closingBrace), ObjoScript.FunctionTypes.TopLevel, Self.DebugMode, False)
+		  Return Compile("", params, New ObjoScript.BlockStmt(body, openingBrace, closingBrace), ObjoScript.FunctionTypes.TopLevel, False, Self.DebugMode, False)
 		  
 		End Function
 	#tag EndMethod
@@ -1259,7 +1260,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Compile the body.
 		  Var compiler As New ObjoScript.Compiler
-		  Var body As ObjoScript.Func = compiler.Compile(c.Signature, c.Parameters, c.Body, ObjoScript.FunctionTypes.Constructor, Self.DebugMode)
+		  Var body As ObjoScript.Func = compiler.Compile(c.Signature, c.Parameters, c.Body, ObjoScript.FunctionTypes.Constructor, False, Self.DebugMode, True)
 		  
 		  // Store the compiled constructor body as a constant in this function's constant pool
 		  // and push it on to the stack.
@@ -1584,7 +1585,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Compile the function body.
 		  Var compiler As New ObjoScript.Compiler
-		  Var f As ObjoScript.Func = compiler.Compile(funcDecl.Name.Lexeme, funcDecl.Parameters, funcDecl.Body, ObjoScript.FunctionTypes.Func, Self.DebugMode)
+		  Var f As ObjoScript.Func = compiler.Compile(funcDecl.Name.Lexeme, funcDecl.Parameters, funcDecl.Body, ObjoScript.FunctionTypes.Func, False, Self.DebugMode, True)
 		  
 		  // Store the compiled function as a constant in this function's constant pool.
 		  Call EmitConstant(f)
@@ -1675,7 +1676,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Compile the body.
 		  Var compiler As New ObjoScript.Compiler
-		  Var body As ObjoScript.Func = compiler.Compile(m.Name, m.Parameters, m.Body, ObjoScript.FunctionTypes.Method, Self.DebugMode)
+		  Var body As ObjoScript.Func = compiler.Compile(m.Name, m.Parameters, m.Body, ObjoScript.FunctionTypes.Method, m.IsStatic, Self.DebugMode, True)
 		  body.IsSetter = m.IsSetter
 		  
 		  // Store the compiled method body as a constant in this function's constant pool
@@ -2001,7 +2002,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  mLocation = this.Location
 		  
 		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
-		    Error("`this` can only be used within a method or constructor.")
+		    Error("`this` can only be used within an instance method or constructor.")
+		  End If
+		  
+		  If Self.IsStaticMethod Then
+		    Error("`this` cannot be used within a static method.")
 		  End If
 		  
 		  // `this` is always at slot 0 of the call frame.
@@ -2128,6 +2133,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 
 	#tag Property, Flags = &h0, Description = 5468652066756E6374696F6E2063757272656E746C79206265696E6720636F6D70696C65642E
 		Func As ObjoScript.Func
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 54727565206966207468697320636F6D70696C657220697320636F6D70696C696E67206120737461746963206D6574686F642E
+		IsStaticMethod As Boolean = False
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 54686520636F6D70696C65722773206C657865722E205573656420746F20746F6B656E69736520736F7572636520636F64652E

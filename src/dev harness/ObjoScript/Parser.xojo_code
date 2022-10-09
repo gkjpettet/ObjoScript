@@ -895,7 +895,9 @@ Protected Class Parser
 		  
 		  Var expr As ObjoScript.Expr = Expression
 		  
-		  ConsumeNewLine("Expected a new line EOL after the print statement.")
+		  If Not Check(ObjoScript.TokenTypes.RCurly) Then
+		    ConsumeNewLine("Expected a new line after the print statement.")
+		  End If
 		  
 		  Return New ObjoScript.PrintStmt(expr, location)
 		End Function
