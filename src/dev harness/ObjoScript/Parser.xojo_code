@@ -1011,21 +1011,9 @@ Protected Class Parser
 		  Advance
 		  
 		  While Not AtEnd
-		    If Previous.Type = ObjoScript.TokenTypes.EOL Then
-		      Return
-		    End If
-		    
 		    Select Case Current.Type
-		    Case ObjoScript.TokenTypes.Assert, ObjoScript.TokenTypes.Breakpoint, _
-		      ObjoScript.TokenTypes.Class_, ObjoScript.TokenTypes.Continue_, _
-		      ObjoScript.TokenTypes.Else_, ObjoScript.TokenTypes.Exit_, _
-		      ObjoScript.TokenTypes.Export, ObjoScript.TokenTypes.Foreign, _
-		      ObjoScript.TokenTypes.For_, ObjoScript.TokenTypes.Function_, _
-		      ObjoScript.TokenTypes.If_, ObjoScript.TokenTypes.Import, _
-		      ObjoScript.TokenTypes.Print, ObjoScript.TokenTypes.Return_, _
-		      ObjoScript.TokenTypes.Static_, ObjoScript.TokenTypes.Var_, _
-		      ObjoScript.TokenTypes.While_
-		      // This token is the start of a statement. Hopefully we're synchronised now.
+		    Case ObjoScript.TokenTypes.Class_, ObjoScript.TokenTypes.Function_
+		      // Hopefully we're synchronised now.
 		      Return
 		    End Select
 		    
