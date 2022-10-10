@@ -16,6 +16,13 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub NewlineAfterStaticTest()
+		  AssertCompilerError("language.class.newline_after_static")
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub ThisInStaticMethodTest()
 		  AssertCompilerError("language.class.this_in_static_method")
 		  
