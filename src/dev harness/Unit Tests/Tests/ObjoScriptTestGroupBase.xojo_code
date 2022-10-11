@@ -8,42 +8,46 @@ Inherits TestGroup
 		  ///
 		  /// Expects `testName` to be in the format: topic.subtopic.testName
 		  
+		  // Get the test source code.
+		  Var source As String = GetTestSourceCode(testName)
+		  
 		  // Get the expected error message.
 		  Var expected As String = GetExpectedResult(testName)
 		  
 		  Try
-		    Call CompileTest(testName)
-		    Assert.Fail("Expected an error.")
+		    Call CompileTest(source)
+		    Assert.Fail("Expected an error.", "", source)
 		    
 		  Catch pe As ObjoScript.ParserException
 		    Var errors() As ObjoScript.ParserException = Compiler.ParserErrors
 		    If errors(0).Message = expected Then
-		      Assert.Pass
+		      Assert.Pass("", source)
 		    Else
-		      Assert.Fail("A parser error occurred but the message did not match. Got """ + errors(0).Message + """ but expected """ + expected + """")
+		      Assert.Fail("A parser error occurred but the message did not match. Got """ + errors(0).Message + """ but expected """ + expected + """", "", source)
 		    End If
 		    
 		  Catch e As ObjoScript.CompilerException
 		    If e.Message = expected Then
-		      Assert.Pass
+		      Assert.Pass("", source)
 		    Else
-		      Assert.Fail("A compiler error occurred but the message did not match. Got """ + e.Message + """ but expected """ + expected + """")
+		      Assert.Fail("A compiler error occurred but the message did not match. Got """ + e.Message + """ but expected """ + expected + """", "", source)
 		    End If
 		  End Try
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0
+	#tag Method, Flags = &h0, Description = 436F6D70696C657320746865207465737420736F7572636520666F722060746573744E616D65602C2072756E7320697420616E642061737365727473207468617420697473206F7574707574206D61746368657320746865206578706563746564206F75747075742E
 		Sub AssertOutputsEqual(testName As String)
 		  /// Compiles the test source for `testName`, runs it and asserts that its output matches the expected output.
 		  ///
 		  /// Expects `testName` to be in the format: topic.subtopic.testName
 		  
-		  Var func As ObjoScript.Func = CompileTest(testName)
+		  Var source As String = GetTestSourceCode(testName)
+		  Var func As ObjoScript.Func = CompileTest(source)
 		  Var expected As String = GetExpectedResult(testName)
 		  Var result As String = RunFunc(func)
-		  Assert.AreEqual(expected, result)
+		  Assert.AreEqual(expected, result, "", source)
 		  
 		End Sub
 	#tag EndMethod
@@ -55,72 +59,40 @@ Inherits TestGroup
 		  ///
 		  /// Expects `testName` to be in the format: topic.subtopic.testName
 		  
+		  // Get the source code.
+		  Var source As String = GetTestSourceCode(testName)
+		  
 		  // Get the expected error message.
 		  Var expected As String = GetExpectedResult(testName)
 		  
-		  Var func As ObjoScript.Func = CompileTest(testName)
+		  Var func As ObjoScript.Func = CompileTest(source)
 		  
 		  Try
 		    Call RunFunc(func)
-		    Assert.Fail("Expected a runtime error.")
+		    Assert.Fail("Expected a runtime error.", "", source)
 		    
 		  Catch e As ObjoScript.VMException
 		    If e.Message = expected Then
-		      Assert.Pass
+		      Assert.Pass("", source)
 		    Else
-		      Assert.Fail("A runtime error occurred but the message did not match. Got """ + e.Message + """ but expected """ + expected + """")
+		      Assert.Fail("A runtime error occurred but the message did not match. Got """ + e.Message + """ but expected """ + expected + """", "", source)
 		    End If
 		  End Try
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 4C6F6164732074686520736F7572636520636F646520666F72207468652074657374206E616D65642060746573744E616D65602C20636F6D70696C65732069742028616C6F6E6720776974682074686520564D2773207374616E64617264206C6962726172792920616E642072657475726E732074686520726573756C74696E672066756E6374696F6E2E
-		Function CompileTest(testName As String) As ObjoScript.Func
-		  /// Loads the source code for the test named `testName`, compiles it (along with the VM's standard library)
-		  /// and returns the resulting function.
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732060736F75726365602028616C6F6E6720776974682074686520564D2773207374616E64617264206C6962726172792920616E642072657475726E732074686520726573756C74696E672066756E6374696F6E2E
+		Function CompileTest(source As String) As ObjoScript.Func
+		  /// Compiles `source` (along with the VM's standard library) and returns the resulting function.
 		  ///
 		  /// Expects `testName` to be in the format: topic.subtopic.testName
 		  /// This mirrors the folder structure of the bundled tests (which are in tests/source/topic/subtopic/)
 		  /// NB: We do not expect `.objo_script` to be appended to testName.
 		  
-		  // Get the required test.
-		  Var parts() As String = testName.Split(".")
-		  If parts.Count <> 3 Then
-		    Raise New InvalidArgumentException("Invalid testName format (" + testName + "). Expected topic.subtopic.testName")
-		  End If
-		  
-		  // Add the .objo_script extension to the test name.
-		  parts(2) = parts(2) + ".objo_script"
-		  
-		  Var f As FolderItem = SpecialFolder.Resource("tests")
-		  If f = Nil Then
-		    Raise New InvalidArgumentException("Unable to retrieve the `tests` folder.")
-		  End If
-		  f = f.Child("source")
-		  If f = Nil Then
-		    Raise New InvalidArgumentException("Unable to retrieve the `tests/source` folder.")
-		  End If
-		  f = f.Child(parts(0)) // topic
-		  If f = Nil Then
-		    Raise New InvalidArgumentException("Unable to retrieve the `tests/source/`" + parts(0) + " folder.")
-		  End If
-		  f = f.Child(parts(1)) // subtopic
-		  If f = Nil Then
-		    Raise New InvalidArgumentException("Unable to retrieve the `tests/source/`" + parts(0) + "/" + parts(1) + " folder.")
-		  End If
-		  f = f.Child(parts(2)) // test file
-		  If f = Nil Then
-		    Raise New InvalidArgumentException("Unable to retrieve the `tests/source/`" + parts(0) + "/" + parts(1) + parts(2) + " test file.")
-		  End If
-		  
-		  // Get the source code to compile.
-		  Var tin As TextInputStream = TextInputStream.Open(f)
-		  Var source As String = tin.ReadAll
-		  tin.Close
-		  
 		  Compiler = New ObjoScript.Compiler
 		  Return Compiler.Compile(source)
+		  
 		End Function
 	#tag EndMethod
 
@@ -169,6 +141,53 @@ Inherits TestGroup
 		  
 		  Return expected
 		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5265747269657665732074686520736F7572636520636F646520666F72207468652074657374206E616D65642060746573744E616D65602E
+		Function GetTestSourceCode(testName As String) As String
+		  /// Retrieves the source code for the test named `testName`.
+		  ///
+		  /// Expects `testName` to be in the format: topic.subtopic.testName
+		  /// This mirrors the folder structure of the bundled tests (which are in tests/source/topic/subtopic/)
+		  /// NB: We do not expect `.objo_script` to be appended to testName.
+		  
+		  // Get the required test.
+		  Var parts() As String = testName.Split(".")
+		  If parts.Count <> 3 Then
+		    Raise New InvalidArgumentException("Invalid testName format (" + testName + "). Expected topic.subtopic.testName")
+		  End If
+		  
+		  // Add the .objo_script extension to the test name.
+		  parts(2) = parts(2) + ".objo_script"
+		  
+		  Var f As FolderItem = SpecialFolder.Resource("tests")
+		  If f = Nil Then
+		    Raise New InvalidArgumentException("Unable to retrieve the `tests` folder.")
+		  End If
+		  f = f.Child("source")
+		  If f = Nil Then
+		    Raise New InvalidArgumentException("Unable to retrieve the `tests/source` folder.")
+		  End If
+		  f = f.Child(parts(0)) // topic
+		  If f = Nil Then
+		    Raise New InvalidArgumentException("Unable to retrieve the `tests/source/`" + parts(0) + " folder.")
+		  End If
+		  f = f.Child(parts(1)) // subtopic
+		  If f = Nil Then
+		    Raise New InvalidArgumentException("Unable to retrieve the `tests/source/`" + parts(0) + "/" + parts(1) + " folder.")
+		  End If
+		  f = f.Child(parts(2)) // test file
+		  If f = Nil Then
+		    Raise New InvalidArgumentException("Unable to retrieve the `tests/source/`" + parts(0) + "/" + parts(1) + parts(2) + " test file.")
+		  End If
+		  
+		  // Get the source code to compile.
+		  Var tin As TextInputStream = TextInputStream.Open(f)
+		  Var source As String = tin.ReadAll
+		  tin.Close
+		  
+		  Return source
 		End Function
 	#tag EndMethod
 

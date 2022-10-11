@@ -1,5 +1,9 @@
 #tag Class
 Protected Class TestResult
+	#tag Property, Flags = &h0, Description = 20
+		Data As String
+	#tag EndProperty
+
 	#tag Property, Flags = &h0
 		Duration As Double
 	#tag EndProperty

@@ -10,7 +10,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
    HasFullScreenButton=   False
    HasMaximizeButton=   False
    HasMinimizeButton=   True
-   Height          =   700
+   Height          =   784
    ImplicitInstance=   True
    MacProcID       =   0
    MaximumHeight   =   32000
@@ -23,7 +23,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
    Title           =   "ObjoScript Unit Tests"
    Type            =   0
    Visible         =   True
-   Width           =   1000
+   Width           =   1316
    Begin DesktopGroupBox GroupBoxes
       AllowAutoDeactivate=   True
       Bold            =   False
@@ -36,7 +36,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
       Index           =   0
       InitialParent   =   ""
       Italic          =   False
-      Left            =   286
+      Left            =   319
       LockBottom      =   False
       LockedInPosition=   True
       LockLeft        =   True
@@ -51,7 +51,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
       Transparent     =   False
       Underline       =   False
       Visible         =   True
-      Width           =   694
+      Width           =   977
       Begin DesktopLabel Labels
          AllowAutoDeactivate=   True
          Bold            =   False
@@ -63,7 +63,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   1
          InitialParent   =   "GroupBoxes$0"
          Italic          =   False
-         Left            =   295
+         Left            =   328
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -96,7 +96,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   2
          InitialParent   =   "GroupBoxes$0"
          Italic          =   False
-         Left            =   540
+         Left            =   573
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -129,7 +129,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   3
          InitialParent   =   "GroupBoxes$0"
          Italic          =   False
-         Left            =   295
+         Left            =   328
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -162,7 +162,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   4
          InitialParent   =   "GroupBoxes$0"
          Italic          =   False
-         Left            =   295
+         Left            =   328
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -195,7 +195,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   5
          InitialParent   =   "GroupBoxes$0"
          Italic          =   False
-         Left            =   295
+         Left            =   328
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -228,7 +228,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   6
          InitialParent   =   "GroupBoxes$0"
          Italic          =   False
-         Left            =   295
+         Left            =   328
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -261,7 +261,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   -2147483648
          InitialParent   =   "GroupBoxes$0"
          Italic          =   False
-         Left            =   375
+         Left            =   408
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -294,7 +294,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   -2147483648
          InitialParent   =   "GroupBoxes$0"
          Italic          =   False
-         Left            =   620
+         Left            =   653
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -327,7 +327,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   -2147483648
          InitialParent   =   "GroupBoxes$0"
          Italic          =   False
-         Left            =   375
+         Left            =   408
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -360,7 +360,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   -2147483648
          InitialParent   =   "GroupBoxes$0"
          Italic          =   False
-         Left            =   375
+         Left            =   408
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -393,7 +393,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   -2147483648
          InitialParent   =   "GroupBoxes$0"
          Italic          =   False
-         Left            =   375
+         Left            =   408
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -426,7 +426,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   -2147483648
          InitialParent   =   "GroupBoxes$0"
          Italic          =   False
-         Left            =   375
+         Left            =   408
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -459,7 +459,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   8
          InitialParent   =   "GroupBoxes$0"
          Italic          =   False
-         Left            =   540
+         Left            =   573
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -492,7 +492,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   -2147483648
          InitialParent   =   "GroupBoxes$0"
          Italic          =   False
-         Left            =   680
+         Left            =   713
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -523,11 +523,11 @@ Begin DesktopWindow WinObjoScriptUnitTests
       FontName        =   "System"
       FontSize        =   0.0
       FontUnit        =   0
-      Height          =   466
+      Height          =   550
       Index           =   1
       InitialParent   =   ""
       Italic          =   False
-      Left            =   286
+      Left            =   319
       LockBottom      =   True
       LockedInPosition=   True
       LockLeft        =   True
@@ -542,7 +542,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
       Transparent     =   False
       Underline       =   False
       Visible         =   True
-      Width           =   700
+      Width           =   983
       Begin DesktopLabel TestNameLabel
          AllowAutoDeactivate=   True
          Bold            =   True
@@ -554,7 +554,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   -2147483648
          InitialParent   =   "GroupBoxes$1"
          Italic          =   False
-         Left            =   304
+         Left            =   337
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -574,7 +574,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Transparent     =   False
          Underline       =   False
          Visible         =   True
-         Width           =   442
+         Width           =   725
       End
       Begin DesktopLabel Labels
          AllowAutoDeactivate=   True
@@ -587,7 +587,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   0
          InitialParent   =   "GroupBoxes$1"
          Italic          =   False
-         Left            =   304
+         Left            =   337
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -620,7 +620,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   -2147483648
          InitialParent   =   "GroupBoxes$1"
          Italic          =   False
-         Left            =   420
+         Left            =   453
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -642,7 +642,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Visible         =   True
          Width           =   100
       End
-      Begin DesktopTextArea TestResultsArea
+      Begin DesktopTextArea TestSourceCodeArea
          AllowAutoDeactivate=   True
          AllowFocusRing  =   True
          AllowSpellChecking=   True
@@ -658,18 +658,18 @@ Begin DesktopWindow WinObjoScriptUnitTests
          HasBorder       =   True
          HasHorizontalScrollbar=   False
          HasVerticalScrollbar=   True
-         Height          =   314
+         Height          =   403
          HideSelection   =   True
          Index           =   -2147483648
          InitialParent   =   "GroupBoxes$1"
          Italic          =   False
-         Left            =   306
+         Left            =   339
          LineHeight      =   0.0
          LineSpacing     =   0.0
          LockBottom      =   True
          LockedInPosition=   True
          LockLeft        =   True
-         LockRight       =   True
+         LockRight       =   False
          LockTop         =   True
          MaximumCharactersAllowed=   0
          Multiline       =   True
@@ -682,15 +682,15 @@ Begin DesktopWindow WinObjoScriptUnitTests
          TextAlignment   =   0
          TextColor       =   &c00000000
          Tooltip         =   ""
-         Top             =   346
+         Top             =   341
          Transparent     =   False
          Underline       =   False
          UnicodeMode     =   0
          ValidationMask  =   ""
          Visible         =   True
-         Width           =   663
+         Width           =   466
       End
-      Begin DesktopLabel Labels
+      Begin DesktopLabel LabelSourceCode
          AllowAutoDeactivate=   True
          Bold            =   False
          Enabled         =   True
@@ -698,10 +698,10 @@ Begin DesktopWindow WinObjoScriptUnitTests
          FontSize        =   0.0
          FontUnit        =   0
          Height          =   20
-         Index           =   7
+         Index           =   -2147483648
          InitialParent   =   "GroupBoxes$1"
          Italic          =   False
-         Left            =   304
+         Left            =   339
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -713,11 +713,11 @@ Begin DesktopWindow WinObjoScriptUnitTests
          TabIndex        =   4
          TabPanelIndex   =   0
          TabStop         =   True
-         Text            =   "Messages:"
+         Text            =   "Source Code:"
          TextAlignment   =   0
          TextColor       =   &c00000000
          Tooltip         =   ""
-         Top             =   317
+         Top             =   309
          Transparent     =   False
          Underline       =   False
          Visible         =   True
@@ -734,7 +734,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   -2147483648
          InitialParent   =   "GroupBoxes$1"
          Italic          =   False
-         Left            =   867
+         Left            =   1183
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   False
@@ -751,6 +751,87 @@ Begin DesktopWindow WinObjoScriptUnitTests
          TextColor       =   &c00000000
          Tooltip         =   ""
          Top             =   245
+         Transparent     =   False
+         Underline       =   False
+         Visible         =   True
+         Width           =   100
+      End
+      Begin DesktopTextArea TestResultsArea
+         AllowAutoDeactivate=   True
+         AllowFocusRing  =   True
+         AllowSpellChecking=   True
+         AllowStyledText =   True
+         AllowTabs       =   False
+         BackgroundColor =   &cFFFFFF
+         Bold            =   False
+         Enabled         =   True
+         FontName        =   "System"
+         FontSize        =   0.0
+         FontUnit        =   0
+         Format          =   ""
+         HasBorder       =   True
+         HasHorizontalScrollbar=   False
+         HasVerticalScrollbar=   True
+         Height          =   403
+         HideSelection   =   True
+         Index           =   -2147483648
+         InitialParent   =   "GroupBoxes$1"
+         Italic          =   False
+         Left            =   817
+         LineHeight      =   0.0
+         LineSpacing     =   1.0
+         LockBottom      =   True
+         LockedInPosition=   True
+         LockLeft        =   True
+         LockRight       =   True
+         LockTop         =   True
+         MaximumCharactersAllowed=   0
+         Multiline       =   True
+         ReadOnly        =   False
+         Scope           =   0
+         TabIndex        =   6
+         TabPanelIndex   =   0
+         TabStop         =   True
+         Text            =   ""
+         TextAlignment   =   0
+         TextColor       =   &c000000
+         Tooltip         =   ""
+         Top             =   341
+         Transparent     =   False
+         Underline       =   False
+         UnicodeMode     =   1
+         ValidationMask  =   ""
+         Visible         =   True
+         Width           =   465
+      End
+      Begin DesktopLabel LabelMessages
+         AllowAutoDeactivate=   True
+         Bold            =   False
+         Enabled         =   True
+         FontName        =   "System"
+         FontSize        =   0.0
+         FontUnit        =   0
+         Height          =   20
+         Index           =   -2147483648
+         InitialParent   =   "GroupBoxes$1"
+         Italic          =   False
+         Left            =   817
+         LockBottom      =   False
+         LockedInPosition=   True
+         LockLeft        =   True
+         LockRight       =   False
+         LockTop         =   True
+         Multiline       =   False
+         Scope           =   0
+         Selectable      =   False
+         TabIndex        =   7
+         TabPanelIndex   =   0
+         TabStop         =   True
+         Text            =   "Messages:"
+         TextAlignment   =   0
+         TextColor       =   &c00000000
+         Tooltip         =   ""
+         Top             =   309
          Transparent     =   False
          Underline       =   False
          Visible         =   True
@@ -789,7 +870,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
       Height          =   16
       Index           =   -2147483648
       InitialParent   =   ""
-      Left            =   964
+      Left            =   1280
       LockBottom      =   False
       LockedInPosition=   True
       LockLeft        =   False
@@ -833,7 +914,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
       HasHorizontalScrollbar=   False
       HasVerticalScrollbar=   True
       HeadingIndex    =   -1
-      Height          =   680
+      Height          =   764
       Index           =   -2147483648
       InitialParent   =   ""
       InitialValue    =   ""
@@ -855,7 +936,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
       Transparent     =   False
       Underline       =   False
       Visible         =   True
-      Width           =   274
+      Width           =   307
       _ScrollOffset   =   0
       _ScrollWidth    =   -1
    End
@@ -1291,6 +1372,7 @@ End
 		  Var result As String
 		  Var message As String
 		  Var duration As String
+		  Var sourcecode As String
 		  
 		  Var item As Variant
 		  If TestGroupList.SelectedRowIndex <> -1 Then
@@ -1302,6 +1384,7 @@ End
 		    name = tr.TestName
 		    result = tr.Result
 		    message = tr.Message
+		    sourcecode = tr.Data
 		    duration = Format(tr.Duration, "#,0.0000000") + "s"
 		  ElseIf item IsA TestGroup Then
 		    Var tg As TestGroup = item
@@ -1313,6 +1396,7 @@ End
 		  TestResultLabel.Text = result
 		  TestResultsArea.Text = message
 		  TestDurationLabel.Text = duration
+		  TestSourceCodeArea.Text = sourcecode
 		  
 		End Sub
 	#tag EndMethod
