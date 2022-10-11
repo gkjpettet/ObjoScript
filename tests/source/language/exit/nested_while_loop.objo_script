@@ -1,11 +1,11 @@
 var i = 0
 while true {
-  print "outer " + i
+  System.print("outer " + i)
   if i > 1 then exit
 
   var j = 0
   while true {
-	print "inner " + j
+	System.print("inner " + j)
 	if j > 1 then exit
 
 	j = j + 1

@@ -1,12 +1,12 @@
 function test() {
   var a = "before"
-  print a // expect: before
+  System.print(a) // expect: before
 
   a = "after"
-  print a // expect: after
+  System.print(a) // expect: after
 
-  print a = "arg" // expect: arg
-  print a // expect: arg
+  System.print(a = "arg") // expect: arg
+  System.print(a) // expect: arg
 }
 
 test()

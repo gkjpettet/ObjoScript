@@ -1,5 +1,5 @@
 function test(i) {
-	print i
+	System.print(i)
 }
 
 // Expect: "i"

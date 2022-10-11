@@ -55,7 +55,6 @@ Class=Nothing;ObjoScript/Nothing.xojo_code;&h00000000075B57FF;&h000000004D1497FF
 Class=Compiler;ObjoScript/Compiler.xojo_code;&h000000001007A7FF;&h000000004D1497FF;false
 Class=CompilerException;ObjoScript/CompilerException.xojo_code;&h0000000061621FFF;&h000000004D1497FF;false
 Class=StopWatch;ObjoScript/StopWatch.xojo_code;&h0000000060BE97FF;&h000000004D1497FF;false
-Class=PrintStmt;ObjoScript/PrintStmt.xojo_code;&h0000000025F967FF;&h000000004D1497FF;false
 Class=AssertStmt;ObjoScript/AssertStmt.xojo_code;&h000000003735DFFF;&h000000004D1497FF;false
 Class=VarDeclStmt;ObjoScript/VarDeclStmt.xojo_code;&h00000000767A07FF;&h000000004D1497FF;false
 Class=AssignmentExpr;ObjoScript/AssignmentExpr.xojo_code;&h000000006FE4BFFF;&h000000004D1497FF;false

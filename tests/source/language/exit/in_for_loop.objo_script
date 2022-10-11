@@ -1,7 +1,7 @@
 foreach i in 1..5 {
-  print i
+  System.print(i)
   if i > 2 then exit
-  print i
+  System.print(i)
 }
 
 // expect: 1

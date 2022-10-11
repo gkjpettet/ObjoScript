@@ -872,6 +872,15 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 5261697365732074686520564D277320605072696E7460206576656E742C2070617373696E67206974206073602E
+		Sub RaisePrint(s As String)
+		  /// Raises the VM's `Print` event, passing it `s`.
+		  
+		  RaiseEvent Print(s)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 526561647320746865206279746520696E20604368756E6B60206174207468652063757272656E74206049506020616E642072657475726E732069742E20496E6372656D656E7473207468652049502E
 		Private Function ReadByte() As UInt8
 		  /// Reads the byte in `Chunk` at the current `IP` and returns it. Increments the IP.
@@ -1152,10 +1161,6 @@ Protected Class VM
 		      AssertNumbers(a, b)
 		      // If a or b are doubles, they are truncated to integers.
 		      Push(Ctype(a.IntegerValue Xor b.IntegerValue, Double))
-		      
-		    Case OP_PRINT
-		      // Pop the top value off the stack and print it via the VM's `Print` event.
-		      RaiseEvent Print(ValueToString(Pop))
 		      
 		    Case OP_ASSERT
 		      // Pop the top of the stack. If it's False then raise a runtime error.
@@ -1761,7 +1766,7 @@ Protected Class VM
 		25: OP_LOAD_1 (0)
 		26: OP_LOAD_0 (0)
 		27: OP_LOAD_MINUS1 (0)
-		28: OP_PRINT (0)
+		28: *Unused*
 		29: OP_ASSERT (0)
 		30: OP_DEFINE_GLOBAL (1)
 		31: OP_DEFINE_GLOBAL_LONG (2)
@@ -1885,7 +1890,6 @@ Protected Class VM
 			  OP_LOAD_1               : 0, _
 			  OP_LOAD_0               : 0, _
 			  OP_LOAD_MINUS1          : 0, _
-			  OP_PRINT                : 0, _
 			  OP_ASSERT               : 0, _
 			  OP_DEFINE_GLOBAL        : 1, _
 			  OP_DEFINE_GLOBAL_LONG   : 2, _
@@ -2125,9 +2129,6 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_POP_N, Type = Double, Dynamic = False, Default = \"36", Scope = Public
-	#tag EndConstant
-
-	#tag Constant, Name = OP_PRINT, Type = Double, Dynamic = False, Default = \"28", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_RANGE, Type = Double, Dynamic = False, Default = \"44", Scope = Public

@@ -1,5 +1,5 @@
 foreach i in 0..10 {
-  print i
+  System.print(i)
   {
 	var a = "a"
 	{

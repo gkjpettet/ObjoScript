@@ -296,9 +296,6 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_LOAD_MINUS1
 		    Return SimpleInstruction("LOAD -1", offset)
 		    
-		  Case ObjoScript.VM.OP_PRINT
-		    Return SimpleInstruction("PRINT", offset)
-		    
 		  Case ObjoScript.VM.OP_ASSERT
 		    Return SimpleInstruction("ASSERT", offset)
 		    

@@ -694,7 +694,6 @@ Protected Class Parser
 		  TokenTypes.Plus                 : BinaryOperator(Precedences.Term), _
 		  TokenTypes.PlusEqual            : Unused, _
 		  TokenTypes.PlusPlus             : Postfix, _
-		  TokenTypes.Print                : Unused, _
 		  TokenTypes.Query                : NewRule(Nil, New ConditionalParselet, Precedences.Assignment), _
 		  TokenTypes.RCurly               : Unused, _
 		  TokenTypes.Return_              : Unused, _
@@ -903,28 +902,6 @@ Protected Class Parser
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 5061727365732061207072696E742073746174656D656E742E20417373756D6573207468652070617273657220686173206A75737420636F6E73756D65642074686520607072696E7460206B6579776F72642E
-		Private Function PrintStatement() As ObjoScript.Stmt
-		  /// Parses a print statement. Assumes the parser has just consumed the `print` keyword.
-		  ///
-		  /// Format:
-		  /// ```objo
-		  /// print EXPRESSION
-		  /// ```
-		  
-		  // Store the location of the print keyword.
-		  Var location As ObjoScript.Token = Previous
-		  
-		  Var expr As ObjoScript.Expr = Expression
-		  
-		  If Not Check(ObjoScript.TokenTypes.RCurly) Then
-		    ConsumeNewLine("Expected a new line after the print statement.")
-		  End If
-		  
-		  Return New ObjoScript.PrintStmt(expr, location)
-		End Function
-	#tag EndMethod
-
 	#tag Method, Flags = &h21, Description = 52657365747320746865207061727365722C20726561647920746F20706172736520616761696E2E
 		Private Sub Reset()
 		  /// Resets the parser, ready to parse again.
@@ -978,9 +955,6 @@ Protected Class Parser
 		    
 		  ElseIf Match(ObjoScript.TokenTypes.ForEach) Then
 		    Return ForEachStatement
-		    
-		  ElseIf Match(ObjoScript.TokenTypes.Print) Then
-		    Return PrintStatement
 		    
 		  ElseIf Match(ObjoScript.TokenTypes.Assert) Then
 		    Return AssertStatement

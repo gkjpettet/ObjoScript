@@ -1882,23 +1882,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C65732061207072696E742073746174656D656E742E
-		Function VisitPrintStmt(stmt As ObjoScript.PrintStmt) As Variant
-		  /// Compiles a print statement.
-		  ///
-		  /// Part of the ObjoScript.StmtVisitor interface.
-		  
-		  mLocation = stmt.Location
-		  Var printLocation As ObjoScript.Token = stmt.Location
-		  
-		  // Compile the expression.
-		  Call stmt.Expression.Accept(Self)
-		  
-		  EmitByte(ObjoScript.VM.OP_PRINT, printLocation)
-		  
-		End Function
-	#tag EndMethod
-
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320616E20696E636C757369766520282E2E29206F72206578636C757369766520282E2E2E292072616E67652065787072657373696F6E2E
 		Function VisitRange(r As ObjoScript.RangeExpr) As Variant
 		  /// Compiles an inclusive (..) or exclusive (...) range expression.
@@ -2429,6 +2412,14 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="DebugMode"
+			Visible=false
+			Group="Behavior"
+			InitialValue="False"
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="IsStaticMethod"
 			Visible=false
 			Group="Behavior"
 			InitialValue="False"

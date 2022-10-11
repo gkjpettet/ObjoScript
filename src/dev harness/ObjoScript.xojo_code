@@ -241,9 +241,6 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.PlusPlus
 		    Return "++"
 		    
-		  Case ObjoScript.TokenTypes.Print
-		    Return "print"
-		    
 		  Case ObjoScript.TokenTypes.Query
 		    Return "query"
 		    
@@ -483,7 +480,6 @@ Protected Module ObjoScript
 		  Plus
 		  PlusEqual
 		  PlusPlus
-		  Print
 		  Query
 		  RCurly
 		  ReservedType

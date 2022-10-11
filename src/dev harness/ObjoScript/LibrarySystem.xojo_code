@@ -4,8 +4,14 @@ Protected Module LibrarySystem
 		Protected Function BindForeignMethod(signature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
 		  /// Returns the method to invoke for a foreign method with `signature` on the `System` class or Nil if there is no such method.
 		  
-		  If isStatic And signature.CompareCase("clock()") Then
+		  // All methods on `System` are static.
+		  If Not isStatic Then Return Nil
+		  
+		  If signature.CompareCase("clock()") Then
 		    Return AddressOf Clock
+		    
+		  ElseIf signature.CompareCase("print(_)") Then
+		    Return AddressOf Print
 		  End If
 		  
 		End Function
@@ -18,6 +24,18 @@ Protected Module LibrarySystem
 		  /// System.clock() -> double
 		  
 		  vm.SetReturn(System.Microseconds)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320746865206E756D626572206F66206D6963726F7365636F6E64732073696E63652074686520686F7374206170706C69636174696F6E20737461727465642E
+		Protected Sub Print(vm As ObjoScript.VM)
+		  /// Computes a string representation of the passed argument and raises the VM's 
+		  /// Print event.
+		  ///
+		  /// System.print(what) -> string
+		  
+		  vm.RaisePrint(vm.GetSlotAsString(1))
 		  
 		End Sub
 	#tag EndMethod

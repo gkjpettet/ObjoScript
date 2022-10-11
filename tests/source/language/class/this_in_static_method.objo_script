@@ -2,7 +2,7 @@ class Foo {
   constructor() {}
 
   static callFoo() {
-	print(this.foo())
+	System.print(this.foo())
   }
 }
 

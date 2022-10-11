@@ -406,7 +406,6 @@ Protected Class Lexer
 		  d.Value("not")         = ObjoScript.TokenTypes.Not_
 		  d.Value("nothing")     = ObjoScript.TokenTypes.Nothing
 		  d.Value("or")          = ObjoScript.TokenTypes.Or_
-		  d.Value("print")       = ObjoScript.TokenTypes.Print
 		  d.Value("return")      = ObjoScript.TokenTypes.Return_
 		  d.Value("static")      = ObjoScript.TokenTypes.Static_
 		  d.Value("super")       = ObjoScript.TokenTypes.Super_

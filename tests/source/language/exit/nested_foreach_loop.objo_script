@@ -1,9 +1,9 @@
 foreach i in 0..2 {
-  print "outer " + i
+  System.print("outer " + i)
   if i > 1 then exit
 
   foreach j in 0..2 {
-	print "inner " + j
+	System.print("inner " + j)
 	if j > 1 then exit
   }
 }

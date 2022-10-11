@@ -549,18 +549,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function VisitPrintStmt(stmt As ObjoScript.PrintStmt) As Variant
-		  /// Part of the ObjoScript.StmtVisitor interface.
-		  
-		  Var node As New TreeViewNode("Print")
-		  
-		  node.AppendNode(stmt.Expression.Accept(Self))
-		  
-		  Return node
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
 		Function VisitRange(r As ObjoScript.RangeExpr) As Variant
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
