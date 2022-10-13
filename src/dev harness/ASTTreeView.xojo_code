@@ -3,12 +3,13 @@ Protected Class ASTTreeView
 Inherits DesktopTreeView
 Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag Method, Flags = &h0, Description = 446973706C61797320606173746020696E20746869732054726565566965772E
-		Sub Display(ast() As ObjoScript.Stmt)
+		Sub Display(ast() As ObjoScript.Stmt, showStandardLibraryNodes As Boolean)
 		  /// Displays `ast` in this TreeView.
 		  
 		  Me.RemoveAllNodes
 		  
 		  For Each statement As ObjoScript.Stmt In ast
+		    If statement.Location.ScriptID = -1 And Not showStandardLibraryNodes Then Continue
 		    Me.AppendNode(statement.Accept(Self))
 		  Next statement
 		  

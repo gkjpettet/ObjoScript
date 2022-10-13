@@ -51,7 +51,7 @@ Protected Class Chunk
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 52657475726E73207468652073637269707420494420666F7220746865206279746520636F646520617420606F6666736574602E
-		Function ScriptIDForOffset(offset As Integer) As UInt16
+		Function ScriptIDForOffset(offset As Integer) As Integer
 		  /// Returns the script ID for the byte code at `offset`.
 		  ///
 		  /// This is abstracted out to its own method in case I ever implement any 
@@ -131,7 +131,7 @@ Protected Class Chunk
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 53746F726573207468652073637269707420494420666F722074686520636F72726573706F6E64696E67206279746520696E2060436F64652829602E2044656661756C747320746F206030602E
-		Private ScriptID() As UInt16
+		Private ScriptID() As Integer
 	#tag EndProperty
 
 
@@ -186,6 +186,14 @@ Protected Class Chunk
 			Group="Behavior"
 			InitialValue=""
 			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="IsDebug"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Boolean"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

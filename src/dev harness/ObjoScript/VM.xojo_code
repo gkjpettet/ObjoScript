@@ -488,13 +488,13 @@ Protected Class VM
 		Private Sub DisassemblerPrintLineDelegate(sender As ObjoScript.Disassembler, s As String)
 		  /// Delegate method that is called by our disassembler's `PrintLine()` event.
 		  ///
-		  /// Dump the contents of the disassembler's buffer and `s` to the debug log.
+		  /// We pass the contents of the disassembler's buffer and `s` to the `DebugPrint` event.
 		  
 		  #Pragma Unused sender
 		  
 		  #If DebugBuild
 		    DisassemblerOutput.Add(s)
-		    System.DebugLog(String.FromArray(DisassemblerOutput))
+		    RaiseEvent DebugPrint(String.FromArray(DisassemblerOutput))
 		    DisassemblerOutput.ResizeTo(-1)
 		  #EndIf
 		  
@@ -656,7 +656,7 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 496E697469616C697365732074686520564D20616E6420696E7465727072657473206066756E63602E20557365207468697320746F20696E74657270726574206120746F70206C6576656C2066756E6374696F6E2E
-		Sub Interpret(func As ObjoScript.Func)
+		Sub Interpret(func As ObjoScript.Func, stepMode As VM.StepModes = VM.StepModes.None)
 		  /// Initialises the VM and interprets `func`. Use this to interpret a top level function.
 		  
 		  #Pragma DisableBoundsChecking
@@ -674,7 +674,7 @@ Protected Class VM
 		  // The current call frame is the first one.
 		  CurrentFrame = Frames(0)
 		  
-		  Run
+		  Run(stepMode)
 		End Sub
 	#tag EndMethod
 
@@ -809,15 +809,15 @@ Protected Class VM
 		  Case VM.StepModes.StepInto
 		    // We stop on everything except pops, loops and jumps.
 		    Return _
-		    opcode <> OP_POP And opcode <> OP_POP_N And opcode <> OP_LOOP And _
-		    opcode <> OP_JUMP And opcode <> OP_JUMP_IF_FALSE And opcode <> OP_JUMP_IF_TRUE
-		     
+		    opcode <> OP_POP Or opcode <> OP_POP_N Or opcode <> OP_LOOP Or _
+		    opcode <> OP_JUMP Or opcode <> OP_JUMP_IF_FALSE Or opcode <> OP_JUMP_IF_TRUE
+		    
 		  Case VM.StepModes.StepOver
 		    // Same as step into but we also don't stop on invocations and calls.
-		    Return _
-		    opcode <> OP_POP And opcode <> OP_POP_N And opcode <> OP_LOOP And _
-		    opcode <> OP_JUMP And opcode <> OP_JUMP_IF_FALSE And opcode <> OP_JUMP_IF_TRUE And _
-		    opcode <> OP_CALL And opcode <> OP_INVOKE And opcode <> OP_INVOKE_LONG
+		    Return Not _
+		    opcode <> OP_POP Or opcode <> OP_POP_N Or opcode <> OP_LOOP Or _
+		    opcode <> OP_JUMP Or opcode <> OP_JUMP_IF_FALSE Or opcode <> OP_JUMP_IF_TRUE Or _
+		    opcode <> OP_CALL Or opcode <> OP_INVOKE Or opcode <> OP_INVOKE_LONG
 		    
 		  Else
 		    Return False
@@ -988,7 +988,7 @@ Protected Class VM
 		  
 		  CurrentLine = -1
 		  CurrentScriptID = -1
-		  StoppableOpcode = False
+		  
 		End Sub
 	#tag EndMethod
 
@@ -1004,26 +1004,30 @@ Protected Class VM
 		    If stepMode <> StepModes.None Then
 		      Var opcode As UInt8 = CurrentChunk.ReadByte(CurrentFrame.IP)
 		      
-		      If (frameScriptID <> CurrentScriptID Or frameLine <> CurrentLine) And StoppableOpcode Then
-		        // We've reached a new source line on a stoppable opcode.
-		        StoppableOpcode = False
-		        Return
+		      // Instruction stepping for the debugger (if enabled).
+		      If CurrentScriptID <> -1 Then
+		        // Note we disallow stopping within the standard library (scriptID = -1).
+		        If (frameLine <> CurrentLine) Or (frameLine = CurrentLine And frameScriptID <> CurrentScriptID) Then
+		          If IsStoppableOpcode(opcode, stepMode) Then
+		            // We've reached a new source line on a stoppable opcode.
+		            CurrentLine = frameLine
+		            CurrentScriptID = frameScriptID
+		            Return
+		          End If
+		        End If
 		      End If
-		      
-		      // Is this opcode "stoppable"?
-		      StoppableOpcode = IsStoppableOpcode(opcode, stepMode)
 		    End If
 		    
 		    // Disassemble each instruction if requested.
-		    #If DebugBuild And TRACE_EXECUTION
+		    If TraceExecution And frameScriptID <> -1 Then
 		      Var s() As String
 		      For i As Integer = 0 To StackTop - 1
 		        Var item As Variant = Stack(i)
 		        s.Add("[ " + ValueToString(item) + " ]")
 		      Next i
-		      System.DebugLog(String.FromArray(s, ""))
+		      RaiseEvent DebugPrint(String.FromArray(s, ""))
 		      Call Disassembler.DisassembleInstruction(-1, -1, CurrentChunk, CurrentFrame.IP)
-		    #EndIf
+		    End If
 		    
 		    // Update line and script ID tracking.
 		    CurrentLine = frameLine
@@ -1778,6 +1782,10 @@ Protected Class VM
 		Event BindForeignMethod(className As String, methodSignature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
 	#tag EndHook
 
+	#tag Hook, Flags = &h0, Description = 6073602069732061206465627567206D6573736167652066726F6D2074686520564D2E
+		Event DebugPrint(s As String)
+	#tag EndHook
+
 	#tag Hook, Flags = &h0, Description = 6073602069732074686520726573756C74206F66206576616C756174696E67206120607072696E74602065787072657373696F6E2E
 		Event Print(s As String)
 	#tag EndHook
@@ -2009,8 +2017,8 @@ Protected Class VM
 		Private StackTop As Integer = 0
 	#tag EndProperty
 
-	#tag Property, Flags = &h21, Description = 547275652069662074686520564D206861732064657465726D696E65642074686174207468652063757272656E74206F70636F646520697320776F7274682073746F7070696E67206F6E207768656E20646562756767696E672E
-		Private StoppableOpcode As Boolean = False
+	#tag Property, Flags = &h0, Description = 49662054727565207468656E2074686520564D2077696C6C206F75747075742028766961206974732044656275675072696E74206576656E74292074686520737461636B20636F6E74656E747320616E642063757272656E74206F70636F64652061732069742065786563757465732E
+		TraceExecution As Boolean = False
 	#tag EndProperty
 
 
@@ -2254,9 +2262,6 @@ Protected Class VM
 	#tag Constant, Name = OP_TRUE, Type = Double, Dynamic = False, Default = \"16", Scope = Public
 	#tag EndConstant
 
-	#tag Constant, Name = TRACE_EXECUTION, Type = Boolean, Dynamic = False, Default = \"False", Scope = Public, Description = 496620547275652028616E6420746869732069732061206465627567206275696C6429207468656E2074686520564D2077696C6C206F757470757420646562756720696E666F726D6174696F6E20746F207468652073797374656D206465627567206C6F672E204E6F2065666665637420696E20636F6D70696C656420617070732E
-	#tag EndConstant
-
 
 	#tag Enum, Name = StepModes, Type = Integer, Flags = &h0
 		None
@@ -2308,6 +2313,14 @@ Protected Class VM
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="DebugMode"
+			Visible=false
+			Group="Behavior"
+			InitialValue="False"
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="TraceExecution"
 			Visible=false
 			Group="Behavior"
 			InitialValue="False"

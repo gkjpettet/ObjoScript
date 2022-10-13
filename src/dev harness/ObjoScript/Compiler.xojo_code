@@ -191,7 +191,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var endLocation As ObjoScript.Token
 		  If mAST.Count = 0 Then
 		    // Synthesise a fake end location token.
-		    endLocation = New ObjoScript.Token(ObjoScript.TokenTypes.EOF, 0, 1)
+		    endLocation = New ObjoScript.Token(ObjoScript.TokenTypes.EOF, 0, 1, "", body.ClosingBrace.ScriptID)
 		  ElseIf mAST(mAST.LastIndex) IsA ObjoScript.BlockStmt Then
 		    endLocation = ObjoScript.BlockStmt(mAST(mAST.LastIndex)).ClosingBrace
 		  Else

@@ -577,7 +577,7 @@ Begin DesktopWindow WinIDE
       Backdrop        =   0
       BorderColor     =   &c00000000
       DefaultImage    =   539498495
-      DisabledImage   =   539498495
+      DisabledImage   =   1357662207
       Enabled         =   True
       HasBottomBorder =   False
       HasLeftBorder   =   False
@@ -613,7 +613,7 @@ Begin DesktopWindow WinIDE
       Backdrop        =   0
       BorderColor     =   &c00000000
       DefaultImage    =   990324735
-      DisabledImage   =   990324735
+      DisabledImage   =   2011461631
       Enabled         =   True
       HasBottomBorder =   False
       HasLeftBorder   =   False
@@ -641,7 +641,7 @@ Begin DesktopWindow WinIDE
       Visible         =   True
       Width           =   22
    End
-   Begin XUIImageButton ButtonRun
+   Begin XUIImageButton ButtonRunPause
       AllowAutoDeactivate=   True
       AllowFocus      =   False
       AllowFocusRing  =   True
@@ -983,6 +983,89 @@ End
 	#tag EndMenuHandler
 
 
+	#tag Method, Flags = &h21, Description = 436F6D70696C65732074686520636F6E74656E7473206F662074686520656469746F722028616E6420746865207374616E64617264206C6962726172792920616E64207468656E2072756E732074686520564D20776974682074686520636F6D70696C65642066756E6374696F6E2E
+		Private Sub BeginVM(stepMode As ObjoScript.VM.StepModes)
+		  /// Compiles the contents of the editor (and the standard library) and then runs the VM with the compiled function.
+		  
+		  Reset
+		  
+		  Var func As ObjoScript.Func = Compile
+		  If func = Nil Then Return
+		  
+		  SwitchToPanel(PANEL_AST)
+		  
+		  // Run the VM in debugging mode.
+		  Vm.DebugMode = True
+		  
+		  Try
+		    VM.Interpret(func, stepMode)
+		  Catch e As ObjoScript.VMException
+		    DisplayVMError(e)
+		  End Try
+		  
+		  ButtonStepOver.Enabled = True
+		  ButtonStepIn.Enabled = True
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 436F6D70696C65732074686520736F7572636520636F646520696E2074686520656469746F722C20616C6F6E67207769746820746865207374616E64617264206C6962726172792C20696E746F20612066756E6374696F6E2077686963682069732072657475726E65642E2052657475726E73204E696C20696620636F6D70696C6174696F6E206661696C732E
+		Private Function Compile() As ObjoScript.Func
+		  /// Compiles the source code in the editor, along with the standard library, into a function which is returned.
+		  /// Returns Nil if compilation fails.
+		  
+		  #Pragma BreakOnExceptions False
+		  
+		  Reset
+		  
+		  // Show the AST by default.
+		  SwitchToPanel(PANEL_AST)
+		  
+		  Var func As ObjoScript.Func
+		  Try
+		    func = Compiler.Compile(Editor.Contents)
+		    
+		    // Show the tokens.
+		    UpdateTokensListbox(Compiler.Tokens, False)
+		    
+		    // Show the AST.
+		    ASTView.Display(Compiler.AST, False)
+		    
+		    // Disassemble the chunk.
+		    DisassemblerOutput.Text = Disassembler.Disassemble(Func.Chunk, "Test")
+		    
+		    // Successful compilation.
+		    Return func
+		    
+		  Catch le As ObjoScript.LexerException
+		    // Show the lexer error.
+		    DisplayLexerError(le)
+		    
+		    Return Nil
+		    
+		  Catch pe As ObjoScript.ParserException
+		    // Show the tokens.
+		    UpdateTokensListbox(Compiler.Tokens, False)
+		    
+		    DisplayParserErrors(Compiler.ParserErrors)
+		    
+		    Return Nil
+		    
+		  Catch ce As ObjoScript.CompilerException
+		    // Show the tokens.
+		    UpdateTokensListbox(Compiler.Tokens, False)
+		    
+		    // Show the AST.
+		    ASTView.Display(Compiler.AST, False)
+		    
+		    DisplayCompilerError(ce)
+		    
+		    Return Nil
+		  End Try
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Sub Constructor(file As FolderItem)
 		  Self.File = file
@@ -1007,6 +1090,54 @@ End
 		    Return "DejaVu Sans Mono"
 		  #EndIf
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 446973706C6179732064657461696C732061626F7574206120636F6D70696C6572206572726F7220696E20746865204F75747075742054657874417265612E
+		Private Sub DisplayCompilerError(e As ObjoScript.CompilerException)
+		  /// Displays details about a compiler error in the Output TextArea.
+		  
+		  Output.Text = e.Location.LineNumber.ToString + ": " + e.Message
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 446973706C6179732064657461696C732061626F75742061206C6578657220657863657074696F6E20696E20746865204F75747075742054657874417265612E
+		Private Sub DisplayLexerError(e As ObjoScript.LexerException)
+		  /// Displays details about a lexer exception in the Output TextArea.
+		  
+		  Output.Text = e.LineNumber.ToString + ", " + e.LineCharacterPosition.ToString + ": " + e.Message
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 446973706C61797320616E79206572726F72732074686174206F6363757272656420647572696E672070617273696E6720696E20746865204F75747075742054657874417265612E
+		Private Sub DisplayParserErrors(errors() As ObjoScript.ParserException)
+		  /// Displays any errors that occurred during parsing in the Output TextArea.
+		  
+		  If errors.Count = 1 Then
+		    Output.Text = "A parsing error occurred."
+		  Else
+		    Output.Text = errors.Count.ToString + " parsing errors occurred."
+		  End If
+		  
+		  UpdateParsingErrorsListbox(errors)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 446973706C6179732064657461696C732061626F7574206120564D2072756E74696D65206572726F7220696E20746865204F75747075742054657874417265612E
+		Sub DisplayVMError(e As ObjoScript.VMException)
+		  /// Displays details about a VM runtime error in the Output TextArea.
+		  
+		  Var s() As String
+		  s.Add("======================")
+		  s.Add("RUNTIME ERROR")
+		  s.Add("======================")
+		  s.Add("[line " + e.LineNumber.ToString + "]: " + e.Message) + EndOfLine
+		  s.Add("STACK TRACE") + EndOfLine + EndOfLine
+		  Output.Text = Output.Text + If(Output.Text.Length > 0, Chr(13), "") + String.FromArray(s, EndOfLine) + String.FromArray(e.VMStackTrace, EndOfLine)
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 496E697469616C6973657320746865206175746F636F6D706C65746520656E67696E652E
@@ -1053,6 +1184,41 @@ End
 		  AutocompleteEngine.AddOption("Range")
 		  AutocompleteEngine.AddOption("String")
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub Reset()
+		  ASTView.RemoveAllNodes
+		  DisassemblerOutput.Text = ""
+		  ErrorsListbox.RemoveAllRows
+		  TokensListbox.RemoveAllRows
+		  Output.Text = ""
+		  DebuggerOutput.Text = ""
+		  
+		  Disassembler = New ObjoScript.Disassembler
+		  
+		  // Create a new compiler in debug mode.
+		  Compiler = New ObjoScript.Compiler
+		  Compiler.DebugMode = True
+		  
+		  // If the VM has been instantiated, remove any handlers we added.
+		  If VM <> Nil Then
+		    RemoveHandler VM.Print, AddressOf VMPrintDelegate
+		    RemoveHandler VM.DebugPrint, AddressOf VMDebugPrintDelegate
+		  End If
+		  
+		  // Create a new VM and add the required event handlers.
+		  VM = New ObjoScript.VM
+		  VM.DebugMode = True
+		  VM.TraceExecution = True
+		  AddHandler VM.Print, AddressOf VMPrintDelegate
+		  AddHandler VM.DebugPrint, AddressOf VMDebugPrintDelegate
+		  
+		  ButtonStepOver.Enabled = False
+		  ButtonStepIn.Enabled = False
+		  
+		  FirstRun = True
 		End Sub
 	#tag EndMethod
 
@@ -1148,17 +1314,106 @@ End
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 55706461746573207468652070617273696E67206572726F7273206C697374626F7820776974682074686520636F6E74656E7473206F6620606572726F7273602E
+		Private Sub UpdateParsingErrorsListbox(errors() As ObjoScript.ParserException)
+		  /// Updates the parsing errors listbox with the contents of `errors`.
+		  
+		  ErrorsListbox.RemoveAllRows
+		  
+		  If errors.Count = 0 Then Return
+		  
+		  For Each e As ObjoScript.ParserException In errors
+		    ErrorsListbox.AddRow(e.Message, e.Location.LineNumber.ToString, e.Location.StartPosition.ToString, e.Location.ScriptID.ToString)
+		  Next e
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 557064617465732074686520746F6B656E73206C697374626F7820776974682074686520706173736564206172726179206F662060746F6B656E73602E
+		Private Sub UpdateTokensListbox(tokens() As ObjoScript.Token, showStandardLibrary As Boolean)
+		  /// Updates the tokens listbox with the passed array of `tokens`.
+		  ///
+		  /// If `showStandardLibrary` is False then we don't list those tokens that were
+		  /// created by the compiler from the standard library. Their scriptID is `-1`.
+		  /// type, line, abs pos, value, script ID.
+		  
+		  TokensListbox.RemoveAllRows
+		  
+		  Var type, value As String
+		  For Each t As ObjoScript.Token In tokens
+		    
+		    If t.ScriptID = -1 And Not showStandardLibrary Then Continue
+		    
+		    // Compute the value and type.
+		    Select Case t.Type
+		    Case ObjoScript.TokenTypes.Number
+		      If t.IsInteger Then
+		        value = t.NumberValue.ToString(Locale.Current, "#")
+		        type = "Number (int)"
+		      Else
+		        value = t.NumberValue.ToString
+		        type = "Number (double)"
+		      End If
+		      
+		    Case ObjoScript.TokenTypes.Boolean_
+		      value = t.BooleanValue.ToString
+		      type = t.Type.ToString
+		      
+		    Else
+		      value = t.Lexeme
+		      type = t.Type.ToString
+		    End Select
+		    
+		    TokensListbox.AddRow(type, t.LineNumber.ToString, t.StartPosition.ToString, value, t.ScriptID.ToString)
+		    
+		  Next t
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub VMDebugPrintDelegate(sender As ObjoScript.VM, s As String)
+		  #Pragma Unused sender
+		  
+		  DebuggerOutput.Text = DebuggerOutput.Text + s + EndOfLine
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub VMPrintDelegate(sender As ObjoScript.VM, s As String)
+		  #Pragma Unused sender
+		  
+		  Output.Text = Output.Text + s + EndOfLine
+		End Sub
+	#tag EndMethod
+
 
 	#tag Property, Flags = &h0, Description = 412076657279206261736963204F626A6F536372697074206175746F636F6D706C65746520656E67696E652E
 		AutocompleteEngine As BasicAutocompleteEngine
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 54686520636F6D70696C6572207573656420746F20636F6D70696C6520736F7572636520636F64652E
+		Compiler As ObjoScript.Compiler
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
+		Disassembler As ObjoScript.Disassembler
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 5468652066696C65206265696E67206564697465642E2057696C6C206265204E696C2069662061206E65772066696C65207468617420686173206E65766572206265656E2073617665642E
 		File As FolderItem
 	#tag EndProperty
 
+	#tag Property, Flags = &h21, Description = 547275652069662074686520564D20686173206E6F74207965742072756E20666F6C6C6F77696E6720636F6D70696C6174696F6E206F662074686520736F7572636520636F646520696E2074686520656469746F722E
+		Private FirstRun As Boolean = True
+	#tag EndProperty
+
 	#tag Property, Flags = &h0, Description = 54686520756E646F206D616E6167657220666F7220746869732077696E646F772E
 		UndoManager As XUIUndoManager
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 54686520564D207573656420746F206578656375746520636F64652E
+		VM As ObjoScript.VM
 	#tag EndProperty
 
 
@@ -1246,6 +1501,27 @@ End
 	#tag Event
 		Sub Opening()
 		  Me.FontName = DefaultMonospaceFont
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ButtonStepIn
+	#tag Event , Description = 54686520627574746F6E20686173206265656E20707265737365642E
+		Sub Pressed()
+		  If FirstRun Then
+		    BeginVM(ObjoScript.VM.StepModes.StepInto)
+		    FirstRun = False
+		  Else
+		    VM.Run(ObjoScript.VM.StepModes.StepInto)
+		  End If
+		  
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ButtonRunPause
+	#tag Event , Description = 54686520627574746F6E20686173206265656E20707265737365642E
+		Sub Pressed()
+		  BeginVM(ObjoScript.VM.StepModes.None)
+		  
 		End Sub
 	#tag EndEvent
 #tag EndEvents

@@ -1,7 +1,7 @@
 #tag Class
 Protected Class Token
 	#tag Method, Flags = &h0, Description = 41206E657720746F6B656E206F662060747970656020626567696E6E696E672061742073637269707420607374617274506F7360206F6E20606C696E654E756D62657260207769746820616E206F7074696F6E616C20606C6578656D656020616E6420607363726970744944602E
-		Sub Constructor(type As TokenTypes, startPos As Integer, lineNumber As Integer, lexeme As String = "", scriptID As Integer = 0)
+		Sub Constructor(type As TokenTypes, startPos As Integer, lineNumber As Integer, lexeme As String, scriptID As Integer)
 		  /// A new token of `type` beginning at script `startPos` on `lineNumber` with an 
 		  /// optional `lexeme` and `scriptID`.
 		  
@@ -178,23 +178,23 @@ Protected Class Token
 				"53 - Plus"
 				"54 - PlusEqual"
 				"55 - PlusPlus"
-				"56 - Print"
-				"57 - Query"
-				"58 - RCurly"
-				"59 - ReservedType"
-				"60 - Return_"
-				"61 - RParen"
-				"62 - RSquare"
-				"63 - Semicolon"
-				"64 - Star"
-				"65 - StarEqual"
-				"66 - Static_"
-				"67 - StaticFieldIdentifier"
-				"68 - String_"
-				"69 - Super_"
-				"70 - This"
-				"71 - Tilde"
-				"72 - Underscore"
+				"56 - Query"
+				"57 - RCurly"
+				"58 - ReservedType"
+				"59 - Return_"
+				"60 - RParen"
+				"61 - RSquare"
+				"62 - Semicolon"
+				"63 - Star"
+				"64 - StarEqual"
+				"65 - Static_"
+				"66 - StaticFieldIdentifier"
+				"67 - String_"
+				"68 - Super_"
+				"69 - This"
+				"70 - Tilde"
+				"71 - Underscore"
+				"72 - UppercaseIdentifier"
 				"73 - Var_"
 				"74 - While_"
 				"75 - Xor_"

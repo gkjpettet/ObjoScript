@@ -234,7 +234,7 @@ Protected Class Lexer
 		  End If
 		  
 		  mTokens.Add(New ObjoScript.Token(ObjoScript.TokenTypes.String_, _
-		  mTokenStart, mLineNumber, String.FromArray(lexeme, "")))
+		  mTokenStart, mLineNumber, String.FromArray(lexeme, ""), mScriptID))
 		  
 		End Sub
 	#tag EndMethod
