@@ -181,6 +181,11 @@ Implements XUINotificationListener
 		      Insert(TabToSpaces, CaretPosition, True)
 		    End If
 		    
+		  Case CmdInsertBacktab
+		    // Shift-Tab. This always acts like a tab insertion (permits the insertion of a tab
+		    // even when tab is used for autocomplete).
+		    Insert(TabToSpaces, CaretPosition, True)
+		    
 		  Case "noop:"
 		    If Keyboard.AsyncControlKey And Keyboard.AsyncKeyDown(&h31) Then
 		      // Ctrl+Space pressed.
@@ -296,6 +301,7 @@ Implements XUINotificationListener
 		      Return True
 		    End If
 		  #EndIf
+		  
 		End Function
 	#tag EndEvent
 
@@ -871,6 +877,19 @@ Implements XUINotificationListener
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662074686520746F6B656E206174207468652063757272656E7420636172657420706F736974696F6E206973206120636F6D6D656E742E
+		Private Function CaretIsInComment() As Boolean
+		  /// Returns True if the token at the current caret position is a comment.
+		  
+		  Var tokenAtCaret As XUICELineToken = CurrentLine.TokenAtColumn(CaretColumn - 1)
+		  If tokenAtCaret <> Nil Then
+		    Return Formatter.TokenIsComment(tokenAtCaret)
+		  Else
+		    Return False
+		  End If
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 436F6D70757465732074686520776964746820696E20706978656C73206F662074686520677574746572207573696E67207468652070617373656420606C696E654E756D6265725769647468602E
 		Private Function ComputeGutterWidth(lineNumberWidth As Double) As Double
 		  /// Computes the width in pixels of the gutter using the passed `lineNumberWidth`.
@@ -1206,12 +1225,7 @@ Implements XUINotificationListener
 		  If CurrentLine = Nil Then Return
 		  
 		  // Disable autocomplete in comments if that's the behaviour the user wants.
-		  If Not AllowAutoCompleteInComments Then
-		    Var tokenAtCaret As XUICELineToken = CurrentLine.TokenAtColumn(CaretColumn - 1)
-		    If tokenAtCaret <> Nil Then
-		      If Formatter.TokenIsComment(tokenAtCaret) Then Return
-		    End If
-		  End If
+		  If Not AllowAutoCompleteInComments And CaretIsInComment Then Return
 		  
 		  // Get the word up to the caret. This is our prefix.
 		  Var prefix As String = CurrentLine.WordToColumn(CaretColumn)
@@ -1703,8 +1717,26 @@ Implements XUINotificationListener
 		      // Replace the selection and update the caret position.
 		      LineManager.ReplaceSelection(char, True, raiseContentsDidChange)
 		    Else
-		      // Insert the character at the current caret position.
-		      LineManager.InsertCharacter(CaretPosition, char, True, raiseContentsDidChange)
+		      // If the user is inserting `(`, `{` or `[` and we're not in a comment then close the bracket for
+		      // them if that's the desired behaviour.
+		      If AutocloseBrackets And Not CaretIsInComment Then
+		        Select Case char
+		         Case "(", "{", "["
+		          // First insert the opening bracket.
+		          LineManager.InsertCharacter(CaretPosition, char, True, raiseContentsDidChange)
+		          // Now the correct closing bracket.
+		          LineManager.InsertCharacter(CaretPosition, ClosingBracketForOpener.Value(char), _
+		          True, raiseContentsDidChange)
+		          // Move the caret back one place so it's within the brackets.
+		          MoveCaretLeft
+		        Else
+		          // Not an opening bracket. Just insert the character at the current caret position.
+		          LineManager.InsertCharacter(CaretPosition, char, True, raiseContentsDidChange)
+		        End Select
+		      Else
+		        // Insert the character at the current caret position.
+		        LineManager.InsertCharacter(CaretPosition, char, True, raiseContentsDidChange)
+		      End If
 		    End If
 		  End If
 		  
@@ -3535,6 +3567,10 @@ Implements XUINotificationListener
 		AllowInertialScrolling As Boolean = True
 	#tag EndProperty
 
+	#tag Property, Flags = &h0, Description = 49662054727565207468656E2074686520656469746F722077696C6C206175746F6D61746963616C6C7920636C6F736520706172656E7468657365732C2073717561726520627261636B65747320616E64206375726C7920627261636B657473207768656E20616E206F70656E696E6720627261636B657420697320656E746572656420616E6420746865206361726574206973206E6F7420696E206120636F6D6D656E742E
+		AutocloseBrackets As Boolean = False
+	#tag EndProperty
+
 	#tag Property, Flags = &h0, Description = 546865206B6579626F6172642073686F7274637574207573656420746F2074726967676572206175746F636F6D706C6574696F6E2E
 		AutocompleteCombo As XUICodeEditor.AutocompleteCombos = XUICodeEditor.AutocompleteCombos.Tab
 	#tag EndProperty
@@ -3690,6 +3726,21 @@ Implements XUINotificationListener
 			End Get
 		#tag EndGetter
 		CaretXCoordinate As Integer
+	#tag EndComputedProperty
+
+	#tag ComputedProperty, Flags = &h21, Description = 4D617073206F70656E696E6720627261636B6574732028652E672E20225B222920746F20746865697220636C6F7365722028652E672E20225D22292E204B6579203D206F70656E696E6720627261636B65742028737472696E67292C2056616C7565203D206D61746368696E6720636C6F73696E6720627261636B65742028737472696E67292E
+		#tag Getter
+			Get
+			  Static d As New Dictionary( _
+			  "(" : ")", _
+			  "[" : "]", _
+			  "{" : "}" )
+			  
+			  Return d
+			  
+			End Get
+		#tag EndGetter
+		Private ClosingBracketForOpener As Dictionary
 	#tag EndComputedProperty
 
 	#tag ComputedProperty, Flags = &h0, Description = 546865207465787420636F6E74656E7473206F662074686520656469746F722E
@@ -4518,118 +4569,6 @@ Implements XUINotificationListener
 
 	#tag ViewBehavior
 		#tag ViewProperty
-			Name="InitialParent"
-			Visible=false
-			Group="Position"
-			InitialValue=""
-			Type="String"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="AutoDeactivate"
-			Visible=true
-			Group="Appearance"
-			InitialValue="True"
-			Type="Boolean"
-			EditorType="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Width"
-			Visible=true
-			Group="Position"
-			InitialValue="100"
-			Type="Integer"
-			EditorType="Integer"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Height"
-			Visible=true
-			Group="Position"
-			InitialValue="100"
-			Type="Integer"
-			EditorType="Integer"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="LockLeft"
-			Visible=true
-			Group="Position"
-			InitialValue="True"
-			Type="Boolean"
-			EditorType="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="LockTop"
-			Visible=true
-			Group="Position"
-			InitialValue="True"
-			Type="Boolean"
-			EditorType="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="LockRight"
-			Visible=true
-			Group="Position"
-			InitialValue="False"
-			Type="Boolean"
-			EditorType="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="LockBottom"
-			Visible=true
-			Group="Position"
-			InitialValue="False"
-			Type="Boolean"
-			EditorType="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="TabIndex"
-			Visible=true
-			Group="Position"
-			InitialValue="0"
-			Type="Integer"
-			EditorType="Integer"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="TabStop"
-			Visible=true
-			Group="Position"
-			InitialValue="True"
-			Type="Boolean"
-			EditorType="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Enabled"
-			Visible=true
-			Group="Appearance"
-			InitialValue="True"
-			Type="Boolean"
-			EditorType="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Tooltip"
-			Visible=true
-			Group="Appearance"
-			InitialValue=""
-			Type="String"
-			EditorType="MultiLineEditor"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Visible"
-			Visible=true
-			Group="Appearance"
-			InitialValue="True"
-			Type="Boolean"
-			EditorType="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="TabPanelIndex"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
-			Type="Integer"
-			EditorType="Integer"
-		#tag EndViewProperty
-		#tag ViewProperty
 			Name="Name"
 			Visible=true
 			Group="ID"
@@ -4668,6 +4607,118 @@ Implements XUINotificationListener
 			InitialValue=""
 			Type="Integer"
 			EditorType="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Width"
+			Visible=true
+			Group="Position"
+			InitialValue="100"
+			Type="Integer"
+			EditorType="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Height"
+			Visible=true
+			Group="Position"
+			InitialValue="100"
+			Type="Integer"
+			EditorType="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="LockLeft"
+			Visible=true
+			Group="Position"
+			InitialValue=""
+			Type="Boolean"
+			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="LockTop"
+			Visible=true
+			Group="Position"
+			InitialValue=""
+			Type="Boolean"
+			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="LockRight"
+			Visible=true
+			Group="Position"
+			InitialValue=""
+			Type="Boolean"
+			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="LockBottom"
+			Visible=true
+			Group="Position"
+			InitialValue=""
+			Type="Boolean"
+			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="TabPanelIndex"
+			Visible=false
+			Group="Position"
+			InitialValue="0"
+			Type="Integer"
+			EditorType="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="TabIndex"
+			Visible=true
+			Group="Position"
+			InitialValue="0"
+			Type="Integer"
+			EditorType="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="TabStop"
+			Visible=true
+			Group="Position"
+			InitialValue="True"
+			Type="Boolean"
+			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="InitialParent"
+			Visible=false
+			Group="Position"
+			InitialValue=""
+			Type="String"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Visible"
+			Visible=true
+			Group="Appearance"
+			InitialValue="True"
+			Type="Boolean"
+			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Tooltip"
+			Visible=true
+			Group="Appearance"
+			InitialValue=""
+			Type="String"
+			EditorType="MultiLineEditor"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="AutoDeactivate"
+			Visible=true
+			Group="Appearance"
+			InitialValue="True"
+			Type="Boolean"
+			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Enabled"
+			Visible=true
+			Group="Appearance"
+			InitialValue="True"
+			Type="Boolean"
+			EditorType="Boolean"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="BlinkCaret"
@@ -4780,9 +4831,9 @@ Implements XUINotificationListener
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="ReadOnly"
-			Visible=false
+			Visible=true
 			Group="Behavior"
-			InitialValue=""
+			InitialValue="False"
 			Type="Boolean"
 			EditorType=""
 		#tag EndViewProperty
@@ -4996,17 +5047,17 @@ Implements XUINotificationListener
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="SpacesPerTab"
-			Visible=false
+			Visible=true
 			Group="Behavior"
-			InitialValue=""
+			InitialValue="4"
 			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="HighlightDelimitersAroundCaret"
-			Visible=false
+			Visible=true
 			Group="Behavior"
-			InitialValue=""
+			InitialValue="True"
 			Type="Boolean"
 			EditorType=""
 		#tag EndViewProperty
@@ -5020,7 +5071,7 @@ Implements XUINotificationListener
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="MinimumParseInterval"
-			Visible=false
+			Visible=true
 			Group="Behavior"
 			InitialValue="500"
 			Type="Integer"
@@ -5035,8 +5086,16 @@ Implements XUINotificationListener
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
+			Name="AutocloseBrackets"
+			Visible=true
+			Group="Behavior"
+			InitialValue="False"
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
 			Name="AutocompleteCombo"
-			Visible=false
+			Visible=true
 			Group="Behavior"
 			InitialValue="XUICodeEditor.AutocompleteCombos.Tab"
 			Type="XUICodeEditor.AutocompleteCombos"

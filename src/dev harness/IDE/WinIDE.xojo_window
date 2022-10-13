@@ -28,7 +28,8 @@ Begin DesktopWindow WinIDE
       AllowAutocomplete=   True
       AllowAutoCompleteInComments=   True
       AllowInertialScrolling=   True
-      AutocompleteCombo=   "XUICodeEditor.AutocompleteCombos.Tab"
+      AutocloseBrackets=   True
+      AutocompleteCombo=   1
       AutocompletePopupFontName=   "System"
       AutocompletePopupFontSize=   12
       AutoDeactivate  =   True
@@ -36,23 +37,35 @@ Begin DesktopWindow WinIDE
       BlinkCaret      =   True
       BorderColor     =   &c00000000
       CaretColour     =   &c00000000
-      CaretType       =   1
+      CaretColumn     =   0
+      CaretLineNumber =   0
+      CaretPosition   =   0
+      CaretType       =   2
+      CaretXCoordinate=   0
+      Contents        =   ""
       ContentType     =   "XUICodeEditor.ContentTypes.SourceCode"
       CurrentLineHighlightColor=   &c00000000
       CurrentLineNumberColor=   &c00000000
+      CurrentUndoID   =   0
       DisplayLineNumbers=   False
       DrawBlockLines  =   True
       Enabled         =   True
+      FirstVisibleLine=   0
       FontName        =   "System"
       FontSize        =   12
       HasBottomBorder =   False
+      HasFocus        =   False
       HasLeftBorder   =   False
       HasRightBorder  =   False
       HasTopBorder    =   False
       Height          =   779
-      HighlightCurrentLine=   False
+      HighlightCurrentLine=   True
+      HighlightDelimitersAroundCaret=   True
       Index           =   -2147483648
       InitialParent   =   ""
+      JustTokenised   =   False
+      LastFullyVisibleLineNumber=   0
+      LastParseMicroseconds=   0.0
       Left            =   0
       LineNumberColor =   &c00000000
       LineNumberFontSize=   12
@@ -61,13 +74,19 @@ Begin DesktopWindow WinIDE
       LockLeft        =   True
       LockRight       =   True
       LockTop         =   True
+      LongestLineChanged=   False
       MinimumAutocompletionLength=   2
       MinimumParseInterval=   500
+      NeedsFullRedraw =   False
+      ReadOnly        =   False
       Scope           =   0
+      ScrollPosX      =   0
       SelectionColour =   &c00000000
+      SpacesPerTab    =   4
       TabIndex        =   0
       TabPanelIndex   =   0
       TabStop         =   True
+      TextSelected    =   False
       Tooltip         =   ""
       Top             =   0
       VerticalLinePadding=   0
@@ -475,11 +494,7 @@ End
 #tag Events Editor
 	#tag Event , Description = 54686520656469746F722069732061626F757420746F20626520646973706C617965642E
 		Sub Opening()
-		  Me.HighlightDelimitersAroundCaret = True
-		  
 		  Editor.ContentType = XUICodeEditor.ContentTypes.SourceCode
-		  
-		  Me.HighlightCurrentLine = True
 		  
 		  Me.BorderColor = New ColorGroup(&cD7D9D9, &c2A2A2A)
 		End Sub
