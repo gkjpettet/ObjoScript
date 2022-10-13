@@ -1001,32 +1001,33 @@ Protected Class VM
 		    Var frameLine As Integer = CurrentChunk.LineForOffset(CurrentFrame.IP)
 		    Var frameScriptID As Integer = CurrentChunk.ScriptIDForOffset(CurrentFrame.IP)
 		    
-		    If stepMode <> StepModes.None Then
-		      Var opcode As UInt8 = CurrentChunk.ReadByte(CurrentFrame.IP)
-		      
+		    If Self.DebugMode Then
 		      // Instruction stepping for the debugger (if enabled).
-		      If CurrentScriptID <> -1 Then
-		        // Note we disallow stopping within the standard library (scriptID = -1).
-		        If (frameLine <> CurrentLine) Or (frameLine = CurrentLine And frameScriptID <> CurrentScriptID) Then
-		          If IsStoppableOpcode(opcode, stepMode) Then
-		            // We've reached a new source line on a stoppable opcode.
-		            CurrentLine = frameLine
-		            CurrentScriptID = frameScriptID
-		            Return
+		      If stepMode <> StepModes.None Then
+		        Var opcode As UInt8 = CurrentChunk.ReadByte(CurrentFrame.IP)
+		        If CurrentScriptID <> -1 Then
+		          // Note we disallow stopping within the standard library (scriptID = -1).
+		          If (frameLine <> CurrentLine) Or (frameLine = CurrentLine And frameScriptID <> CurrentScriptID) Then
+		            If IsStoppableOpcode(opcode, stepMode) Then
+		              // We've reached a new source line on a stoppable opcode.
+		              CurrentLine = frameLine
+		              CurrentScriptID = frameScriptID
+		              Return
+		            End If
 		          End If
 		        End If
 		      End If
-		    End If
-		    
-		    // Disassemble each instruction if requested.
-		    If TraceExecution And frameScriptID <> -1 Then
-		      Var s() As String
-		      For i As Integer = 0 To StackTop - 1
-		        Var item As Variant = Stack(i)
-		        s.Add("[ " + ValueToString(item) + " ]")
-		      Next i
-		      RaiseEvent DebugPrint(String.FromArray(s, ""))
-		      Call Disassembler.DisassembleInstruction(-1, -1, CurrentChunk, CurrentFrame.IP)
+		      
+		      // Disassemble each instruction if requested.
+		      If TraceExecution And frameScriptID <> -1 Then
+		        Var s() As String
+		        For i As Integer = 0 To StackTop - 1
+		          Var item As Variant = Stack(i)
+		          s.Add("[ " + ValueToString(item) + " ]")
+		        Next i
+		        RaiseEvent DebugPrint(String.FromArray(s, ""))
+		        Call Disassembler.DisassembleInstruction(-1, -1, CurrentChunk, CurrentFrame.IP)
+		      End If
 		    End If
 		    
 		    // Update line and script ID tracking.
