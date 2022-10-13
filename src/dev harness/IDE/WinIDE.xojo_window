@@ -10,7 +10,7 @@ Begin DesktopWindow WinIDE
    HasFullScreenButton=   False
    HasMaximizeButton=   True
    HasMinimizeButton=   True
-   Height          =   820
+   Height          =   836
    ImplicitInstance=   False
    MacProcID       =   0
    MaximumHeight   =   32000
@@ -20,10 +20,10 @@ Begin DesktopWindow WinIDE
    MinimumHeight   =   64
    MinimumWidth    =   64
    Resizeable      =   True
-   Title           =   "ObjoScript Editor"
+   Title           =   "ObjoScript IDE"
    Type            =   0
    Visible         =   True
-   Width           =   1090
+   Width           =   1300
    Begin XUICodeEditor Editor
       AllowAutocomplete=   True
       AllowAutoCompleteInComments=   True
@@ -58,7 +58,7 @@ Begin DesktopWindow WinIDE
       HasLeftBorder   =   False
       HasRightBorder  =   False
       HasTopBorder    =   False
-      Height          =   779
+      Height          =   564
       HighlightCurrentLine=   True
       HighlightDelimitersAroundCaret=   True
       Index           =   -2147483648
@@ -91,48 +91,674 @@ Begin DesktopWindow WinIDE
       Top             =   0
       VerticalLinePadding=   0
       Visible         =   True
-      Width           =   1090
+      Width           =   651
    End
-   Begin DesktopLabel Info
+   Begin DesktopBevelButton ButtonAST
+      Active          =   False
       AllowAutoDeactivate=   True
+      AllowFocus      =   True
+      AllowTabStop    =   True
+      BackgroundColor =   &c00000000
+      BevelStyle      =   0
       Bold            =   False
+      ButtonStyle     =   1
+      Caption         =   "AST"
+      CaptionAlignment=   3
+      CaptionDelta    =   0
+      CaptionPosition =   1
       Enabled         =   True
-      FontName        =   "SmallSystem"
+      FontName        =   "System"
       FontSize        =   0.0
       FontUnit        =   0
-      Height          =   20
+      HasBackgroundColor=   False
+      Height          =   22
+      Icon            =   0
+      IconAlignment   =   0
+      IconDeltaX      =   0
+      IconDeltaY      =   0
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   1220
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   True
+      MenuStyle       =   0
+      PanelIndex      =   0
+      Scope           =   2
+      TabIndex        =   1
+      TabPanelIndex   =   0
+      TextColor       =   &c00000000
+      Tooltip         =   ""
+      Top             =   20
+      Transparent     =   False
+      Underline       =   False
+      Value           =   True
+      Visible         =   True
+      Width           =   60
+      _mIndex         =   0
+      _mInitialParent =   ""
+      _mName          =   ""
+      _mPanelIndex    =   0
+   End
+   Begin DesktopBevelButton ButtonDisassembler
+      Active          =   False
+      AllowAutoDeactivate=   True
+      AllowFocus      =   True
+      AllowTabStop    =   True
+      BackgroundColor =   &c00000000
+      BevelStyle      =   0
+      Bold            =   False
+      ButtonStyle     =   1
+      Caption         =   "Disassembler"
+      CaptionAlignment=   3
+      CaptionDelta    =   0
+      CaptionPosition =   1
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      HasBackgroundColor=   False
+      Height          =   22
+      Icon            =   0
+      IconAlignment   =   0
+      IconDeltaX      =   0
+      IconDeltaY      =   0
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   958
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   True
+      MenuStyle       =   0
+      PanelIndex      =   0
+      Scope           =   2
+      TabIndex        =   2
+      TabPanelIndex   =   0
+      TextColor       =   &c00000000
+      Tooltip         =   ""
+      Top             =   20
+      Transparent     =   False
+      Underline       =   False
+      Value           =   False
+      Visible         =   True
+      Width           =   106
+      _mIndex         =   0
+      _mInitialParent =   ""
+      _mName          =   ""
+      _mPanelIndex    =   0
+   End
+   Begin DesktopBevelButton ButtonErrors
+      Active          =   False
+      AllowAutoDeactivate=   True
+      AllowFocus      =   True
+      AllowTabStop    =   True
+      BackgroundColor =   &c00000000
+      BevelStyle      =   0
+      Bold            =   False
+      ButtonStyle     =   1
+      Caption         =   "Errors"
+      CaptionAlignment=   3
+      CaptionDelta    =   0
+      CaptionPosition =   1
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      HasBackgroundColor=   False
+      Height          =   22
+      Icon            =   0
+      IconAlignment   =   0
+      IconDeltaX      =   0
+      IconDeltaY      =   0
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   1076
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   True
+      MenuStyle       =   0
+      PanelIndex      =   0
+      Scope           =   2
+      TabIndex        =   3
+      TabPanelIndex   =   0
+      TextColor       =   &c00000000
+      Tooltip         =   ""
+      Top             =   20
+      Transparent     =   False
+      Underline       =   False
+      Value           =   False
+      Visible         =   True
+      Width           =   60
+      _mIndex         =   0
+      _mInitialParent =   ""
+      _mName          =   ""
+      _mPanelIndex    =   0
+   End
+   Begin DesktopBevelButton ButtonTokens
+      Active          =   False
+      AllowAutoDeactivate=   True
+      AllowFocus      =   True
+      AllowTabStop    =   True
+      BackgroundColor =   &c00000000
+      BevelStyle      =   0
+      Bold            =   False
+      ButtonStyle     =   1
+      Caption         =   "Tokens"
+      CaptionAlignment=   3
+      CaptionDelta    =   0
+      CaptionPosition =   1
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      HasBackgroundColor=   False
+      Height          =   22
+      Icon            =   0
+      IconAlignment   =   0
+      IconDeltaX      =   0
+      IconDeltaY      =   0
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   1148
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   True
+      MenuStyle       =   0
+      PanelIndex      =   0
+      Scope           =   2
+      TabIndex        =   5
+      TabPanelIndex   =   0
+      TextColor       =   &c00000000
+      Tooltip         =   ""
+      Top             =   20
+      Transparent     =   False
+      Underline       =   False
+      Value           =   False
+      Visible         =   True
+      Width           =   60
+      _mIndex         =   0
+      _mInitialParent =   ""
+      _mName          =   ""
+      _mPanelIndex    =   0
+   End
+   Begin DesktopPagePanel Panel
+      AllowAutoDeactivate=   True
+      Enabled         =   True
+      Height          =   510
+      Index           =   -2147483648
+      Left            =   663
+      LockBottom      =   True
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   True
+      LockTop         =   True
+      PanelCount      =   4
+      Panels          =   ""
+      Scope           =   2
+      SelectedPanelIndex=   0
+      TabIndex        =   6
+      TabPanelIndex   =   0
+      TabStop         =   False
+      Tooltip         =   ""
+      Top             =   54
+      Transparent     =   False
+      Value           =   1
+      Visible         =   True
+      Width           =   617
+      Begin DesktopListBox TokensListbox
+         AllowAutoDeactivate=   True
+         AllowAutoHideScrollbars=   True
+         AllowExpandableRows=   False
+         AllowFocusRing  =   False
+         AllowResizableColumns=   False
+         AllowRowDragging=   False
+         AllowRowReordering=   False
+         Bold            =   False
+         ColumnCount     =   5
+         ColumnWidths    =   "200, 60, 60, *, 60"
+         DefaultRowHeight=   20
+         DropIndicatorVisible=   False
+         Enabled         =   True
+         FontName        =   "System"
+         FontSize        =   0.0
+         FontUnit        =   0
+         GridLineStyle   =   0
+         HasBorder       =   True
+         HasHeader       =   True
+         HasHorizontalScrollbar=   False
+         HasVerticalScrollbar=   True
+         HeadingIndex    =   -1
+         Height          =   510
+         Index           =   -2147483648
+         InitialParent   =   "Panel"
+         InitialValue    =   "Type	Line	Abs Pos	Value	Script ID"
+         Italic          =   False
+         Left            =   663
+         LockBottom      =   True
+         LockedInPosition=   False
+         LockLeft        =   True
+         LockRight       =   True
+         LockTop         =   True
+         RequiresSelection=   False
+         RowSelectionType=   0
+         Scope           =   0
+         TabIndex        =   0
+         TabPanelIndex   =   1
+         TabStop         =   True
+         Tooltip         =   ""
+         Top             =   54
+         Transparent     =   False
+         Underline       =   False
+         Visible         =   True
+         Width           =   617
+         _ScrollOffset   =   0
+         _ScrollWidth    =   -1
+      End
+      Begin DesktopListBox ErrorsListbox
+         AllowAutoDeactivate=   True
+         AllowAutoHideScrollbars=   True
+         AllowExpandableRows=   False
+         AllowFocusRing  =   False
+         AllowResizableColumns=   False
+         AllowRowDragging=   False
+         AllowRowReordering=   False
+         Bold            =   False
+         ColumnCount     =   4
+         ColumnWidths    =   "*, 60, 60, 60"
+         DefaultRowHeight=   -1
+         DropIndicatorVisible=   False
+         Enabled         =   True
+         FontName        =   "System"
+         FontSize        =   0.0
+         FontUnit        =   0
+         GridLineStyle   =   0
+         HasBorder       =   True
+         HasHeader       =   True
+         HasHorizontalScrollbar=   False
+         HasVerticalScrollbar=   True
+         HeadingIndex    =   -1
+         Height          =   510
+         Index           =   -2147483648
+         InitialParent   =   "Panel"
+         InitialValue    =   "Message	Line	AbsPos	Script ID"
+         Italic          =   False
+         Left            =   663
+         LockBottom      =   True
+         LockedInPosition=   False
+         LockLeft        =   True
+         LockRight       =   True
+         LockTop         =   True
+         RequiresSelection=   False
+         RowSelectionType=   0
+         Scope           =   2
+         TabIndex        =   0
+         TabPanelIndex   =   3
+         TabStop         =   True
+         Tooltip         =   ""
+         Top             =   54
+         Transparent     =   False
+         Underline       =   False
+         Visible         =   True
+         Width           =   617
+         _ScrollOffset   =   0
+         _ScrollWidth    =   -1
+      End
+      Begin ASTTreeView ASTView
+         AutoDeactivate  =   True
+         BackColor       =   &cFFFFFF00
+         ColumnCount     =   1
+         DarkBackColor   =   &c2D2D2D00
+         DarkNodeTextColor=   &cFFFFFF00
+         DarkSelectionTextColor=   &cFFFFFF00
+         DragReceiveBehavior=   1
+         Enabled         =   True
+         FontName        =   "System"
+         FontSize        =   0.0
+         FontUnit        =   0
+         HasBackColor    =   False
+         HasBorder       =   True
+         HasHeader       =   False
+         HasInactiveSelectionColor=   False
+         HasNodeColor    =   False
+         HasNodeTextColor=   False
+         HasSelectionColor=   False
+         HasSelectionTextColor=   False
+         Height          =   510
+         InactiveSelectionColor=   &cD3D3D300
+         Index           =   -2147483648
+         InitialParent   =   "Panel"
+         Left            =   663
+         LinuxDrawTreeLines=   False
+         LinuxExpanderStyle=   0
+         LinuxHighlightFullRow=   True
+         LockBottom      =   False
+         LockedInPosition=   False
+         LockLeft        =   True
+         LockRight       =   False
+         LockTop         =   True
+         MacDrawTreeLines=   False
+         MacExpanderStyle=   0
+         MacHighlightFullRow=   True
+         MultiSelection  =   False
+         NodeEvenColor   =   &cFFFFFF00
+         NodeHeight      =   18
+         NodeOddColor    =   &cFFFFFF00
+         NodeTextColor   =   &c00000000
+         QuartzShading   =   False
+         Scope           =   2
+         SelectionColor  =   &c478A1A00
+         SelectionSeparator=   0
+         SelectionTextColor=   &cFFFFFF00
+         SystemNodeColors=   True
+         TabIndex        =   0
+         TabPanelIndex   =   2
+         TabStop         =   True
+         Tooltip         =   ""
+         Top             =   54
+         UseFocusRing    =   True
+         Visible         =   True
+         Width           =   617
+         WinDrawTreeLines=   True
+         WinHighlightFullRow=   False
+      End
+      Begin DesktopTextArea DisassemblerOutput
+         AllowAutoDeactivate=   True
+         AllowFocusRing  =   False
+         AllowSpellChecking=   True
+         AllowStyledText =   True
+         AllowTabs       =   False
+         BackgroundColor =   &cFFFFFF
+         Bold            =   False
+         Enabled         =   True
+         FontName        =   "System"
+         FontSize        =   0.0
+         FontUnit        =   0
+         Format          =   ""
+         HasBorder       =   True
+         HasHorizontalScrollbar=   False
+         HasVerticalScrollbar=   True
+         Height          =   510
+         HideSelection   =   True
+         Index           =   -2147483648
+         InitialParent   =   "Panel"
+         Italic          =   False
+         Left            =   663
+         LineHeight      =   0.0
+         LineSpacing     =   1.0
+         LockBottom      =   False
+         LockedInPosition=   False
+         LockLeft        =   True
+         LockRight       =   False
+         LockTop         =   True
+         MaximumCharactersAllowed=   0
+         Multiline       =   True
+         ReadOnly        =   True
+         Scope           =   2
+         TabIndex        =   0
+         TabPanelIndex   =   4
+         TabStop         =   True
+         Text            =   ""
+         TextAlignment   =   0
+         TextColor       =   &c000000
+         Tooltip         =   ""
+         Top             =   54
+         Transparent     =   False
+         Underline       =   False
+         UnicodeMode     =   1
+         ValidationMask  =   ""
+         Visible         =   True
+         Width           =   617
+      End
+   End
+   Begin DesktopTextArea Output
+      AllowAutoDeactivate=   True
+      AllowFocusRing  =   False
+      AllowSpellChecking=   True
+      AllowStyledText =   True
+      AllowTabs       =   False
+      BackgroundColor =   &cFFFFFF
+      Bold            =   False
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      Format          =   ""
+      HasBorder       =   True
+      HasHorizontalScrollbar=   False
+      HasVerticalScrollbar=   True
+      Height          =   249
+      HideSelection   =   True
       Index           =   -2147483648
       Italic          =   False
-      Left            =   784
+      Left            =   20
+      LineHeight      =   0.0
+      LineSpacing     =   1.0
+      LockBottom      =   True
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   True
+      LockTop         =   False
+      MaximumCharactersAllowed=   0
+      Multiline       =   True
+      ReadOnly        =   True
+      Scope           =   2
+      TabIndex        =   7
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Text            =   ""
+      TextAlignment   =   0
+      TextColor       =   &c000000
+      Tooltip         =   ""
+      Top             =   576
+      Transparent     =   False
+      Underline       =   False
+      UnicodeMode     =   1
+      ValidationMask  =   ""
+      Visible         =   True
+      Width           =   631
+   End
+   Begin XUIImageButton ButtonStepOver
+      AllowAutoDeactivate=   True
+      AllowFocus      =   False
+      AllowFocusRing  =   True
+      AllowTabs       =   False
+      Backdrop        =   0
+      BorderColor     =   &c00000000
+      DefaultImage    =   539498495
+      DisabledImage   =   539498495
+      Enabled         =   True
+      HasBottomBorder =   False
+      HasLeftBorder   =   False
+      HasRightBorder  =   False
+      HasTopBorder    =   False
+      Height          =   22
+      HoverImage      =   539498495
+      Index           =   -2147483648
+      IsPressed       =   False
+      Left            =   722
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   True
+      PressedImage    =   1357662207
+      Scope           =   2
+      TabIndex        =   8
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   20
+      Transparent     =   True
+      Type            =   ""
+      Visible         =   True
+      Width           =   22
+   End
+   Begin XUIImageButton ButtonStepIn
+      AllowAutoDeactivate=   True
+      AllowFocus      =   False
+      AllowFocusRing  =   True
+      AllowTabs       =   False
+      Backdrop        =   0
+      BorderColor     =   &c00000000
+      DefaultImage    =   990324735
+      DisabledImage   =   990324735
+      Enabled         =   True
+      HasBottomBorder =   False
+      HasLeftBorder   =   False
+      HasRightBorder  =   False
+      HasTopBorder    =   False
+      Height          =   22
+      HoverImage      =   990324735
+      Index           =   -2147483648
+      IsPressed       =   False
+      Left            =   751
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   True
+      PressedImage    =   2011461631
+      Scope           =   2
+      TabIndex        =   9
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   20
+      Transparent     =   True
+      Type            =   ""
+      Visible         =   True
+      Width           =   22
+   End
+   Begin XUIImageButton ButtonRun
+      AllowAutoDeactivate=   True
+      AllowFocus      =   False
+      AllowFocusRing  =   True
+      AllowTabs       =   False
+      Backdrop        =   0
+      BorderColor     =   &c00000000
+      DefaultImage    =   601647103
+      DisabledImage   =   601647103
+      Enabled         =   True
+      HasBottomBorder =   False
+      HasLeftBorder   =   False
+      HasRightBorder  =   False
+      HasTopBorder    =   False
+      Height          =   22
+      HoverImage      =   601647103
+      Index           =   -2147483648
+      IsPressed       =   False
+      Left            =   663
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   True
+      PressedImage    =   507774975
+      Scope           =   2
+      TabIndex        =   10
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   20
+      Transparent     =   True
+      Type            =   ""
+      Visible         =   True
+      Width           =   22
+   End
+   Begin XUIImageButton ButtonStop
+      AllowAutoDeactivate=   True
+      AllowFocus      =   False
+      AllowFocusRing  =   True
+      AllowTabs       =   False
+      Backdrop        =   0
+      BorderColor     =   &c00000000
+      DefaultImage    =   285988863
+      DisabledImage   =   285988863
+      Enabled         =   True
+      HasBottomBorder =   False
+      HasLeftBorder   =   False
+      HasRightBorder  =   False
+      HasTopBorder    =   False
+      Height          =   22
+      HoverImage      =   285988863
+      Index           =   -2147483648
+      IsPressed       =   False
+      Left            =   693
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   True
+      PressedImage    =   1880049663
+      Scope           =   2
+      TabIndex        =   11
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   20
+      Transparent     =   True
+      Type            =   ""
+      Visible         =   True
+      Width           =   22
+   End
+   Begin DesktopTextArea DebuggerOutput
+      AllowAutoDeactivate=   True
+      AllowFocusRing  =   False
+      AllowSpellChecking=   True
+      AllowStyledText =   True
+      AllowTabs       =   False
+      BackgroundColor =   &cFFFFFF
+      Bold            =   False
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      Format          =   ""
+      HasBorder       =   True
+      HasHorizontalScrollbar=   False
+      HasVerticalScrollbar=   True
+      Height          =   249
+      HideSelection   =   True
+      Index           =   -2147483648
+      Italic          =   False
+      Left            =   663
+      LineHeight      =   0.0
+      LineSpacing     =   1.0
       LockBottom      =   True
       LockedInPosition=   False
       LockLeft        =   False
       LockRight       =   True
       LockTop         =   False
-      Multiline       =   False
+      MaximumCharactersAllowed=   0
+      Multiline       =   True
+      ReadOnly        =   True
       Scope           =   2
-      Selectable      =   False
-      TabIndex        =   1
+      TabIndex        =   12
       TabPanelIndex   =   0
       TabStop         =   True
-      Text            =   "Info"
-      TextAlignment   =   3
+      Text            =   ""
+      TextAlignment   =   0
       TextColor       =   &c000000
       Tooltip         =   ""
-      Top             =   791
+      Top             =   576
       Transparent     =   False
       Underline       =   False
+      UnicodeMode     =   1
+      ValidationMask  =   ""
       Visible         =   True
-      Width           =   295
-   End
-   Begin Timer InfoTimer
-      Enabled         =   True
-      Index           =   -2147483648
-      LockedInPosition=   False
-      Period          =   500
-      RunMode         =   2
-      Scope           =   2
-      TabPanelIndex   =   0
+      Width           =   613
    End
 End
 #tag EndDesktopWindow
@@ -367,6 +993,22 @@ End
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 52657475726E7320612073656E7369626C652064656661756C74206D6F6E6F737061636520666F6E74206E616D6520666F722074686520706C6174666F726D207765277265206F6E2E
+		Private Function DefaultMonospaceFont() As String
+		  /// Returns a sensible default monospace font name for the platform we're on.
+		  
+		  #If TargetMacOS Then
+		    Return "Menlo"
+		    
+		  #ElseIf TargetWindows Then
+		    Return "Consolas"
+		    
+		  #ElseIf TargetLinux Then
+		    Return "DejaVu Sans Mono"
+		  #EndIf
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 496E697469616C6973657320746865206175746F636F6D706C65746520656E67696E652E
 		Private Sub InitialiseAutocomplete()
 		  /// Initialises the autocomplete engine.
@@ -468,6 +1110,44 @@ End
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21
+		Private Sub SwitchToPanel(id As Integer)
+		  Select Case id
+		  Case PANEL_AST
+		    ButtonAST.Value = True
+		    ButtonTokens.Value = False
+		    ButtonErrors.Value = False
+		    ButtonDisassembler.Value = False
+		    Panel.SelectedPanelIndex = id
+		    
+		  Case PANEL_TOKENS
+		    ButtonAST.Value = False
+		    ButtonTokens.Value = True
+		    ButtonErrors.Value = False
+		    ButtonDisassembler.Value = False
+		    Panel.SelectedPanelIndex = id
+		    
+		  Case PANEL_ERRORS
+		    ButtonAST.Value = False
+		    ButtonTokens.Value = False
+		    ButtonErrors.Value = True
+		    ButtonDisassembler.Value = False
+		    Panel.SelectedPanelIndex = PANEL_ERRORS
+		    
+		  Case PANEL_DISASSEMBLER_OUTPUT
+		    ButtonAST.Value = False
+		    ButtonTokens.Value = False
+		    ButtonErrors.Value = False
+		    ButtonDisassembler.Value = True
+		    Panel.SelectedPanelIndex = PANEL_DISASSEMBLER_OUTPUT
+		    
+		  Else
+		    Raise New UnsupportedOperationException("Unknown panel ID.")
+		  End Select
+		  
+		End Sub
+	#tag EndMethod
+
 
 	#tag Property, Flags = &h0, Description = 412076657279206261736963204F626A6F536372697074206175746F636F6D706C65746520656E67696E652E
 		AutocompleteEngine As BasicAutocompleteEngine
@@ -480,6 +1160,19 @@ End
 	#tag Property, Flags = &h0, Description = 54686520756E646F206D616E6167657220666F7220746869732077696E646F772E
 		UndoManager As XUIUndoManager
 	#tag EndProperty
+
+
+	#tag Constant, Name = PANEL_AST, Type = Double, Dynamic = False, Default = \"1", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = PANEL_DISASSEMBLER_OUTPUT, Type = Double, Dynamic = False, Default = \"3", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = PANEL_ERRORS, Type = Double, Dynamic = False, Default = \"2", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = PANEL_TOKENS, Type = Double, Dynamic = False, Default = \"0", Scope = Private
+	#tag EndConstant
 
 
 	#tag Enum, Name = SavePromptChoices, Type = Integer, Flags = &h0
@@ -514,11 +1207,52 @@ End
 		End Sub
 	#tag EndEvent
 #tag EndEvents
-#tag Events InfoTimer
+#tag Events ButtonAST
 	#tag Event
-		Sub Action()
-		  Info.Text = "Ln " + Editor.CaretLineNumber.ToString + ", Col " + _
-		  Editor.CaretColumn.ToString
+		Sub Pressed()
+		  SwitchToPanel(PANEL_AST)
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ButtonDisassembler
+	#tag Event
+		Sub Pressed()
+		  SwitchToPanel(PANEL_DISASSEMBLER_OUTPUT)
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ButtonErrors
+	#tag Event
+		Sub Pressed()
+		  SwitchToPanel(PANEL_ERRORS)
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ButtonTokens
+	#tag Event
+		Sub Pressed()
+		  SwitchToPanel(PANEL_TOKENS)
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events DisassemblerOutput
+	#tag Event
+		Sub Opening()
+		  Me.FontName = DefaultMonospaceFont
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events Output
+	#tag Event
+		Sub Opening()
+		  Me.FontName = DefaultMonospaceFont
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events DebuggerOutput
+	#tag Event
+		Sub Opening()
+		  Me.FontName = DefaultMonospaceFont
 		End Sub
 	#tag EndEvent
 #tag EndEvents
