@@ -1,9 +1,28 @@
 #tag Class
 Protected Class App
-Inherits DesktopApplication
+Inherits XUIApp
 	#tag MenuHandler
-		Function WindowEditor() As Boolean Handles WindowEditor.Action
-		  WinEditor.Show
+		Function FileNew() As Boolean Handles FileNew.Action
+		  // Create a new IDE window instance.
+		  
+		  Var w As New WinIDE(Nil)
+		  w.Show
+		  
+		  Return True
+		  
+		End Function
+	#tag EndMenuHandler
+
+	#tag MenuHandler
+		Function FileOpen() As Boolean Handles FileOpen.Action
+		  /// Open an ObjoScript file.
+		  
+		  Var f As FolderItem = FolderItem.ShowOpenFileDialog(DocumentTypes.ObjoScript)
+		  
+		  If f = Nil Then Return True
+		  
+		  Var w As New WinIDE(f)
+		  w.Show
 		  
 		  Return True
 		  

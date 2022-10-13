@@ -801,6 +801,30 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 52657475726E73205472756520696620606F70636F64656020697320776F7274682073746F7070696E67206F6E20676976656E207468652060737465704D6F6465602E
+		Private Function IsStoppableOpcode(opcode As UInt8, stepMode As VM.StepModes) As Boolean
+		  /// Returns True if `opcode` is worth stopping on given the `stepMode`.
+		  
+		  Select Case stepMode
+		  Case VM.StepModes.StepInto
+		    // We stop on everything except pops, loops and jumps.
+		    Return _
+		    opcode <> OP_POP And opcode <> OP_POP_N And opcode <> OP_LOOP And _
+		    opcode <> OP_JUMP And opcode <> OP_JUMP_IF_FALSE And opcode <> OP_JUMP_IF_TRUE
+		     
+		  Case VM.StepModes.StepOver
+		    // Same as step into but we also don't stop on invocations and calls.
+		    Return _
+		    opcode <> OP_POP And opcode <> OP_POP_N And opcode <> OP_LOOP And _
+		    opcode <> OP_JUMP And opcode <> OP_JUMP_IF_FALSE And opcode <> OP_JUMP_IF_TRUE And _
+		    opcode <> OP_CALL And opcode <> OP_INVOKE And opcode <> OP_INVOKE_LONG
+		    
+		  Else
+		    Return False
+		  End Select
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E73205472756520696620607660206973202A6E6F742A20636F6E73696465726564202266616C736579222E
 		Private Function IsTruthy(v As Variant) As Boolean
 		  /// Returns True if `v` is *not* considered "falsey".
@@ -962,14 +986,34 @@ Protected Class VM
 		    APISlots(i) = Nothing
 		  Next i
 		  
+		  CurrentLine = -1
+		  CurrentScriptID = -1
+		  StoppableOpcode = False
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 52756E732074686520696E7465727072657465722E20417373756D657320697420686173206265656E20696E697469616C69736564207072696F7220746F207468697320616E642068617320612076616C69642063616C6C206672616D6520746F20657865637574652E
-		Sub Run()
+		Sub Run(stepMode As ObjoScript.VM.StepModes = ObjoScript.VM.StepModes.None)
 		  /// Runs the interpreter. Assumes it has been initialised prior to this and has a valid call frame to execute.
 		  
 		  While True
+		    
+		    Var frameLine As Integer = CurrentChunk.LineForOffset(CurrentFrame.IP)
+		    Var frameScriptID As Integer = CurrentChunk.ScriptIDForOffset(CurrentFrame.IP)
+		    
+		    If stepMode <> StepModes.None Then
+		      Var opcode As UInt8 = CurrentChunk.ReadByte(CurrentFrame.IP)
+		      
+		      If (frameScriptID <> CurrentScriptID Or frameLine <> CurrentLine) And StoppableOpcode Then
+		        // We've reached a new source line on a stoppable opcode.
+		        StoppableOpcode = False
+		        Return
+		      End If
+		      
+		      // Is this opcode "stoppable"?
+		      StoppableOpcode = IsStoppableOpcode(opcode, stepMode)
+		    End If
+		    
 		    // Disassemble each instruction if requested.
 		    #If DebugBuild And TRACE_EXECUTION
 		      Var s() As String
@@ -980,6 +1024,10 @@ Protected Class VM
 		      System.DebugLog(String.FromArray(s, ""))
 		      Call Disassembler.DisassembleInstruction(-1, -1, CurrentChunk, CurrentFrame.IP)
 		    #EndIf
+		    
+		    // Update line and script ID tracking.
+		    CurrentLine = frameLine
+		    CurrentScriptID = frameScriptID
 		    
 		    Select Case ReadByte
 		    Case OP_RETURN
@@ -1830,6 +1878,14 @@ Protected Class VM
 		Private CurrentFrame As ObjoScript.CallFrame
 	#tag EndProperty
 
+	#tag Property, Flags = &h21, Description = 5468652063757272656E74206C696E65206F6620636F6465206265696E672065786563757465642E
+		Private CurrentLine As Integer = -1
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 546865204944206F66207468652063757272656E7420736372697074206265696E672065786563757465642E20602D316020666F7220746865207374616E64617264206C6962726172792E205479706963616C6C792060306020666F72206D6F737420736372697074732E
+		Private CurrentScriptID As Integer = -1
+	#tag EndProperty
+
 	#tag Property, Flags = &h0, Description = 49662054727565207468656E2074686520564D20697320696E206C6F7720706572666F726D616E6365206465627567206D6F646520616E642063616E20696E7465726163742077697468206368756E6B7320636F6D70696C656420696E206465627567206D6F646520746F2070726F7669646520646562756767696E6720696E666F726D6174696F6E2E
 		DebugMode As Boolean = False
 	#tag EndProperty
@@ -1951,6 +2007,10 @@ Protected Class VM
 
 	#tag Property, Flags = &h21, Description = 506F696E747320746F2074686520696E64657820696E2060537461636B60206A757374202A706173742A2074686520656C656D656E7420636F6E7461696E696E672074686520746F702076616C75652E205468657265666F726520603060206D65616E732074686520737461636B20697320656D7074792E20497427732074686520696E64657820746865206E6578742076616C75652077696C6C2062652070757368656420746F2E
 		Private StackTop As Integer = 0
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 547275652069662074686520564D206861732064657465726D696E65642074686174207468652063757272656E74206F70636F646520697320776F7274682073746F7070696E67206F6E207768656E20646562756767696E672E
+		Private StoppableOpcode As Boolean = False
 	#tag EndProperty
 
 
@@ -2196,6 +2256,13 @@ Protected Class VM
 
 	#tag Constant, Name = TRACE_EXECUTION, Type = Boolean, Dynamic = False, Default = \"False", Scope = Public, Description = 496620547275652028616E6420746869732069732061206465627567206275696C6429207468656E2074686520564D2077696C6C206F757470757420646562756720696E666F726D6174696F6E20746F207468652073797374656D206465627567206C6F672E204E6F2065666665637420696E20636F6D70696C656420617070732E
 	#tag EndConstant
+
+
+	#tag Enum, Name = StepModes, Type = Integer, Flags = &h0
+		None
+		  StepInto
+		StepOver
+	#tag EndEnum
 
 
 	#tag ViewBehavior

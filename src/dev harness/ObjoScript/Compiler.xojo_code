@@ -1001,7 +1001,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Tokenises the standard library source code.
 		  /// These will be prepended to the user's source code tokens.
 		  ///
-		  /// Uses scriptID of -2.
+		  /// Uses scriptID of -1.
 		  
 		  Var lex As New ObjoScript.Lexer
 		  
@@ -1017,7 +1017,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    End If
 		  Next sourceFile
 		  
-		  Return lex.Tokenise(standardLib, False, -2)
+		  Return lex.Tokenise(standardLib, False, -1)
 		  
 		End Function
 	#tag EndMethod

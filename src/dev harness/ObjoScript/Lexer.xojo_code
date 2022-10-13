@@ -865,7 +865,7 @@ Protected Class Lexer
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 546F6B656E6973657320756E70726F636573736564204F626A6F5363726970742060736F757263656020636F646520696E746F20616E206172726179206F6620746F6B656E732E206073637269707449446020697320616E206F7074696F6E616C20494420726570726573656E74696E6720746865207363726970742074686520736F75726365206F726967696E6174656420696E2E
-		Function Tokenise(source As String, includeEOFToken As Boolean = True, scriptID As Integer = -1) As ObjoScript.Token()
+		Function Tokenise(source As String, includeEOFToken As Boolean = True, scriptID As Integer = 0) As ObjoScript.Token()
 		  /// Tokenises unprocessed ObjoScript `source` code into an array of tokens.
 		  /// `scriptID` is an optional ID representing the script the source originated in.
 		  ///

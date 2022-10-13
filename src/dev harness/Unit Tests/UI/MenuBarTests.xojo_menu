@@ -1,5 +1,5 @@
 #tag Menu
-Begin Menu BasicUnitTestsMenuBar
+Begin Menu MenuBarTests
    Begin DesktopMenuItem FileMenu
       SpecialMenu = 0
       Index = -2147483648
@@ -127,14 +127,6 @@ Begin Menu BasicUnitTestsMenuBar
          Visible = True
       End
    End
-   Begin DesktopMenuItem HelpMenu
-      SpecialMenu = 0
-      Index = -2147483648
-      Text = "&Help"
-      AutoEnabled = True
-      AutoEnable = True
-      Visible = True
-   End
    Begin DesktopMenuItem WindowMenu
       SpecialMenu = 0
       Index = -2147483648
@@ -153,10 +145,10 @@ Begin Menu BasicUnitTestsMenuBar
          AutoEnable = True
          Visible = True
       End
-      Begin DesktopMenuItem WindowEditor
+      Begin DesktopMenuItem WindowIDE
          SpecialMenu = 0
          Index = -2147483648
-         Text = "Editor"
+         Text = "IDE"
          ShortcutKey = "1"
          Shortcut = "Cmd+1"
          MenuModifier = True
@@ -164,6 +156,25 @@ Begin Menu BasicUnitTestsMenuBar
          AutoEnable = True
          Visible = True
       End
+      Begin DesktopMenuItem WindowEditor
+         SpecialMenu = 0
+         Index = -2147483648
+         Text = "Editor"
+         ShortcutKey = "2"
+         Shortcut = "Cmd+2"
+         MenuModifier = True
+         AutoEnabled = True
+         AutoEnable = True
+         Visible = True
+      End
+   End
+   Begin DesktopMenuItem HelpMenu
+      SpecialMenu = 0
+      Index = -2147483648
+      Text = "&Help"
+      AutoEnabled = True
+      AutoEnable = True
+      Visible = True
    End
 End
 #tag EndMenu
