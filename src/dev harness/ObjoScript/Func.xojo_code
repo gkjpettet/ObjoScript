@@ -80,9 +80,14 @@ Implements ObjoScript.Value,ObjoScript.Method
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(name As String, arity As Integer, isSetter As Boolean, debugMode As Boolean)
+		Sub Constructor(name As String, parameterTokens() As ObjoScript.Token, isSetter As Boolean, debugMode As Boolean)
 		  Self.Name = name
-		  Self.Arity = arity
+		  
+		  For Each paramToken As ObjoScript.Token In parameterTokens
+		    Self.Parameters.Add(paramToken.Lexeme)
+		  Next paramToken
+		  Self.Arity = parameters.Count
+		  
 		  Self.Chunk = New ObjoScript.Chunk(debugMode)
 		  Self.IsSetter = isSetter
 		  mSignature = ComputeSignature(name, arity, isSetter)
@@ -157,6 +162,10 @@ Implements ObjoScript.Value,ObjoScript.Method
 		Name As String
 	#tag EndProperty
 
+	#tag Property, Flags = &h0, Description = 546865206E616D65206F6620746869732066756E6374696F6E277320706172616D65746572732028696E206F72646572292E204D617920626520656D7074792E
+		Parameters() As String
+	#tag EndProperty
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
@@ -221,7 +230,7 @@ Implements ObjoScript.Value,ObjoScript.Method
 			Group="Behavior"
 			InitialValue=""
 			Type="String"
-			EditorType=""
+			EditorType="MultiLineEditor"
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class

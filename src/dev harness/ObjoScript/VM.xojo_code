@@ -644,6 +644,42 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21
+		Private Function HandleStepping(stepMode As VM.StepModes) As Boolean
+		  /// Returns True if the VM should exit its run loop or False if it should continue.
+		  /// True indicates we've reached a sensible stopping point.
+		  
+		  Var frameLine As Integer = CurrentChunk.LineForOffset(CurrentFrame.IP)
+		  Var frameScriptID As Integer = CurrentChunk.ScriptIDForOffset(CurrentFrame.IP)
+		  
+		  Var opcode As UInt8 = CurrentChunk.ReadByte(CurrentFrame.IP)
+		  If frameScriptID <> -1 Then // Disallow stopping within the standard library (scriptID < 0).
+		    If frameLine <> mLastStoppedLine Or frameScriptID <> LastStoppedScriptID Then
+		      If LastInstructionFrame <> CurrentFrame Or IsStoppableOpcode(opcode, stepMode) Then
+		        // We've reached a new source line on a stoppable opcode.
+		        mLastStoppedLine = frameLine
+		        LastStoppedScriptID = frameScriptID
+		        LastInstructionFrame = CurrentFrame
+		        Return True
+		      End If
+		    End If
+		  End If
+		  
+		  // Disassemble each instruction if requested.
+		  If TraceExecution And frameScriptID <> -1 Then
+		    Var s() As String
+		    For i As Integer = 0 To StackTop - 1
+		      Var item As Variant = Stack(i)
+		      s.Add("[ " + ValueToString(item) + " ]")
+		    Next i
+		    RaiseEvent DebugPrint(String.FromArray(s, ""))
+		    Call Disassembler.DisassembleInstruction(-1, -1, CurrentChunk, CurrentFrame.IP)
+		  End If
+		  
+		  Return False
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 48616E646C657320746865204F505F494E484552495420696E737472756374696F6E2E
 		Private Sub Inherit()
 		  /// Handles the OP_INHERIT instruction.
@@ -1013,6 +1049,7 @@ Protected Class VM
 		  mLastStoppedLine = -1
 		  LastStoppedScriptID = -1
 		  mShouldStop = False
+		  LastInstructionFrame = Nil
 		End Sub
 	#tag EndMethod
 
@@ -1027,35 +1064,7 @@ Protected Class VM
 		    
 		    If Self.DebugMode And CurrentChunk.IsDebug Then
 		      If mShouldStop Then Return
-		      
-		      Var frameLine As Integer = CurrentChunk.LineForOffset(CurrentFrame.IP)
-		      Var frameScriptID As Integer = CurrentChunk.ScriptIDForOffset(CurrentFrame.IP)
-		      
-		      // Instruction stepping for the debugger (if enabled).
-		      If stepMode <> StepModes.None Then
-		        Var opcode As UInt8 = CurrentChunk.ReadByte(CurrentFrame.IP)
-		        If frameScriptID <> -1 Then // Disallow stopping within the standard library (scriptID < 0).
-		          If frameLine <> mLastStoppedLine Or frameScriptID <> LastStoppedScriptID Then
-		            If IsStoppableOpcode(opcode, stepMode) Then
-		              // We've reached a new source line on a stoppable opcode.
-		              mLastStoppedLine = frameLine
-		              LastStoppedScriptID = frameScriptID
-		              Return
-		            End If
-		          End If
-		        End If
-		        
-		        // Disassemble each instruction if requested.
-		        If TraceExecution And frameScriptID <> -1 Then
-		          Var s() As String
-		          For i As Integer = 0 To StackTop - 1
-		            Var item As Variant = Stack(i)
-		            s.Add("[ " + ValueToString(item) + " ]")
-		          Next i
-		          RaiseEvent DebugPrint(String.FromArray(s, ""))
-		          Call Disassembler.DisassembleInstruction(-1, -1, CurrentChunk, CurrentFrame.IP)
-		        End If
-		      End If
+		      If HandleStepping(stepMode) Then Return
 		    End If
 		    
 		    Select Case ReadByte
@@ -1303,13 +1312,6 @@ Protected Class VM
 		      // The operand is the stack slot where the local variable lives.
 		      // Load the value at that index and then push it on to the top of the stack.
 		      Push(Stack(CurrentFrame.StackBase + ReadByte))
-		      
-		    Case OP_GET_LOCAL_NAME
-		      // This is OP_GET_LOCAL followed by the index in the constants pool of the name
-		      // of the local variable.
-		      Var slot As Integer = ReadByte
-		      Push(Stack(CurrentFrame.StackBase + slot))
-		      CurrentFrame.Locals.Value(ReadConstantLong) = slot
 		      
 		    Case OP_GET_LOCAL_CLASS
 		      // The operand is the stack slot where the local variable lives.
@@ -1897,7 +1899,7 @@ Protected Class VM
 		67: OP_SUPER_SETTER_LONG (2)
 		68: OP_SUPER_INVOKE (2)
 		69: OP_SUPER_INVOKE_LONG (3)
-		70: OP_GET_LOCAL_NAME (3)
+		70: **Unused**
 		71: **Unused**
 		72: OP_GET_STATIC_FIELD (1)
 		73: OP_GET_STATIC_FIELD_LONG (2)
@@ -1941,6 +1943,10 @@ Protected Class VM
 
 	#tag Property, Flags = &h21, Description = 53746F7265732074686520564D277320676C6F62616C207661726961626C65732E204B6579203D207661726961626C65206E616D652028537472696E67292C2056616C7565203D207661726961626C652076616C7565202856617269616E74292E
 		Private Globals As Dictionary
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 5468652063616C6C206672616D6520647572696E67207468652070726576696F757320696E737472756374696F6E2E
+		Private LastInstructionFrame As ObjoScript.CallFrame
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0, Description = 546865206C696E65206E756D6265722074686520564D206C6173742073746F70706564206F6E2E2057696C6C20626520602D31602069662074686520564D206861732079657420746F2073746F70206F6E2061206C696E652E
@@ -2044,7 +2050,6 @@ Protected Class VM
 			  OP_SET_STATIC_FIELD_LONG: 2, _
 			  OP_FOREIGN_METHOD       : 3, _
 			  OP_IS                   : 0, _
-			  OP_GET_LOCAL_NAME       : 3, _
 			  OP_GET_LOCAL_CLASS      : 1 _
 			  )
 			  
@@ -2159,9 +2164,6 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_GET_LOCAL_CLASS, Type = Double, Dynamic = False, Default = \"49", Scope = Public
-	#tag EndConstant
-
-	#tag Constant, Name = OP_GET_LOCAL_NAME, Type = Double, Dynamic = False, Default = \"70", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_GET_STATIC_FIELD, Type = Double, Dynamic = False, Default = \"72", Scope = Public

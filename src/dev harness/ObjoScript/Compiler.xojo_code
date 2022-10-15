@@ -161,7 +161,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Should this compiler compile chunks for production or debugging?
 		  Self.DebugMode = debugMode
 		  
-		  Func = New ObjoScript.Func(name, parameters.Count, False, Self.DebugMode)
+		  Func = New ObjoScript.Func(name, parameters, False, Self.DebugMode)
 		  Self.Type = type
 		  Self.IsStaticMethod = isStaticMethod
 		  Self.CurrentClass = currentClass
@@ -775,23 +775,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var arg As Integer = ResolveLocal(name)
 		  If arg <> -1 Then
 		    // Retrieve a local variable.
-		    
-		    If Self.DebugMode Then
-		      // First the VM needs to push the value at slot `arg` on to the top of the stack.
-		      // It then needs to know the name of this variable for debugging purposes.
-		      
-		      // Tell the VM the name of the local we've just retrieved.
-		      EmitByte(ObjoScript.VM.OP_GET_LOCAL_NAME)
-		      EmitByte(arg)
-		      
-		      // Add the name of the variable to the constant pool and emit its index.
-		      Var index As Integer = AddConstant(name)
-		      EmitUInt16(index)
-		      
-		    Else
-		      // Just tell the VM to push the value at slot `arg` on to the top of the stack.
-		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL, arg)
-		    End If
+		    // Tell the VM to push the value at slot `arg` on to the top of the stack.
+		    EmitBytes(ObjoScript.VM.OP_GET_LOCAL, arg)
 		    
 		  Else
 		    // Retrieve a global variable.
@@ -2159,6 +2144,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles a variable declaration.
 		  ///
 		  /// Part of the ObjoScript.StmtVisitor interface.
+		  
+		  #Pragma Warning "TODO: Need a way for the VM to store the name of local variables for debugging"
 		  
 		  mLocation = stmt.Location
 		  
