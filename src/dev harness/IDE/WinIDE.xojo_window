@@ -23,7 +23,7 @@ Begin DesktopWindow WinIDE
    Title           =   "ObjoScript IDE"
    Type            =   0
    Visible         =   True
-   Width           =   1300
+   Width           =   1380
    Begin XUICodeEditor Editor
       AllowAutocomplete=   True
       AllowAutoCompleteInComments=   True
@@ -91,7 +91,7 @@ Begin DesktopWindow WinIDE
       Top             =   0
       VerticalLinePadding=   0
       Visible         =   True
-      Width           =   651
+      Width           =   670
    End
    Begin DesktopBevelButton ButtonAST
       Active          =   False
@@ -119,7 +119,7 @@ Begin DesktopWindow WinIDE
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   1220
+      Left            =   1300
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   False
@@ -169,7 +169,7 @@ Begin DesktopWindow WinIDE
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   958
+      Left            =   1038
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   False
@@ -219,7 +219,7 @@ Begin DesktopWindow WinIDE
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   1076
+      Left            =   1156
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   False
@@ -269,7 +269,7 @@ Begin DesktopWindow WinIDE
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   1148
+      Left            =   1228
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   False
@@ -298,13 +298,13 @@ Begin DesktopWindow WinIDE
       Enabled         =   True
       Height          =   510
       Index           =   -2147483648
-      Left            =   663
+      Left            =   682
       LockBottom      =   True
       LockedInPosition=   False
-      LockLeft        =   True
+      LockLeft        =   False
       LockRight       =   True
       LockTop         =   True
-      PanelCount      =   4
+      PanelCount      =   5
       Panels          =   ""
       Scope           =   2
       SelectedPanelIndex=   0
@@ -314,9 +314,9 @@ Begin DesktopWindow WinIDE
       Tooltip         =   ""
       Top             =   54
       Transparent     =   False
-      Value           =   1
+      Value           =   4
       Visible         =   True
-      Width           =   617
+      Width           =   678
       Begin DesktopListBox TokensListbox
          AllowAutoDeactivate=   True
          AllowAutoHideScrollbars=   True
@@ -345,7 +345,7 @@ Begin DesktopWindow WinIDE
          InitialParent   =   "Panel"
          InitialValue    =   "Type	Line	Abs Pos	Value	Script ID"
          Italic          =   False
-         Left            =   663
+         Left            =   682
          LockBottom      =   True
          LockedInPosition=   False
          LockLeft        =   True
@@ -362,7 +362,7 @@ Begin DesktopWindow WinIDE
          Transparent     =   False
          Underline       =   False
          Visible         =   True
-         Width           =   617
+         Width           =   678
          _ScrollOffset   =   0
          _ScrollWidth    =   -1
       End
@@ -394,7 +394,7 @@ Begin DesktopWindow WinIDE
          InitialParent   =   "Panel"
          InitialValue    =   "Message	Line	AbsPos	Script ID"
          Italic          =   False
-         Left            =   663
+         Left            =   682
          LockBottom      =   True
          LockedInPosition=   False
          LockLeft        =   True
@@ -411,7 +411,7 @@ Begin DesktopWindow WinIDE
          Transparent     =   False
          Underline       =   False
          Visible         =   True
-         Width           =   617
+         Width           =   678
          _ScrollOffset   =   0
          _ScrollWidth    =   -1
       End
@@ -435,18 +435,18 @@ Begin DesktopWindow WinIDE
          HasNodeTextColor=   False
          HasSelectionColor=   False
          HasSelectionTextColor=   False
-         Height          =   510
+         Height          =   490
          InactiveSelectionColor=   &cD3D3D300
          Index           =   -2147483648
          InitialParent   =   "Panel"
-         Left            =   663
+         Left            =   682
          LinuxDrawTreeLines=   False
          LinuxExpanderStyle=   0
          LinuxHighlightFullRow=   True
-         LockBottom      =   False
+         LockBottom      =   True
          LockedInPosition=   False
          LockLeft        =   True
-         LockRight       =   False
+         LockRight       =   True
          LockTop         =   True
          MacDrawTreeLines=   False
          MacExpanderStyle=   0
@@ -469,7 +469,7 @@ Begin DesktopWindow WinIDE
          Top             =   54
          UseFocusRing    =   True
          Visible         =   True
-         Width           =   617
+         Width           =   678
          WinDrawTreeLines=   True
          WinHighlightFullRow=   False
       End
@@ -494,13 +494,13 @@ Begin DesktopWindow WinIDE
          Index           =   -2147483648
          InitialParent   =   "Panel"
          Italic          =   False
-         Left            =   663
+         Left            =   682
          LineHeight      =   0.0
          LineSpacing     =   1.0
-         LockBottom      =   False
+         LockBottom      =   True
          LockedInPosition=   False
          LockLeft        =   True
-         LockRight       =   False
+         LockRight       =   True
          LockTop         =   True
          MaximumCharactersAllowed=   0
          Multiline       =   True
@@ -519,7 +519,65 @@ Begin DesktopWindow WinIDE
          UnicodeMode     =   1
          ValidationMask  =   ""
          Visible         =   True
-         Width           =   617
+         Width           =   678
+      End
+      Begin DebuggerTreeView DebuggerTree
+         AutoDeactivate  =   True
+         BackColor       =   &cFFFFFF00
+         ColumnCount     =   1
+         DarkBackColor   =   &c2D2D2D00
+         DarkNodeTextColor=   &cFFFFFF00
+         DarkSelectionTextColor=   &cFFFFFF00
+         DragReceiveBehavior=   1
+         Enabled         =   True
+         FontName        =   "System"
+         FontSize        =   0.0
+         FontUnit        =   0
+         HasBackColor    =   False
+         HasBorder       =   True
+         HasHeader       =   False
+         HasInactiveSelectionColor=   False
+         HasNodeColor    =   False
+         HasNodeTextColor=   False
+         HasSelectionColor=   False
+         HasSelectionTextColor=   False
+         Height          =   490
+         InactiveSelectionColor=   &cD3D3D300
+         Index           =   -2147483648
+         InitialParent   =   "Panel"
+         Left            =   682
+         LinuxDrawTreeLines=   False
+         LinuxExpanderStyle=   0
+         LinuxHighlightFullRow=   True
+         LockBottom      =   True
+         LockedInPosition=   False
+         LockLeft        =   True
+         LockRight       =   True
+         LockTop         =   True
+         MacDrawTreeLines=   False
+         MacExpanderStyle=   0
+         MacHighlightFullRow=   True
+         MultiSelection  =   False
+         NodeEvenColor   =   &cFFFFFF00
+         NodeHeight      =   18
+         NodeOddColor    =   &cFFFFFF00
+         NodeTextColor   =   &c00000000
+         QuartzShading   =   False
+         Scope           =   2
+         SelectionColor  =   &c478A1A00
+         SelectionSeparator=   0
+         SelectionTextColor=   &cFFFFFF00
+         SystemNodeColors=   True
+         TabIndex        =   0
+         TabPanelIndex   =   5
+         TabStop         =   True
+         Tooltip         =   ""
+         Top             =   54
+         UseFocusRing    =   True
+         Visible         =   True
+         Width           =   678
+         WinDrawTreeLines=   True
+         WinHighlightFullRow=   False
       End
    End
    Begin DesktopTextArea Output
@@ -567,7 +625,7 @@ Begin DesktopWindow WinIDE
       UnicodeMode     =   1
       ValidationMask  =   ""
       Visible         =   True
-      Width           =   631
+      Width           =   650
    End
    Begin XUIImageButton ButtonStepOver
       AllowAutoDeactivate=   True
@@ -587,7 +645,7 @@ Begin DesktopWindow WinIDE
       HoverImage      =   539498495
       Index           =   -2147483648
       IsPressed       =   False
-      Left            =   722
+      Left            =   741
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   False
@@ -623,7 +681,7 @@ Begin DesktopWindow WinIDE
       HoverImage      =   990324735
       Index           =   -2147483648
       IsPressed       =   False
-      Left            =   751
+      Left            =   770
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   False
@@ -659,7 +717,7 @@ Begin DesktopWindow WinIDE
       HoverImage      =   601647103
       Index           =   -2147483648
       IsPressed       =   False
-      Left            =   663
+      Left            =   682
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   False
@@ -695,7 +753,7 @@ Begin DesktopWindow WinIDE
       HoverImage      =   285988863
       Index           =   -2147483648
       IsPressed       =   False
-      Left            =   693
+      Left            =   712
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   False
@@ -733,7 +791,7 @@ Begin DesktopWindow WinIDE
       HideSelection   =   True
       Index           =   -2147483648
       Italic          =   False
-      Left            =   663
+      Left            =   682
       LineHeight      =   0.0
       LineSpacing     =   1.0
       LockBottom      =   True
@@ -758,7 +816,86 @@ Begin DesktopWindow WinIDE
       UnicodeMode     =   1
       ValidationMask  =   ""
       Visible         =   True
-      Width           =   613
+      Width           =   674
+   End
+   Begin DesktopCheckBox CheckBoxDebugMode
+      AllowAutoDeactivate=   True
+      Bold            =   False
+      Caption         =   "Debug Mode"
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      Height          =   20
+      Index           =   -2147483648
+      Italic          =   False
+      Left            =   804
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   True
+      Scope           =   0
+      TabIndex        =   13
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   20
+      Transparent     =   False
+      Underline       =   False
+      Visible         =   True
+      VisualState     =   1
+      Width           =   108
+   End
+   Begin DesktopBevelButton ButtonDebugger
+      Active          =   False
+      AllowAutoDeactivate=   True
+      AllowFocus      =   True
+      AllowTabStop    =   True
+      BackgroundColor =   &c00000000
+      BevelStyle      =   0
+      Bold            =   False
+      ButtonStyle     =   1
+      Caption         =   "Debugger"
+      CaptionAlignment=   3
+      CaptionDelta    =   0
+      CaptionPosition =   1
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      HasBackgroundColor=   False
+      Height          =   22
+      Icon            =   0
+      IconAlignment   =   0
+      IconDeltaX      =   0
+      IconDeltaY      =   0
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   924
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   True
+      MenuStyle       =   0
+      PanelIndex      =   0
+      Scope           =   2
+      TabIndex        =   14
+      TabPanelIndex   =   0
+      TextColor       =   &c00000000
+      Tooltip         =   ""
+      Top             =   20
+      Transparent     =   False
+      Underline       =   False
+      Value           =   False
+      Visible         =   True
+      Width           =   106
+      _mIndex         =   0
+      _mInitialParent =   ""
+      _mName          =   ""
+      _mPanelIndex    =   0
    End
 End
 #tag EndDesktopWindow
@@ -994,8 +1131,8 @@ End
 		  
 		  SwitchToPanel(PANEL_AST)
 		  
-		  // Run the VM in debugging mode.
-		  Vm.DebugMode = True
+		  // Run the VM in debugging mode if specified.
+		  Vm.DebugMode = CheckBoxDebugMode.Value
 		  
 		  Try
 		    VM.Interpret(func, stepMode)
@@ -1210,8 +1347,8 @@ End
 		  
 		  // Create a new VM and add the required event handlers.
 		  VM = New ObjoScript.VM
-		  VM.DebugMode = True
-		  VM.TraceExecution = True
+		  VM.DebugMode = CheckBoxDebugMode.Value
+		  VM.TraceExecution = CheckBoxDebugMode.Value
 		  AddHandler VM.Print, AddressOf VMPrintDelegate
 		  AddHandler VM.DebugPrint, AddressOf VMDebugPrintDelegate
 		  
@@ -1284,6 +1421,7 @@ End
 		    ButtonTokens.Value = False
 		    ButtonErrors.Value = False
 		    ButtonDisassembler.Value = False
+		    ButtonDebugger.Value = False
 		    Panel.SelectedPanelIndex = id
 		    
 		  Case PANEL_TOKENS
@@ -1291,6 +1429,7 @@ End
 		    ButtonTokens.Value = True
 		    ButtonErrors.Value = False
 		    ButtonDisassembler.Value = False
+		    ButtonDebugger.Value = False
 		    Panel.SelectedPanelIndex = id
 		    
 		  Case PANEL_ERRORS
@@ -1298,6 +1437,7 @@ End
 		    ButtonTokens.Value = False
 		    ButtonErrors.Value = True
 		    ButtonDisassembler.Value = False
+		    ButtonDebugger.Value = False
 		    Panel.SelectedPanelIndex = PANEL_ERRORS
 		    
 		  Case PANEL_DISASSEMBLER_OUTPUT
@@ -1305,7 +1445,16 @@ End
 		    ButtonTokens.Value = False
 		    ButtonErrors.Value = False
 		    ButtonDisassembler.Value = True
+		    
 		    Panel.SelectedPanelIndex = PANEL_DISASSEMBLER_OUTPUT
+		    
+		  Case PANEL_DEBUGGER
+		    ButtonAST.Value = False
+		    ButtonTokens.Value = False
+		    ButtonErrors.Value = False
+		    ButtonDisassembler.Value = False
+		    ButtonDebugger.Value = True
+		    Panel.SelectedPanelIndex = PANEL_DEBUGGER
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown panel ID.")
@@ -1420,6 +1569,9 @@ End
 	#tag Constant, Name = PANEL_AST, Type = Double, Dynamic = False, Default = \"1", Scope = Private
 	#tag EndConstant
 
+	#tag Constant, Name = PANEL_DEBUGGER, Type = Double, Dynamic = False, Default = \"4", Scope = Private
+	#tag EndConstant
+
 	#tag Constant, Name = PANEL_DISASSEMBLER_OUTPUT, Type = Double, Dynamic = False, Default = \"3", Scope = Private
 	#tag EndConstant
 
@@ -1514,6 +1666,8 @@ End
 		    VM.Run(ObjoScript.VM.StepModes.StepInto)
 		  End If
 		  
+		  // Update the debugger.
+		  If VM <> Nil Then DebuggerTree.Display(VM, VM.GetCurrentFrame)
 		End Sub
 	#tag EndEvent
 #tag EndEvents
@@ -1529,6 +1683,27 @@ End
 	#tag Event
 		Sub Opening()
 		  Me.FontName = DefaultMonospaceFont
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events CheckBoxDebugMode
+	#tag Event
+		Sub ValueChanged()
+		  If VM <> Nil Then
+		    VM.DebugMode = Me.Value
+		    VM.TraceExecution = Me.Value
+		  End If
+		  
+		  ButtonStepIn.Enabled = Me.Value
+		  ButtonStepOver.Enabled = Me.Value
+		  
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ButtonDebugger
+	#tag Event
+		Sub Pressed()
+		  SwitchToPanel(PANEL_DEBUGGER)
 		End Sub
 	#tag EndEvent
 #tag EndEvents

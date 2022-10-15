@@ -1001,7 +1001,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Tokenises the standard library source code.
 		  /// These will be prepended to the user's source code tokens.
 		  ///
-		  /// Uses scriptID of -1.
+		  /// We use a scriptID of -1.
 		  
 		  Var lex As New ObjoScript.Lexer
 		  

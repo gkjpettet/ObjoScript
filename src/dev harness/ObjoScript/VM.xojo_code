@@ -524,6 +524,15 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 52657475726E73207468652063757272656E742063616C6C206672616D652E20546869732073686F756C6420626520636F6E7369646572656420726561642D6F6E6C792E
+		Function GetCurrentFrame() As CallFrame
+		  /// Returns the current call frame. This should be considered read-only.
+		  
+		  Return CurrentFrame
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 526574726965766573207468652076616C7565206F6620616E20696E7374616E6365206669656C64206E616D656420606E616D6560206F6E2074686520696E7374616E63652063757272656E746C79206F6E2074686520746F70206F662074686520737461636B20616E64207468656E20707573686573206974206F6E20746F2074686520746F70206F662074686520737461636B2E
 		Private Sub GetField(name As String)
 		  /// Retrieves the value of an instance field named `name` on the instance currently on the top of the 
@@ -607,6 +616,16 @@ Protected Class VM
 		  Push(value)
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 52657475726E73207468652076616C756520696E2074686520737461636B2061742074686520606672616D65602060736C6F74602E2060736C6F74203060206973207468652066756E6374696F6E20616E642C205468656E2077652068617665206F7074696F6E616C2066756E6374696F6E20617267756D656E747320616E64207468656E20616E79206C6F63616C7320646566696E656420696E207468652066756E6374696F6E2E
+		Function GetValueAtFrameSlot(frame As ObjoScript.CallFrame, slot As Integer) As Variant
+		  /// Returns the value in the stack at the `frame` `slot`. `slot 0` is the function and, 
+		  /// Then we have optional function arguments and then any locals defined in the function.
+		  
+		  Return Stack(frame.StackBase + slot)
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 4C6F6F6B73207570206120746F702D6C6576656C207661726961626C65206E616D656420606E616D656020616E64207075747320697420696E207468652041504920736C6F742060736C6F74602E2052657475726E73205472756520696620666F756E64206F722046616C736520696620746865207661726961626C6520646F6573206E6F742065786973742E
@@ -805,23 +824,28 @@ Protected Class VM
 		Private Function IsStoppableOpcode(opcode As UInt8, stepMode As VM.StepModes) As Boolean
 		  /// Returns True if `opcode` is worth stopping on given the `stepMode`.
 		  
+		  // Stop on the following operations:
+		  // Variable declarations, assignments, assertions, continue, exit, return
 		  Select Case stepMode
 		  Case VM.StepModes.StepInto
-		    // We stop on everything except pops, loops and jumps.
-		    Return _
-		    opcode <> OP_POP Or opcode <> OP_POP_N Or opcode <> OP_LOOP Or _
-		    opcode <> OP_JUMP Or opcode <> OP_JUMP_IF_FALSE Or opcode <> OP_JUMP_IF_TRUE
+		    Select Case opcode
+		    Case OP_ASSERT, OP_SET_LOCAL, OP_SET_GLOBAL, OP_SET_GLOBAL_LONG, _
+		      OP_DEFINE_GLOBAL, OP_DEFINE_GLOBAL_LONG, OP_SET_FIELD, OP_SET_FIELD_LONG, _
+		      OP_SET_STATIC_FIELD, OP_SET_STATIC_FIELD_LONG, OP_RETURN, OP_LOOP, OP_CALL, _
+		      OP_INVOKE, OP_INVOKE_LONG
+		      Return True
+		      
+		    Else
+		      Return False
+		    End Select
 		    
 		  Case VM.StepModes.StepOver
-		    // Same as step into but we also don't stop on invocations and calls.
-		    Return Not _
-		    opcode <> OP_POP Or opcode <> OP_POP_N Or opcode <> OP_LOOP Or _
-		    opcode <> OP_JUMP Or opcode <> OP_JUMP_IF_FALSE Or opcode <> OP_JUMP_IF_TRUE Or _
-		    opcode <> OP_CALL Or opcode <> OP_INVOKE Or opcode <> OP_INVOKE_LONG
+		    Raise New UnsupportedOperationException("Stepping into not yet implemented.")
 		    
 		  Else
 		    Return False
 		  End Select
+		  
 		End Function
 	#tag EndMethod
 
@@ -986,8 +1010,8 @@ Protected Class VM
 		    APISlots(i) = Nothing
 		  Next i
 		  
-		  CurrentLine = -1
-		  CurrentScriptID = -1
+		  LastStoppedLine = -1
+		  LastStoppedScriptID = -1
 		  
 		End Sub
 	#tag EndMethod
@@ -996,43 +1020,41 @@ Protected Class VM
 		Sub Run(stepMode As ObjoScript.VM.StepModes = ObjoScript.VM.StepModes.None)
 		  /// Runs the interpreter. Assumes it has been initialised prior to this and has a valid call frame to execute.
 		  
+		  // Make sure we don't try to step in with an out of bounds instruction pointer.
+		  If CurrentFrame.IP > CurrentChunk.Code.LastIndex Then Return
+		  
 		  While True
 		    
-		    Var frameLine As Integer = CurrentChunk.LineForOffset(CurrentFrame.IP)
-		    Var frameScriptID As Integer = CurrentChunk.ScriptIDForOffset(CurrentFrame.IP)
-		    
-		    If Self.DebugMode Then
+		    If Self.DebugMode And CurrentChunk.IsDebug Then
+		      Var frameLine As Integer = CurrentChunk.LineForOffset(CurrentFrame.IP)
+		      Var frameScriptID As Integer = CurrentChunk.ScriptIDForOffset(CurrentFrame.IP)
+		      
 		      // Instruction stepping for the debugger (if enabled).
 		      If stepMode <> StepModes.None Then
 		        Var opcode As UInt8 = CurrentChunk.ReadByte(CurrentFrame.IP)
-		        If CurrentScriptID <> -1 Then
-		          // Note we disallow stopping within the standard library (scriptID = -1).
-		          If (frameLine <> CurrentLine) Or (frameLine = CurrentLine And frameScriptID <> CurrentScriptID) Then
+		        If frameScriptID <> -1 Then // Disallow stopping within the standard library (scriptID < 0).
+		          If frameLine <> LastStoppedLine Or frameScriptID <> LastStoppedScriptID Then
 		            If IsStoppableOpcode(opcode, stepMode) Then
 		              // We've reached a new source line on a stoppable opcode.
-		              CurrentLine = frameLine
-		              CurrentScriptID = frameScriptID
+		              LastStoppedLine = frameLine
+		              LastStoppedScriptID = frameScriptID
 		              Return
 		            End If
 		          End If
 		        End If
-		      End If
-		      
-		      // Disassemble each instruction if requested.
-		      If TraceExecution And frameScriptID <> -1 Then
-		        Var s() As String
-		        For i As Integer = 0 To StackTop - 1
-		          Var item As Variant = Stack(i)
-		          s.Add("[ " + ValueToString(item) + " ]")
-		        Next i
-		        RaiseEvent DebugPrint(String.FromArray(s, ""))
-		        Call Disassembler.DisassembleInstruction(-1, -1, CurrentChunk, CurrentFrame.IP)
+		        
+		        // Disassemble each instruction if requested.
+		        If TraceExecution And frameScriptID <> -1 Then
+		          Var s() As String
+		          For i As Integer = 0 To StackTop - 1
+		            Var item As Variant = Stack(i)
+		            s.Add("[ " + ValueToString(item) + " ]")
+		          Next i
+		          RaiseEvent DebugPrint(String.FromArray(s, ""))
+		          Call Disassembler.DisassembleInstruction(-1, -1, CurrentChunk, CurrentFrame.IP)
+		        End If
 		      End If
 		    End If
-		    
-		    // Update line and script ID tracking.
-		    CurrentLine = frameLine
-		    CurrentScriptID = frameScriptID
 		    
 		    Select Case ReadByte
 		    Case OP_RETURN
@@ -1887,14 +1909,6 @@ Protected Class VM
 		Private CurrentFrame As ObjoScript.CallFrame
 	#tag EndProperty
 
-	#tag Property, Flags = &h21, Description = 5468652063757272656E74206C696E65206F6620636F6465206265696E672065786563757465642E
-		Private CurrentLine As Integer = -1
-	#tag EndProperty
-
-	#tag Property, Flags = &h21, Description = 546865204944206F66207468652063757272656E7420736372697074206265696E672065786563757465642E20602D316020666F7220746865207374616E64617264206C6962726172792E205479706963616C6C792060306020666F72206D6F737420736372697074732E
-		Private CurrentScriptID As Integer = -1
-	#tag EndProperty
-
 	#tag Property, Flags = &h0, Description = 49662054727565207468656E2074686520564D20697320696E206C6F7720706572666F726D616E6365206465627567206D6F646520616E642063616E20696E7465726163742077697468206368756E6B7320636F6D70696C656420696E206465627567206D6F646520746F2070726F7669646520646562756767696E6720696E666F726D6174696F6E2E
 		DebugMode As Boolean = False
 	#tag EndProperty
@@ -1907,8 +1921,8 @@ Protected Class VM
 		Private DisassemblerOutput() As String
 	#tag EndProperty
 
-	#tag Property, Flags = &h21, Description = 546865206E756D626572206F66206F6E676F696E672066756E6374696F6E2063616C6C732E
-		Private FrameCount As Integer = 0
+	#tag Property, Flags = &h0, Description = 546865206E756D626572206F66206F6E676F696E672066756E6374696F6E2063616C6C732E
+		FrameCount As Integer = 0
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 4120737461636B206F662063616C6C206672616D65732E
@@ -1917,6 +1931,14 @@ Protected Class VM
 
 	#tag Property, Flags = &h21, Description = 53746F7265732074686520564D277320676C6F62616C207661726961626C65732E204B6579203D207661726961626C65206E616D652028537472696E67292C2056616C7565203D207661726961626C652076616C7565202856617269616E74292E
 		Private Globals As Dictionary
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 546865206C696E65206F6620636F64652074686520564D206C6173742073746F70706564206F6E2E
+		Private LastStoppedLine As Integer = -1
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 546865204944206F6620746865207363726970742074686520564D206C6173742073746F7070656420696E2E20602D316020666F7220746865207374616E64617264206C6962726172792E205479706963616C6C792060306020666F72206D6F737420736372697074732E
+		Private LastStoppedScriptID As Integer = -1
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 53696E676C65746F6E20696E7374616E6365206F6620224E6F7468696E67222E
