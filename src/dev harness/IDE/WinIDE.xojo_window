@@ -744,7 +744,7 @@ Begin DesktopWindow WinIDE
       BorderColor     =   &c00000000
       DefaultImage    =   285988863
       DisabledImage   =   285988863
-      Enabled         =   True
+      Enabled         =   False
       HasBottomBorder =   False
       HasLeftBorder   =   False
       HasRightBorder  =   False
@@ -1129,7 +1129,7 @@ End
 		  Var func As ObjoScript.Func = Compile
 		  If func = Nil Then Return
 		  
-		  SwitchToPanel(PANEL_AST)
+		  SwitchToPanel(PANEL_DEBUGGER)
 		  
 		  // Run the VM in debugging mode if specified.
 		  Vm.DebugMode = CheckBoxDebugMode.Value
@@ -1155,8 +1155,8 @@ End
 		  
 		  Reset
 		  
-		  // Show the AST by default.
-		  SwitchToPanel(PANEL_AST)
+		  // Show the debugger by default.
+		  SwitchToPanel(PANEL_DEBUGGER)
 		  
 		  Var func As ObjoScript.Func
 		  Try
@@ -1659,6 +1659,8 @@ End
 #tag Events ButtonStepIn
 	#tag Event , Description = 54686520627574746F6E20686173206265656E20707265737365642E
 		Sub Pressed()
+		  ButtonStop.Enabled = True
+		  
 		  If FirstRun Then
 		    BeginVM(ObjoScript.VM.StepModes.StepInto)
 		    FirstRun = False
@@ -1667,15 +1669,36 @@ End
 		  End If
 		  
 		  // Update the debugger.
-		  If VM <> Nil Then DebuggerTree.Display(VM, VM.GetCurrentFrame)
+		  DebuggerTree.Display(VM, VM.GetCurrentFrame)
+		  
+		  // Highlight the currently stopped on line.
+		  If VM.LastStoppedLine > 0 And VM.LastStoppedLine <= Editor.LineManager.LineCount Then
+		    Editor.CaretLineNumber = VM.LastStoppedLine
+		  End If
 		End Sub
 	#tag EndEvent
 #tag EndEvents
 #tag Events ButtonRunPause
 	#tag Event , Description = 54686520627574746F6E20686173206265656E20707265737365642E
 		Sub Pressed()
+		  ButtonStop.Enabled = True
+		  
 		  BeginVM(ObjoScript.VM.StepModes.None)
 		  
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ButtonStop
+	#tag Event , Description = 54686520627574746F6E20686173206265656E20707265737365642E
+		Sub Pressed()
+		  // Stops and resets the VM.
+		  
+		  If VM <> Nil Then
+		    VM.Stop
+		    VM.Reset
+		  End If
+		  
+		  Me.Enabled = False
 		End Sub
 	#tag EndEvent
 #tag EndEvents

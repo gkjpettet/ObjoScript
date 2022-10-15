@@ -1010,9 +1010,9 @@ Protected Class VM
 		    APISlots(i) = Nothing
 		  Next i
 		  
-		  LastStoppedLine = -1
+		  mLastStoppedLine = -1
 		  LastStoppedScriptID = -1
-		  
+		  mShouldStop = False
 		End Sub
 	#tag EndMethod
 
@@ -1026,6 +1026,8 @@ Protected Class VM
 		  While True
 		    
 		    If Self.DebugMode And CurrentChunk.IsDebug Then
+		      If mShouldStop Then Return
+		      
 		      Var frameLine As Integer = CurrentChunk.LineForOffset(CurrentFrame.IP)
 		      Var frameScriptID As Integer = CurrentChunk.ScriptIDForOffset(CurrentFrame.IP)
 		      
@@ -1033,10 +1035,10 @@ Protected Class VM
 		      If stepMode <> StepModes.None Then
 		        Var opcode As UInt8 = CurrentChunk.ReadByte(CurrentFrame.IP)
 		        If frameScriptID <> -1 Then // Disallow stopping within the standard library (scriptID < 0).
-		          If frameLine <> LastStoppedLine Or frameScriptID <> LastStoppedScriptID Then
+		          If frameLine <> mLastStoppedLine Or frameScriptID <> LastStoppedScriptID Then
 		            If IsStoppableOpcode(opcode, stepMode) Then
 		              // We've reached a new source line on a stoppable opcode.
-		              LastStoppedLine = frameLine
+		              mLastStoppedLine = frameLine
 		              LastStoppedScriptID = frameScriptID
 		              Return
 		            End If
@@ -1657,6 +1659,14 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 496D6D6564696174656C792073746F70732074686520564D2E20446F6573206E6F742072657365742069742E205468697320636F756C64206C656176652074686520564D20696E20616E20756E737461626C652073746174652E
+		Sub Stop()
+		  /// Immediately stops the VM. Does not reset it. This could leave the VM in an unstable state.
+		  
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 52657475726E73205472756520696620746865204F626A6F53637269707420737461636B206076616C756560206973206F66206074797065602E
 		Shared Function ValueIsType(type As String, value As Variant) As Boolean
 		  /// Returns True if the ObjoScript stack `value` is of `type`.
@@ -1933,12 +1943,25 @@ Protected Class VM
 		Private Globals As Dictionary
 	#tag EndProperty
 
-	#tag Property, Flags = &h21, Description = 546865206C696E65206F6620636F64652074686520564D206C6173742073746F70706564206F6E2E
-		Private LastStoppedLine As Integer = -1
-	#tag EndProperty
+	#tag ComputedProperty, Flags = &h0, Description = 546865206C696E65206E756D6265722074686520564D206C6173742073746F70706564206F6E2E2057696C6C20626520602D31602069662074686520564D206861732079657420746F2073746F70206F6E2061206C696E652E
+		#tag Getter
+			Get
+			  Return mLastStoppedLine
+			End Get
+		#tag EndGetter
+		LastStoppedLine As Integer
+	#tag EndComputedProperty
 
 	#tag Property, Flags = &h21, Description = 546865204944206F6620746865207363726970742074686520564D206C6173742073746F7070656420696E2E20602D316020666F7220746865207374616E64617264206C6962726172792E205479706963616C6C792060306020666F72206D6F737420736372697074732E
 		Private LastStoppedScriptID As Integer = -1
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 546865206C696E65206F6620636F64652074686520564D206C6173742073746F70706564206F6E2E
+		Private mLastStoppedLine As Integer = -1
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 49662054727565207468656E2074686520564D2073686F756C642073746F7020617420746865206E657874206F70706F7274756E69747920287072696F7220746F20746865206E65787420696E737472756374696F6E206665746368292E204F6E6C7920776F726B73207768656E206044656275674D6F64656020697320547275652E
+		Private mShouldStop As Boolean = False
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 53696E676C65746F6E20696E7374616E6365206F6620224E6F7468696E67222E
