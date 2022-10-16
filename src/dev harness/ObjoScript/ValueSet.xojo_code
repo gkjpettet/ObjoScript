@@ -35,11 +35,28 @@ Protected Class ValueSet
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 546865206E756D626572206F66206974656D7320696E20746865207365742E
+		Function Count() As Integer
+		  /// The number of items in the set.
+		  
+		  Return mItems.Count
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 52657475726E732074686520696E64657820696E2074686520736574206F6620607660206F7220602D316020696620607660206973206E6F7420696E20746865207365742E
 		Function IndexOf(v As Variant) As Integer
 		  /// Returns the index in the set of `v` or `-1` if `v` is not in the set.
 		  
 		  Return mLookupTable.Lookup(v, -1)
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 52657475726E7320746865206974656D2061742060696E646578602E204D617920726169736520616E20604F75744F66426F756E6473457863657074696F6E602E
+		Function ItemAt(index As Integer) As Variant
+		  /// Returns the item at `index`. May raise an `OutOfBoundsException`.
+		  
+		  Return mItems(index)
+		  
 		End Function
 	#tag EndMethod
 

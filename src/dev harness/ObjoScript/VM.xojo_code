@@ -296,8 +296,6 @@ Protected Class VM
 
 	#tag Method, Flags = &h0
 		Sub Constructor()
-		  Disassembler = New ObjoScript.Disassembler
-		  
 		  Reset
 		End Sub
 	#tag EndMethod
@@ -465,38 +463,6 @@ Protected Class VM
 		  
 		  // Pop the method's body off the stack.
 		  Call Pop
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21, Description = 44656C6567617465206D6574686F6420746861742069732063616C6C6564206279206F757220646973617373656D626C6572277320605072696E74282960206576656E742E
-		Private Sub DisassemblerPrintDelegate(sender As ObjoScript.Disassembler, s As String)
-		  /// Delegate method that is called by our disassembler's `Print()` event.
-		  ///
-		  /// We will add `s` to our disassembler output buffer until the disassembler raises its `PrintLine()` event.
-		  
-		  #Pragma Unused sender
-		  
-		  #If DebugBuild
-		    DisassemblerOutput.Add(s)
-		  #EndIf
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21, Description = 44656C6567617465206D6574686F6420746861742069732063616C6C6564206279206F757220646973617373656D626C6572277320605072696E744C696E65282960206576656E742E
-		Private Sub DisassemblerPrintLineDelegate(sender As ObjoScript.Disassembler, s As String)
-		  /// Delegate method that is called by our disassembler's `PrintLine()` event.
-		  ///
-		  /// We pass the contents of the disassembler's buffer and `s` to the `DebugPrint` event.
-		  
-		  #Pragma Unused sender
-		  
-		  #If DebugBuild
-		    DisassemblerOutput.Add(s)
-		    RaiseEvent DebugPrint(String.FromArray(DisassemblerOutput))
-		    DisassemblerOutput.ResizeTo(-1)
-		  #EndIf
 		  
 		End Sub
 	#tag EndMethod
@@ -675,10 +641,11 @@ Protected Class VM
 		      s.Add("[ " + ValueToString(item) + " ]")
 		    Next i
 		    RaiseEvent DebugPrint(String.FromArray(s, ""))
-		    Call Disassembler.DisassembleInstruction(-1, -1, CurrentChunk, CurrentFrame.IP)
+		    RaiseEvent DebugPrint(Self.Debugger.DisassembleInstruction(-1, -1, CurrentChunk, CurrentFrame.IP))
 		  End If
 		  
 		  Return False
+		  
 		End Function
 	#tag EndMethod
 
@@ -1052,6 +1019,8 @@ Protected Class VM
 		  LastStoppedScriptID = -1
 		  mShouldStop = False
 		  LastInstructionFrame = Nil
+		  
+		  Self.Debugger = New ObjoScript.Debugger
 		End Sub
 	#tag EndMethod
 
@@ -1932,16 +1901,12 @@ Protected Class VM
 		Private CurrentFrame As ObjoScript.CallFrame
 	#tag EndProperty
 
+	#tag Property, Flags = &h21, Description = 54686520564D27732064656275676765722E
+		Private Debugger As ObjoScript.Debugger
+	#tag EndProperty
+
 	#tag Property, Flags = &h0, Description = 49662054727565207468656E2074686520564D20697320696E206C6F7720706572666F726D616E6365206465627567206D6F646520616E642063616E20696E7465726163742077697468206368756E6B7320636F6D70696C656420696E206465627567206D6F646520746F2070726F7669646520646562756767696E6720696E666F726D6174696F6E2E
 		DebugMode As Boolean = False
-	#tag EndProperty
-
-	#tag Property, Flags = &h21
-		Private Disassembler As ObjoScript.Disassembler
-	#tag EndProperty
-
-	#tag Property, Flags = &h21, Description = 54686520737472696E6773207061737365642062792074686520646973617373656D626C6572277320605072696E74282960206576656E742061726520616464656420746F2074686973206275666665722E204974277320636C6561726564207768656E2074686520646973617373656D626C6572207261697365732069747320605072696E744C696E65282960206576656E742E
-		Private DisassemblerOutput() As String
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 546865206E756D626572206F66206F6E676F696E672066756E6374696F6E2063616C6C732E
@@ -2388,6 +2353,22 @@ Protected Class VM
 			Group="Behavior"
 			InitialValue="False"
 			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="FrameCount"
+			Visible=false
+			Group="Behavior"
+			InitialValue="0"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="LastStoppedLine"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

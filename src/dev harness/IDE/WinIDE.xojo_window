@@ -1168,8 +1168,9 @@ End
 		    // Show the AST.
 		    ASTView.Display(Compiler.AST, False)
 		    
-		    // Disassemble the chunk.
-		    DisassemblerOutput.Text = Disassembler.Disassemble(Func.Chunk, "Test")
+		    // Disassemble the function.
+		    Var debugger As New ObjoScript.Debugger
+		    DisassemblerOutput.Text = debugger.DisassembleFunction(Func)
 		    
 		    // Successful compilation.
 		    Return func
@@ -1332,8 +1333,6 @@ End
 		  TokensListbox.RemoveAllRows
 		  Output.Text = ""
 		  DebuggerOutput.Text = ""
-		  
-		  Disassembler = New ObjoScript.Disassembler
 		  
 		  // Create a new compiler in debug mode.
 		  Compiler = New ObjoScript.Compiler
@@ -1543,10 +1542,6 @@ End
 
 	#tag Property, Flags = &h0, Description = 54686520636F6D70696C6572207573656420746F20636F6D70696C6520736F7572636520636F64652E
 		Compiler As ObjoScript.Compiler
-	#tag EndProperty
-
-	#tag Property, Flags = &h0
-		Disassembler As ObjoScript.Disassembler
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 5468652066696C65206265696E67206564697465642E2057696C6C206265204E696C2069662061206E65772066696C65207468617420686173206E65766572206265656E2073617665642E

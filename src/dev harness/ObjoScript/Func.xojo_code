@@ -137,19 +137,6 @@ Implements ObjoScript.Value,ObjoScript.Method
 		Chunk As ObjoScript.Chunk
 	#tag EndProperty
 
-	#tag ComputedProperty, Flags = &h0, Description = 4120737472696E672064756D70206F6620746869732066756E6374696F6E2E
-		#tag Getter
-			Get
-			  /// Dumps this function as a string.
-			  
-			  Var d As New ObjoScript.Disassembler
-			  
-			  Return d.Disassemble(Self.Chunk, Self.Name)
-			End Get
-		#tag EndGetter
-		Dump As String
-	#tag EndComputedProperty
-
 	#tag Property, Flags = &h0, Description = 49662054727565207468656E2074686973206973206120736574746572206D6574686F642E20536574746572732063616E20626520696E766F6B656420696D6D6564696174656C79206265666F726520616E20603D60207369676E2E
 		IsSetter As Boolean = False
 	#tag EndProperty
@@ -223,14 +210,6 @@ Implements ObjoScript.Value,ObjoScript.Method
 			InitialValue="False"
 			Type="Boolean"
 			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Dump"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
-			Type="String"
-			EditorType="MultiLineEditor"
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class

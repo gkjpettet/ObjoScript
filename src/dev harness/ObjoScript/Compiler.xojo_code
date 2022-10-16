@@ -1362,7 +1362,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Compile the body.
 		  Var compiler As New ObjoScript.Compiler
-		  Var body As ObjoScript.Func = compiler.Compile(c.Signature, c.Parameters, c.Body, ObjoScript.FunctionTypes.Constructor, CurrentClass, False, Self.DebugMode, True)
+		  Var body As ObjoScript.Func = compiler.Compile("constructor", c.Parameters, c.Body, ObjoScript.FunctionTypes.Constructor, CurrentClass, False, Self.DebugMode, True)
 		  
 		  // Store the compiled constructor body as a constant in this function's constant pool
 		  // and push it on to the stack.
