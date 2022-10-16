@@ -649,6 +649,8 @@ Protected Class VM
 		  /// Returns True if the VM should exit its run loop or False if it should continue.
 		  /// True indicates we've reached a sensible stopping point.
 		  
+		  If stepMode = VM.StepModes.None Then Return False
+		  
 		  Var frameLine As Integer = CurrentChunk.LineForOffset(CurrentFrame.IP)
 		  Var frameScriptID As Integer = CurrentChunk.ScriptIDForOffset(CurrentFrame.IP)
 		  
@@ -1313,6 +1315,15 @@ Protected Class VM
 		      // Load the value at that index and then push it on to the top of the stack.
 		      Push(Stack(CurrentFrame.StackBase + ReadByte))
 		      
+		    Case OP_LOCAL_VAR_DEC
+		      If DebugMode Then // Only required for debugging.
+		        // The compiler has declared a new local variable. The first UInt16 operand is the index in the
+		        // constant pool of the name of the variable declared. The second one byte operand is the
+		        // slot the local occupies.
+		        // The compiler will have already emitted OP_GET_LOCAL.
+		        CurrentFrame.Locals.Value(ReadConstantLong) = ReadByte
+		      End If
+		      
 		    Case OP_GET_LOCAL_CLASS
 		      // The operand is the stack slot where the local variable lives.
 		      // This local variable should be an instance. Load it and then push its
@@ -1857,7 +1868,7 @@ Protected Class VM
 		25: OP_LOAD_1 (0)
 		26: OP_LOAD_0 (0)
 		27: OP_LOAD_MINUS1 (0)
-		28: *Unused*
+		28: OP_LOCAL_VAR_DEC (3)
 		29: OP_ASSERT (0)
 		30: OP_DEFINE_GLOBAL (1)
 		31: OP_DEFINE_GLOBAL_LONG (2)
@@ -2050,7 +2061,8 @@ Protected Class VM
 			  OP_SET_STATIC_FIELD_LONG: 2, _
 			  OP_FOREIGN_METHOD       : 3, _
 			  OP_IS                   : 0, _
-			  OP_GET_LOCAL_CLASS      : 1 _
+			  OP_GET_LOCAL_CLASS      : 1, _
+			  OP_LOCAL_VAR_DEC        : 28 _
 			  )
 			  
 			  Return d
@@ -2212,6 +2224,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_LOAD_MINUS1, Type = Double, Dynamic = False, Default = \"27", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_LOCAL_VAR_DEC, Type = Double, Dynamic = False, Default = \"28", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_LOGICAL_XOR, Type = Double, Dynamic = False, Default = \"42", Scope = Public

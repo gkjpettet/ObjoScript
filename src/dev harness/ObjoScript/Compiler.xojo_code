@@ -2145,8 +2145,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.StmtVisitor interface.
 		  
-		  #Pragma Warning "TODO: Need a way for the VM to store the name of local variables for debugging"
-		  
 		  mLocation = stmt.Location
 		  
 		  // Compile the initialiser.
@@ -2162,6 +2160,16 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  DefineVariable(index)
 		  
+		  // Debugging support for named local variables.
+		  If DebugMode And ScopeDepth > 0 Then
+		    // This is a local variable declaration. Tell the VM to record the name and location of
+		    // the variable for debugging.
+		    // OPCODE, NAME_CONSTANT_INDEX, STACK_SLOT
+		    EmitByte(VM.OP_LOCAL_VAR_DEC, stmt.Location)
+		    index = AddConstant(stmt.Name)
+		    EmitUInt16(index)
+		    EmitByte(ResolveLocal(stmt.Name)) 
+		  End If
 		End Function
 	#tag EndMethod
 

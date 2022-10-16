@@ -7,11 +7,19 @@ Inherits DesktopTreeView
 		  
 		  Me.RemoveAllNodes
 		  
+		  // Handle `this`
+		  Var this As Variant = vm.GetValueAtFrameSlot(frame, 0)
+		  If this IsA ObjoScript.Instance Or this IsA ObjoScript.Klass Then
+		    Me.AppendNode(VariableToNode("this", this))
+		  End If
+		  
+		  // Optional arguments.
 		  For i As Integer = 0 To frame.Func.Parameters.LastIndex
 		    Var slot As Integer = i + 1 // Add one because slot 0 is the function but the parameters array is 0-based.
 		    Me.AppendNode(VariableToNode(frame.Func.Parameters(i), vm.GetValueAtFrameSlot(frame, slot)))
 		  Next i
 		  
+		  // Locally declared variables.
 		  For Each entry As DictionaryEntry In frame.Locals
 		    Me.AppendNode(VariableToNode(entry.Key, vm.GetValueAtFrameSlot(frame, entry.Value)))
 		  Next entry

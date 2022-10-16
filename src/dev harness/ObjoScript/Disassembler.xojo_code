@@ -419,6 +419,9 @@ Protected Class Disassembler
 		  Case ObjoScript.VM.OP_GET_LOCAL_CLASS
 		    Return TwoByteInstruction("GET LOCAL CLASS", chunk, offset)
 		    
+		  Case ObjoScript.VM.OP_LOCAL_VAR_DEC
+		    Return LocalVarDec(chunk, offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
@@ -502,6 +505,40 @@ Protected Class Disassembler
 		  PrintLine(destCol.JustifyLeft(COL_WIDTH * 2))
 		  
 		  Return offset + 3
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function LocalVarDec(chunk As ObjoScript.Chunk, offset As Integer) As Integer
+		  /// Handles the OP_LOCAL_VAR_DECLARATION instruction which takes a 2 bytes (name index) and a one byte (slot index) operand.
+		  /// Returns the offset of the next instruction.
+		  ///
+		  /// Format:
+		  /// OFFSET  LINE  (OPTIONAL SCRIPT ID)  VAR_NAME  SLOT
+		  
+		  Var instruction As String = "OP_LOCAL_VAR_DEC"
+		  
+		  // Print the instruction name.
+		  Print(instruction.JustifyLeft(2 * COL_WIDTH))
+		  
+		  // Get the index of the name of the variable in the chunk's constant pool.
+		  Var index As Integer = chunk.ReadUInt16(offset + 1)
+		  
+		  // Get the local slot.
+		  Var slot As Integer = chunk.ReadByte(offset + 3)
+		  
+		  Var newOffset As Integer = offset + 4
+		  
+		  // Print the name of the variable.
+		  Var varName As String = chunk.Constants(index)
+		  varName = varName.JustifyLeft(2 * COL_WIDTH)
+		  Print(varName)
+		  
+		  // Print the slot.
+		  PrintLine(slot.ToString)
+		  
+		  Return newOffset
 		  
 		End Function
 	#tag EndMethod
