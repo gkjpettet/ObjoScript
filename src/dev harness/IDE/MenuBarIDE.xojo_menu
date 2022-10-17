@@ -181,14 +181,6 @@ Begin Menu MenuBarIDE
          Visible = True
       End
    End
-   Begin DesktopMenuItem DebugMenu
-      SpecialMenu = 0
-      Index = -2147483648
-      Text = ""
-      AutoEnabled = True
-      AutoEnable = True
-      Visible = True
-   End
    Begin DesktopMenuItem WindowMenu
       SpecialMenu = 0
       Index = -2147483648

@@ -120,6 +120,7 @@ Class=ObjoScriptTestController;Unit Tests/Tests/ObjoScriptTestController.xojo_co
 Class=LanguageAssignmentTests;Unit Tests/Tests/LanguageAssignmentTests.xojo_code;&h0000000064D907FF;&h000000000BB987FF;false
 Class=LanguageExitTests;Unit Tests/Tests/LanguageExitTests.xojo_code;&h000000000195C7FF;&h000000000BB987FF;false
 Class=LanguageCommentTests;Unit Tests/Tests/LanguageCommentTests.xojo_code;&h00000000357EE7FF;&h000000000BB987FF;false
+Class=LanguageConditionalTests;Unit Tests/Tests/LanguageConditionalTests.xojo_code;&h0000000005DE07FF;&h000000000BB987FF;false
 Class=LanguageClassTests;Unit Tests/Tests/LanguageClassTests.xojo_code;&h000000003DBFFFFF;&h000000000BB987FF;false
 Folder=UI;Unit Tests/UI;&h0000000003D06FFF;&h000000002516B04D;false
 MenuBar=MenuBarTests;Unit Tests/UI/MenuBarTests.xojo_menu;&h000000002BBD1FFF;&h0000000003D06FFF;false

@@ -282,9 +282,9 @@ Protected Class Lexer
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 436F6E73756D657320616C6C206368617261637465727320756E74696C20454F4C206F7220454F462E
+	#tag Method, Flags = &h21, Description = 436F6E73756D657320616C6C206368617261637465727320756E74696C20454F4C206F7220454F462E20446F6573202A6E6F742A20636F6E73756D652074686520454F4C206966206F6E6520697320726561636865642E
 		Private Sub ConsumeComment()
-		  /// Consumes all characters until EOL or EOF.
+		  /// Consumes all characters until EOL or EOF. Does *not* consume the EOL if one is reached.
 		  ///
 		  /// Assumes we are at the beginning of a comment.
 		  /// In ObjoScript, comments begin with `//`.
@@ -294,7 +294,6 @@ Protected Class Lexer
 		  Do
 		    If Peek = EndOfLine.UNIX Then
 		      AddToken(MakeToken(ObjoScript.TokenTypes.EOL))
-		      mLineNumber = mLineNumber + 1
 		      Exit
 		      
 		    ElseIf AtEnd Then

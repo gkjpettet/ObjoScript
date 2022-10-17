@@ -1,0 +1,3 @@
+// Newline after ':'.
+System.print(false ? "yes" :
+  "no") // expect error.

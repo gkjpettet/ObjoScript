@@ -1,0 +1,1 @@
+Expected a `:` after the 'then' expression of the conditional operator.

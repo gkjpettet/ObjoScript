@@ -18,6 +18,25 @@ Begin Menu MenuBarTests
          AutoEnable = True
          Visible = True
       End
+      Begin DesktopMenuItem UntitledSeparator
+         SpecialMenu = 0
+         Index = -2147483648
+         Text = "-"
+         AutoEnabled = True
+         AutoEnable = True
+         Visible = True
+      End
+      Begin DesktopMenuItem FileCloseWindow
+         SpecialMenu = 0
+         Index = -2147483648
+         Text = "Close Window"
+         ShortcutKey = "w"
+         Shortcut = "Cmd+w"
+         MenuModifier = True
+         AutoEnabled = True
+         AutoEnable = True
+         Visible = True
+      End
       Begin DesktopQuitMenuItem FileQuit
          SpecialMenu = 0
          Index = -2147483648

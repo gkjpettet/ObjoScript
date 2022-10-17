@@ -86,7 +86,7 @@ Protected Module ObjoScript
 		    Return "assert"
 		    
 		  Case ObjoScript.TokenTypes.Boolean_
-		    Return "boolean"
+		    Return "Boolean"
 		    
 		  Case ObjoScript.TokenTypes.Breakpoint
 		    Return "breakpoint"
@@ -221,7 +221,7 @@ Protected Module ObjoScript
 		    Return "nothing"
 		    
 		  Case ObjoScript.TokenTypes.Number
-		    Return "number"
+		    Return "Number"
 		    
 		  Case ObjoScript.TokenTypes.Or_
 		    Return "or"
@@ -275,7 +275,7 @@ Protected Module ObjoScript
 		    Return "static field identifier"
 		    
 		  Case ObjoScript.TokenTypes.String_
-		    Return "string"
+		    Return "String"
 		    
 		  Case ObjoScript.TokenTypes.Super_
 		    Return "super"

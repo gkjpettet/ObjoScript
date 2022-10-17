@@ -1036,6 +1036,15 @@ End
 	#tag EndMenuHandler
 
 	#tag MenuHandler
+		Function FileCloseWindow() As Boolean Handles FileCloseWindow.Action
+		  Self.Close
+		  
+		  Return True
+		  
+		End Function
+	#tag EndMenuHandler
+
+	#tag MenuHandler
 		Function FileRunTests() As Boolean Handles FileRunTests.Action
 		  RunTests
 		  

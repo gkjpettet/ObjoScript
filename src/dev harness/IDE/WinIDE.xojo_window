@@ -314,7 +314,7 @@ Begin DesktopWindow WinIDE
       Tooltip         =   ""
       Top             =   54
       Transparent     =   False
-      Value           =   3
+      Value           =   2
       Visible         =   True
       Width           =   678
       Begin DesktopListBox TokensListbox
@@ -1244,7 +1244,13 @@ End
 		Private Sub DisplayCompilerError(e As ObjoScript.CompilerException)
 		  /// Displays details about a compiler error in the Output TextArea.
 		  
-		  Output.Text = e.Location.LineNumber.ToString + ": " + e.Message
+		  Var s() As String
+		  s.Add("======================")
+		  s.Add("COMPILER ERROR")
+		  s.Add("======================")
+		  s.Add("line " + e.Location.LineNumber.ToString + ": " + e.Message)
+		  
+		  Output.Text = String.FromArray(s, EndOfLine)
 		  
 		End Sub
 	#tag EndMethod
@@ -1645,6 +1651,31 @@ End
 		Sub Pressed()
 		  SwitchToPanel(PANEL_TOKENS)
 		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ErrorsListbox
+	#tag Event
+		Function ConstructContextualMenu(base As DesktopMenuItem, x As Integer, y As Integer) As Boolean
+		  // We allow the user to copy the contents of the error message (column 0).
+		  
+		  If Me.SelectedRowValue = "" Then Return False
+		  
+		  base.AddMenu(New DesktopMenuItem("Copy"))
+		  
+		  Return True
+		End Function
+	#tag EndEvent
+	#tag Event
+		Function ContextualMenuItemSelected(selectedItem As DesktopMenuItem) As Boolean
+		  Select Case selectedItem.Text
+		  Case "Copy"
+		    Var c As New Clipboard
+		    c.Text = Me.SelectedRowValue
+		    c.Close
+		    Return True
+		  End Select
+		  
+		End Function
 	#tag EndEvent
 #tag EndEvents
 #tag Events DisassemblyOutput
