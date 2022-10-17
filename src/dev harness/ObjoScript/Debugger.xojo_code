@@ -479,6 +479,9 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_BITWISE_XOR
 		    Return SimpleInstruction("BITWISE XOR", offset, line, s)
 		    
+		  Case ObjoScript.VM.OP_BITWISE_NOT
+		    Return SimpleInstruction("BITWISE NOT", offset, line, s)
+		    
 		  Case ObjoScript.VM.OP_LOGICAL_XOR
 		    Return SimpleInstruction("LOGICAL XOR", offset, line, s)
 		    
@@ -806,6 +809,9 @@ Protected Class Debugger
 		    
 		  Case ObjoScript.VM.OP_BITWISE_XOR
 		    details = SimpleInstructionDetails("BITWISE XOR", offset)
+		    
+		  Case ObjoScript.VM.OP_BITWISE_NOT
+		    details = SimpleInstructionDetails("BITWISE NOT", offset)
 		    
 		  Case ObjoScript.VM.OP_LOGICAL_XOR
 		    details = SimpleInstructionDetails("LOGICAL XOR", offset)

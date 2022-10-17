@@ -1279,8 +1279,8 @@ End
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 446973706C6179732064657461696C732061626F7574206120564D2072756E74696D65206572726F7220696E20746865204F75747075742054657874417265612E
-		Sub DisplayVMError(e As ObjoScript.VMException)
+	#tag Method, Flags = &h21, Description = 446973706C6179732064657461696C732061626F7574206120564D2072756E74696D65206572726F7220696E20746865204F75747075742054657874417265612E
+		Private Sub DisplayVMError(e As ObjoScript.VMException)
 		  /// Displays details about a VM runtime error in the Output TextArea.
 		  
 		  Var s() As String
@@ -1288,6 +1288,8 @@ End
 		  s.Add("RUNTIME ERROR")
 		  s.Add("======================")
 		  s.Add("[line " + e.LineNumber.ToString + "]: " + e.Message) + EndOfLine
+		  s.Add("STACK DUMP") + EndOfLine
+		  s.Add(e.StackDump) + EndOfLine
 		  s.Add("STACK TRACE") + EndOfLine + EndOfLine
 		  Output.Text = Output.Text + If(Output.Text.Length > 0, Chr(13), "") + String.FromArray(s, EndOfLine) + String.FromArray(e.VMStackTrace, EndOfLine)
 		  

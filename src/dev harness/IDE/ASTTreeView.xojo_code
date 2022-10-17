@@ -444,6 +444,26 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitLogical(logical As ObjoScript.LogicalExpr) As Variant
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  Var node As New TreeViewNode("Logical (" + logical.Operator.ToString + ")")
+		  
+		  Var left As TreeViewNode = logical.Left.Accept(Self)
+		  left.Text = "Left: " + left.Text
+		  
+		  Var right As TreeViewNode = logical.Right.Accept(Self)
+		  right.Text = "Right: " + right.Text
+		  
+		  node.AppendNode(left)
+		  node.AppendNode(right)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitMethodDeclaration(m As ObjoScript.MethodDeclStmt) As Variant
 		  Var node As New TreeViewNode("Method declaration")
 		  

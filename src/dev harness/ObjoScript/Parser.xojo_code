@@ -639,7 +639,7 @@ Protected Class Parser
 		  
 		  mRules = New Dictionary( _
 		  TokenTypes.Ampersand            : BinaryOperator(Precedences.BitwiseAnd), _
-		  TokenTypes.And_                 : BinaryOperator(Precedences.LogicalAnd), _
+		  TokenTypes.And_                 : LogicalOperator(Precedences.LogicalAnd), _
 		  TokenTypes.Assert               : Unused, _
 		  TokenTypes.As_                  : Unused, _
 		  TokenTypes.Boolean_             : Prefix(New LiteralParselet), _
@@ -688,7 +688,7 @@ Protected Class Parser
 		  TokenTypes.Nothing              : Prefix(New LiteralParselet), _
 		  TokenTypes.Not_                 : Prefix(New UnaryParselet), _
 		  TokenTypes.Number               : Prefix(New LiteralParselet), _
-		  TokenTypes.Or_                  : BinaryOperator(Precedences.LogicalOr), _
+		  TokenTypes.Or_                  : LogicalOperator(Precedences.LogicalOr), _
 		  TokenTypes.Percent              : BinaryOperator(Precedences.Factor), _
 		  TokenTypes.Pipe                 : BinaryOperator(Precedences.BitwiseOr), _
 		  TokenTypes.Plus                 : BinaryOperator(Precedences.Term), _
@@ -713,10 +713,18 @@ Protected Class Parser
 		  TokenTypes.UppercaseIdentifier : Prefix(New ClassParselet), _
 		  TokenTypes.Var_                 : Unused, _
 		  TokenTypes.While_               : Unused, _
-		  TokenTypes.Xor_                 : BinaryOperator(Precedences.LogicalXor) _
+		  TokenTypes.Xor_                 : LogicalOperator(Precedences.LogicalXor) _
 		  )
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 436F6E76656E69656E6365206D6574686F6420666F722072657475726E696E672061206E6577206772616D6D61722072756C6520666F722061206C6F676963616C206F70657261746F722E
+		Private Function LogicalOperator(precedence As Integer) As ObjoScript.GrammarRule
+		  /// Convenience method for returning a new grammar rule for a logical operator.
+		  
+		  Return New ObjoScript.GrammarRule(Nil, New LogicalParselet(precedence), precedence)
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 4966207468652063757272656E7420746F6B656E206D61746368657320616E79206F66207468652073706563696669656420747970657320697420697320636F6E73756D656420616E64207468652066756E6374696F6E2072657475726E7320547275652E204F7468657277697365206974206A7573742072657475726E732046616C73652E

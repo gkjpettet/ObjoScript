@@ -486,7 +486,7 @@ Protected Class VM
 		    stackFrames.Add(s)
 		  Next i
 		  
-		  Raise New ObjoScript.VMException(message, CurrentChunk.LineForOffset(offset), stackFrames, CurrentChunk.ScriptIDForOffset(offset))
+		  Raise New ObjoScript.VMException(message, CurrentChunk.LineForOffset(offset), stackFrames, StackDump, CurrentChunk.ScriptIDForOffset(offset))
 		End Sub
 	#tag EndMethod
 
@@ -635,12 +635,7 @@ Protected Class VM
 		  
 		  // Disassemble each instruction if requested.
 		  If TraceExecution And frameScriptID <> -1 Then
-		    Var s() As String
-		    For i As Integer = 0 To StackTop - 1
-		      Var item As Variant = Stack(i)
-		      s.Add("[ " + ValueToString(item) + " ]")
-		    Next i
-		    RaiseEvent DebugPrint(String.FromArray(s, ""))
+		    RaiseEvent DebugPrint(StackDump)
 		    RaiseEvent DebugPrint(Self.Debugger.DisassembleInstruction(-1, -1, CurrentChunk, CurrentFrame.IP))
 		  End If
 		  
@@ -1641,6 +1636,21 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 52657475726E73206120737461636B2064756D702E
+		Private Function StackDump() As String
+		  /// Returns a stack dump.
+		  
+		  Var s() As String
+		  
+		  For i As Integer = 0 To StackTop - 1
+		    Var item As Variant = Stack(i)
+		    s.Add("[ " + ValueToString(item) + " ]")
+		  Next i
+		  
+		  Return String.FromArray(s, "")
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 496D6D6564696174656C792073746F70732074686520564D2E20446F6573206E6F742072657365742069742E205468697320636F756C64206C656176652074686520564D20696E20616E20756E737461626C652073746174652E
 		Sub Stop()
 		  /// Immediately stops the VM. Does not reset it. This could leave the VM in an unstable state.
@@ -1854,7 +1864,7 @@ Protected Class VM
 		42: OP_LOGICAL_XOR (0)
 		43: OP_LOOP (2)
 		44: OP_RANGE (0)
-		45: *Unused*
+		45: OP_BITWISE_NOT (0)
 		46: OP_EXIT (0)
 		47: OP_CALL (1)
 		48: OP_CLASS (3)
@@ -2027,7 +2037,8 @@ Protected Class VM
 			  OP_FOREIGN_METHOD       : 3, _
 			  OP_IS                   : 0, _
 			  OP_GET_LOCAL_CLASS      : 1, _
-			  OP_LOCAL_VAR_DEC        : 28 _
+			  OP_LOCAL_VAR_DEC        : 28, _
+			  OP_BITWISE_NOT          :0 _
 			  )
 			  
 			  Return d
@@ -2075,6 +2086,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_BITWISE_AND, Type = Double, Dynamic = False, Default = \"22", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_BITWISE_NOT, Type = Double, Dynamic = False, Default = \"45", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_BITWISE_OR, Type = Double, Dynamic = False, Default = \"23", Scope = Public

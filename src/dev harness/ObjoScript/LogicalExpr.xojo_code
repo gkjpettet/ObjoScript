@@ -1,11 +1,11 @@
 #tag Class
-Protected Class BinaryExpr
+Protected Class LogicalExpr
 Implements ObjoScript.Expr
 	#tag Method, Flags = &h0
 		Function Accept(visitor As ObjoScript.ExprVisitor) As Variant
 		  /// Part of the ExprVisitor interface.
 		  
-		  Return visitor.VisitBinary(Self)
+		  Return visitor.VisitLogical(Self)
 		End Function
 	#tag EndMethod
 
@@ -18,9 +18,9 @@ Implements ObjoScript.Expr
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 546865206C6F636174696F6E206F66207468652062696E617279206F70657261746F7220696E20746865206F726967696E616C20746F6B656E2073747265616D2E
+	#tag Method, Flags = &h0, Description = 546865206C6F636174696F6E206F6620746865206C6F676963616C206F70657261746F7220696E20746865206F726967696E616C20746F6B656E2073747265616D2E
 		Function Location() As ObjoScript.Token
-		  /// The location of the binary operator in the original token stream.
+		  /// The location of the logical operator in the original token stream.
 		  ///
 		  /// Part of the ObjoScript.Expr interface.
 		  
@@ -33,11 +33,11 @@ Implements ObjoScript.Expr
 		Left As ObjoScript.Expr
 	#tag EndProperty
 
-	#tag Property, Flags = &h21, Description = 54686520746F6B656E20726570726573656E74696E67207468652062696E617279206F70657261746F7220696E20746865206F726967696E616C20746F6B656E2073747265616D2E
+	#tag Property, Flags = &h21, Description = 54686520746F6B656E20726570726573656E74696E6720746865206C6F676963616C206F70657261746F7220696E20746865206F726967696E616C20746F6B656E2073747265616D2E
 		Private mLocation As ObjoScript.Token
 	#tag EndProperty
 
-	#tag ComputedProperty, Flags = &h0, Description = 5468652062696E617279206F70657261746F7220747970652E
+	#tag ComputedProperty, Flags = &h0, Description = 546865206C6F676963616C206F70657261746F7220747970652E
 		#tag Getter
 			Get
 			  Return mLocation.Type

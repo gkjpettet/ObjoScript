@@ -687,10 +687,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 436F6D70696C65732061206C6F676963616C2060616E64602065787072657373696F6E2E
-		Private Sub LogicalAnd(logical As ObjoScript.BinaryExpr)
+		Private Sub LogicalAnd(logical As ObjoScript.LogicalExpr)
 		  /// Compiles a logical `and` expression.
-		  ///
-		  /// Assumes `logical` is a logical `and` expression.
 		  
 		  mLocation = logical.Location
 		  
@@ -715,10 +713,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 436F6D70696C65732061206C6F676963616C2060616E64602065787072657373696F6E2E
-		Private Sub LogicalOr(logical As ObjoScript.BinaryExpr)
+		Private Sub LogicalOr(logical As ObjoScript.LogicalExpr)
 		  /// Compiles a logical `or` expression.
-		  ///
-		  /// Assumes `logical` is a logical `or` expression.
 		  
 		  mLocation = logical.Location
 		  
@@ -1172,20 +1168,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Case ObjoScript.TokenTypes.Ampersand
 		    EmitByte(ObjoScript.VM.OP_BITWISE_AND)
 		    
-		  Case ObjoScript.TokenTypes.And_
-		    LogicalAnd(expr)
-		    
 		  Case ObjoScript.TokenTypes.Caret
 		    EmitByte(ObjoScript.VM.OP_BITWISE_XOR)
 		    
-		  Case ObjoScript.TokenTypes.Or_
-		    LogicalOr(expr)
-		    
 		  Case ObjoScript.TokenTypes.Pipe
 		    EmitByte(ObjoScript.VM.OP_BITWISE_OR)
-		    
-		  Case ObjoScript.TokenTypes.Xor_
-		    EmitByte(ObjoScript.VM.OP_LOGICAL_XOR)
 		    
 		  Else
 		    Error("Unknown binary operator """ + expr.Operator.ToString + """")
@@ -1761,6 +1748,32 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 54686520636F6D70696C6572206973207669736974696E672061206C6F676963616C2065787072657373696F6E20286F722C20616E642C20786F72292E
+		Function VisitLogical(logical As ObjoScript.LogicalExpr) As Variant
+		  /// The compiler is visiting a logical expression (or, and, xor).
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  mLocation = logical.Location
+		  
+		  Select Case logical.Operator
+		  Case ObjoScript.TokenTypes.And_
+		    LogicalAnd(logical)
+		    
+		  Case ObjoScript.TokenTypes.Or_
+		    LogicalOr(logical)
+		    
+		  Case ObjoScript.TokenTypes.Xor_
+		    #Pragma Warning "TODO"
+		    Raise New UnsupportedOperationException("Logical xor is not yet implemented.")
+		    
+		  Else
+		    Error("Unsupported logical operator: " + logical.Operator.ToString)
+		  End Select
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120636C617373206D6574686F64206465636C61726174696F6E2E
 		Function VisitMethodDeclaration(m As ObjoScript.MethodDeclStmt) As Variant
 		  /// Compiles a class method declaration.
@@ -2061,6 +2074,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // if condition = false _after_ we've compiled the "then branch".
 		  Var thenJump As Integer = EmitJump(ObjoScript.VM.OP_JUMP_IF_FALSE, t.Location)
 		  
+		  // Pop the condition if it was true before executing the "then branch".
+		  EmitByte(ObjoScript.VM.OP_POP)
+		  
 		  // Compile the "then branch" statement(s).
 		  Call t.ThenBranch.Accept(Self)
 		  
@@ -2069,6 +2085,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var elseJump As Integer = EmitJump(ObjoScript.VM.OP_JUMP, t.Location)
 		  
 		  PatchJump(thenJump)
+		  
+		  // Pop the condition if it was false before executing the "else branch".
+		  EmitByte(ObjoScript.VM.OP_POP)
 		  
 		  // Compile the "else" branch.
 		  Call t.ElseBranch.Accept(Self)
@@ -2132,6 +2151,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Call expr.Operand.Accept(Self)
 		    // Emit the not instruction.
 		    EmitByte(ObjoScript.VM.OP_NOT)
+		    
+		  Case ObjoScript.TokenTypes.Tilde
+		    // Compile the operand.
+		    Call expr.Operand.Accept(Self)
+		    // Emit the bitwise not instruction.
+		    EmitByte(ObjoScript.VM.OP_BITWISE_NOT)
 		    
 		  Else
 		    Error("Unknown unary operator: " + expr.Operator.ToString)
