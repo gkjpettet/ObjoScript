@@ -314,7 +314,7 @@ Begin DesktopWindow WinIDE
       Tooltip         =   ""
       Top             =   54
       Transparent     =   False
-      Value           =   4
+      Value           =   3
       Visible         =   True
       Width           =   678
       Begin DesktopListBox TokensListbox
@@ -473,54 +473,6 @@ Begin DesktopWindow WinIDE
          WinDrawTreeLines=   True
          WinHighlightFullRow=   False
       End
-      Begin DesktopTextArea DisassemblerOutput
-         AllowAutoDeactivate=   True
-         AllowFocusRing  =   False
-         AllowSpellChecking=   True
-         AllowStyledText =   True
-         AllowTabs       =   False
-         BackgroundColor =   &cFFFFFF
-         Bold            =   False
-         Enabled         =   True
-         FontName        =   "System"
-         FontSize        =   0.0
-         FontUnit        =   0
-         Format          =   ""
-         HasBorder       =   True
-         HasHorizontalScrollbar=   False
-         HasVerticalScrollbar=   True
-         Height          =   510
-         HideSelection   =   True
-         Index           =   -2147483648
-         InitialParent   =   "Panel"
-         Italic          =   False
-         Left            =   682
-         LineHeight      =   0.0
-         LineSpacing     =   1.0
-         LockBottom      =   True
-         LockedInPosition=   False
-         LockLeft        =   True
-         LockRight       =   True
-         LockTop         =   True
-         MaximumCharactersAllowed=   0
-         Multiline       =   True
-         ReadOnly        =   True
-         Scope           =   2
-         TabIndex        =   0
-         TabPanelIndex   =   4
-         TabStop         =   True
-         Text            =   ""
-         TextAlignment   =   0
-         TextColor       =   &c000000
-         Tooltip         =   ""
-         Top             =   54
-         Transparent     =   False
-         Underline       =   False
-         UnicodeMode     =   1
-         ValidationMask  =   ""
-         Visible         =   True
-         Width           =   678
-      End
       Begin DebuggerTreeView DebuggerTree
          AutoDeactivate  =   True
          BackColor       =   &cFFFFFF00
@@ -570,6 +522,64 @@ Begin DesktopWindow WinIDE
          SystemNodeColors=   True
          TabIndex        =   0
          TabPanelIndex   =   5
+         TabStop         =   True
+         Tooltip         =   ""
+         Top             =   54
+         UseFocusRing    =   True
+         Visible         =   True
+         Width           =   678
+         WinDrawTreeLines=   True
+         WinHighlightFullRow=   False
+      End
+      Begin DisassemblyTreeView DisassemblyOutput
+         AutoDeactivate  =   True
+         BackColor       =   &cFFFFFF00
+         ColumnCount     =   1
+         DarkBackColor   =   &c2D2D2D00
+         DarkNodeTextColor=   &cFFFFFF00
+         DarkSelectionTextColor=   &cFFFFFF00
+         DragReceiveBehavior=   1
+         Enabled         =   True
+         FontName        =   "System"
+         FontSize        =   0.0
+         FontUnit        =   0
+         HasBackColor    =   False
+         HasBorder       =   True
+         HasHeader       =   False
+         HasInactiveSelectionColor=   False
+         HasNodeColor    =   False
+         HasNodeTextColor=   False
+         HasSelectionColor=   False
+         HasSelectionTextColor=   False
+         Height          =   510
+         InactiveSelectionColor=   &cD3D3D300
+         Index           =   -2147483648
+         InitialParent   =   "Panel"
+         Left            =   682
+         LinuxDrawTreeLines=   False
+         LinuxExpanderStyle=   0
+         LinuxHighlightFullRow=   True
+         LockBottom      =   True
+         LockedInPosition=   False
+         LockLeft        =   True
+         LockRight       =   True
+         LockTop         =   True
+         MacDrawTreeLines=   False
+         MacExpanderStyle=   0
+         MacHighlightFullRow=   True
+         MultiSelection  =   False
+         NodeEvenColor   =   &cFFFFFF00
+         NodeHeight      =   18
+         NodeOddColor    =   &cFFFFFF00
+         NodeTextColor   =   &c00000000
+         QuartzShading   =   False
+         Scope           =   2
+         SelectionColor  =   &c478A1A00
+         SelectionSeparator=   0
+         SelectionTextColor=   &cFFFFFF00
+         SystemNodeColors=   True
+         TabIndex        =   0
+         TabPanelIndex   =   4
          TabStop         =   True
          Tooltip         =   ""
          Top             =   54
@@ -1169,9 +1179,8 @@ End
 		    // Show the AST.
 		    ASTView.Display(Compiler.AST, False)
 		    
-		    // Disassemble the function.
-		    Var debugger As New ObjoScript.Debugger
-		    DisassemblerOutput.Text = debugger.DisassembleFunction(Func)
+		    // Disassemble the function. Show the standard library bytecode.
+		    DisassemblyOutput.Display(func, True)
 		    
 		    // Successful compilation.
 		    Return func
@@ -1329,7 +1338,7 @@ End
 	#tag Method, Flags = &h0
 		Sub Reset()
 		  ASTView.RemoveAllNodes
-		  DisassemblerOutput.Text = ""
+		  DisassemblyOutput.RemoveAllNodes
 		  ErrorsListbox.RemoveAllRows
 		  TokensListbox.RemoveAllRows
 		  Output.Text = ""
@@ -1638,9 +1647,10 @@ End
 		End Sub
 	#tag EndEvent
 #tag EndEvents
-#tag Events DisassemblerOutput
+#tag Events DisassemblyOutput
 	#tag Event
 		Sub Opening()
+		  // Ensure we use a monospace font.
 		  Me.FontName = DefaultMonospaceFont
 		End Sub
 	#tag EndEvent

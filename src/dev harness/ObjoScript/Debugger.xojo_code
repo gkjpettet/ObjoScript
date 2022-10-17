@@ -1,14 +1,23 @@
 #tag Class
 Protected Class Debugger
 	#tag Method, Flags = &h21, Description = 446973617373656D626C6573207468652062797465636F64652077697468696E20606368756E6B602C2072657475726E696E672069742061732061206054726565566965774E6F6465602E
-		Private Function BytecodeToNode(chunk As ObjoScript.Chunk) As TreeViewNode
+		Private Function BytecodeToNode(chunk As ObjoScript.Chunk, includeStandardLibraryBytecode As Boolean = True) As TreeViewNode
 		  /// Disassembles the bytecode within `chunk`, returning it as a `TreeViewNode`.
+		  ///
+		  /// If `includeStandardLibraryBytecode` is False then we don't add these nodes.
 		  
 		  Var chunkNode As New TreeViewNode("Bytecode")
 		  
 		  Var offset As Integer = 0
 		  While offset < chunk.Length
-		    chunkNode.AppendNode(InstructionToNode(chunk, offset))
+		    Var instructionNode As TreeViewNode = InstructionToNode(chunk, offset)
+		    If Not includeStandardLibraryBytecode Then
+		      If instructionNode.ItemData <> Nil And instructionNode.ItemData.DoubleValue < 0 Then
+		        // This bytecode originated in the standard library and the user doesn't want to include it.
+		        Continue
+		      End If
+		    End If
+		    chunkNode.AppendNode(instructionNode)
 		  Wend
 		  
 		  Return chunkNode
@@ -616,8 +625,10 @@ Protected Class Debugger
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 446973617373656D626C65732060666020746F2061206054726565566965774E6F64656020666F7220646973706C617920696E206120604465736B746F705472656556696577602E
-		Function FunctionToTreeViewNode(f As ObjoScript.Func) As TreeViewNode
+		Function FunctionToTreeViewNode(f As ObjoScript.Func, includeStandardLibraryBytecode As Boolean = True) As TreeViewNode
 		  /// Disassembles `f` to a `TreeViewNode` for display in a `DesktopTreeView`.
+		  ///
+		  /// If `includeStandardLibraryBytecode` is False then we don't add these nodes.
 		  
 		  // Function title.
 		  Var funcTitle As String
@@ -655,7 +666,7 @@ Protected Class Debugger
 		  funcNode.AppendNode(constantsNode)
 		  
 		  // Bytecode.
-		  funcNode.AppendNode(BytecodeToNode(f.Chunk))
+		  funcNode.AppendNode(BytecodeToNode(f.Chunk, includeStandardLibraryBytecode))
 		  
 		  Return funcNode
 		  
@@ -943,6 +954,9 @@ Protected Class Debugger
 		  Var node As New TreeViewNode(offsetString + ": " + details)
 		  node.AppendNode(New TreeViewNode("Line: " + lineNum.ToString))
 		  node.AppendNode(New TreeViewNode("ScriptID: " + scriptID.ToString))
+		  
+		  // Store the script ID as data on the node so we can filter it.
+		  node.ItemData = scriptID
 		  
 		  Return node
 		  

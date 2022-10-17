@@ -104,6 +104,7 @@ Module=Range;ObjoScript/LibraryCore/Range.xojo_code;&h000000004252DFFF;&h0000000
 Folder=Unit Tests;Unit Tests;&h000000002516B04D;&h0000000000000000;false
 Folder=XUI;XUI;&h000000002DAC07FF;&h0000000000000000;false
 Folder=IDE;IDE;&h000000005A3CC7FF;&h0000000000000000;false
+Class=DisassemblyTreeView;IDE/DisassemblyTreeView.xojo_code;&h000000002D5977FF;&h000000005A3CC7FF;false
 Class=DebuggerTreeView;IDE/DebuggerTreeView.xojo_code;&h0000000035AADFFF;&h000000005A3CC7FF;false
 Folder=TestFramework;Unit Tests/TestFramework;&h000000003E1A9B41;&h000000002516B04D;false
 Folder=Tests;Unit Tests/Tests;&h000000000BB987FF;&h000000002516B04D;false
