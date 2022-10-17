@@ -1214,6 +1214,15 @@ Protected Class VM
 		      // If a or b are doubles, they are truncated to integers.
 		      Push(Ctype(a.IntegerValue Xor b.IntegerValue, Double))
 		      
+		    Case OP_BITWISE_NOT
+		      #Pragma Warning "BUG? ~0 = -1 or 4294967295"
+		      Var v As Variant = Pop
+		      If v.Type <> Variant.TypeDouble Then
+		        Error("Expected a number. Instead got `" + ValueToString(v) + "`.")
+		      Else
+		        Push(CType(Not v.IntegerValue, Double))
+		      End If
+		      
 		    Case OP_ASSERT
 		      // Pop the top of the stack. If it's False then raise a runtime error.
 		      If IsFalsey(Pop) Then
