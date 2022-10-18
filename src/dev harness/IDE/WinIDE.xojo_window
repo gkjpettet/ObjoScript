@@ -1658,6 +1658,9 @@ End
 #tag Events ErrorsListbox
 	#tag Event
 		Function ConstructContextualMenu(base As DesktopMenuItem, x As Integer, y As Integer) As Boolean
+		  #Pragma Unused x
+		  #Pragma Unused y
+		  
 		  // We allow the user to copy the contents of the error message (column 0).
 		  
 		  If Me.SelectedRowValue = "" Then Return False

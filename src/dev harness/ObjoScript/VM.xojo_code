@@ -1197,30 +1197,30 @@ Protected Class VM
 		      Var b As Variant = Pop
 		      Var a As Variant = Pop
 		      AssertNumbers(a, b)
-		      // If a or b are doubles, they are truncated to integers.
-		      Push(Ctype(a.IntegerValue And b.IntegerValue, Double))
+		      // Bitwise operators always work on 32-bit unsigned integers.
+		      Push(Ctype(a.UInt32Value And b.UInt32Value, Double))
 		      
 		    Case OP_BITWISE_OR
 		      Var b As Variant = Pop
 		      Var a As Variant = Pop
 		      AssertNumbers(a, b)
-		      // If a or b are doubles, they are truncated to integers.
-		      Push(Ctype(a.IntegerValue Or b.IntegerValue, Double))
+		      // Bitwise operators always work on 32-bit unsigned integers.
+		      Push(Ctype(a.UInt32Value Or b.UInt32Value, Double))
 		      
 		    Case OP_BITWISE_XOR
 		      Var b As Variant = Pop
 		      Var a As Variant = Pop
 		      AssertNumbers(a, b)
-		      // If a or b are doubles, they are truncated to integers.
-		      Push(Ctype(a.IntegerValue Xor b.IntegerValue, Double))
+		      // Bitwise operators always work on 32-bit unsigned integers.
+		      Push(Ctype(a.UInt32Value Xor b.UInt32Value, Double))
 		      
 		    Case OP_BITWISE_NOT
-		      #Pragma Warning "BUG? ~0 = -1 or 4294967295"
+		      // Bitwise operators always work on 32-bit unsigned integers.
 		      Var v As Variant = Pop
 		      If v.Type <> Variant.TypeDouble Then
 		        Error("Expected a number. Instead got `" + ValueToString(v) + "`.")
 		      Else
-		        Push(CType(Not v.IntegerValue, Double))
+		        Push(CType(Not v.UInt32Value, Double))
 		      End If
 		      
 		    Case OP_ASSERT
