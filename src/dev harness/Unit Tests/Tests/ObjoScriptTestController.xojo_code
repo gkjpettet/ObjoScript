@@ -12,6 +12,7 @@ Inherits TestController
 		  group = New LanguageClassTests(Self, "Language - Class")
 		  group = New LanguageCommentTests(Self, "Language - Comments")
 		  group = New LanguageConditionalTests(Self, "Language - Conditional")
+		  group = New LanguageConstructorTests(Self, "Language - Constructor")
 		End Sub
 	#tag EndEvent
 

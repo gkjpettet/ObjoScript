@@ -1,55 +1,21 @@
 #tag Class
-Protected Class LanguageAssignmentTests
+Protected Class LanguageConstructorTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
-		Sub AssociativityTest()
-		  AssertOutputsEqual("language.assignment.associativity")
-		  
+		Sub CannotBeStaticTest()
+		  AssertCompilerError("language.constructor.cannot_be_static")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub GlobalTest()
-		  AssertOutputsEqual("language.assignment.global")
-		  
+		Sub CannotReturnValueTest()
+		  AssertCompilerError("language.constructor.cannot_return_value")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub GroupingTest()
-		  AssertCompilerError("language.assignment.grouping")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub InfixOperatorTest()
-		  AssertCompilerError("language.assignment.infix_operator")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub LocalTest()
-		  AssertOutputsEqual("language.assignment.local")
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub PrefixOperatorTest()
-		  AssertCompilerError("language.assignment.prefix_operator")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub SyntaxTest()
-		  AssertOutputsEqual("language.assignment.syntax")
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub UndefinedTest()
-		  AssertRuntimeError("language.assignment.undefined")
+		Sub DefaultTest()
+		  AssertOutputsEqual("language.constructor.default")
 		End Sub
 	#tag EndMethod
 

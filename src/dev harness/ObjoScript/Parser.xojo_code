@@ -1030,7 +1030,7 @@ Protected Class Parser
 		  // Store the location of the var keyword.
 		  Var varLocation As ObjoScript.Token = Previous
 		  
-		  Var identifier As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier, "Expected a variable name.")
+		  Var identifier As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier, "Expected a lowercase identifier (variable name).")
 		  
 		  Var initialiser As ObjoScript.Expr = New ObjoScript.NothingLiteral(varLocation)
 		  If Match(ObjoScript.TokenTypes.Equal) Then
