@@ -20,7 +20,9 @@ Implements ObjoScript.InfixParselet
 		  parser.Consume(ObjoScript.TokenTypes.Colon, "Expected a `:` after the 'then' expression of the conditional operator.")
 		  
 		  // Parse the "else" branch.
-		  Var elseBranch As ObjoScript.Expr = parser.ParsePrecedence(Precedences.Assignment)
+		  // I thought this should have an `assignment` precedence but during testing it would seem
+		  // `lowest` is required. This *might* be wrong though...
+		  Var elseBranch As ObjoScript.Expr = parser.ParsePrecedence(Precedences.Lowest)
 		  
 		  Return New TernaryExpr(left, thenBranch, elseBranch, query)
 		  

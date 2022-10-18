@@ -1782,8 +1782,15 @@ Protected Class VM
 		  /// Returns a string representation of a VM value.
 		  
 		  Select Case v.Type
-		  Case Variant.TypeString, Variant.TypeBoolean
+		  Case Variant.TypeString
 		    Return v.StringValue
+		    
+		  Case Variant.TypeBoolean
+		    If v Then
+		      Return "true"
+		    Else
+		      Return "false"
+		    End If
 		    
 		  Case Variant.TypeDouble
 		    If v.DoubleValue.IsInteger Then

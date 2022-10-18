@@ -1,0 +1,37 @@
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+Range instance
+12
+7
+1
+false
+4294967295
+false
+Foo instance
+5
+5
+2
+1
+Range instance
+12
+7
+2
+true
+4294967295
+true
+Foo instance
+2
+4

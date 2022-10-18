@@ -41,7 +41,7 @@ System.print(a) // expect: 5
 // Else branch precedence.
 System.print(false ? 1 : (2)) // expect: 2
 //System.print(false ? 1 : [2][0]) // expect: 2
-System.print(false ? 2 : Foo.baz) // expect: 1
+System.print(false ? 2 : Foo.baz()) // expect: 1
 System.print(false ? 1 : 3..4) // expect: 3..4
 System.print(false ? 1 : 3 * 4) // expect: 12
 System.print(false ? 1 : 3 + 4) // expect: 7

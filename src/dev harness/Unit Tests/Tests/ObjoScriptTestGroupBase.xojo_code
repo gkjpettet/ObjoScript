@@ -47,7 +47,7 @@ Inherits TestGroup
 		  Var func As ObjoScript.Func = CompileTest(source)
 		  Var expected As String = GetExpectedResult(testName)
 		  Var result As String = RunFunc(func)
-		  Assert.AreEqual(expected, result, "", source)
+		  Assert.AreSame(expected, result, "", source)
 		  
 		End Sub
 	#tag EndMethod

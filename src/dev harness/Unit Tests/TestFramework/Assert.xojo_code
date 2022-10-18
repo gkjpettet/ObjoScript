@@ -556,7 +556,7 @@ Protected Class Assert
 	#tag Method, Flags = &h0
 		Sub AreSame(expected As String, actual As String, message As String = "", data As String = "")
 		  If Not AreSameBytes(expected, actual) Then
-		    Fail(FailEqualMessage(expected, actual), message )
+		    Fail(FailEqualMessage(expected, actual), message, data )
 		    
 		  ElseIf Not expected.IsEmpty And expected.Encoding <> actual.Encoding Then
 		    Fail("The bytes match but the text encoding does not", message, data)
@@ -664,7 +664,7 @@ Protected Class Assert
 		  Group.CurrentTestResult.Result = TestResult.Failed
 		  FailCount = FailCount + 1
 		  
-		  Message(message + ": " + failMessage)
+		  Message(message + If(message <> "", ": ", "") + failMessage)
 		  
 		  Group.CurrentTestResult.Data = data
 		  
@@ -680,7 +680,7 @@ Protected Class Assert
 		Private Function FailEqualMessage(expected As String, actual As String) As String
 		  Var message As String
 		  
-		  message = "Expected [" + expected + "] but was [" + actual + "]."
+		  message = "Expected:" + EndOfLine + EndOfLine + expected + EndOfLine + EndOfLine + "Instead got:" + EndOfLine + EndOfLine + actual
 		  
 		  Return message
 		End Function
