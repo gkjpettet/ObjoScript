@@ -695,7 +695,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Compile the left hand operand to leave it on the VM's stack.
 		  Call logical.Left.Accept(Self)
 		  
-		  // Since the logical operators short circuit, if the left hand operand is false then the 
+		  // Since `and` short circuits, if the left hand operand is false then the 
 		  // whole expression is false so we jump over the right operand and leave the left
 		  // operand on the top of the stack.
 		  Var endJump As Integer = EmitJump(ObjoScript.VM.OP_JUMP_IF_FALSE, logical.Location)
@@ -1764,8 +1764,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    LogicalOr(logical)
 		    
 		  Case ObjoScript.TokenTypes.Xor_
-		    #Pragma Warning "TODO"
-		    Raise New UnsupportedOperationException("Logical xor is not yet implemented.")
+		    Call logical.Left.Accept(Self)
+		    Call logical.Right.Accept(Self)
+		    EmitByte(VM.OP_LOGICAL_XOR)
 		    
 		  Else
 		    Error("Unsupported logical operator: " + logical.Operator.ToString)
