@@ -1751,25 +1751,18 @@ Protected Class VM
 		    End If
 		    
 		    // ===================
-		    // Ranges.
-		    // ===================
-		    // Ranges are stored internally as pairs of doubles (lower : upper)
-		    If a IsA Pair And b IsA Pair Then
-		      Var aPair As Pair = a
-		      Var bPair As Pair = b
-		      If aPair.Left = bPair.Left And aPair.Right = bPair.Right Then
-		        Return True
-		      End If
-		    End If
-		    
-		    // ===================
 		    // Instances.
 		    // ===================
 		    If a IsA ObjoScript.Instance And b IsA ObjoScript.Instance Then
 		      Return a = b
 		    End If
 		    
-		    Error("Unexpected value type.")
+		    // ===================
+		    // Klasses.
+		    // ===================
+		    If a IsA ObjoScript.Klass And b IsA ObjoScript.Klass Then
+		      Return ObjoScript.Klass(a).Name.CompareCase(ObjoScript.Klass(b).Name)
+		    End If
 		  End Select
 		  
 		  Return False

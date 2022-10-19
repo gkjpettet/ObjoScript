@@ -19,6 +19,36 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub NoParameterListTest()
+		  AssertCompilerError("language.constructor.no_parameter_list")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub NotInheritedTest()
+		  AssertRuntimeError("language.constructor.not_inherited")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ReturnWithoutValueTest()
+		  AssertOutputsEqual("language.constructor.return_without_value")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub SuperclassTest()
+		  AssertOutputsEqual("language.constructor.superclass")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub SuperMustHaveMethodTest()
+		  AssertCompilerError("language.constructor.super_must_have_method")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

@@ -1,0 +1,7 @@
+class A {}
+
+class B is A {
+  constructor() {
+    super // expect error as method call expected.
+  }
+}

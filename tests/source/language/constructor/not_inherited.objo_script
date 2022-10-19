@@ -1,0 +1,7 @@
+class Foo {
+  constructor(a) {}
+}
+
+class Bar is Foo {}
+
+Bar(10) // expect runtime error: Bar does not inherit Foo's constructor.

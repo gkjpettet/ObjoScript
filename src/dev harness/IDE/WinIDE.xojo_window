@@ -28,7 +28,7 @@ Begin DesktopWindow WinIDE
       AllowAutocomplete=   True
       AllowAutoCompleteInComments=   True
       AllowInertialScrolling=   True
-      AutocloseBrackets=   True
+      AutocloseBrackets=   False
       AutocompleteCombo=   1
       AutocompletePopupFontName=   "System"
       AutocompletePopupFontSize=   12

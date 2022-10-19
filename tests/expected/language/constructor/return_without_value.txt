@@ -1,0 +1,4 @@
+Baz instance
+Bar instance
+Foo instance
+true

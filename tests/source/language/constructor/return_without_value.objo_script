@@ -1,0 +1,18 @@
+class Baz {
+  constructor() {}
+}
+
+class Bar {
+  constructor() {
+  }
+}
+
+class Foo {
+  constructor() {
+    return
+  }
+}
+System.print(Baz()) // expect: instance of Baz
+System.print(Bar()) // expect: instance of Bar
+System.print(Foo()) // expect: instance of Foo
+System.print(Foo() <> nothing) // expect: true

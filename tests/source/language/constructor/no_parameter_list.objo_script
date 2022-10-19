@@ -1,0 +1,5 @@
+class Foo {
+  constructor { // expect error
+    System.print("ok")
+  }
+}
