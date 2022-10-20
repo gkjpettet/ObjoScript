@@ -16,10 +16,7 @@ Implements ObjoScript.Expr
 		  Self.Indices = indices
 		  Self.ValueToAssign = valueToAssign
 		  
-		  #Pragma Warning "TODO: Fix subscript setter signatures"
-		  ' These should be `operator_subscript[_]=(_)` or `operator_subscript[_,_]=(_)` rather than
-		  ' `operator_subscript=(_)`.
-		  ' Will also require changes to the parser to permit method signatures including `[]`.
+		  #Pragma Warning "TODO: Need to sort this out with a new syntax for declaring subscript setter methods"
 		  mSignature = ObjoScript.Func.ComputeSignature("operator_subscript", indices.Count, True)
 		End Sub
 	#tag EndMethod

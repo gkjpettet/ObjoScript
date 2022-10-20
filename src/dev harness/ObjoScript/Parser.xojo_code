@@ -175,6 +175,8 @@ Protected Class Parser
 		      End If
 		      
 		    Else
+		      #Pragma Warning "TODO: Handle parsing operator overrides (e.g: subscripts)"
+		      
 		      Var m As ObjoScript.MethodDeclStmt = MethodDeclaration(className, False)
 		      If staticMethods.HasKey(m.Signature) Or methods.HasKey(m.Signature) Or foreignMethods.HasKey(m.Signature) Then
 		        Error("Duplicate method definition: " + m.Signature, m.Location)
