@@ -723,10 +723,7 @@ Protected Class VM
 		  If receiver IsA ObjoScript.Klass Then
 		    isStatic = True
 		    
-		  ElseIf receiver IsA ObjoScript.Instance Then
-		    // Ignore. We obviously allow method invocations on instances.
-		    
-		  Else
+		  ElseIf receiver IsA ObjoScript.Instance = False Then
 		    Error("Only classes and instances have methods.")
 		  End If
 		  
