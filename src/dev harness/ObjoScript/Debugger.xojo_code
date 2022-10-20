@@ -620,6 +620,9 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_LOCAL_VAR_DEC
 		    Return LocalVarDec(chunk, offset, line, s)
 		    
+		  Case ObjoScript.VM.OP_SUPER_CONSTRUCTOR
+		    Return SuperConstructorInstruction(chunk, offset, line, s)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
@@ -953,6 +956,10 @@ Protected Class Debugger
 		    
 		  Case ObjoScript.VM.OP_LOCAL_VAR_DEC
 		    details = LocalVarDecDetails(chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_SUPER_CONSTRUCTOR
+		    details = SuperConstructorDetails(opcode, chunk, offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
@@ -969,9 +976,9 @@ Protected Class Debugger
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 54616B65732061207061727469616C6C7920636F6E737472756374656420606C696E656020616E6420617070656E647320616E20696E766F6B652F73757065725F696E766F6B6520696E737472756374696F6E20746F2069742E204974207468656E20617070656E64732074686174206C696E6520746F206073602E2052657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
+	#tag Method, Flags = &h21, Description = 54616B65732061207061727469616C6C7920636F6E737472756374656420606C696E656020616E6420617070656E647320616E20696E766F6B652F73757065725F696E766F6B652F73757065725F636F6E7374727563746F7220696E737472756374696F6E20746F2069742E204974207468656E20617070656E64732074686174206C696E6520746F206073602E2052657475726E7320746865206F666673657420666F7220746865206E65787420696E737472756374696F6E2E
 		Private Function InvokeInstruction(opcode As UInt8, chunk As ObjoScript.Chunk, offset As Integer, line As String, s() As String) As Integer
-		  /// Takes a partially constructed `line` and appends an invoke/super_invoke instruction to it. It then appends that line to `s`.
+		  /// Takes a partially constructed `line` and appends an invoke/super_invoke/super_constructor instruction to it. It then appends that line to `s`.
 		  /// Returns the offset for the next instruction.
 		  ///
 		  /// Prints the instruction's name, the constant's index in the pool, the method's name and the argument count.
@@ -1006,6 +1013,12 @@ Protected Class Debugger
 		    argCount = chunk.ReadByte(offset + 3)
 		    newOffset = offset + 4
 		    
+		  Case ObjoScript.VM.OP_SUPER_CONSTRUCTOR
+		    instructionName = "SUPER_CONSTRUCTOR"
+		    index = chunk.ReadByte(offset + 1)
+		    argCount = chunk.ReadByte(offset + 2)
+		    newOffset = offset + 3
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown invoke opcode.")
 		  End Select
@@ -1033,18 +1046,18 @@ Protected Class Debugger
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52657475726E73207468652064657461696C73206F6620616E20696E766F6B652F73757065725F696E766F6B6520696E737472756374696F6E20617420606F66667365746020616E6420696E6372656D656E747320606F66667365746020746F20706F696E7420746F20746865206E65787420696E737472756374696F6E2E
+	#tag Method, Flags = &h21, Description = 52657475726E73207468652064657461696C73206F6620616E20696E766F6B652F73757065725F696E766F6B652F73757065725F636F6E7374727563746F7220696E737472756374696F6E20617420606F66667365746020616E6420696E6372656D656E747320606F66667365746020746F20706F696E7420746F20746865206E65787420696E737472756374696F6E2E
 		Private Function InvokeInstructionDetails(opcode As UInt8, chunk As ObjoScript.Chunk, name As String, ByRef offset As Integer) As String
-		  /// Returns the details of an invoke/super_invoke instruction at `offset` and increments `offset` to point to the next instruction.
+		  /// Returns the details of an invoke/super_invoke/super_constructor instruction at `offset` and increments `offset` to point to the next instruction.
 		  ///
-		  /// Prints the instruction's name, the constant's index in the pool, the method's name and the argument count.
+		  /// Prints the instruction's name, the constant's index in the pool, the method's signature and the argument count.
 		  ///
 		  /// Format:
 		  /// INSTRUCTION  METHOD_NAME_INDEX  METHOD_NAME  ARGCOUNT
 		  
 		  Var index, argCount As Integer
 		  Select Case opcode
-		  Case ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_SUPER_INVOKE
+		  Case ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_SUPER_INVOKE, ObjoScript.VM.OP_SUPER_CONSTRUCTOR
 		    index = chunk.ReadByte(offset + 1)
 		    argCount = chunk.ReadByte(offset + 2)
 		    offset = offset + 3
@@ -1350,6 +1363,48 @@ Protected Class Debugger
 		  
 		  Return instructionName.JustifyLeft(COL_WIDTH)
 		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E73207468652064657461696C73206F6620616E20696E766F6B652F73757065725F696E766F6B652F73757065725F636F6E7374727563746F7220696E737472756374696F6E20617420606F66667365746020616E6420696E6372656D656E747320606F66667365746020746F20706F696E7420746F20746865206E65787420696E737472756374696F6E2E
+		Private Function SuperConstructorDetails(opcode As UInt8, chunk As ObjoScript.Chunk, ByRef offset As Integer) As String
+		  /// Returns the details of a super_constructor instruction at `offset` and increments `offset` to point to the next instruction.
+		  ///
+		  /// Prints the instruction's name, the superclass's name, the constructor's signature and the argument count.
+		  ///
+		  /// Format:
+		  /// INSTRUCTION  SUPERCLASS_NAME  CONSTRUCTOR_SIG  ARGCOUNT
+		  
+		  Var superNameIndex, sigIndex, argCount As Integer
+		  superNameIndex = chunk.ReadUInt16(offset + 1)
+		  sigIndex = chunk.ReadUInt16(offset + 3)
+		  argCount = chunk.ReadByte(offset + 5)
+		  offset = offset + 6
+		  
+		  // The instruction's name.
+		  Var details As String = "SUPER_CONSTRUCTOR"
+		  details = details.JustifyLeft(2 * COL_WIDTH)
+		  
+		  // Append the superclass name.
+		  Var superclassName As String = _
+		  ObjoScript.VM.ValueToString(chunk.Constants(superNameIndex))
+		  details = details + superclassName.JustifyLeft(2 * COL_WIDTH)
+		  
+		  // Append the constructor's signature.
+		  Var sig As String = ObjoScript.VM.ValueToString(chunk.Constants(sigIndex))
+		  details = details + sig.JustifyLeft(2 * COL_WIDTH)
+		  
+		  // Append the argument count.
+		  details = details + argCount.ToString.JustifyLeft(2 * COL_WIDTH)
+		  
+		  Return details
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function SuperConstructorInstruction(chunk As ObjoScript.Chunk, offset As Integer, line As String, s() As String) As Integer
+		  #Pragma Warning "TODO"
 		End Function
 	#tag EndMethod
 

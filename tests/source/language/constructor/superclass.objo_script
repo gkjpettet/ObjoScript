@@ -35,6 +35,6 @@ System.print(c is A) // expect: true
 System.print(c is B) // expect: true
 System.print(c is C) // expect: true
 
-System.print(c.aField) // expect: two
-System.print(c.bField) // expect: one
-System.print(c.cField) // expect: c
+System.print(c.aField()) // expect: two
+System.print(c.bField()) // expect: one
+System.print(c.cField()) // expect: c

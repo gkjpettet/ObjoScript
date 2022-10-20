@@ -674,6 +674,29 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 52657475726E7320547275652069662060696E737460206973206F66206074797065602E2057616C6B7320746865207375706572636C61737320686965726172636879206966206E65636573736172792E
+		Shared Function InstanceIsOfType(inst As ObjoScript.Instance, type As String) As Boolean
+		  /// Returns True if `inst` is of `type`. Walks the superclass hierarchy if necessary.
+		  
+		  If inst.Klass.Name.CompareCase(type) Then
+		    Return True
+		  Else
+		    // Check the class hierarchy.
+		    Var parent As ObjoScript.Klass = inst.Klass.Superclass
+		    While parent <> Nil
+		      If parent.Name.CompareCase(type) Then
+		        Return True
+		      Else
+		        parent = parent.Superclass
+		      End If
+		    Wend
+		  End If
+		  
+		  Return False
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 496E697469616C697365732074686520564D20616E6420696E7465727072657473206066756E63602E20557365207468697320746F20696E74657270726574206120746F70206C6576656C2066756E6374696F6E2E
 		Sub Interpret(func As ObjoScript.Func, stepMode As VM.StepModes = VM.StepModes.None)
 		  /// Initialises the VM and interprets `func`. Use this to interpret a top level function.
@@ -1417,6 +1440,9 @@ Protected Class VM
 		    Case OP_SUPER_INVOKE_LONG
 		      Invoke(ReadConstantLong, ReadByte, True)
 		      
+		    Case OP_SUPER_CONSTRUCTOR
+		      SuperConstructor(ReadConstantLong, ReadConstantLong, ReadByte)
+		      
 		    Case OP_GET_STATIC_FIELD
 		      GetStaticField(ReadConstant)
 		      
@@ -1668,6 +1694,50 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 496E766F6B65732074686520737065636966696564207375706572636C61737320636F6E7374727563746F72206F6E20616E20696E7374616E63652E2054686520696E7374616E63652073686F756C64206265206F6E2074686520737461636B20616C6F6E67207769746820616E7920617267756D656E74732069742072657175697265732E
+		Private Sub SuperConstructor(superclassName As String, signature As String, argCount As Integer)
+		  /// Invokes the specified superclass constructor on an instance. The instance should be on the stack
+		  /// along with any arguments it requires.
+		  ///
+		  /// |
+		  /// | argN <-- top of stack
+		  /// | arg1
+		  /// | instance
+		  
+		  #Pragma Warning "TODO: Issue with overwriting fields?"
+		  
+		  // Grab the receiver from the stack. It should be beneath any arguments to the call.
+		  Var receiver As Variant = Peek(argCount)
+		  
+		  Var inst As ObjoScript.Instance
+		  If receiver IsA ObjoScript.Instance = False Then
+		    Error("Can only invoke a superclass constructor on an instance.")
+		  Else
+		    inst = receiver
+		  End If
+		  
+		  // Get the super class. Since classes are all declared locally, it should be in Globals.
+		  Var superclassVariant As Variant = Globals.Lookup(superclassName, Nil)
+		  Var superclass As ObjoScript.Klass
+		  If superclassVariant = Nil Then
+		    Error("Unable to retrieve " + inst.Klass.Name + "'s superclass as there is no class named `" + superclassName + "` in the global scope.")
+		  ElseIf superclassVariant IsA ObjoScript.Klass  = False Then
+		    Error("Tried to retrieve a superclass named `" + superclassName + "` but the global variable with this name is a " + ValueToString(superclassVariant) + ".")
+		  Else
+		    superclass = ObjoScript.Klass(superclassVariant)
+		  End If
+		  
+		  // Get the constructor to call.
+		  Var constructor As ObjoScript.Func = superclass.Constructors.Lookup(signature, Nil)
+		  If constructor = Nil Then
+		    Error("`" + superclassName + "` does not have a constructor with signature `" + signature + "`.")
+		  End If
+		  
+		  CallValue(constructor, argCount)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 52657475726E73205472756520696620746865204F626A6F53637269707420737461636B206076616C756560206973206F66206074797065602E
 		Shared Function ValueIsType(type As String, value As Variant) As Boolean
 		  /// Returns True if the ObjoScript stack `value` is of `type`.
@@ -1699,8 +1769,8 @@ Protected Class VM
 		    Return True
 		  End If
 		  
-		  If value IsA ObjoScript.Instance And ObjoScript.Instance(value).Klass.Name.Compare(type, ComparisonOptions.CaseSensitive) = 0 Then
-		    Return True
+		  If value IsA ObjoScript.Instance Then
+		    Return InstanceIsOfType(value, type)
 		  End If
 		  
 		  If value IsA ObjoScript.Nothing And type.Compare("nothing", ComparisonOptions.CaseSensitive) = 0 Then
@@ -1898,7 +1968,7 @@ Protected Class VM
 		67: OP_SUPER_SETTER_LONG (2)
 		68: OP_SUPER_INVOKE (2)
 		69: OP_SUPER_INVOKE_LONG (3)
-		70: **Unused**
+		70: OP_SUPER_CONSTRUCTOR (5)
 		71: **Unused**
 		72: OP_GET_STATIC_FIELD (1)
 		73: OP_GET_STATIC_FIELD_LONG (2)
@@ -1973,81 +2043,82 @@ Protected Class VM
 		#tag Getter
 			Get
 			  Static d As New Dictionary( _
-			  OP_RETURN               : 0, _
-			  OP_CONSTANT             : 1, _
-			  OP_CONSTANT_LONG        : 2, _
-			  OP_NEGATE               : 0, _
-			  OP_ADD                  : 0, _
-			  OP_SUBTRACT             : 0, _
-			  OP_DIVIDE               : 0, _
-			  OP_MULTIPLY             : 0, _
-			  OP_MODULO               : 0, _
-			  OP_NOT                  : 0, _
-			  OP_EQUAL                : 0 , _
-			  OP_GREATER              : 0, _
-			  OP_LESS                 : 0, _
-			  OP_LESS_EQUAL           : 0, _
-			  OP_GREATER_EQUAL        : 0, _
-			  OP_NOT_EQUAL            : 0, _
-			  OP_TRUE                 : 0, _
-			  OP_FALSE                : 0, _
-			  OP_NOTHING              : 0, _
-			  OP_POP                  : 0, _
-			  OP_SHIFT_LEFT           : 0, _
-			  OP_SHIFT_RIGHT          : 0, _
-			  OP_BITWISE_AND          : 0, _
-			  OP_BITWISE_OR           : 0, _
-			  OP_BITWISE_XOR          : 0, _
-			  OP_LOAD_1               : 0, _
-			  OP_LOAD_0               : 0, _
-			  OP_LOAD_MINUS1          : 0, _
-			  OP_ASSERT               : 0, _
-			  OP_DEFINE_GLOBAL        : 1, _
-			  OP_DEFINE_GLOBAL_LONG   : 2, _
-			  OP_GET_GLOBAL           : 1, _
-			  OP_GET_GLOBAL_LONG      : 2, _
-			  OP_SET_GLOBAL           : 1, _
-			  OP_SET_GLOBAL_LONG      : 2, _
-			  OP_POP_N                : 1, _
-			  OP_GET_LOCAL            : 1, _
-			  OP_SET_LOCAL            : 1, _
-			  OP_JUMP_IF_FALSE        : 2, _
-			  OP_JUMP                 : 2, _
-			  OP_JUMP_IF_TRUE         : 2, _
-			  OP_LOGICAL_XOR          : 0, _
-			  OP_LOOP                 : 2, _
-			  OP_RANGE                : 0, _
-			  OP_EXIT                 : 0, _
-			  OP_CALL                 : 1, _
-			  OP_CLASS                : 3, _
-			  OP_METHOD               : 3, _
-			  OP_SETTER               : 1, _
-			  OP_SETTER_LONG          : 2, _
-			  OP_GETTER               : 1, _
-			  OP_GETTER_LONG          : 2, _
-			  OP_GET_FIELD            : 1, _
-			  OP_GET_FIELD_LONG       : 2, _
-			  OP_SET_FIELD            : 1, _
-			  OP_SET_FIELD_LONG       : 2, _
-			  OP_CONSTRUCTOR          : 2, _
-			  OP_INVOKE               : 2, _
-			  OP_INVOKE_LONG          : 3, _
-			  OP_INHERIT              : 0, _
-			  OP_SUPER_GETTER         : 1, _
-			  OP_SUPER_GETTER_LONG    : 2, _
-			  OP_SUPER_SETTER         : 1, _
-			  OP_SUPER_SETTER_LONG    : 2, _
-			  OP_SUPER_INVOKE         : 2, _
-			  OP_SUPER_INVOKE_LONG    : 3, _
-			  OP_GET_STATIC_FIELD     : 1, _
-			  OP_GET_STATIC_FIELD_LONG: 2, _
-			  OP_SET_STATIC_FIELD     : 1, _
-			  OP_SET_STATIC_FIELD_LONG: 2, _
-			  OP_FOREIGN_METHOD       : 3, _
-			  OP_IS                   : 0, _
-			  OP_GET_LOCAL_CLASS      : 1, _
-			  OP_LOCAL_VAR_DEC        : 28, _
-			  OP_BITWISE_NOT          :0 _
+			  OP_RETURN                 : 0, _
+			  OP_CONSTANT               : 1, _
+			  OP_CONSTANT_LONG          : 2, _
+			  OP_NEGATE                 : 0, _
+			  OP_ADD                    : 0, _
+			  OP_SUBTRACT               : 0, _
+			  OP_DIVIDE                 : 0, _
+			  OP_MULTIPLY               : 0, _
+			  OP_MODULO                 : 0, _
+			  OP_NOT                    : 0, _
+			  OP_EQUAL                  : 0 , _
+			  OP_GREATER                : 0, _
+			  OP_LESS                   : 0, _
+			  OP_LESS_EQUAL             : 0, _
+			  OP_GREATER_EQUAL          : 0, _
+			  OP_NOT_EQUAL              : 0, _
+			  OP_TRUE                   : 0, _
+			  OP_FALSE                  : 0, _
+			  OP_NOTHING                : 0, _
+			  OP_POP                    : 0, _
+			  OP_SHIFT_LEFT             : 0, _
+			  OP_SHIFT_RIGHT            : 0, _
+			  OP_BITWISE_AND            : 0, _
+			  OP_BITWISE_OR             : 0, _
+			  OP_BITWISE_XOR            : 0, _
+			  OP_LOAD_1                 : 0, _
+			  OP_LOAD_0                 : 0, _
+			  OP_LOAD_MINUS1            : 0, _
+			  OP_ASSERT                 : 0, _
+			  OP_DEFINE_GLOBAL          : 1, _
+			  OP_DEFINE_GLOBAL_LONG     : 2, _
+			  OP_GET_GLOBAL             : 1, _
+			  OP_GET_GLOBAL_LONG        : 2, _
+			  OP_SET_GLOBAL             : 1, _
+			  OP_SET_GLOBAL_LONG        : 2, _
+			  OP_POP_N                  : 1, _
+			  OP_GET_LOCAL              : 1, _
+			  OP_SET_LOCAL              : 1, _
+			  OP_JUMP_IF_FALSE          : 2, _
+			  OP_JUMP                   : 2, _
+			  OP_JUMP_IF_TRUE           : 2, _
+			  OP_LOGICAL_XOR            : 0, _
+			  OP_LOOP                   : 2, _
+			  OP_RANGE                  : 0, _
+			  OP_EXIT                   : 0, _
+			  OP_CALL                   : 1, _
+			  OP_CLASS                  : 3, _
+			  OP_METHOD                 : 3, _
+			  OP_SETTER                 : 1, _
+			  OP_SETTER_LONG            : 2, _
+			  OP_GETTER                 : 1, _
+			  OP_GETTER_LONG            : 2, _
+			  OP_GET_FIELD              : 1, _
+			  OP_GET_FIELD_LONG         : 2, _
+			  OP_SET_FIELD              : 1, _
+			  OP_SET_FIELD_LONG         : 2, _
+			  OP_CONSTRUCTOR            : 2, _
+			  OP_INVOKE                 : 2, _
+			  OP_INVOKE_LONG            : 3, _
+			  OP_INHERIT                : 0, _
+			  OP_SUPER_GETTER           : 1, _
+			  OP_SUPER_GETTER_LONG      : 2, _
+			  OP_SUPER_SETTER           : 1, _
+			  OP_SUPER_SETTER_LONG      : 2, _
+			  OP_SUPER_INVOKE           : 2, _
+			  OP_SUPER_INVOKE_LONG      : 3, _
+			  OP_GET_STATIC_FIELD       : 1, _
+			  OP_GET_STATIC_FIELD_LONG  : 2, _
+			  OP_SET_STATIC_FIELD       : 1, _
+			  OP_SET_STATIC_FIELD_LONG  : 2, _
+			  OP_FOREIGN_METHOD         : 3, _
+			  OP_IS                     : 0, _
+			  OP_GET_LOCAL_CLASS        : 1, _
+			  OP_LOCAL_VAR_DEC          : 3, _
+			  OP_BITWISE_NOT            : 0, _
+			  OP_SUPER_CONSTRUCTOR      : 5 _
 			  )
 			  
 			  Return d
@@ -2290,6 +2361,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SUBTRACT, Type = Double, Dynamic = False, Default = \"5", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SUPER_CONSTRUCTOR, Type = Double, Dynamic = False, Default = \"70", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SUPER_GETTER, Type = Double, Dynamic = False, Default = \"64", Scope = Public

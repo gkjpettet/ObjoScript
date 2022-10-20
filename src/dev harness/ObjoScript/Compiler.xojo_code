@@ -2027,6 +2027,48 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C657320612063616C6C20746F20746865207375706572636C6173732720636F6E7374727563746F722E
+		Function VisitSuperConstructor(s As ObjoScript.SuperConstructorExpr) As Variant
+		  /// Compiles a call to the superclass' constructor.
+		  /// E.g: `super(argN)`.
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  mLocation = s.Location
+		  
+		  If Self.Type <> ObjoScript.FunctionTypes.Constructor Or CurrentClass = Nil Then
+		    Error("You can only call a superclass constructor from within a constructor.")
+		  End If
+		  
+		  // Check this class actually has a superclass.
+		  If CurrentClass.Superclass = "" Then
+		    Error("Class `" + CurrentClass.Name + "` does not have a superclass.")
+		  End If
+		  
+		  // Load the superclass' name into the constant pool.
+		  Var superNameIndex As Integer = AddConstant(CurrentClass.Superclass)
+		  
+		  // Load the constructor's signature into the constant pool.
+		  Var sigIndex As Integer = AddConstant(s.Signature)
+		  
+		  // Push `this` onto the stack. It's always at slot 0 of the call frame.
+		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		  
+		  // Compile the arguments.
+		  For Each arg As ObjoScript.Expr In s.Arguments
+		    Call arg.Accept(Self)
+		  Next arg
+		  
+		  // Emit the OP_SUPER_CONSTRUCTOR instruction, the index of the superclass' name, the index of the constructors signature
+		  // and the argument count.
+		  EmitByte(ObjoScript.VM.OP_SUPER_CONSTRUCTOR, s.Location)
+		  EmitUInt16(superNameIndex, s.Location)
+		  EmitUInt16(sigIndex, s.Location)
+		  EmitByte(s.Arguments.Count, s.Location)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120676574746572206D6574686F6420696E766F636174696F6E206F6E20607375706572602E
 		Function VisitSuperMethodInvocation(s As ObjoScript.SuperMethodInvocationExpr) As Variant
 		  /// Compiles a getter method invocation on `super`.
@@ -2053,7 +2095,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Call arg.Accept(Self)
 		  Next arg
 		  
-		  // Emit the OP_SUPER_INVOKE instruction and the index of the method's name in the constant pool
+		  // Emit the OP_SUPER_INVOKE instruction and the index of the method's name in the constant pool.
 		  EmitIndexedOpcode(ObjoScript.VM.OP_SUPER_INVOKE, ObjoScript.VM.OP_SUPER_INVOKE_LONG, index, s.Location)
 		  
 		  // Emit the argument count.

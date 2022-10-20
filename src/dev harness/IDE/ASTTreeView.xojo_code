@@ -645,6 +645,26 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitSuperConstructor(s As ObjoScript.SuperConstructorExpr) As Variant
+		  Var node As New TreeViewNode("Super constructor")
+		  
+		  // Optional arguments.
+		  If s.Arguments.Count = 0 Then
+		    node.AppendNode(New TreeViewNode("No arguments"))
+		  Else
+		    Var argNode As New TreeViewNode("Arguments")
+		    For Each arg As ObjoScript.Expr In s.Arguments
+		      argNode.AppendNode(arg.Accept(Self))
+		    Next arg
+		    node.AppendNode(argNode)
+		  End If
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitSuperMethodInvocation(s As ObjoScript.SuperMethodInvocationExpr) As Variant
 		  Var node As New TreeViewNode("Super method invocation")
 		  

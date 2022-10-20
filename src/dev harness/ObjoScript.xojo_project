@@ -28,6 +28,7 @@ Class=ClassParselet;ObjoScript/ClassParselet.xojo_code;&h0000000018348FFF;&h0000
 Class=FieldParselet;ObjoScript/FieldParselet.xojo_code;&h0000000020BAD7FF;&h000000004D1497FF;false
 Class=NumberLiteral;ObjoScript/NumberLiteral.xojo_code;&h00000000789ED7FF;&h000000004D1497FF;false
 Class=SuperExpr;ObjoScript/SuperExpr.xojo_code;&h0000000055D267FF;&h000000004D1497FF;false
+Class=SuperConstructorExpr;ObjoScript/SuperConstructorExpr.xojo_code;&h0000000047EBFFFF;&h000000004D1497FF;false
 Class=BooleanLiteral;ObjoScript/BooleanLiteral.xojo_code;&h00000000121B77FF;&h000000004D1497FF;false
 Class=VariableExpr;ObjoScript/VariableExpr.xojo_code;&h000000000DC8E7FF;&h000000004D1497FF;false
 Class=ClassExpr;ObjoScript/ClassExpr.xojo_code;&h000000006F698FFF;&h000000004D1497FF;false
