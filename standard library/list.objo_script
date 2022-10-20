@@ -1,0 +1,14 @@
+// The List class represents a single dimension array.
+foreign class List {
+  foreign iterate(iter)
+  foreign iteratorValue(iter)
+  
+  toString() {
+var s = "["
+foreach element in this {
+s = s + element + ","
+}
+s = s + "]"
+return s
+}
+}

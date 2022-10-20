@@ -4,10 +4,13 @@ class Foo {
   static baz() { return 1 }
 }
 
+var boolList = [true, false]
+var numList = [1, 2, 3]
+
 // Condition precedence.
 System.print(true ? 1 : 2) // expect: 1
 System.print((true) ? 1 : 2) // expect: 1
-//System.print([true][0] ? 1 : 2) // expect: 1
+//System.print(boolList[0] ? 1 : 2) // expect: 1
 System.print(Foo.bar ? 1 : 2) // expect: 1
 System.print(3..4 ? 1 : 2) // expect: 1
 System.print(3 * 4 ? 1 : 2) // expect: 1
@@ -24,7 +27,7 @@ System.print(a) // expect: 1
 
 // Then branch precedence.
 System.print(true ? (1) : 2) // expect: 1
-//System.print(true ? [1][0] : 2) // expect: 1
+//System.print(true ? numList[1] : 2) // expect: 2
 System.print(true ? Foo.baz() : 2) // expect: 1
 System.print(true ? 3..4 : 2) // expect: 3..4
 System.print(true ? 3 * 4 : 2) // expect: 12

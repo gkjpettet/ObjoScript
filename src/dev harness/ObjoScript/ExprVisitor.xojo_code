@@ -60,6 +60,12 @@ Protected Interface ExprVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E672061206C697374206C69746572616C2C20652E673A205B312C20322C20335D2E
+		Function VisitListLiteral(expr As ObjoScript.ListLiteral) As Variant
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E672061206C6F676963616C2065787072657373696F6E2E
 		Function VisitLogical(logical As ObjoScript.LogicalExpr) As Variant
 		  
@@ -110,6 +116,18 @@ Protected Interface ExprVisitor
 
 	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E67206120737472696E67206C69746572616C2E
 		Function VisitString(expr As ObjoScript.StringLiteral) As Variant
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E67206120737562736372697074206D6574686F642C20652E673A20615B315D2E
+		Function VisitSubscript(s As ObjoScript.Subscript) As Variant
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E67206120737562736372697074207365747465722C20652E673A20615B315D203D2076616C75652E
+		Function VisitSubscriptSetter(s As ObjoScript.SubscriptSetter) As Variant
 		  
 		End Function
 	#tag EndMethod

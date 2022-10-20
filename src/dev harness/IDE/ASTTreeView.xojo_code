@@ -444,6 +444,25 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitListLiteral(expr As ObjoScript.ListLiteral) As Variant
+		  Var node As TreeViewNode
+		  If expr.Elements.Count = 0 Then
+		    node = New TreeViewNode("Empty List")
+		  Else
+		    node = New TreeViewNode("List (" + expr.Elements.Count.ToString + If(expr.Elements.Count = 1, " element)", " elements)"))
+		    Var elementsNode As New TreeViewNode("Elements")
+		    For Each element As ObjoScript.Expr In expr.Elements
+		      elementsNode.AppendNode(element.Accept(Self))
+		    Next element
+		    node.AppendNode(elementsNode)
+		  End If
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitLogical(logical As ObjoScript.LogicalExpr) As Variant
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
@@ -629,6 +648,40 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
 		  Var node As New TreeViewNode("String: " + expr.Value)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function VisitSubscript(s As ObjoScript.Subscript) As Variant
+		  Var node As New TreeViewNode("Subscript")
+		  
+		  Var indicesNode As New TreeViewNode("Indices")
+		  For Each index As ObjoScript.Expr In s.Indices
+		    indicesNode.AppendNode(index.Accept(Self))
+		  Next index
+		  node.AppendNode(indicesNode)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function VisitSubscriptSetter(s As ObjoScript.SubscriptSetter) As Variant
+		  Var node As New TreeViewNode("Subscript Setter")
+		  
+		  Var indicesNode As New TreeViewNode("Indices")
+		  For Each index As ObjoScript.Expr In s.Indices
+		    indicesNode.AppendNode(index.Accept(Self))
+		  Next index
+		  node.AppendNode(indicesNode)
+		  
+		  Var valueNode As New TreeViewNode("Value to assign")
+		  valueNode.AppendNode(s.ValueToAssign.Accept(Self))
+		  node.AppendNode(valueNode)
 		  
 		  Return node
 		  

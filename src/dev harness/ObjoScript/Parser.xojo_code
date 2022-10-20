@@ -679,8 +679,8 @@ Protected Class Parser
 		  TokenTypes.Less                 : BinaryOperator(Precedences.Comparison), _
 		  TokenTypes.LessEqual            : BinaryOperator(Precedences.Comparison), _
 		  TokenTypes.LessLess             : BinaryOperator(Precedences.BitwiseShift), _
-		  TokenTypes.LParen               : NewRule(New GroupParselet,  New CallParselet, Precedences.Call_), _
-		  TokenTypes.LSquare              : Unused, _
+		  TokenTypes.LParen               : NewRule(New GroupParselet, New CallParselet, Precedences.Call_), _
+		  TokenTypes.LSquare              : NewRule(New ListParselet, New SubscriptParselet, Precedences.Call_), _
 		  TokenTypes.Minus                : Operator, _
 		  TokenTypes.MinusMinus           : Postfix, _
 		  TokenTypes.MinusEqual           : Unused, _

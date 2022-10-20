@@ -43,9 +43,9 @@ Protected Module Range
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h1, Description = 52657475726E732066616C736520696620746865726520617265206E6F206D6F7265206974656D7320746F2069746572617465206F722072657475726E7320746865206E6578742076616C756520696E207468652073657175656E6365
+	#tag Method, Flags = &h1, Description = 52657475726E732066616C736520696620746865726520617265206E6F206D6F7265206974656D7320746F2069746572617465206F722072657475726E7320746865206E6578742076616C756520696E207468652073657175656E63652E
 		Protected Sub Iterate(vm As ObjoScript.VM)
-		  /// Returns false if there are no more items to iterate or returns the next value in the sequence
+		  /// Returns false if there are no more items to iterate or returns the next value in the sequence.
 		  ///
 		  /// if `iter` is nothing then we should return the first item.
 		  /// Assumes slot 0 contains a Range instance.
@@ -89,5 +89,7 @@ Protected Module Range
 	#tag EndMethod
 
 
+	#tag ViewBehavior
+	#tag EndViewBehavior
 End Module
 #tag EndModule

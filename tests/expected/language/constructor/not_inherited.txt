@@ -1,1 +1,1 @@
-The default `Bar` constructor expected 0 arguments but got 1.
+There is no `Bar` constructor that expects 1 argument.

@@ -43,6 +43,10 @@ Protected Class VM
 		  
 		  If className.CompareCase("Range") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.LibraryCore.Range.Allocate, Nil)
+		    
+		  ElseIf className.CompareCase("List") Then
+		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.LibraryCore.List.Allocate, Nil)
+		    
 		  End If
 		  
 		End Function
@@ -60,6 +64,9 @@ Protected Class VM
 		    
 		  ElseIf className.CompareCase("Range") Then
 		    Return LibraryCore.Range.BindForeignMethod(signature, isStatic)
+		    
+		  ElseIf className.CompareCase("List") Then
+		    Return LibraryCore.List.BindForeignMethod(signature, isStatic)
 		    
 		  End If
 		  
@@ -341,6 +348,29 @@ Protected Class VM
 		  Return New ObjoScript.CallHandle(CallHandles.LastIndex, argCount, isConstructor)
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 4372656174652061206E6577206C697374206C69746572616C2E2054686520636F6D70696C65722077696C6C206861766520706C6163656420746865204C69737420636C617373206F6E2074686520737461636B20616E6420616E7920696E697469616C20656C656D656E74732061626F766520746869732E
+		Private Sub CreateListLiteral(elementCount As Integer)
+		  /// Create a new list literal. The compiler will have placed the List class on the stack
+		  /// and any initial elements above this.
+		  
+		  // Pop and store any optional initial elements.
+		  Var elements() As Variant
+		  
+		  For i As Integer = 1 To elementCount
+		    elements.AddAt(0, Pop)
+		  Next i
+		  
+		  // Call the default list constructor.
+		  Call CallClass(Peek(0), 0)
+		  
+		  // The top of the stack will now be a List instance.
+		  // Add the initial elements to it's foreign data.
+		  Var list As ObjoScript.Instance = Stack(StackTop - 1)
+		  list.ForeignData = elements
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 52657475726E7320746865206368756E6B207765206172652063757272656E746C792072656164696E672066726F6D2E2049742773206F776E6564206279207468652066756E6374696F6E2077686F73652063616C6C206672616D65207765206172652063757272656E746C7920696E2E
@@ -1428,6 +1458,11 @@ Protected Class VM
 		      // The compiler will have ensured that `type` is a string.
 		      Push(ValueIsType(Pop, Pop))
 		      
+		    Case OP_LIST
+		      CreateListLiteral(ReadByte)
+		      ' Var elementCount As Integer = ReadByte
+		      ' Call CallValue(Peek(elementCount), 0)
+		      
 		    End Select
 		  Wend
 		  
@@ -1912,7 +1947,7 @@ Protected Class VM
 		61: OP_INVOKE (2)
 		62: OP_INVOKE_LONG (3)
 		63: OP_INHERIT (0)
-		64: **Unused**
+		64: OP_LIST (1)
 		65: **Unused**
 		66: OP_SUPER_SETTER (4)
 		67: **Unused**
@@ -2064,7 +2099,8 @@ Protected Class VM
 			  OP_GET_LOCAL_CLASS        : 1, _
 			  OP_LOCAL_VAR_DEC          : 3, _
 			  OP_BITWISE_NOT            : 0, _
-			  OP_SUPER_CONSTRUCTOR      : 3 _
+			  OP_SUPER_CONSTRUCTOR      : 3, _
+			  OP_LIST                   : 1 _
 			  )
 			  
 			  Return d
@@ -2220,6 +2256,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_LESS_EQUAL, Type = Double, Dynamic = False, Default = \"13", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_LIST, Type = Double, Dynamic = False, Default = \"64", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_LOAD_0, Type = Double, Dynamic = False, Default = \"26", Scope = Public

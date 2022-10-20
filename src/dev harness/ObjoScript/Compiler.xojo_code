@@ -1778,6 +1778,33 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732061206C697374206C69746572616C2E
+		Function VisitListLiteral(expr As ObjoScript.ListLiteral) As Variant
+		  /// Compiles a list literal.
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  mLocation = expr.Location
+		  
+		  // Retrieve the List class. It should have been defined globally in the standard library.
+		  NamedVariable("List")
+		  
+		  // Make sure no more than 255 initial elements are defined.
+		  If expr.Elements.Count > 255 Then
+		    Error("The maximum number of initial elements for a list is 255.")
+		  End If
+		  
+		  // Any initial elements need compiling to leave them on the top of the stack.
+		  For Each element As ObjoScript.Expr In expr.Elements
+		    Call element.Accept(Self)
+		  Next element
+		  
+		  // Tell the VM to create a List instance with the optional initial elements.
+		  EmitBytes(VM.OP_LIST, expr.Elements.Count, expr.Location)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 54686520636F6D70696C6572206973207669736974696E672061206C6F676963616C2065787072657373696F6E20286F722C20616E642C20786F72292E
 		Function VisitLogical(logical As ObjoScript.LogicalExpr) As Variant
 		  /// The compiler is visiting a logical expression (or, and, xor).
@@ -2017,6 +2044,34 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  mLocation = expr.Location
 		  
 		  Call EmitConstant(expr.Value)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function VisitSubscript(s As ObjoScript.Subscript) As Variant
+		  /// Compiles a subscript method call.
+		  ///
+		  /// E.g: a[1]
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  #Pragma Warning "TODO"
+		  
+		  Error("Subscript methods are not yet implemented.")
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120737562736372697074207365747465722063616C6C2E
+		Function VisitSubscriptSetter(s As ObjoScript.SubscriptSetter) As Variant
+		  /// Compiles a subscript setter call.
+		  ///
+		  /// E.g: a[1] = value
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  #Pragma Warning "TODO"
+		  
+		  Error("Subscript setters are not yet implemented.")
 		  
 		End Function
 	#tag EndMethod

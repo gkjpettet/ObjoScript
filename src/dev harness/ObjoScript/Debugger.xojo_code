@@ -505,25 +505,25 @@ Protected Class Debugger
 		    Return Instruction8BitOperand("SET LOCAL", chunk, offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_JUMP
-		    Return JumpInstruction("OP_JUMP", False, chunk, offset, line, s)
+		    Return JumpInstruction("JUMP", False, chunk, offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_JUMP_IF_FALSE
-		    Return JumpInstruction("OP_JUMP_IF_FALSE", False, chunk, offset, line, s)
+		    Return JumpInstruction("JUMP_IF_FALSE", False, chunk, offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_JUMP_IF_TRUE
-		    Return JumpInstruction("OP_JUMP_IF_TRUE", False, chunk, offset, line, s)
+		    Return JumpInstruction("JUMP_IF_TRUE", False, chunk, offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_LOOP
-		    Return JumpInstruction("OP_LOOP", True, chunk, offset, line, s)
+		    Return JumpInstruction("LOOP", True, chunk, offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_RANGE
-		    Return SimpleInstruction("OP_RANGE", offset, line, s)
+		    Return SimpleInstruction("RANGE", offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_EXIT
-		    Return SimpleInstruction("OP_EXIT", offset, line, s)
+		    Return SimpleInstruction("EXIT", offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_CALL
-		    Return Instruction8BitOperand("OP_CALL", chunk, offset, line, s)
+		    Return Instruction8BitOperand("CALL", chunk, offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_CLASS
 		    Return ConstantInstruction(opcode, chunk, offset, line, s)
@@ -565,7 +565,7 @@ Protected Class Debugger
 		    Return InvokeInstruction(opcode, chunk, offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_INHERIT
-		    Return SimpleInstruction("OP_INHERIT", offset, line, s)
+		    Return SimpleInstruction("INHERIT", offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_GETTER_LONG
 		    Return ConstantInstruction(opcode, chunk, offset, line, s)
@@ -586,7 +586,7 @@ Protected Class Debugger
 		    Return MethodInstruction(opcode, chunk, offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_IS
-		    Return SimpleInstruction("OP_IS", offset, line, s)
+		    Return SimpleInstruction("IS", offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_GET_LOCAL_CLASS
 		    Return Instruction8BitOperand("GET LOCAL CLASS", chunk, offset, line, s)
@@ -596,6 +596,9 @@ Protected Class Debugger
 		    
 		  Case ObjoScript.VM.OP_SUPER_CONSTRUCTOR
 		    Return SuperConstructorInstruction(chunk, offset, line, s)
+		    
+		  Case ObjoScript.VM.OP_LIST
+		    Return Instruction8BitOperand("LIST", chunk, offset, line, s)
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
@@ -833,25 +836,25 @@ Protected Class Debugger
 		    details = Instruction8BitOperandDetails("SET LOCAL", chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_JUMP
-		    details = JumpInstructionDetails("OP_JUMP", False, chunk, offset)
+		    details = JumpInstructionDetails("JUMP", False, chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_JUMP_IF_FALSE
-		    details = JumpInstructionDetails("OP_JUMP_IF_FALSE", False, chunk, offset)
+		    details = JumpInstructionDetails("JUMP_IF_FALSE", False, chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_JUMP_IF_TRUE
-		    details = JumpInstructionDetails("OP_JUMP_IF_TRUE", False, chunk, offset)
+		    details = JumpInstructionDetails("JUMP_IF_TRUE", False, chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_LOOP
-		    details = JumpInstructionDetails("OP_LOOP", True, chunk, offset)
+		    details = JumpInstructionDetails("LOOP", True, chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_RANGE
-		    details = SimpleInstructionDetails("OP_RANGE", offset)
+		    details = SimpleInstructionDetails("RANGE", offset)
 		    
 		  Case ObjoScript.VM.OP_EXIT
-		    details = SimpleInstructionDetails("OP_EXIT", offset)
+		    details = SimpleInstructionDetails("EXIT", offset)
 		    
 		  Case ObjoScript.VM.OP_CALL
-		    details = Instruction8BitOperandDetails("OP_CALL", chunk, offset)
+		    details = Instruction8BitOperandDetails("CALL", chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_CLASS
 		    details = ConstantInstructionDetails(opcode, chunk, "CLASS", offset)
@@ -893,7 +896,7 @@ Protected Class Debugger
 		    details = InvokeInstructionDetails(opcode, chunk, "INVOKE_LONG", offset)
 		    
 		  Case ObjoScript.VM.OP_INHERIT
-		    details = SimpleInstructionDetails("OP_INHERIT", offset)
+		    details = SimpleInstructionDetails("INHERIT", offset)
 		    
 		  Case ObjoScript.VM.OP_GETTER_LONG
 		    details = ConstantInstructionDetails(opcode, chunk, "GETTER_LONG", offset)
@@ -917,7 +920,7 @@ Protected Class Debugger
 		    details = MethodInstructionDetails(opcode, chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_IS
-		    details = SimpleInstructionDetails("OP_IS", offset)
+		    details = SimpleInstructionDetails("IS", offset)
 		    
 		  Case ObjoScript.VM.OP_GET_LOCAL_CLASS
 		    details = Instruction8BitOperandDetails("GET LOCAL CLASS", chunk, offset)
@@ -927,6 +930,9 @@ Protected Class Debugger
 		    
 		  Case ObjoScript.VM.OP_SUPER_CONSTRUCTOR
 		    details = SuperConstructorDetails(chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_LIST
+		    details = Instruction8BitOperandDetails("LIST", chunk, offset)
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
