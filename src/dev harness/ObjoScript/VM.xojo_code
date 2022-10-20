@@ -1373,10 +1373,10 @@ Protected Class VM
 		      BindMethod(ReadConstantLong)
 		      
 		    Case OP_SETTER
-		      Setter(ReadConstant, False)
+		      Setter(ReadConstant)
 		      
 		    Case OP_SETTER_LONG
-		      Setter(ReadConstantLong, False)
+		      Setter(ReadConstantLong)
 		      
 		    Case OP_GET_FIELD
 		      GetField(ReadConstant)
@@ -1566,16 +1566,13 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 43616C6C73207468652073657474657220666F722074686520696E7374616E6365206F6E652066726F6D2074686520746F70206F662074686520737461636B2C2070617373696E6720696E207468652076616C7565206F6E2074686520746F70206F662074686520737461636B2061732074686520706172616D657465722E
-		Private Sub Setter(signature As String, onSuper As Boolean)
+		Private Sub Setter(signature As String)
 		  /// Calls the setter for the instance or class one from the top of the stack, passing in the 
 		  /// value on the top of the stack as the parameter.
 		  ///
 		  /// |
 		  /// | ValueToAssign   <-- top of the stack
 		  /// | instance or class
-		  ///
-		  /// If `onSuper` is True then we look for the method on the instance's superclass, otherwise
-		  /// we look on the instance's class.
 		  
 		  // Check we have a class/instance in the correct place.
 		  Var receiver As Variant = Peek(1)
@@ -1589,19 +1586,9 @@ Protected Class VM
 		  // Get the value to assign. This will be the parameter to the setter method.
 		  Var value As Variant = Pop
 		  
-		  // Get the correct method. It's either on the instance, the instance's super or a class.
+		  // Get the correct method. It's either on the instance or a class.
 		  Var setter As Variant
-		  If onSuper And Not isStatic Then
-		    If ObjoScript.Instance(receiver).Klass.Superclass = Nil Then
-		      Error("`" + ObjoScript.Instance(receiver).Klass.ToString + "` does not have a superclass.")
-		    Else
-		      setter = ObjoScript.Instance(receiver).Klass.Superclass.Methods.Lookup(signature, Nil)
-		    End If
-		    If setter = Nil Then
-		      Error("Undefined instance setter `" + signature + "` on " + ObjoScript.Instance(receiver).klass.Superclass.ToString + ".")
-		    End If
-		    
-		  ElseIf isStatic Then
+		  If isStatic Then
 		    setter = ObjoScript.Klass(receiver).StaticMethods.Lookup(signature, Nil)
 		    If setter = Nil Then
 		      Error("Undefined static setter `" + signature + "` on " + ObjoScript.Klass(receiver).ToString + ".")
