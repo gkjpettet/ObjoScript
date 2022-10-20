@@ -138,7 +138,7 @@ Protected Class VM
 		  
 		  // We allow a class to omit providing a default (zero parameter) constructor.
 		  If constructor = Nil And argCount <> 0 Then
-		    Error("The default `" + klass.Name + "` constructor expected 0 arguments but got " + argCount.ToString + ".")
+		    Error("There is no `" + klass.Name + "` constructor that expects " + argCount.ToString + If(argCount = 1, " argument.", "arguments."))
 		  End If
 		  
 		  // If this is a foreign class, call the allocate delegate so the host can do any additional setup needed.
