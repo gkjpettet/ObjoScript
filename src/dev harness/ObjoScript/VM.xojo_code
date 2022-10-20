@@ -357,7 +357,6 @@ Protected Class VM
 		  
 		  // Pop and store any optional initial elements.
 		  Var elements() As Variant
-		  
 		  For i As Integer = 1 To elementCount
 		    elements.AddAt(0, Pop)
 		  Next i
@@ -1052,6 +1051,9 @@ Protected Class VM
 	#tag Method, Flags = &h0, Description = 52756E732074686520696E7465727072657465722E20417373756D657320697420686173206265656E20696E697469616C69736564207072696F7220746F207468697320616E642068617320612076616C69642063616C6C206672616D6520746F20657865637574652E
 		Sub Run(stepMode As ObjoScript.VM.StepModes = ObjoScript.VM.StepModes.None)
 		  /// Runs the interpreter. Assumes it has been initialised prior to this and has a valid call frame to execute.
+		  
+		  #Pragma Warning "TODO: Allow methods to raise a VM exception"
+		  ' This will allow, for example, subscript methods to indicate that an out of bounds error has occurred.
 		  
 		  // Make sure we don't try to step in with an out of bounds instruction pointer.
 		  If CurrentFrame.IP > CurrentChunk.Code.LastIndex Then Return

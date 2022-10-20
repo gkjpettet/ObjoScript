@@ -1414,9 +1414,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C65206120646F742065787072657373696F6E20286D6574686F6420696E766F636174696F6E292E
+	#tag Method, Flags = &h0, Description = 436F6D70696C65206120646F742065787072657373696F6E2E
 		Function VisitDot(dot As ObjoScript.DotExpr) As Variant
-		  /// Compile a dot expression (method invocation).
+		  /// Compile a dot expression.
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
@@ -2052,13 +2052,27 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Function VisitSubscript(s As ObjoScript.Subscript) As Variant
 		  /// Compiles a subscript method call.
 		  ///
-		  /// E.g: a[1]
+		  /// E.g: operand[1]
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
-		  #Pragma Warning "TODO"
+		  mLocation = s.Location
 		  
-		  Error("Subscript methods are not yet implemented.")
+		  // Compile the operand to put it on the stack.
+		  Call s.Operand.Accept(Self)
 		  
+		  // Load the subscript into the constant pool.
+		  Var index As Integer = AddConstant(s.Signature)
+		  
+		  // Compile the indices.
+		  For Each i As ObjoScript.Expr In s.Indices
+		    Call i.Accept(Self)
+		  Next i
+		  
+		  // Emit the OP_INVOKE instruction and the index of the method's signature in the constant pool
+		  EmitIndexedOpcode(ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_INVOKE_LONG, index, s.Location)
+		  
+		  // Emit the index count.
+		  EmitByte(s.Indices.Count, s.Location)
 		End Function
 	#tag EndMethod
 
@@ -2069,9 +2083,17 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// E.g: a[1] = value
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
-		  #Pragma Warning "TODO"
+		  mLocation = s.Location
 		  
-		  Error("Subscript setters are not yet implemented.")
+		  // Compile the operand to put it on the stack.
+		  Call s.Operand.Accept(Self)
+		  
+		  // Load the signature into the constant pool.
+		  Var index As Integer = AddConstant(s.Signature)
+		  
+		  // Compile the value to assign.
+		  Call s.ValueToAssign.Accept(Self)
+		  EmitIndexedOpcode(ObjoScript.VM.OP_SETTER, ObjoScript.VM.OP_SETTER_LONG, index)
 		  
 		End Function
 	#tag EndMethod

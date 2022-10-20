@@ -658,6 +658,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Function VisitSubscript(s As ObjoScript.Subscript) As Variant
 		  Var node As New TreeViewNode("Subscript")
 		  
+		  Var operandNode As New TreeViewNode("Operand")
+		  operandNode.AppendNode(s.Operand.Accept(Self))
+		  node.AppendNode(operandNode)
+		  
 		  Var indicesNode As New TreeViewNode("Indices")
 		  For Each index As ObjoScript.Expr In s.Indices
 		    indicesNode.AppendNode(index.Accept(Self))
@@ -672,6 +676,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag Method, Flags = &h0
 		Function VisitSubscriptSetter(s As ObjoScript.SubscriptSetter) As Variant
 		  Var node As New TreeViewNode("Subscript Setter")
+		  
+		  Var operandNode As New TreeViewNode("Operand")
+		  operandNode.AppendNode(s.Operand.Accept(Self))
+		  node.AppendNode(operandNode)
 		  
 		  Var indicesNode As New TreeViewNode("Indices")
 		  For Each index As ObjoScript.Expr In s.Indices

@@ -31,13 +31,14 @@ Implements ObjoScript.InfixParselet
 		  Var valueToAssign As ObjoScript.Expr = Nil
 		  Var isSetter As Boolean = False
 		  If canAssign And parser.Match(ObjoScript.TokenTypes.Equal) Then
+		    isSetter = True
 		    valueToAssign = parser.Expression
 		  End If
 		  
 		  If isSetter Then
-		    Return New ObjoScript.SubscriptSetter(lsquare, indexes, valueToAssign)
+		    Return New ObjoScript.SubscriptSetter(lsquare, left, indexes, valueToAssign)
 		  Else
-		    Return New ObjoScript.Subscript(lsquare, indexes)
+		    Return New ObjoScript.Subscript(lsquare, left, indexes)
 		  End If
 		  
 		End Function

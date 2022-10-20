@@ -10,11 +10,17 @@ Implements ObjoScript.Expr
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(lsquare As ObjoScript.Token, indices() As ObjoScript.Expr, valueToAssign As ObjoScript.Expr)
+		Sub Constructor(lsquare As ObjoScript.Token, operand As ObjoScript.EXpr, indices() As ObjoScript.Expr, valueToAssign As ObjoScript.Expr)
 		  mLSquare = lsquare
+		  Self.Operand = operand
 		  Self.Indices = indices
 		  Self.ValueToAssign = valueToAssign
 		  
+		  #Pragma Warning "TODO: Fix subscript setter signatures"
+		  ' These should be `operator_subscript[_]=(_)` or `operator_subscript[_,_]=(_)` rather than
+		  ' `operator_subscript=(_)`.
+		  ' Will also require changes to the parser to permit method signatures including `[]`.
+		  mSignature = ObjoScript.Func.ComputeSignature("operator_subscript", indices.Count, True)
 		End Sub
 	#tag EndMethod
 
@@ -34,6 +40,23 @@ Implements ObjoScript.Expr
 	#tag Property, Flags = &h21
 		Private mLSquare As ObjoScript.Token
 	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mSignature As String
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 546865206F706572616E6420746F2063616C6C2074686520606F70657261746F725F7375627363726970746020736574746572206D6574686F64206F6E2E
+		Operand As ObjoScript.Expr
+	#tag EndProperty
+
+	#tag ComputedProperty, Flags = &h0, Description = 546865207369676E6174757265206F662074686973207375627363726970742073657474657263616C6C2E
+		#tag Getter
+			Get
+			  Return mSignature
+			End Get
+		#tag EndGetter
+		Signature As String
+	#tag EndComputedProperty
 
 	#tag Property, Flags = &h0, Description = 5468652076616C756520746F2061737369676E2E
 		ValueToAssign As ObjoScript.Expr

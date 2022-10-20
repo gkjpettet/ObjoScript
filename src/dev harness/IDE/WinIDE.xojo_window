@@ -314,7 +314,7 @@ Begin DesktopWindow WinIDE
       Tooltip         =   ""
       Top             =   54
       Transparent     =   False
-      Value           =   2
+      Value           =   1
       Visible         =   True
       Width           =   678
       Begin DesktopListBox TokensListbox
@@ -467,7 +467,7 @@ Begin DesktopWindow WinIDE
          TabStop         =   True
          Tooltip         =   ""
          Top             =   54
-         UseFocusRing    =   True
+         UseFocusRing    =   False
          Visible         =   True
          Width           =   678
          WinDrawTreeLines=   True

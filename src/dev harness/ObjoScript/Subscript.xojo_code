@@ -10,9 +10,12 @@ Implements ObjoScript.Expr
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(lsquare As ObjoScript.Token, indices() As ObjoScript.Expr)
+		Sub Constructor(lsquare As ObjoScript.Token, operand As ObjoScript.Expr, indices() As ObjoScript.Expr)
 		  mLSquare = lsquare
+		  Self.Operand = operand
 		  Self.Indices = indices
+		  mSignature = ObjoScript.Func.ComputeSignature("operator_subscript", indices.Count, False)
+		  
 		End Sub
 	#tag EndMethod
 
@@ -32,6 +35,23 @@ Implements ObjoScript.Expr
 	#tag Property, Flags = &h21
 		Private mLSquare As ObjoScript.Token
 	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mSignature As String
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 546865206F706572616E6420746F2063616C6C20606F70657261746F725F73756273637269707460206F6E2E
+		Operand As ObjoScript.Expr
+	#tag EndProperty
+
+	#tag ComputedProperty, Flags = &h0, Description = 546865207369676E6174757265206F662074686973207375627363726970742063616C6C2E
+		#tag Getter
+			Get
+			  Return mSignature
+			End Get
+		#tag EndGetter
+		Signature As String
+	#tag EndComputedProperty
 
 
 	#tag ViewBehavior
