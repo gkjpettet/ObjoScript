@@ -66,13 +66,10 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 42696E6473206120726567756C6172202867657474657229206D6574686F64206E616D656420606E616D656020746F2074686520636C617373206F7220696E7374616E6365206F6E2074686520746F70206F662074686520737461636B2E20417373657274732074686520746F70206F662074686520737461636B20697320616E20696E7374616E6365206F7220636C6173732E
-		Private Sub BindMethod(name As String, onSuper As Boolean)
-		  /// Binds a regular (getter) method named `name` to the class or instance on the top of the stack.
+	#tag Method, Flags = &h21, Description = 42696E6473206120726567756C6172206D6574686F64206E616D656420606E616D656020746F2074686520636C617373206F7220696E7374616E6365206F6E2074686520746F70206F662074686520737461636B2E20417373657274732074686520746F70206F662074686520737461636B20697320616E20696E7374616E6365206F7220636C6173732E
+		Private Sub BindMethod(name As String)
+		  /// Binds a regular method named `name` to the class or instance on the top of the stack.
 		  /// Asserts the top of the stack is an instance or class.
-		  ///
-		  /// If `onSuper` is True then we look for the method on the instance's superclass, otherwise
-		  /// we look on the instance's class.
 		  
 		  // Check we have an instance or a class on the top of the stack.
 		  Var receiver As Variant = Peek(0)
@@ -84,20 +81,10 @@ Protected Class VM
 		  End If
 		  
 		  // Get the correct method. It might be Objo native or foreign.
-		  // It's either on the instance's class or its superclass
+		  // It's either on the instance's class
 		  // or it'll be a static method on the class on the top of the stack.
 		  Var method As Variant
-		  If onSuper And Not isStatic Then
-		    If ObjoScript.Instance(receiver).Klass.Superclass = Nil Then
-		      Error("`" + ObjoScript.Instance(receiver).Klass.ToString + "` does not have a superclass.")
-		    Else
-		      method = ObjoScript.Instance(receiver).Klass.Superclass.Methods.Lookup(name, Nil)
-		    End If
-		    If method = Nil Then
-		      Error("Undefined instance method `" + name + "` on " + ObjoScript.Instance(receiver).klass.Superclass.ToString + ".")
-		    End If
-		    
-		  ElseIf isStatic Then
+		  If isStatic Then
 		    method = ObjoScript.Klass(receiver).StaticMethods.Lookup(name, Nil)
 		    If method = Nil Then
 		      Error("Undefined static method `" + name + "` on " + ObjoScript.Klass(receiver).ToString + ".")
@@ -720,9 +707,9 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 496E766F6B65732061206D6574686F64206F6E20616E20696E7374616E636520286F722069747320737570657229206F72206120636C6173732E2054686520726563656976657220636F6E7461696E696E6720746865206D6574686F642073686F756C64206265206F6E2074686520737461636B20616C6F6E67207769746820616E7920617267756D656E74732069742072657175697265732E
-		Private Sub Invoke(signature As String, argCount As Integer, onSuper As Boolean)
-		  /// Invokes a method on an instance (or its super) or a class. The receiver containing the method should be on the stack
+	#tag Method, Flags = &h21, Description = 496E766F6B65732061206D6574686F64206F6E20616E20696E7374616E6365206F66206120636C6173732E2054686520726563656976657220636F6E7461696E696E6720746865206D6574686F642073686F756C64206265206F6E2074686520737461636B20616C6F6E67207769746820616E7920617267756D656E74732069742072657175697265732E
+		Private Sub Invoke(signature As String, argCount As Integer)
+		  /// Invokes a method on an instance of a class. The receiver containing the method should be on the stack
 		  /// along with any arguments it requires.
 		  ///
 		  /// |
@@ -743,14 +730,7 @@ Protected Class VM
 		    Error("Only classes and instances have methods.")
 		  End If
 		  
-		  // Is this a call to a method on the receiver's superclass?
-		  If onSuper And Not isStatic Then
-		    If ObjoScript.Instance(receiver).Klass.Superclass = Nil Then
-		      Error("`" + ObjoScript.Instance(receiver).Klass.ToString + "` does not have a superclass.")
-		    End If
-		    InvokeFromClass(ObjoScript.Instance(receiver).Klass.Superclass, signature, argCount, False)
-		    
-		  ElseIf isStatic Then
+		  If isStatic Then
 		    // This is a static method invocation.
 		    InvokeFromClass(ObjoScript.Klass(receiver), signature, argCount, True)
 		    
@@ -1387,10 +1367,10 @@ Protected Class VM
 		      DefineMethod(ReadConstantLong, If(ReadByte = 0, False, True))
 		      
 		    Case OP_GETTER
-		      BindMethod(ReadConstant, False)
+		      BindMethod(ReadConstant)
 		      
 		    Case OP_GETTER_LONG
-		      BindMethod(ReadConstantLong, False)
+		      BindMethod(ReadConstantLong)
 		      
 		    Case OP_SETTER
 		      Setter(ReadConstant, False)
@@ -1414,28 +1394,18 @@ Protected Class VM
 		      DefineConstructor(ReadByte)
 		      
 		    Case VM.OP_INVOKE
-		      Invoke(ReadConstant, ReadByte, False)
+		      Invoke(ReadConstant, ReadByte)
 		      
 		    Case VM.OP_INVOKE_LONG
-		      Invoke(ReadConstantLong, ReadByte, False)
+		      Invoke(ReadConstantLong, ReadByte)
 		      
 		    Case OP_INHERIT
 		      Inherit
 		      
-		    Case OP_SUPER_GETTER
-		      BindMethod(ReadConstant, True)
-		      
-		    Case OP_SUPER_GETTER_LONG
-		      BindMethod(ReadConstantLong, True)
-		      
 		    Case OP_SUPER_SETTER
-		      Setter(ReadConstant, True)
-		      
-		    Case OP_SUPER_SETTER_LONG
-		      Setter(ReadConstantLong, True)
+		      SuperInvoke(ReadConstantLong, ReadConstantLong, 1)
 		      
 		    Case OP_SUPER_INVOKE
-		      'Invoke(ReadConstant, ReadByte, True)
 		      SuperInvoke(ReadConstantLong, ReadConstantLong, ReadByte)
 		      
 		    Case OP_SUPER_CONSTRUCTOR
@@ -1958,10 +1928,10 @@ Protected Class VM
 		61: OP_INVOKE (2)
 		62: OP_INVOKE_LONG (3)
 		63: OP_INHERIT (0)
-		64: OP_SUPER_GETTER (1)
-		65: OP_SUPER_GETTER_LONG (2)
-		66: OP_SUPER_SETTER (1)
-		67: OP_SUPER_SETTER_LONG (2)
+		64: **Unused**
+		65: **Unused**
+		66: OP_SUPER_SETTER (4)
+		67: **Unused**
 		68: OP_SUPER_INVOKE (4)
 		69: **Unused**
 		70: OP_SUPER_CONSTRUCTOR (3)
@@ -2099,10 +2069,7 @@ Protected Class VM
 			  OP_INVOKE                 : 2, _
 			  OP_INVOKE_LONG            : 3, _
 			  OP_INHERIT                : 0, _
-			  OP_SUPER_GETTER           : 1, _
-			  OP_SUPER_GETTER_LONG      : 2, _
-			  OP_SUPER_SETTER           : 1, _
-			  OP_SUPER_SETTER_LONG      : 2, _
+			  OP_SUPER_SETTER           : 4, _
 			  OP_SUPER_INVOKE           : 4, _
 			  OP_GET_STATIC_FIELD       : 1, _
 			  OP_GET_STATIC_FIELD_LONG  : 2, _
@@ -2361,19 +2328,10 @@ Protected Class VM
 	#tag Constant, Name = OP_SUPER_CONSTRUCTOR, Type = Double, Dynamic = False, Default = \"70", Scope = Public
 	#tag EndConstant
 
-	#tag Constant, Name = OP_SUPER_GETTER, Type = Double, Dynamic = False, Default = \"64", Scope = Public
-	#tag EndConstant
-
-	#tag Constant, Name = OP_SUPER_GETTER_LONG, Type = Double, Dynamic = False, Default = \"65", Scope = Public
-	#tag EndConstant
-
 	#tag Constant, Name = OP_SUPER_INVOKE, Type = Double, Dynamic = False, Default = \"68", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SUPER_SETTER, Type = Double, Dynamic = False, Default = \"66", Scope = Public
-	#tag EndConstant
-
-	#tag Constant, Name = OP_SUPER_SETTER_LONG, Type = Double, Dynamic = False, Default = \"67", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_TRUE, Type = Double, Dynamic = False, Default = \"16", Scope = Public

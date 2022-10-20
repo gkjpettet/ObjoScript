@@ -1,0 +1,36 @@
+class Person {
+name=(value) {
+_name = value
+System.print("From Person instance")
+}
+
+print() {
+System.print(_name)
+}
+}
+
+class Doctor is Person {
+name=(value) {
+super.name = value
+System.print("From Doctor instance")
+}
+}
+
+class Radiologist is Doctor {
+name=(value) {
+super.name = value
+System.print("From Radiologist instance")
+}
+}
+
+var aoife = Person()
+aoife.name = "Aoife"
+aoife.print()
+
+var fi = Doctor()
+fi.name = "Fiona"
+fi.print()
+
+var garry = Radiologist()
+garry.name = "Garry"
+garry.print()

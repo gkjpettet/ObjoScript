@@ -1,11 +1,11 @@
 #tag Class
-Protected Class SuperExpr
+Protected Class SuperSetterExpr
 Implements ObjoScript.Expr
 	#tag Method, Flags = &h0
 		Function Accept(visitor As ObjoScript.ExprVisitor) As Variant
 		  /// Part of the ExprVisitor interface.
 		  
-		  Return visitor.VisitSuper(Self)
+		  Return visitor.VisitSuperSetter(Self)
 		End Function
 	#tag EndMethod
 
@@ -14,6 +14,7 @@ Implements ObjoScript.Expr
 		  mSuperKeyword = superKeyword
 		  Self.Identifier = methodIdentifier
 		  Self.ValueToAssign = valueToAssign
+		  mSignature = ObjoScript.Func.ComputeSignature(methodIdentifier.Lexeme, 1, True)
 		  
 		End Sub
 	#tag EndMethod
@@ -31,21 +32,24 @@ Implements ObjoScript.Expr
 		Identifier As ObjoScript.Token
 	#tag EndProperty
 
-	#tag ComputedProperty, Flags = &h0, Description = 54727565206966207468697320697320612073657474657220696E766F636174696F6E2E
-		#tag Getter
-			Get
-			  Return ValueToAssign <> Nil
-			  
-			End Get
-		#tag EndGetter
-		IsSetter As Boolean
-	#tag EndComputedProperty
+	#tag Property, Flags = &h21
+		Private mSignature As String
+	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 5468652060737570657260206B6579776F726420746F6B656E2E
 		Private mSuperKeyword As ObjoScript.Token
 	#tag EndProperty
 
-	#tag Property, Flags = &h0, Description = 4966207468697320697320612073657474657220696E766F636174696F6E2C2074686973206973207468652076616C756520746F2061737369676E2E204D6179206265204E696C2E
+	#tag ComputedProperty, Flags = &h0, Description = 546865207369676E6174757265206F66207468652073657474657220746F20696E766F6B652E
+		#tag Getter
+			Get
+			  Return mSignature
+			End Get
+		#tag EndGetter
+		Signature As String
+	#tag EndComputedProperty
+
+	#tag Property, Flags = &h0, Description = 5468652076616C756520746F2061737369676E2E
 		ValueToAssign As ObjoScript.Expr
 	#tag EndProperty
 
@@ -89,14 +93,6 @@ Implements ObjoScript.Expr
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="IsSetter"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
-			Type="Boolean"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

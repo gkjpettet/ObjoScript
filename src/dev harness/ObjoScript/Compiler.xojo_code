@@ -2021,42 +2021,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120607375706572602065787072657373696F6E2E
-		Function VisitSuper(s As ObjoScript.SuperExpr) As Variant
-		  /// Compiles a `super` expression.
-		  ///
-		  /// The runtime needs three things to execute a `super` expression.
-		  ///  1. The instance.
-		  ///  2. The superclass.
-		  ///  3. The name of the method to invoke.
-		  ///
-		  /// Part of the ObjoScript.ExprVisitor interface.
-		  
-		  mLocation = s.Location
-		  
-		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
-		    Error("`super` can only be used within a method or constructor.")
-		  End If
-		  
-		  // Push `this` onto the stack. It's always at slot 0 of the call frame.
-		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
-		  
-		  // Load the method's name into the constant pool.
-		  Var index As Integer = AddConstant(s.Identifier.Lexeme)
-		  
-		  If s.IsSetter Then
-		    // Compile the value to assign.
-		    Call s.ValueToAssign.Accept(Self)
-		    // Emit the `super` setter instruction with the index in the constant pool of the method name to invoke.
-		    EmitIndexedOpcode(ObjoScript.VM.OP_SUPER_SETTER, ObjoScript.VM.OP_SUPER_SETTER_LONG, index)
-		  Else
-		    // Emit the `super` getter instruction with the index in the constant pool of the method name to invoke.
-		    EmitIndexedOpcode(ObjoScript.VM.OP_SUPER_GETTER, ObjoScript.VM.OP_SUPER_GETTER_LONG, index)
-		  End If
-		  
-		End Function
-	#tag EndMethod
-
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320612063616C6C20746F20746865207375706572636C6173732720636F6E7374727563746F722E
 		Function VisitSuperConstructor(s As ObjoScript.SuperConstructorExpr) As Variant
 		  /// Compiles a call to the superclass' constructor.
@@ -2115,13 +2079,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120676574746572206D6574686F6420696E766F636174696F6E206F6E20607375706572602E
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732061206D6574686F6420696E766F636174696F6E206F6E20607375706572602E
 		Function VisitSuperMethodInvocation(s As ObjoScript.SuperMethodInvocationExpr) As Variant
-		  /// Compiles a getter method invocation on `super`.
+		  /// Compiles a method invocation on `super`.
 		  ///
 		  /// E.g: super.method(arg1, arg2)
-		  /// The OP_SUPER_INVOKE instruction is a fusion of OP_SUPER_GETTER and OP_CALL.
-		  /// This is an optimisation for the runtime.
+		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
 		  mLocation = s.Location
@@ -2174,6 +2137,69 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  EmitUInt16(superNameIndex, s.Location)
 		  EmitUInt16(index, s.Location)
 		  EmitByte(s.Arguments.Count, s.Location)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C657320612060737570657260207365747465722065787072657373696F6E2E
+		Function VisitSuperSetter(s As ObjoScript.SuperSetterExpr) As Variant
+		  /// Compiles a `super` setter expression.
+		  ///
+		  /// The runtime needs three things to execute a `super` setter expression.
+		  ///  1. The superclass name.
+		  ///  2. The signature of the setter
+		  ///  3. The value to assign.
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  mLocation = s.Location
+		  
+		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		    Error("`super` can only be used within a method or constructor.")
+		  End If
+		  
+		  // Check this class actually has a superclass.
+		  If CurrentClass.Superclass = "" Then
+		    Error("Class `" + CurrentClass.Name + "` does not have a superclass.")
+		  End If
+		  
+		  // Get the class declaration for this class' superclass, if it exists.
+		  Var superclassDecl As ObjoScript.ClassDeclStmt = FindClass(CurrentClass.Superclass)
+		  If superclassDecl = Nil Then
+		    Error("Class `" + CurrentClass.Name + "` inherits `" + CurrentClass.Superclass + "` but there is no class with this name.")
+		  End If
+		  
+		  // Check the superclass has a matching setter.
+		  Var superHasMatchingSetter As Boolean = False
+		  For Each entry As DictionaryEntry In superclassDecl.Methods
+		    Var method As ObjoScript.MethodDeclStmt = entry.Value
+		    If Not method.IsSetter Then Continue
+		    If method.Signature.CompareCase(s.Signature) Then
+		      superHasMatchingSetter = True
+		      Exit
+		    End If
+		  Next entry
+		  If Not superHasMatchingSetter Then
+		    Error("The superclass (`" + CurrentClass.Superclass + "`) of `" + CurrentClass.Name + "` does not define a setter `" + s.Signature + "`.")
+		  End If
+		  
+		  // Load the superclass' name into the constant pool.
+		  Var superNameIndex As Integer = AddConstant(CurrentClass.Superclass)
+		  
+		  // Push `this` onto the stack. It's always at slot 0 of the call frame.
+		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		  
+		  // Load the setter's signature into the constant pool.
+		  Var index As Integer = AddConstant(s.Signature)
+		  
+		  // Compile the value to assign.
+		  Call s.ValueToAssign.Accept(Self)
+		  
+		  // Emit the OP_SUPER_SETTER instruction, the superclass name and the index of the 
+		  // method's signature in the constant pool.
+		  EmitByte(ObjoScript.VM.OP_SUPER_SETTER, s.Location)
+		  EmitUInt16(superNameIndex, s.Location)
+		  EmitUInt16(index, s.Location)
 		  
 		End Function
 	#tag EndMethod

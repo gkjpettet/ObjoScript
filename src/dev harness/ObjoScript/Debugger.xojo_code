@@ -131,26 +131,6 @@ Protected Class Debugger
 		    newOffset = offset + 3
 		    name = "GET_FIELD_LONG"
 		    
-		  Case ObjoScript.VM.OP_SUPER_GETTER
-		    constantIndex = chunk.ReadByte(offset + 1)
-		    newOffset = offset + 2
-		    name = "SUPER_GETTER"
-		    
-		  Case ObjoScript.VM.OP_SUPER_GETTER_LONG
-		    constantIndex = chunk.ReadUInt16(offset + 1)
-		    newOffset = offset + 3
-		    name = "SUPER_GETTER_LONG"
-		    
-		  Case ObjoScript.VM.OP_SUPER_SETTER
-		    constantIndex = chunk.ReadByte(offset + 1)
-		    newOffset = offset + 2
-		    name = "SUPER_SETTER"
-		    
-		  Case ObjoScript.VM.OP_SUPER_SETTER_LONG
-		    constantIndex = chunk.ReadUInt16(offset + 1)
-		    newOffset = offset + 3
-		    name = "SUPER_SETTER_LONG"
-		    
 		  Case ObjoScript.VM.OP_GET_STATIC_FIELD
 		    constantIndex = chunk.ReadByte(offset + 1)
 		    newOffset = offset + 2
@@ -198,15 +178,15 @@ Protected Class Debugger
 		  Select Case opcode
 		  Case ObjoScript.VM.OP_CONSTANT, ObjoScript.VM.OP_DEFINE_GLOBAL, ObjoScript.VM.OP_GET_GLOBAL, _
 		    ObjoScript.VM.OP_SET_GLOBAL, ObjoScript.VM.OP_GETTER, ObjoScript.VM.OP_SETTER, _
-		    ObjoScript.VM.OP_SET_FIELD, ObjoScript.VM.OP_GET_FIELD, ObjoScript.VM.OP_SUPER_GETTER, _
-		    ObjoScript.VM.OP_SUPER_SETTER, ObjoScript.VM.OP_GET_STATIC_FIELD
+		    ObjoScript.VM.OP_SET_FIELD, ObjoScript.VM.OP_GET_FIELD, _
+		    ObjoScript.VM.OP_GET_STATIC_FIELD
 		    constantIndex = chunk.ReadByte(offset + 1)
 		    offset = offset + 2
 		    
 		  Case ObjoScript.VM.OP_CONSTANT_LONG, ObjoScript.VM.OP_DEFINE_GLOBAL_LONG, _
 		    ObjoScript.VM.OP_GET_GLOBAL_LONG, ObjoScript.VM.OP_SET_GLOBAL_LONG, ObjoScript.VM.OP_CONSTRUCTOR, _
 		    ObjoScript.VM.OP_GETTER_LONG, ObjoScript.VM.OP_SETTER_LONG, ObjoScript.VM.OP_SET_FIELD_LONG, _
-		    ObjoScript.VM.OP_GET_FIELD_LONG, ObjoScript.VM.OP_SUPER_GETTER_LONG, ObjoScript.VM.OP_SUPER_SETTER_LONG, _
+		    ObjoScript.VM.OP_GET_FIELD_LONG, _
 		    ObjoScript.VM.OP_GET_STATIC_FIELD_LONG
 		    constantIndex = chunk.ReadUInt16(offset + 1)
 		    offset = offset + 3
@@ -587,14 +567,11 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_INHERIT
 		    Return SimpleInstruction("OP_INHERIT", offset, line, s)
 		    
-		  Case ObjoScript.VM.OP_SUPER_GETTER
-		    Return ConstantInstruction(opcode, chunk, offset, line, s)
-		    
 		  Case ObjoScript.VM.OP_GETTER_LONG
 		    Return ConstantInstruction(opcode, chunk, offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_SUPER_SETTER
-		    Return ConstantInstruction(opcode, chunk, offset, line, s)
+		    Return SuperSetterInstruction(chunk, offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_SETTER_LONG
 		    Return ConstantInstruction(opcode, chunk, offset, line, s)
@@ -918,14 +895,11 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_INHERIT
 		    details = SimpleInstructionDetails("OP_INHERIT", offset)
 		    
-		  Case ObjoScript.VM.OP_SUPER_GETTER
-		    details = ConstantInstructionDetails(opcode, chunk, "SUPER_GETTER", offset)
-		    
 		  Case ObjoScript.VM.OP_GETTER_LONG
 		    details = ConstantInstructionDetails(opcode, chunk, "GETTER_LONG", offset)
 		    
 		  Case ObjoScript.VM.OP_SUPER_SETTER
-		    details = ConstantInstructionDetails(opcode, chunk, "SUPER_SETTER", offset)
+		    details = SuperSetterDetails(chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_SETTER_LONG
 		    details = ConstantInstructionDetails(opcode, chunk, "SETTER_LONG", offset)
@@ -1424,6 +1398,45 @@ Protected Class Debugger
 
 	#tag Method, Flags = &h21
 		Private Function SuperInvokeInstruction(chunk As ObjoScript.Chunk, offset As Integer, line As String, s() As String) As Integer
+		  #Pragma Warning "TODO"
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E73207468652064657461696C73206F6620612073757065725F73657474657220696E737472756374696F6E20617420606F66667365746020616E6420696E6372656D656E747320606F66667365746020746F20706F696E7420746F20746865206E65787420696E737472756374696F6E2E
+		Private Function SuperSetterDetails(chunk As ObjoScript.Chunk, ByRef offset As Integer) As String
+		  /// Returns the details of a super_setter instruction at `offset` and increments `offset` to point to the next instruction.
+		  ///
+		  /// Prints the instruction's name, the superclass's name and the setter signature to invoke.
+		  ///
+		  /// Format:
+		  /// INSTRUCTION  SUPERCLASS_NAME  SIGNATURE
+		  
+		  Var superNameIndex, sigIndex As Integer
+		  superNameIndex = chunk.ReadUInt16(offset + 1)
+		  sigIndex = chunk.ReadUInt16(offset + 3)
+		  offset = offset + 5
+		  
+		  // The instruction's name.
+		  Var details As String = "SUPER_SETTER"
+		  details = details.JustifyLeft(2 * COL_WIDTH)
+		  
+		  // Append the superclass name.
+		  Var superclassName As String = _
+		  ObjoScript.VM.ValueToString(chunk.Constants(superNameIndex))
+		  details = details + superclassName.JustifyLeft(2 * COL_WIDTH)
+		  
+		  // Append the signature name.
+		  Var sig As String = _
+		  ObjoScript.VM.ValueToString(chunk.Constants(sigIndex))
+		  details = details + sig.JustifyLeft(2 * COL_WIDTH)
+		  
+		  Return details
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function SuperSetterInstruction(chunk As ObjoScript.Chunk, offset As Integer, line As String, s() As String) As Integer
 		  #Pragma Warning "TODO"
 		End Function
 	#tag EndMethod

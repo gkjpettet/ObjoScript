@@ -636,15 +636,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function VisitSuper(s As ObjoScript.SuperExpr) As Variant
-		  #Pragma Unused s
-		  
-		  Return New TreeViewNode("Super")
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
 		Function VisitSuperConstructor(s As ObjoScript.SuperConstructorExpr) As Variant
 		  Var node As New TreeViewNode("Super constructor")
 		  
@@ -680,6 +671,19 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Next arg
 		    node.AppendNode(argNode)
 		  End If
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function VisitSuperSetter(s As ObjoScript.SuperSetterExpr) As Variant
+		  #Pragma Unused s
+		  
+		  Var node As New TreeViewNode("Super setter")
+		  Var valueNode As New TreeViewNode("Value to assign:")
+		  valueNode.AppendNode(s.ValueToAssign.Accept(Self))
 		  
 		  Return node
 		  

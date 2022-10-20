@@ -63,8 +63,7 @@ Implements ObjoScript.PrefixParselet
 		    
 		  ElseIf parser.Match(ObjoScript.TokenTypes.LParen) Then
 		    isMethodInvocation = True
-		    // Assume this is an immediate method invocation on `super` since we're seeing: "super.identifier("
-		    // This provides a runtime performance boost for `super` getters.
+		    // This is an immediate method invocation on `super` since we're seeing: "super.identifier("
 		    If Not parser.Check(ObjoScript.TokenTypes.RParen) Then
 		      Do
 		        arguments.Add(parser.Expression)
@@ -76,7 +75,7 @@ Implements ObjoScript.PrefixParselet
 		  If isMethodInvocation Then
 		    Return New ObjoScript.SuperMethodInvocationExpr(superKeyword, methodIdentifier, arguments)
 		  Else
-		    Return New ObjoScript.SuperExpr(superKeyword, methodIdentifier, valueToAssign)
+		    Return New ObjoScript.SuperSetterExpr(superKeyword, methodIdentifier, valueToAssign)
 		  End If
 		End Function
 	#tag EndMethod
