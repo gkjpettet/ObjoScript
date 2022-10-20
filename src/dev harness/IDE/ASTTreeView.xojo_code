@@ -668,7 +668,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Function VisitSuperMethodInvocation(s As ObjoScript.SuperMethodInvocationExpr) As Variant
 		  Var node As New TreeViewNode("Super method invocation")
 		  
-		  node.AppendNode(New TreeViewNode("Method name: " + s.MethodName))
+		  node.AppendNode(New TreeViewNode("Signature: " + s.Signature))
 		  
 		  // Optional arguments.
 		  If s.Arguments.Count = 0 Then

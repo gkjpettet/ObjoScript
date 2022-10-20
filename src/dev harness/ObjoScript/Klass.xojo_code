@@ -4,7 +4,6 @@ Implements ObjoScript.Value
 	#tag Method, Flags = &h0
 		Sub Constructor(name As String, isForeign As Boolean)
 		  Self.Name = name
-		  Self.Constructors = New Dictionary
 		  Self.Methods = ParseJSON("{}") // HACK: Case sensitive.
 		  Self.StaticMethods = ParseJSON("{}") // HACK: Case sensitive.
 		  Self.StaticFields = ParseJSON("{}") // HACK: Case sensitive.
@@ -36,8 +35,8 @@ Implements ObjoScript.Value
 	#tag EndMethod
 
 
-	#tag Property, Flags = &h0, Description = 54686520636C61737320636F6E7374727563746F727320284B6579203D20636F6E7374727563746F722773207369676E61747572652C2056616C7565203D204F626A6F5363726970742E46756E63292E
-		Constructors As Dictionary
+	#tag Property, Flags = &h0, Description = 54686520636C61737320636F6E7374727563746F72732E2054686520696E6465782069732074686520617267756D656E7420636F756E742E
+		Constructors() As ObjoScript.Func
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 49662074686973206973206120666F726569676E20636C6173732C207468657365206172652074686520636C6173732064656C65676174657320746F207573696E672075706F6E20696E7374616E74696174696F6E20616E64206465737472756374696F6E2E204D6179206265204E696C2E
@@ -120,6 +119,14 @@ Implements ObjoScript.Value
 			Group="Behavior"
 			InitialValue=""
 			Type="String"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="IsForeign"
+			Visible=false
+			Group="Behavior"
+			InitialValue="False"
+			Type="Boolean"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

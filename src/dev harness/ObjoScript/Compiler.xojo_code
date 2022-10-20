@@ -148,7 +148,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320612066756E6374696F6E206465636C61726174696F6E20696E746F20612066756E6374696F6E2E2052616973657320612060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
-		Function Compile(name As String, parameters() As ObjoScript.Token, body As ObjoScript.BlockStmt, type As ObjoScript.FunctionTypes, currentClass As ObjoScript.ClassDeclStmt, isStaticMethod As Boolean, debugMode As Boolean, shouldResetFirst As Boolean) As ObjoScript.Func
+		Function Compile(name As String, parameters() As ObjoScript.Token, body As ObjoScript.BlockStmt, type As ObjoScript.FunctionTypes, currentClass As ObjoScript.ClassDeclStmt, isStaticMethod As Boolean, debugMode As Boolean, shouldResetFirst As Boolean, enclosingCompiler As ObjoScript.Compiler) As ObjoScript.Func
 		  /// Compiles a function declaration into a function. Raises a `CompilerException` if an error occurs.
 		  ///
 		  /// Resets by default but if this is being called internally (after the compiler has tokenised and parsed the source) 
@@ -157,6 +157,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  mStopWatch.Start
 		  
 		  If shouldResetFirst Then Reset
+		  
+		  Self.Enclosing = enclosingCompiler
 		  
 		  // Should this compiler compile chunks for production or debugging?
 		  Self.DebugMode = debugMode
@@ -220,7 +222,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Empty parameters.
 		  Var params() As ObjoScript.Token
 		  
-		  Return Compile("", params, New ObjoScript.BlockStmt(body, openingBrace, closingBrace), ObjoScript.FunctionTypes.TopLevel, Nil, False, Self.DebugMode, False)
+		  Return Compile("", params, New ObjoScript.BlockStmt(body, openingBrace, closingBrace), ObjoScript.FunctionTypes.TopLevel, Nil, False, Self.DebugMode, False, Nil)
 		  
 		End Function
 	#tag EndMethod
@@ -592,6 +594,32 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 436865636B73207468697320636F6D70696C65722773206B6E6F776E20636C617373657320616E6420616C6C206F662069747320656E636C6F73696E6720636F6D70696C65727320666F72206120636C617373206E616D65642060636C6173734E616D65602E2052657475726E732074686520636C617373206465636C61726174696F6E2073746174656D656E74206F72204E696C206966206E6F7420666F756E642E
+		Private Function FindClass(className As String) As ObjoScript.ClassDeclStmt
+		  /// Checks this compiler's known classes and all of its enclosing compilers for a class named `className`.
+		  /// Returns the class declaration statement or Nil if not found.
+		  
+		  // Known to this compiler?
+		  If KnownClasses.HasKey(className) Then
+		    Return KnownClasses.Value(className)
+		  End If
+		  
+		  // Walk the compiler hierarchy.
+		  Var parent As ObjoScript.Compiler = Enclosing
+		  While parent <> Nil
+		    If parent.KnownClasses.HasKey(className) Then
+		      Return parent.KnownClasses.Value(className)
+		    Else
+		      parent = parent.Enclosing
+		    End If
+		  Wend
+		  
+		  // Unknown class.
+		  Return Nil
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 436F6D70696C6573207468652073796E746865736973656420666F726561636820636F6E646974696F6E3A2060697465722A203D207365712A2E6974657261746528697465722A2960
 		Private Sub ForEachCondition()
 		  /// Compiles the synthesised foreach condition: `iter* = seq*.iterate(iter*)`
@@ -890,7 +918,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  CurrentLoop = Nil
 		  CurrentClass = Nil
-		  
+		  KnownClasses = ParseJSON("{}") // HACK: Case-sensitive dictionary.
+		  Enclosing = Nil
 		End Sub
 	#tag EndMethod
 
@@ -1265,6 +1294,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  mLocation = c.Location
 		  
 		  // Store data about the class we're about to compile.
+		  If KnownClasses.HasKey(c.Name) Then
+		    Error("Redefined class `" + c.Name + "`.")
+		  Else
+		    KnownClasses.Value(c.Name) = c
+		  End If
 		  CurrentClass = c
 		  
 		  If Self.Type <> ObjoScript.FunctionTypes.TopLevel Then
@@ -1338,26 +1372,22 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.StmtVisitor interface.
 		  /// To define a new constructor, the VM needs three things:
-		  ///  1. The constructor's signature.
+		  ///  1. The constructor's argument count.
 		  ///  2. The function that is the constructor's body.
 		  ///  3. The class to bind the constructor to.
 		  
 		  mLocation = c.Location
 		  
-		  // Add the constructor's signature to the function's constants pool.
-		  Var index As Integer = AddConstant(c.Signature)
-		  
 		  // Compile the body.
 		  Var compiler As New ObjoScript.Compiler
-		  Var body As ObjoScript.Func = compiler.Compile("constructor", c.Parameters, c.Body, ObjoScript.FunctionTypes.Constructor, CurrentClass, False, Self.DebugMode, True)
+		  Var body As ObjoScript.Func = compiler.Compile("constructor", c.Parameters, c.Body, ObjoScript.FunctionTypes.Constructor, CurrentClass, False, Self.DebugMode, True, Self)
 		  
 		  // Store the compiled constructor body as a constant in this function's constant pool
 		  // and push it on to the stack.
 		  Call EmitConstant(body)
 		  
-		  // Emit the "declare constructor" opcode, the operand is the index of the constructor's signature in the constants pool.
-		  EmitByte(VM.OP_CONSTRUCTOR, c.Location)
-		  EmitUInt16(index, c.Location)
+		  // Emit the "declare constructor" opcode, the operand is the argument count.
+		  EmitBytes(VM.OP_CONSTRUCTOR, c.Parameters.Count, c.Location)
 		  
 		End Function
 	#tag EndMethod
@@ -1674,7 +1704,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Compile the function body.
 		  Var compiler As New ObjoScript.Compiler
-		  Var f As ObjoScript.Func = compiler.Compile(funcDecl.Name.Lexeme, funcDecl.Parameters, funcDecl.Body, ObjoScript.FunctionTypes.Func, CurrentClass, False, Self.DebugMode, True)
+		  Var f As ObjoScript.Func = compiler.Compile(funcDecl.Name.Lexeme, funcDecl.Parameters, funcDecl.Body, ObjoScript.FunctionTypes.Func, CurrentClass, False, Self.DebugMode, True, Self)
 		  
 		  // Store the compiled function as a constant in this function's constant pool.
 		  Call EmitConstant(f)
@@ -1792,7 +1822,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Compile the body.
 		  Var compiler As New ObjoScript.Compiler
-		  Var body As ObjoScript.Func = compiler.Compile(m.Name, m.Parameters, m.Body, ObjoScript.FunctionTypes.Method, CurrentClass, m.IsStatic, Self.DebugMode, True)
+		  Var body As ObjoScript.Func = compiler.Compile(m.Name, m.Parameters, m.Body, ObjoScript.FunctionTypes.Method, CurrentClass, m.IsStatic, Self.DebugMode, True, Self)
 		  body.IsSetter = m.IsSetter
 		  
 		  // Store the compiled method body as a constant in this function's constant pool
@@ -2045,11 +2075,28 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Error("Class `" + CurrentClass.Name + "` does not have a superclass.")
 		  End If
 		  
+		  // Get the class declaration for this class' superclass, if it exists.
+		  Var superclassDecl As ObjoScript.ClassDeclStmt = FindClass(CurrentClass.Superclass)
+		  If superclassDecl = Nil Then
+		    Error("Class `" + CurrentClass.Name + "` inherits `" + CurrentClass.Superclass + "` but there is no class with this name.")
+		  End If
+		  
+		  // Check the superclass has a constructor with this many arguments.
+		  If s.Arguments.Count > 0 Then
+		    Var superHasMatchingConstructor As Boolean = False
+		    For Each constructor As ObjoScript.ConstructorDeclStmt In superclassDecl.Constructors
+		      If constructor.Arity = s.Arguments.Count Then
+		        superHasMatchingConstructor = True
+		        Exit
+		      End If
+		    Next constructor
+		    If Not superHasMatchingConstructor Then
+		      Error("The superclass (`" + CurrentClass.Superclass + "`) of `" + CurrentClass.Name + "` does not define a constructor with " + s.Arguments.Count.ToString + " arguments.")
+		    End If
+		  End If
+		  
 		  // Load the superclass' name into the constant pool.
 		  Var superNameIndex As Integer = AddConstant(CurrentClass.Superclass)
-		  
-		  // Load the constructor's signature into the constant pool.
-		  Var sigIndex As Integer = AddConstant(s.Signature)
 		  
 		  // Push `this` onto the stack. It's always at slot 0 of the call frame.
 		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
@@ -2059,11 +2106,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Call arg.Accept(Self)
 		  Next arg
 		  
-		  // Emit the OP_SUPER_CONSTRUCTOR instruction, the index of the superclass' name, the index of the constructors signature
+		  // Emit the OP_SUPER_CONSTRUCTOR instruction, the index of the superclass' name
 		  // and the argument count.
 		  EmitByte(ObjoScript.VM.OP_SUPER_CONSTRUCTOR, s.Location)
 		  EmitUInt16(superNameIndex, s.Location)
-		  EmitUInt16(sigIndex, s.Location)
 		  EmitByte(s.Arguments.Count, s.Location)
 		  
 		End Function
@@ -2087,15 +2133,15 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Push `this` onto the stack. It's always at slot 0 of the call frame.
 		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
 		  
-		  // Load the method's name into the constant pool.
-		  Var index As Integer = AddConstant(s.MethodName)
+		  // Load the method's signature into the constant pool.
+		  Var index As Integer = AddConstant(s.Signature)
 		  
 		  // Compile the arguments.
 		  For Each arg As ObjoScript.Expr In s.Arguments
 		    Call arg.Accept(Self)
 		  Next arg
 		  
-		  // Emit the OP_SUPER_INVOKE instruction and the index of the method's name in the constant pool.
+		  // Emit the OP_SUPER_INVOKE instruction and the index of the method's signature in the constant pool.
 		  EmitIndexedOpcode(ObjoScript.VM.OP_SUPER_INVOKE, ObjoScript.VM.OP_SUPER_INVOKE_LONG, index, s.Location)
 		  
 		  // Emit the argument count.
@@ -2298,12 +2344,20 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		DebugMode As Boolean = False
 	#tag EndProperty
 
+	#tag Property, Flags = &h0, Description = 5468697320636F6D70696C6572277320656E636C6F73696E6720636F6D70696C65722028696620616E79292E204D6179206265204E696C2E204E656564656420617320636F6D70696C6572732063616E2063616C6C206F7468657220636F6D70696C65727320746F20636F6D70696C652066756E6374696F6E732C206D6574686F64732C206574632E
+		Enclosing As ObjoScript.Compiler
+	#tag EndProperty
+
 	#tag Property, Flags = &h0, Description = 5468652066756E6374696F6E2063757272656E746C79206265696E6720636F6D70696C65642E
 		Func As ObjoScript.Func
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 54727565206966207468697320636F6D70696C657220697320636F6D70696C696E67206120737461746963206D6574686F642E
 		IsStaticMethod As Boolean = False
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 54686520636C617373657320616C726561647920636F6D70696C65642062792074686520636F6D70696C65722E204B6579203D20436C617373206E616D652C2056616C7565203D204F626A6F5363726970742E436C6173734465636C53746D742E
+		KnownClasses As Dictionary
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 54686520636F6D70696C65722773206C657865722E205573656420746F20746F6B656E69736520736F7572636520636F64652E

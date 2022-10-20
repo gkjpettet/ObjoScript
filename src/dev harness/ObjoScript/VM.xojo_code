@@ -144,19 +144,10 @@ Protected Class VM
 		  Stack(StackTop - argCount - 1) = New ObjoScript.Instance(klass)
 		  
 		  // Invoke the constructor (if defined).
-		  // Since constructors are stored by signature and they are predictable, we have a few precomputed
-		  // onses to save a call to `ObjoScript.Func.ComputeSignature()`.
 		  Var constructor As ObjoScript.Func
-		  Select Case argCount
-		  Case 0
-		    constructor  = klass.Constructors.Lookup(CONSTRUCTOR_SIG_0, Nil)
-		  Case 1
-		    constructor = klass.Constructors.Lookup(CONSTRUCTOR_SIG_1, Nil)
-		  Case 2
-		    constructor = klass.Constructors.Lookup(CONSTRUCTOR_SIG_2, Nil)
-		  Else
-		    constructor = klass.Constructors.Lookup(ObjoScript.Func.ComputeSignature("constructor", argCount, False), Nil)
-		  End Select
+		  If argCount <= klass.Constructors.LastIndex Then
+		    constructor = klass.Constructors(argCount)
+		  End If
 		  
 		  // We allow a class to omit providing a default (zero parameter) constructor.
 		  If constructor = Nil And argCount <> 0 Then
@@ -333,7 +324,12 @@ Protected Class VM
 		    End If
 		    
 		  ElseIf isConstructor Then
-		    method = ObjoScript.Klass(receiver).Constructors.Lookup(signature, Nil)
+		    Var klass As ObjoScript.Klass = ObjoScript.Klass(receiver)
+		    If argCount > klass.Constructors.LastIndex Then
+		      Error("Undefined constructor `" + signature + "` on " + klass.ToString + ".")
+		    End If
+		    
+		    method = klass.Constructors(argCount)
 		    If method = Nil Then
 		      Error("Undefined constructor `" + signature + "` on " + ObjoScript.Klass(receiver).ToString + ".")
 		    End If
@@ -375,7 +371,7 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 446566696E6573206120636F6E7374727563746F72206F6E2074686520636C617373206A7573742062656C6F772074686520636F6E7374727563746F72277320626F6479206F6E2074686520737461636B2E
-		Private Sub DefineConstructor(signature As String)
+		Private Sub DefineConstructor(argCount As Integer)
 		  /// Defines a constructor on the class just below the constructor's body on the stack.
 		  ///
 		  /// The constructor's body should be on the top of the stack with its class just beneath it.
@@ -383,7 +379,11 @@ Protected Class VM
 		  Var constructor As ObjoScript.Func = Peek(0)
 		  Var klass As ObjoScript.Klass = Peek(1)
 		  
-		  klass.Constructors.Value(signature) = constructor
+		  // Constructors are stored on the class by arity.
+		  If argCount > klass.Constructors.LastIndex Then
+		    klass.Constructors.ResizeTo(argCount)
+		  End If
+		  klass.Constructors(argCount) = constructor
 		  
 		  // Pop the constructor's body off the stack.
 		  Call Pop
@@ -1411,7 +1411,7 @@ Protected Class VM
 		      SetField(ReadConstantLong)
 		      
 		    Case OP_CONSTRUCTOR
-		      DefineConstructor(ReadConstantLong)
+		      DefineConstructor(ReadByte)
 		      
 		    Case VM.OP_INVOKE
 		      Invoke(ReadConstant, ReadByte, False)
@@ -1441,7 +1441,7 @@ Protected Class VM
 		      Invoke(ReadConstantLong, ReadByte, True)
 		      
 		    Case OP_SUPER_CONSTRUCTOR
-		      SuperConstructor(ReadConstantLong, ReadConstantLong, ReadByte)
+		      SuperConstructor(ReadConstantLong, ReadByte)
 		      
 		    Case OP_GET_STATIC_FIELD
 		      GetStaticField(ReadConstant)
@@ -1695,7 +1695,7 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 496E766F6B65732074686520737065636966696564207375706572636C61737320636F6E7374727563746F72206F6E20616E20696E7374616E63652E2054686520696E7374616E63652073686F756C64206265206F6E2074686520737461636B20616C6F6E67207769746820616E7920617267756D656E74732069742072657175697265732E
-		Private Sub SuperConstructor(superclassName As String, signature As String, argCount As Integer)
+		Private Sub SuperConstructor(superclassName As String, argCount As Integer)
 		  /// Invokes the specified superclass constructor on an instance. The instance should be on the stack
 		  /// along with any arguments it requires.
 		  ///
@@ -1704,36 +1704,13 @@ Protected Class VM
 		  /// | arg1
 		  /// | instance
 		  
-		  #Pragma Warning "TODO: Issue with overwriting fields?"
+		  // Get the super class. Since classes are all declared in the top level, it should be in Globals.
+		  // The compiler will have checked that the superclass exists during compilation.
+		  Var superclass As ObjoScript.Klass = Globals.Value(superclassName)
 		  
-		  // Grab the receiver from the stack. It should be beneath any arguments to the call.
-		  Var receiver As Variant = Peek(argCount)
-		  
-		  Var inst As ObjoScript.Instance
-		  If receiver IsA ObjoScript.Instance = False Then
-		    Error("Can only invoke a superclass constructor on an instance.")
-		  Else
-		    inst = receiver
-		  End If
-		  
-		  // Get the super class. Since classes are all declared locally, it should be in Globals.
-		  Var superclassVariant As Variant = Globals.Lookup(superclassName, Nil)
-		  Var superclass As ObjoScript.Klass
-		  If superclassVariant = Nil Then
-		    Error("Unable to retrieve " + inst.Klass.Name + "'s superclass as there is no class named `" + superclassName + "` in the global scope.")
-		  ElseIf superclassVariant IsA ObjoScript.Klass  = False Then
-		    Error("Tried to retrieve a superclass named `" + superclassName + "` but the global variable with this name is a " + ValueToString(superclassVariant) + ".")
-		  Else
-		    superclass = ObjoScript.Klass(superclassVariant)
-		  End If
-		  
-		  // Get the constructor to call.
-		  Var constructor As ObjoScript.Func = superclass.Constructors.Lookup(signature, Nil)
-		  If constructor = Nil Then
-		    Error("`" + superclassName + "` does not have a constructor with signature `" + signature + "`.")
-		  End If
-		  
-		  CallValue(constructor, argCount)
+		  // Call the correct constructor.
+		  // The compiler will have guaranteed that the superclass has a constructor with the correct arity.
+		  CallValue(superclass.Constructors(argcount), argCount)
 		  
 		End Sub
 	#tag EndMethod
@@ -1958,7 +1935,7 @@ Protected Class VM
 		57: OP_GET_FIELD_LONG (2)
 		58: OP_SET_FIELD (1)
 		59: OP_SET_FIELD_LONG (2)
-		60: OP_CONSTRUCTOR (2)
+		60: OP_CONSTRUCTOR (1)
 		61: OP_INVOKE (2)
 		62: OP_INVOKE_LONG (3)
 		63: OP_INHERIT (0)
@@ -1968,7 +1945,7 @@ Protected Class VM
 		67: OP_SUPER_SETTER_LONG (2)
 		68: OP_SUPER_INVOKE (2)
 		69: OP_SUPER_INVOKE_LONG (3)
-		70: OP_SUPER_CONSTRUCTOR (5)
+		70: OP_SUPER_CONSTRUCTOR (3)
 		71: **Unused**
 		72: OP_GET_STATIC_FIELD (1)
 		73: OP_GET_STATIC_FIELD_LONG (2)
@@ -2099,7 +2076,7 @@ Protected Class VM
 			  OP_GET_FIELD_LONG         : 2, _
 			  OP_SET_FIELD              : 1, _
 			  OP_SET_FIELD_LONG         : 2, _
-			  OP_CONSTRUCTOR            : 2, _
+			  OP_CONSTRUCTOR            : 1, _
 			  OP_INVOKE                 : 2, _
 			  OP_INVOKE_LONG            : 3, _
 			  OP_INHERIT                : 0, _
@@ -2118,7 +2095,7 @@ Protected Class VM
 			  OP_GET_LOCAL_CLASS        : 1, _
 			  OP_LOCAL_VAR_DEC          : 3, _
 			  OP_BITWISE_NOT            : 0, _
-			  OP_SUPER_CONSTRUCTOR      : 5 _
+			  OP_SUPER_CONSTRUCTOR      : 3 _
 			  )
 			  
 			  Return d

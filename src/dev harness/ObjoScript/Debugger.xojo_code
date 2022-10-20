@@ -576,7 +576,7 @@ Protected Class Debugger
 		    Return ConstantInstruction(opcode, chunk, offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_CONSTRUCTOR
-		    Return ConstantInstruction(opcode, chunk, offset, line, s)
+		    Return Instruction8BitOperand("CONSTRUCTOR", chunk, offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_INVOKE
 		    Return InvokeInstruction(opcode, chunk, offset, line, s)
@@ -910,7 +910,7 @@ Protected Class Debugger
 		    details = ConstantInstructionDetails(opcode, chunk, "SET_FIELD_LONG", offset)
 		    
 		  Case ObjoScript.VM.OP_CONSTRUCTOR
-		    details = ConstantInstructionDetails(opcode, chunk, "CONSTRUCTOR", offset)
+		    details = Instruction8BitOperandDetails("CONSTRUCTOR", chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_INVOKE
 		    details = InvokeInstructionDetails(opcode, chunk, "INVOKE", offset)
@@ -958,7 +958,7 @@ Protected Class Debugger
 		    details = LocalVarDecDetails(chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_SUPER_CONSTRUCTOR
-		    details = SuperConstructorDetails(opcode, chunk, offset)
+		    details = SuperConstructorDetails(chunk, offset)
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
@@ -1367,19 +1367,18 @@ Protected Class Debugger
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 52657475726E73207468652064657461696C73206F6620616E20696E766F6B652F73757065725F696E766F6B652F73757065725F636F6E7374727563746F7220696E737472756374696F6E20617420606F66667365746020616E6420696E6372656D656E747320606F66667365746020746F20706F696E7420746F20746865206E65787420696E737472756374696F6E2E
-		Private Function SuperConstructorDetails(opcode As UInt8, chunk As ObjoScript.Chunk, ByRef offset As Integer) As String
+		Private Function SuperConstructorDetails(chunk As ObjoScript.Chunk, ByRef offset As Integer) As String
 		  /// Returns the details of a super_constructor instruction at `offset` and increments `offset` to point to the next instruction.
 		  ///
-		  /// Prints the instruction's name, the superclass's name, the constructor's signature and the argument count.
+		  /// Prints the instruction's name, the superclass's name and the argument count.
 		  ///
 		  /// Format:
-		  /// INSTRUCTION  SUPERCLASS_NAME  CONSTRUCTOR_SIG  ARGCOUNT
+		  /// INSTRUCTION  SUPERCLASS_NAME  ARGCOUNT
 		  
-		  Var superNameIndex, sigIndex, argCount As Integer
+		  Var superNameIndex, argCount As Integer
 		  superNameIndex = chunk.ReadUInt16(offset + 1)
-		  sigIndex = chunk.ReadUInt16(offset + 3)
-		  argCount = chunk.ReadByte(offset + 5)
-		  offset = offset + 6
+		  argCount = chunk.ReadByte(offset + 3)
+		  offset = offset + 4
 		  
 		  // The instruction's name.
 		  Var details As String = "SUPER_CONSTRUCTOR"
@@ -1389,10 +1388,6 @@ Protected Class Debugger
 		  Var superclassName As String = _
 		  ObjoScript.VM.ValueToString(chunk.Constants(superNameIndex))
 		  details = details + superclassName.JustifyLeft(2 * COL_WIDTH)
-		  
-		  // Append the constructor's signature.
-		  Var sig As String = ObjoScript.VM.ValueToString(chunk.Constants(sigIndex))
-		  details = details + sig.JustifyLeft(2 * COL_WIDTH)
 		  
 		  // Append the argument count.
 		  details = details + argCount.ToString.JustifyLeft(2 * COL_WIDTH)

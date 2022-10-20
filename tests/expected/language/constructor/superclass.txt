@@ -1,6 +1,16 @@
 new A two
 new B one
-new C
-two
+true
+true
+false
 one
+one
+new A two
+new B one
+new C
+true
+true
+true
+c
+c
 c
