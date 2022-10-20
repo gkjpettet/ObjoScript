@@ -600,10 +600,7 @@ Protected Class Debugger
 		    Return ConstantInstruction(opcode, chunk, offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_SUPER_INVOKE
-		    Return InvokeInstruction(opcode, chunk, offset, line, s)
-		    
-		  Case ObjoScript.VM.OP_SUPER_INVOKE_LONG
-		    Return InvokeInstruction(opcode, chunk, offset, line, s)
+		    Return SuperInvokeInstruction(chunk, offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_GET_STATIC_FIELD, ObjoScript.VM.OP_GET_STATIC_FIELD_LONG
 		    Return ConstantInstruction(opcode, chunk, offset, line, s)
@@ -934,10 +931,7 @@ Protected Class Debugger
 		    details = ConstantInstructionDetails(opcode, chunk, "SETTER_LONG", offset)
 		    
 		  Case ObjoScript.VM.OP_SUPER_INVOKE
-		    details = InvokeInstructionDetails(opcode, chunk, "SUPER_INVOKE", offset)
-		    
-		  Case ObjoScript.VM.OP_SUPER_INVOKE_LONG
-		    details = InvokeInstructionDetails(opcode, chunk, "SUPER_INVOKE_LONG", offset)
+		    details = SuperInvokeDetails(chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_GET_STATIC_FIELD
 		    details = ConstantInstructionDetails(opcode, chunk, "GET_STATIC_FIELD", offset)
@@ -1001,18 +995,6 @@ Protected Class Debugger
 		    argCount = chunk.ReadByte(offset + 3)
 		    newOffset = offset + 4
 		    
-		  Case ObjoScript.VM.OP_SUPER_INVOKE
-		    instructionName = "OP_SUPER_INVOKE"
-		    index = chunk.ReadByte(offset + 1)
-		    argCount = chunk.ReadByte(offset + 2)
-		    newOffset = offset + 3
-		    
-		  Case ObjoScript.VM.OP_SUPER_INVOKE_LONG
-		    instructionName = "OP_SUPER_INVOKE_LONG"
-		    index = chunk.ReadUInt16(offset + 1)
-		    argCount = chunk.ReadByte(offset + 3)
-		    newOffset = offset + 4
-		    
 		  Case ObjoScript.VM.OP_SUPER_CONSTRUCTOR
 		    instructionName = "SUPER_CONSTRUCTOR"
 		    index = chunk.ReadByte(offset + 1)
@@ -1057,12 +1039,12 @@ Protected Class Debugger
 		  
 		  Var index, argCount As Integer
 		  Select Case opcode
-		  Case ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_SUPER_INVOKE, ObjoScript.VM.OP_SUPER_CONSTRUCTOR
+		  Case ObjoScript.VM.OP_INVOKE
 		    index = chunk.ReadByte(offset + 1)
 		    argCount = chunk.ReadByte(offset + 2)
 		    offset = offset + 3
 		    
-		  Case ObjoScript.VM.OP_INVOKE_LONG, ObjoScript.VM.OP_SUPER_INVOKE_LONG
+		  Case ObjoScript.VM.OP_INVOKE_LONG
 		    index = chunk.ReadUInt16(offset + 1)
 		    argCount = chunk.ReadByte(offset + 3)
 		    offset = offset + 4
@@ -1399,6 +1381,49 @@ Protected Class Debugger
 
 	#tag Method, Flags = &h21
 		Private Function SuperConstructorInstruction(chunk As ObjoScript.Chunk, offset As Integer, line As String, s() As String) As Integer
+		  #Pragma Warning "TODO"
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E73207468652064657461696C73206F6620616E20696E766F6B652F73757065725F696E766F6B652F73757065725F636F6E7374727563746F7220696E737472756374696F6E20617420606F66667365746020616E6420696E6372656D656E747320606F66667365746020746F20706F696E7420746F20746865206E65787420696E737472756374696F6E2E
+		Private Function SuperInvokeDetails(chunk As ObjoScript.Chunk, ByRef offset As Integer) As String
+		  /// Returns the details of a super_invoke instruction at `offset` and increments `offset` to point to the next instruction.
+		  ///
+		  /// Prints the instruction's name, the superclass's name, the method signature to invoke and the argument count.
+		  ///
+		  /// Format:
+		  /// INSTRUCTION  SUPERCLASS_NAME  SIGNATURE   ARGCOUNT
+		  
+		  Var superNameIndex, sigIndex, argCount As Integer
+		  superNameIndex = chunk.ReadUInt16(offset + 1)
+		  sigIndex = chunk.ReadUInt16(offset + 3)
+		  argCount = chunk.ReadByte(offset + 5)
+		  offset = offset + 6
+		  
+		  // The instruction's name.
+		  Var details As String = "SUPER_INVOKE"
+		  details = details.JustifyLeft(2 * COL_WIDTH)
+		  
+		  // Append the superclass name.
+		  Var superclassName As String = _
+		  ObjoScript.VM.ValueToString(chunk.Constants(superNameIndex))
+		  details = details + superclassName.JustifyLeft(2 * COL_WIDTH)
+		  
+		  // Append the signature name.
+		  Var sig As String = _
+		  ObjoScript.VM.ValueToString(chunk.Constants(sigIndex))
+		  details = details + sig.JustifyLeft(2 * COL_WIDTH)
+		  
+		  // Append the argument count.
+		  details = details + argCount.ToString.JustifyLeft(2 * COL_WIDTH)
+		  
+		  Return details
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function SuperInvokeInstruction(chunk As ObjoScript.Chunk, offset As Integer, line As String, s() As String) As Integer
 		  #Pragma Warning "TODO"
 		End Function
 	#tag EndMethod

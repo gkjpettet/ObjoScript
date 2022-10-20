@@ -2130,6 +2130,33 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Error("`super` can only be used within a method or constructor.")
 		  End If
 		  
+		  // Check this class actually has a superclass.
+		  If CurrentClass.Superclass = "" Then
+		    Error("Class `" + CurrentClass.Name + "` does not have a superclass.")
+		  End If
+		  
+		  // Get the class declaration for this class' superclass, if it exists.
+		  Var superclassDecl As ObjoScript.ClassDeclStmt = FindClass(CurrentClass.Superclass)
+		  If superclassDecl = Nil Then
+		    Error("Class `" + CurrentClass.Name + "` inherits `" + CurrentClass.Superclass + "` but there is no class with this name.")
+		  End If
+		  
+		  // Check the superclass has a matching method.
+		  Var superHasMatchingMethod As Boolean = False
+		  For Each entry As DictionaryEntry In superclassDecl.Methods
+		    Var method As ObjoScript.MethodDeclStmt = entry.Value
+		    If method.Signature.CompareCase(s.Signature) Then
+		      superHasMatchingMethod = True
+		      Exit
+		    End If
+		  Next entry
+		  If Not superHasMatchingMethod Then
+		    Error("The superclass (`" + CurrentClass.Superclass + "`) of `" + CurrentClass.Name + "` does not define `" + s.Signature + "`.")
+		  End If
+		  
+		  // Load the superclass' name into the constant pool.
+		  Var superNameIndex As Integer = AddConstant(CurrentClass.Superclass)
+		  
 		  // Push `this` onto the stack. It's always at slot 0 of the call frame.
 		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
 		  
@@ -2141,10 +2168,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Call arg.Accept(Self)
 		  Next arg
 		  
-		  // Emit the OP_SUPER_INVOKE instruction and the index of the method's signature in the constant pool.
-		  EmitIndexedOpcode(ObjoScript.VM.OP_SUPER_INVOKE, ObjoScript.VM.OP_SUPER_INVOKE_LONG, index, s.Location)
-		  
-		  // Emit the argument count.
+		  // Emit the OP_SUPER_INVOKE instruction, the superclass name, the index of the 
+		  // method's signature in the constant pool and the argument count.
+		  EmitByte(ObjoScript.VM.OP_SUPER_INVOKE, s.Location)
+		  EmitUInt16(superNameIndex, s.Location)
+		  EmitUInt16(index, s.Location)
 		  EmitByte(s.Arguments.Count, s.Location)
 		  
 		End Function

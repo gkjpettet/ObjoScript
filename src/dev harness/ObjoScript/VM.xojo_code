@@ -1435,10 +1435,8 @@ Protected Class VM
 		      Setter(ReadConstantLong, True)
 		      
 		    Case OP_SUPER_INVOKE
-		      Invoke(ReadConstant, ReadByte, True)
-		      
-		    Case OP_SUPER_INVOKE_LONG
-		      Invoke(ReadConstantLong, ReadByte, True)
+		      'Invoke(ReadConstant, ReadByte, True)
+		      SuperInvoke(ReadConstantLong, ReadConstantLong, ReadByte)
 		      
 		    Case OP_SUPER_CONSTRUCTOR
 		      SuperConstructor(ReadConstantLong, ReadByte)
@@ -1715,6 +1713,27 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 496E766F6B65732074686520737065636966696564206D6574686F64206F6E20746865207375706572636C617373206F662074686520696E7374616E6365206F6E2074686520737461636B2E2054686520726571756972656420617267756D656E74732073686F756C6420616C736F206265206F6E2074686520737461636B2E
+		Private Sub SuperInvoke(superclassName As String, signature As String, argCount As Integer)
+		  /// Invokes the specified method on the superclass of the instance on the stack. 
+		  /// The required arguments should also be on the stack.
+		  ///
+		  /// |
+		  /// | argN <-- top of stack
+		  /// | arg1
+		  /// | instance
+		  
+		  // Get the super class. Since classes are all declared in the top level, it should be in Globals.
+		  // The compiler will have checked that the superclass exists during compilation.
+		  Var superclass As ObjoScript.Klass = Globals.Value(superclassName)
+		  
+		  // Call the correct method.
+		  // The compiler will have guaranteed that the superclass has a method with this signature.
+		  CallValue(superclass.Methods.Value(signature), argCount)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 52657475726E73205472756520696620746865204F626A6F53637269707420737461636B206076616C756560206973206F66206074797065602E
 		Shared Function ValueIsType(type As String, value As Variant) As Boolean
 		  /// Returns True if the ObjoScript stack `value` is of `type`.
@@ -1943,8 +1962,8 @@ Protected Class VM
 		65: OP_SUPER_GETTER_LONG (2)
 		66: OP_SUPER_SETTER (1)
 		67: OP_SUPER_SETTER_LONG (2)
-		68: OP_SUPER_INVOKE (2)
-		69: OP_SUPER_INVOKE_LONG (3)
+		68: OP_SUPER_INVOKE (4)
+		69: **Unused**
 		70: OP_SUPER_CONSTRUCTOR (3)
 		71: **Unused**
 		72: OP_GET_STATIC_FIELD (1)
@@ -2084,8 +2103,7 @@ Protected Class VM
 			  OP_SUPER_GETTER_LONG      : 2, _
 			  OP_SUPER_SETTER           : 1, _
 			  OP_SUPER_SETTER_LONG      : 2, _
-			  OP_SUPER_INVOKE           : 2, _
-			  OP_SUPER_INVOKE_LONG      : 3, _
+			  OP_SUPER_INVOKE           : 4, _
 			  OP_GET_STATIC_FIELD       : 1, _
 			  OP_GET_STATIC_FIELD_LONG  : 2, _
 			  OP_SET_STATIC_FIELD       : 1, _
@@ -2350,9 +2368,6 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SUPER_INVOKE, Type = Double, Dynamic = False, Default = \"68", Scope = Public
-	#tag EndConstant
-
-	#tag Constant, Name = OP_SUPER_INVOKE_LONG, Type = Double, Dynamic = False, Default = \"69", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SUPER_SETTER, Type = Double, Dynamic = False, Default = \"66", Scope = Public

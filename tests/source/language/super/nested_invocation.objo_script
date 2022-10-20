@@ -1,0 +1,35 @@
+class Person {
+greet(who) {
+System.print("Hello " + who + " from Person")
+}
+}
+
+class Doctor is Person {
+greet(who) {
+System.print("Hello " + who + " from Doctor")
+super.greet(who)
+}
+}
+
+class Radiologist is Doctor {
+greet(who) {
+System.print("Hello " + who + " from Radiologist")
+super.greet(who)
+}
+}
+
+var aoife = Person()
+aoife.greet("stranger") // Expect: Hello stranger from Person
+
+var fi = Doctor()
+fi.greet("stranger")
+// Expect: 
+// Hello stranger from Doctor
+// Hello stranger from Person
+
+var garry = Radiologist()
+garry.greet("stranger")
+// Expect:
+// Hello stranger from Radiologist
+// Hello stranger from Doctor
+// Hello stranger from Person
