@@ -535,72 +535,72 @@ Protected Class Lexer
 		  // ====================================================================
 		  Select Case c
 		  Case "("
-		    AddToken(MakeToken(ObjoScript.TokenTypes.LParen))
+		    AddToken(MakeToken(ObjoScript.TokenTypes.LParen, c))
 		    mUnclosedParenCount = mUnclosedParenCount + 1
 		    Return
 		    
 		  Case ")"
-		    AddToken(MakeToken(ObjoScript.TokenTypes.RParen))
+		    AddToken(MakeToken(ObjoScript.TokenTypes.RParen, c))
 		    mUnclosedParenCount = mUnclosedParenCount - 1
 		    If mUnclosedParenCount < 0 Then Error("Syntax error. Unmatched closing parenthesis.")
 		    Return
 		    
 		  Case "{"
-		    AddToken(MakeToken(ObjoScript.TokenTypes.LCurly))
+		    AddToken(MakeToken(ObjoScript.TokenTypes.LCurly, c))
 		    mUnclosedCurlyCount = mUnclosedCurlyCount + 1
 		    Return
 		    
 		  Case "}"
-		    AddToken(MakeToken(ObjoScript.TokenTypes.RCurly))
+		    AddToken(MakeToken(ObjoScript.TokenTypes.RCurly, c))
 		    mUnclosedCurlyCount = mUnclosedCurlyCount - 1
 		    If mUnclosedCurlyCount < 0 Then Error("Syntax error. Unmatched closing curly bracket.")
 		    Return
 		    
 		  Case "["
-		    AddToken(MakeToken(ObjoScript.TokenTypes.LSquare))
+		    AddToken(MakeToken(ObjoScript.TokenTypes.LSquare, c))
 		    mUnclosedSquareCount = mUnclosedSquareCount + 1
 		    Return
 		    
 		  Case "]"
-		    AddToken(MakeToken(ObjoScript.TokenTypes.RSquare))
+		    AddToken(MakeToken(ObjoScript.TokenTypes.RSquare, c))
 		    mUnclosedSquareCount = mUnclosedSquareCount - 1
 		    If mUnclosedSquareCount < 0 Then Error("Syntax error. Unmatched closing square bracket.")
 		    Return
 		    
 		  Case ","
-		    AddToken(MakeToken(ObjoScript.TokenTypes.Comma))
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Comma, c))
 		    Return
 		    
 		  Case "&"
-		    AddToken(MakeToken(ObjoScript.TokenTypes.Ampersand))
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Ampersand, c))
 		    Return
 		    
 		  Case "|"
-		    AddToken(MakeToken(ObjoScript.TokenTypes.Pipe))
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Pipe, c))
 		    Return
 		    
 		  Case "^"
-		    AddToken(MakeToken(ObjoScript.TokenTypes.Caret))
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Caret, c))
 		    Return
 		    
 		  Case "~"
-		    AddToken(MakeToken(ObjoScript.TokenTypes.Tilde))
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Tilde, c))
 		    Return
 		    
 		  Case ":"
-		    AddToken(MakeToken(ObjoScript.TokenTypes.Colon))
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Colon, c))
 		    Return
 		    
 		  Case ";"
-		    AddToken(MakeToken(ObjoScript.TokenTypes.Semicolon))
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Semicolon, c))
 		    Return
 		    
 		  Case "?"
-		    AddToken(MakeToken(ObjoScript.TokenTypes.Query))
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Query, c))
 		    Return
 		    
 		  Case "%"
-		    AddToken(MakeToken(ObjoScript.TokenTypes.Percent))
+		    AddToken(MakeToken(ObjoScript.TokenTypes.Percent, c))
 		    Return
 		  End Select
 		  
@@ -612,93 +612,93 @@ Protected Class Lexer
 		  Select Case c
 		  Case "="
 		    If Match("=") Then
-		      AddToken(MakeToken(ObjoScript.TokenTypes.EqualEqual))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.EqualEqual, "=="))
 		      Return
 		    Else
-		      AddToken(MakeToken(ObjoScript.TokenTypes.Equal))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.Equal, "="))
 		      Return
 		    End If
 		    
 		  Case "."
 		    If Match(".") Then
 		      If Match(".") Then
-		        AddToken(MakeToken(ObjoScript.TokenTypes.DotDotDot)) // ...
+		        AddToken(MakeToken(ObjoScript.TokenTypes.DotDotDot, "...")) // ...
 		        Return
 		      Else
-		        AddToken(MakeToken(ObjoScript.TokenTypes.DotDot)) // ..
+		        AddToken(MakeToken(ObjoScript.TokenTypes.DotDot, "..")) // ..
 		        Return
 		      End If
 		    Else
-		      AddToken(MakeToken(ObjoScript.TokenTypes.Dot))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.Dot, "."))
 		      Return
 		    End If
 		    
 		  Case "+"
 		    If Match("=") Then
-		      AddToken(MakeToken(ObjoScript.TokenTypes.PlusEqual))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.PlusEqual, "+="))
 		      Return
 		    ElseIf Match("+") Then
-		      AddToken(MakeToken(ObjoScript.TokenTypes.PlusPlus))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.PlusPlus, "++"))
 		      Return
 		    Else
-		      AddToken(MakeToken(ObjoScript.TokenTypes.Plus))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.Plus, "+"))
 		      Return
 		    End If
 		    
 		  Case "-"
 		    If Match("=") Then
-		      AddToken(MakeToken(ObjoScript.TokenTypes.MinusEqual))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.MinusEqual, "-="))
 		      Return
 		    ElseIf Match("-") Then
-		      AddToken(MakeToken(ObjoScript.TokenTypes.MinusMinus))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.MinusMinus, "--"))
 		      Return
 		    Else
-		      AddToken(MakeToken(ObjoScript.TokenTypes.Minus))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.Minus, "-"))
 		      Return
 		    End If
 		    
 		  Case "*"
 		    If Match("=") Then
-		      AddToken(MakeToken(ObjoScript.TokenTypes.StarEqual))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.StarEqual, "*="))
 		      Return
 		    Else
-		      AddToken(MakeToken(ObjoScript.TokenTypes.Star))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.Star, "*"))
 		      Return
 		    End If
 		    
 		  Case "/"
 		    If Match("=") Then
-		      AddToken(MakeToken(ObjoScript.TokenTypes.ForwardSlashEqual))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.ForwardSlashEqual, "/="))
 		      Return
 		    Else
-		      AddToken(MakeToken(ObjoScript.TokenTypes.ForwardSlash))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.ForwardSlash, "/"))
 		      Return
 		    End If
 		    
 		  Case "<"
 		    If Match(">") Then
-		      AddToken(MakeToken(ObjoScript.TokenTypes.NotEqual))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.NotEqual, "<>"))
 		      Return
 		    ElseIf Match("=") Then
-		      AddToken(MakeToken(ObjoScript.TokenTypes.LessEqual))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.LessEqual, "<="))
 		      Return
 		    ElseIf Match("<") Then
-		      AddToken(MakeToken(ObjoScript.TokenTypes.LessLess))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.LessLess, "<<"))
 		      Return
 		    Else
-		      AddToken(MakeToken(ObjoScript.TokenTypes.Less))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.Less, "<"))
 		      Return
 		    End If
 		    
 		  Case ">"
 		    If Match("=") Then
-		      AddToken(MakeToken(ObjoScript.TokenTypes.GreaterEqual))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.GreaterEqual, ">="))
 		      Return
 		    ElseIf Match(">") Then
-		      AddToken(MakeToken(ObjoScript.TokenTypes.GreaterGreater))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.GreaterGreater, ">>"))
 		      Return
 		    Else
-		      AddToken(MakeToken(ObjoScript.TokenTypes.Greater))
+		      AddToken(MakeToken(ObjoScript.TokenTypes.Greater, ">"))
 		      Return
 		    End If
 		  End Select

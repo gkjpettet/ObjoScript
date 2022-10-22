@@ -1147,6 +1147,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///                 a
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
+		  #Pragma Warning "TODO: Figure out a way to handle overloaded operators (not subscripts, they're already done)"
+		  
 		  mLocation = expr.Location
 		  
 		  // Compile the left and right operands - this will leave them on the stack.
@@ -2060,7 +2062,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Compile the operand to put it on the stack.
 		  Call s.Operand.Accept(Self)
 		  
-		  // Load the subscript into the constant pool.
+		  // Load the signature into the constant pool.
 		  Var index As Integer = AddConstant(s.Signature)
 		  
 		  // Compile the indices.
@@ -2085,15 +2087,26 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = s.Location
 		  
-		  // Compile the operand to put it on the stack.
-		  Call s.Operand.Accept(Self)
-		  
 		  // Load the signature into the constant pool.
 		  Var index As Integer = AddConstant(s.Signature)
 		  
+		  // Compile the operand to put it on the stack.
+		  Call s.Operand.Accept(Self)
+		  
+		  // Compile the arguments.
+		  For Each arg As ObjoScript.Expr In s.Indices
+		    Call arg.Accept(Self)
+		  Next arg
+		  
 		  // Compile the value to assign.
 		  Call s.ValueToAssign.Accept(Self)
-		  EmitIndexedOpcode(ObjoScript.VM.OP_SETTER, ObjoScript.VM.OP_SETTER_LONG, index)
+		  
+		  // Emit the OP_INVOKE instruction and the index of the signature in the constant pool
+		  EmitIndexedOpcode(ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_INVOKE_LONG, index, s.Location)
+		  
+		  // Emit the argument count.
+		  // +1 because the value to assign is passed as the last argument to the setter method.
+		  EmitByte(s.Indices.Count + 1, s.Location)
 		  
 		End Function
 	#tag EndMethod

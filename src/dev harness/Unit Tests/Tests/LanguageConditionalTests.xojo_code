@@ -53,7 +53,6 @@ Inherits ObjoScriptTestGroupBase
 		Sub PrecedenceTest()
 		  AssertOutputsEqual("language.conditional.precedence")
 		  
-		  #Pragma Warning "TODO: Uncomment array lines in the source code for this test when implemented"
 		End Sub
 	#tag EndMethod
 

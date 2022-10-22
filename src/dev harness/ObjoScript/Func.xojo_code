@@ -79,6 +79,42 @@ Implements ObjoScript.Value,ObjoScript.Method
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D7075746573206120737562736372697074207369676E617475726520676976656E206974732061726974792E
+		Shared Function ComputeSubscriptSignature(arity As Integer, isSetter As Boolean) As String
+		  /// Computes a subscript signature given its arity.
+		  ///
+		  /// If this is a subscript setter then the arity is one greater than the 
+		  /// index count (since the last parameter is the value to assign).
+		  /// Examples:
+		  /// ```
+		  /// [index, indexN]
+		  /// [index, indexN]=(value)
+		  /// ```
+		  
+		  If isSetter And arity < 2 Then
+		    Raise New InvalidArgumentException("Subscript setters must have at least two parameters.")
+		  End If
+		  
+		  Var sig As String = "["
+		  
+		  Var paramCount As Integer = If(isSetter, arity - 1, arity)
+		  
+		  For i As Integer = 1 To paramCount
+		    sig = sig + "_"
+		    If i < paramCount Then sig = sig + ","
+		  Next i
+		  
+		  sig = sig + "]"
+		  
+		  If isSetter Then
+		    sig = sig + "=(_)"
+		  End If
+		  
+		  Return sig
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Sub Constructor(name As String, parameterTokens() As ObjoScript.Token, isSetter As Boolean, debugMode As Boolean)
 		  Self.Name = name

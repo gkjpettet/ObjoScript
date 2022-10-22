@@ -341,6 +341,19 @@ Protected Module ObjoScript
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 52657475726E7320547275652069662060766020697320616E20696E746567657220726570726573656E746564206173206120646F75626C652E
+		Protected Function VariantIsIntegerDouble(v As Variant) As Boolean
+		  /// Returns True if `v` is an integer represented as a double.
+		  
+		  If v.Type <> Variant.TypeDouble Then
+		    Return False
+		  Else
+		    Return v.DoubleValue = Floor(v.DoubleValue)
+		  End If
+		  
+		End Function
+	#tag EndMethod
+
 
 	#tag Note, Name = About
 		Foreign methods call Xojo methods with this delegate's signature when they are invoked.

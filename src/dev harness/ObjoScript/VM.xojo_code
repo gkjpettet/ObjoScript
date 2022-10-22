@@ -1052,9 +1052,6 @@ Protected Class VM
 		Sub Run(stepMode As ObjoScript.VM.StepModes = ObjoScript.VM.StepModes.None)
 		  /// Runs the interpreter. Assumes it has been initialised prior to this and has a valid call frame to execute.
 		  
-		  #Pragma Warning "TODO: Allow methods to raise a VM exception"
-		  ' This will allow, for example, subscript methods to indicate that an out of bounds error has occurred.
-		  
 		  // Make sure we don't try to step in with an out of bounds instruction pointer.
 		  If CurrentFrame.IP > CurrentChunk.Code.LastIndex Then Return
 		  

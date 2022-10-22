@@ -29,6 +29,12 @@ Protected Module List
 		    
 		  ElseIf signature.CompareCase("iteratorValue(_)") Then
 		    Return AddressOf IteratorValue
+		    
+		  ElseIf signature = "[_]=(_)" Then
+		    Return AddressOf SubscriptSetter
+		    
+		  ElseIf signature = "[_]" Then
+		    Return AddressOf Subscript
 		  End If
 		  
 		End Function
@@ -88,6 +94,77 @@ Protected Module List
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
 		  
 		  vm.SetReturn(instance.Fields.Value("_next"))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E732066616C736520696620746865726520617265206E6F206D6F7265206974656D7320746F2069746572617465206F722072657475726E7320746865206E6578742076616C756520696E207468652073657175656E63652E
+		Protected Sub Subscript(vm As ObjoScript.VM)
+		  /// Returns the value at the specified index.
+		  ///
+		  /// Assumes:
+		  /// - Slot 0 contains a List instance.
+		  /// - Slot 1 is the index (needs to be an integer double).
+		  /// List.[index]
+		  
+		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
+		  Var rawIndex As Variant = vm.GetSlotValue(1)
+		  
+		  // The index must be an integer.
+		  If Not ObjoScript.VariantIsIntegerDouble(rawIndex) Then
+		    vm.Error("Subscript index must be an integer.")
+		  End If
+		  Var index As Integer = rawIndex
+		  
+		  // A List's foreign data is an array of variants.
+		  // We need to declare this as a local variable because there is 
+		  // no way in Xojo to case a Variant to a Variant array.
+		  Var data() As Variant = instance.ForeignData
+		  
+		  // Bounds check.
+		  If index < 0 Then
+		    vm.Error("Subscript index must be >= 0.")
+		  ElseIf index > data.LastIndex Then
+		    vm.Error("Subscript index out of bounds (" + index.ToString + ").")
+		  End If
+		  
+		  vm.SetReturn(data(index))
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E732066616C736520696620746865726520617265206E6F206D6F7265206974656D7320746F2069746572617465206F722072657475726E7320746865206E6578742076616C756520696E207468652073657175656E63652E
+		Protected Sub SubscriptSetter(vm As ObjoScript.VM)
+		  /// Assigns a value to a specified index.
+		  ///
+		  /// Assumes:
+		  /// - Slot 0 contains a List instance.
+		  /// - Slot 1 is the index (needs to be an integer double).
+		  /// - Slot 2 is the value to assign.
+		  /// List.[index]=(value)
+		  
+		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
+		  Var rawIndex As Variant = vm.GetSlotValue(1)
+		  Var value As Variant = vm.GetSlotValue(2)
+		  
+		  // The index must be an integer.
+		  If Not ObjoScript.VariantIsIntegerDouble(rawIndex) Then
+		    vm.Error("Subscript index must be an integer.")
+		  End If
+		  Var index As Integer = rawIndex
+		  
+		  // A List's foreign data is an array of variants.
+		  // We need to declare this as a local variable because there is 
+		  // no way in Xojo to case a Variant to a Variant array.
+		  Var data() As Variant = instance.ForeignData
+		  
+		  // Bounds check.
+		  If index < 0 Then
+		    vm.Error("Subscript index must be >= 0.")
+		  ElseIf index > data.LastIndex Then
+		    vm.Error("Subscript index out of bounds (" + index.ToString + ").")
+		  End If
+		  
+		  data(index) = value
 		  
 		End Sub
 	#tag EndMethod

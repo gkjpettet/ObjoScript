@@ -18,7 +18,13 @@ Implements ObjoScript.Stmt
 		  Self.IsStatic = isStatic
 		  Self.Parameters = params
 		  Self.Body = body
-		  mSignature = ObjoScript.Func.ComputeSignature(Self.Name, Self.Parameters.Count, isSetter)
+		  
+		  If identifier.Type = ObjoScript.TokenTypes.LSquare Then
+		    mSignature = ObjoScript.Func.ComputeSubscriptSignature(Self.Parameters.Count, isSetter)
+		  Else
+		    mSignature = ObjoScript.Func.ComputeSignature(Self.Name, Self.Parameters.Count, isSetter)
+		  End If
+		  
 		End Sub
 	#tag EndMethod
 
@@ -136,6 +142,22 @@ Implements ObjoScript.Stmt
 			Group="Behavior"
 			InitialValue="False"
 			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="IsStatic"
+			Visible=false
+			Group="Behavior"
+			InitialValue="False"
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Signature"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="String"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

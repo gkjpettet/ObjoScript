@@ -13,6 +13,8 @@
 1
 1
 1
+1
+1
 Range instance
 12
 7
@@ -23,6 +25,7 @@ false
 Foo instance
 5
 5
+2
 2
 1
 Range instance

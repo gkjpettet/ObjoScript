@@ -2,6 +2,9 @@
 foreign class List {
 foreign iterate(iter)
 foreign iteratorValue(iter)
+
+foreign [index]
+foreign [index]=(value)
   
 toString() {
 var s = "["

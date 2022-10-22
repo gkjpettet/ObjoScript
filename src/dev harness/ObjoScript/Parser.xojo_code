@@ -11,6 +11,17 @@ Protected Class Parser
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 416476616E63657320746F20746865206E65787420746F6B656E2C2073746F72696E6720616E642072657475726E696E67207265666572656E636520746F207468652070726576696F757320746F6B656E2E
+		Private Function Advance() As ObjoScript.Token
+		  /// Advances to the next token, storing and returning reference to the previous token.
+		  
+		  Previous = Current
+		  mCurrentIndex = mCurrentIndex + 1
+		  Current = mTokens(mCurrentIndex)
+		  Return Previous
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 50617273657320616E206173736572742073746174656D656E742E20417373756D6573207468652070617273657220686173206A75737420636F6E73756D656420746865206061737365727460206B6579776F72642E
 		Private Function AssertStatement() As ObjoScript.Stmt
 		  /// Parses an assert statement. Assumes the parser has just consumed the `assert` keyword.
@@ -136,7 +147,7 @@ Protected Class Parser
 		  // Optional new line.
 		  Call Match(ObjoScript.TokenTypes.EOL)
 		  
-		  // Optional constructors/methods.
+		  // Optional constructors/methods/operator overloads.
 		  Var methods As Dictionary = ParseJSON("{}") // HACK: Case sensitive dictonary.
 		  Var staticMethods As Dictionary = ParseJSON("{}") // HACK: Case sensitive dictonary.
 		  Var foreignMethods As Dictionary = ParseJSON("{}") // HACK: Case sensitive dictonary.
@@ -175,8 +186,6 @@ Protected Class Parser
 		      End If
 		      
 		    Else
-		      #Pragma Warning "TODO: Handle parsing operator overrides (e.g: subscripts)"
-		      
 		      Var m As ObjoScript.MethodDeclStmt = MethodDeclaration(className, False)
 		      If staticMethods.HasKey(m.Signature) Or methods.HasKey(m.Signature) Or foreignMethods.HasKey(m.Signature) Then
 		        Error("Duplicate method definition: " + m.Signature, m.Location)
@@ -470,6 +479,12 @@ Protected Class Parser
 		  /// ```
 		  /// If `isStatic` is True then this is a static method declaration.
 		  
+		  // Handle operators differently.
+		  If Match(OverloadableOperators) Then
+		    Return ObjoScript.ForeignMethodDeclStmt(OverloadedOperator(className, Previous, isStatic, True))
+		  End If
+		  
+		  // Get the identifier
 		  Var identifier As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier)
 		  
 		  // Setter?
@@ -730,6 +745,21 @@ Protected Class Parser
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 4966207468652063757272656E7420746F6B656E206D61746368657320616E79206F66207468652073706563696669656420747970657320697420697320636F6E73756D656420616E64207468652066756E6374696F6E2072657475726E7320547275652E204F7468657277697365206974206A7573742072657475726E732046616C73652E
+		Function Match(types() As ObjoScript.TokenTypes) As Boolean
+		  /// If the current token matches any of the specified types it is consumed and 
+		  /// the function returns True. Otherwise it just returns False.
+		  
+		  If Check(types) Then
+		    Advance
+		    Return True
+		  End If
+		  
+		  Return False
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 4966207468652063757272656E7420746F6B656E206D61746368657320616E79206F66207468652073706563696669656420747970657320697420697320636F6E73756D656420616E64207468652066756E6374696F6E2072657475726E7320547275652E204F7468657277697365206974206A7573742072657475726E732046616C73652E
 		Function Match(ParamArray types As ObjoScript.TokenTypes) As Boolean
 		  /// If the current token matches any of the specified types it is consumed and 
 		  /// the function returns True. Otherwise it just returns False.
@@ -755,6 +785,11 @@ Protected Class Parser
 		  /// age=(value){} // Note the `=` to denote it's a setter.
 		  /// ```
 		  /// If `isStatic` is True then this is a static method declaration.
+		  
+		  // Handle operators differently.
+		  If Match(OverloadableOperators) Then
+		    Return ObjoScript.MethodDeclStmt(OverloadedOperator(className, Previous, isStatic, False))
+		  End If
 		  
 		  Var identifier As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier)
 		  
@@ -801,6 +836,113 @@ Protected Class Parser
 		  /// Convenience method for returning a new grammar rule for a unary and binary operator.
 		  
 		  Return New ObjoScript.GrammarRule(New UnaryParselet, New BinaryParselet(precedence, rightAssociative), precedence)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E7320616E206172726179206F6620746865206F70657261746F72732074686174206D6179206265206F7665726C6F616465642E
+		Private Function OverloadableOperators() As ObjoScript.TokenTypes()
+		  /// Returns an array of the operators that may be overloaded.
+		  
+		  Var operators() As ObjoScript.TokenTypes
+		  
+		  operators.Add(ObjoScript.TokenTypes.LSquare)
+		  
+		  Return operators
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060747970656020697320616E206F7665726C6F616461626C6520756E617279206F70657261746F7220747970652E
+		Private Function OverloadableUnaryOperator(type As ObjoScript.TokenTypes) As Boolean
+		  /// Returns True if `type` is an overloadable unary operator type.
+		  
+		  Select Case type
+		  Case ObjoScript.TokenTypes.Minus
+		    Return True
+		    
+		  Else
+		    Return False
+		  End Select
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 50617273657320616E206F7665726C6F6164656420606F70657261746F72602E2052657475726E73206569746865722061204D6574686F644465636C53746D74206F72206120466F726569676E4D6574686F644465636C53746D742E
+		Private Function OverloadedOperator(className As String, operator As ObjoScript.Token, isStatic As Boolean, isForeign As Boolean) As ObjoScript.Stmt
+		  /// Parses an overloaded `operator`. Returns either a MethodDeclStmt or a ForeignMethodDeclStmt.
+		  ///
+		  /// Assumes `operator` is an overloadable operator.
+		  /// Assumes the last consumed token is the operator to overload.
+		  /// Examples:
+		  /// ```
+		  /// -() {body} // prefix (i.e. unary) `-`
+		  /// +(a) {body} // infix `+`
+		  /// [a] {body} // single index subscript getter
+		  /// [a, b] {body} // multi-index subscript getter
+		  /// [a]=(value) // single index subscript setter
+		  /// [a, b]=(value) // single index subscript setter
+		  /// ```
+		  /// Note: foreign methods do not have a body.
+		  
+		  // Every declaration needs an opening parenthesis after the operator *except* subscripts.
+		  If operator.Type <> ObjoScript.TokenTypes.LSquare Then
+		    Consume(ObjoScript.TokenTypes.LParen, "Expected an opening parenthesis after the overloaded operator.")
+		  End If
+		  
+		  // Parameter(s).
+		  Var params() As ObjoScript.Token
+		  If Not Check(ObjoScript.TokenTypes.RParen) Then
+		    Do
+		      params.Add(Consume(ObjoScript.TokenTypes.Identifier, "Expected parameter name."))
+		    Loop Until Not Match(ObjoScript.TokenTypes.Comma)
+		  End If
+		  
+		  // Closer after parameter/index(es).
+		  If operator.Type = ObjoScript.TokenTypes.LSquare Then
+		    Consume(ObjoScript.TokenTypes.RSquare, "Expected a closing square bracket after indices.")
+		  Else
+		    Consume(ObjoScript.TokenTypes.RParen, "Expected a closing parenthesis after method parameters.")
+		  End If
+		  
+		  // Subscript setter?
+		  // The value to assign becomes the last parameter.
+		  Var isSetter As Boolean = False
+		  If Match(ObjoScript.TokenTypes.Equal) Then
+		    // Must have at least one parameter already.
+		    If params.Count = 0 Then
+		      Error("Subscript setters require at least one index after the `[`.")
+		    End If
+		    If operator.Type = ObjoScript.TokenTypes.LSquare Then
+		      isSetter = True
+		      Consume(ObjoScript.TokenTypes.LParen, "Expected an opening parenthesis after `=`.")
+		      params.Add(Consume(ObjoScript.TokenTypes.Identifier))
+		      Consume(ObjoScript.TokenTypes.RParen, "Expected a closing parenthesis after the value to assign to overloaded subscript setter.")
+		    Else
+		      Error("Unexpected `=` token. Only overloaded subscript operators may be setters.")
+		    End If
+		  End If
+		  
+		  // Check the correct number of parameters have been specified.
+		  If params.Count = 0 Then
+		    // Only overloadable unary operators may have zero parameters.
+		     If Not OverloadableUnaryOperator(operator.Type) Then
+		      Error("`" + operator.Type.ToString + "` is not an overloadable unary operator.")
+		    End If
+		  ElseIf params.Count > 1 And operator.Type <> ObjoScript.TokenTypes.LSquare Then
+		    // Only subscripts can have more than one parameter.
+		    Error("Only subscript methods may have more than one parameter.")
+		  End If
+		  
+		  If isForeign Then
+		    // Foreign methods don't have a body so we're done.
+		    Return New ForeignMethodDeclStmt(className, operator, isSetter, isStatic, params)
+		  Else
+		    // Consume the method's body.
+		    Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after method parameters.")
+		    Var body As ObjoScript.BlockStmt = ObjoScript.BlockStmt(Block)
+		    Return New MethodDeclStmt(className, operator, isSetter, isStatic, params, body)
+		  End If
+		  
 		  
 		End Function
 	#tag EndMethod

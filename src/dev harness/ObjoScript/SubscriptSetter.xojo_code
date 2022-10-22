@@ -15,9 +15,8 @@ Implements ObjoScript.Expr
 		  Self.Operand = operand
 		  Self.Indices = indices
 		  Self.ValueToAssign = valueToAssign
+		  mSignature = ObjoScript.Func.ComputeSubscriptSignature(indices.Count + 1, True) // +1 since indices excludes the value to assign.
 		  
-		  #Pragma Warning "TODO: Need to sort this out with a new syntax for declaring subscript setter methods"
-		  mSignature = ObjoScript.Func.ComputeSignature("operator_subscript", indices.Count, True)
 		End Sub
 	#tag EndMethod
 

@@ -14,7 +14,7 @@ Implements ObjoScript.Expr
 		  mLSquare = lsquare
 		  Self.Operand = operand
 		  Self.Indices = indices
-		  mSignature = ObjoScript.Func.ComputeSignature("operator_subscript", indices.Count, False)
+		  mSignature = ObjoScript.Func.ComputeSubscriptSignature(indices.Count, False)
 		  
 		End Sub
 	#tag EndMethod
