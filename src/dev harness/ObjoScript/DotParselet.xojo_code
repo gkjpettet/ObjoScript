@@ -14,14 +14,23 @@ Implements ObjoScript.InfixParselet
 		  // This may be a setter call so parse the value to assign if the precedence allows.
 		  Var valueToAssign As ObjoScript.Expr = Nil
 		  Var arguments() As ObjoScript.Expr
-		  Var isMethodInvocation As Boolean = False
+		  Var isSetter As Boolean = False
 		  If canAssign And parser.Match(ObjoScript.TokenTypes.Equal) Then
+		    isSetter = True
 		    valueToAssign = parser.Expression
 		    
+		    ' ElseIf parser.Match(ObjoScript.TokenTypes.LParen) Then
+		    ' isMethodInvocation = True
+		    ' // Assume this is an immediate method invocation on an instance since we're seeing: "left.identifier("
+		    ' // This provides a runtime performance boost.
+		    ' If Not parser.Check(ObjoScript.TokenTypes.RParen) Then
+		    ' Do
+		    ' arguments.Add(parser.Expression)
+		    ' Loop Until Not parser.Match(ObjoScript.TokenTypes.Comma)
+		    ' End If
+		    ' parser.Consume(ObjoScript.TokenTypes.RParen, "Expected a `)` after the method call's arguments.")
+		    ' End If
 		  ElseIf parser.Match(ObjoScript.TokenTypes.LParen) Then
-		    isMethodInvocation = True
-		    // Assume this is an immediate method invocation on an instance since we're seeing: "left.identifier("
-		    // This provides a runtime performance boost.
 		    If Not parser.Check(ObjoScript.TokenTypes.RParen) Then
 		      Do
 		        arguments.Add(parser.Expression)
@@ -30,10 +39,16 @@ Implements ObjoScript.InfixParselet
 		    parser.Consume(ObjoScript.TokenTypes.RParen, "Expected a `)` after the method call's arguments.")
 		  End If
 		  
-		  If isMethodInvocation Then
-		    Return New ObjoScript.MethodInvocationExpr(left, identifier, arguments)
-		  Else
+		  ' If isMethodInvocation Then
+		  ' Return New ObjoScript.MethodInvocationExpr(left, identifier, arguments)
+		  ' Else
+		  ' Return New ObjoScript.DotExpr(left, identifier, valueToAssign)
+		  ' End If
+		  
+		  If isSetter Then
 		    Return New ObjoScript.DotExpr(left, identifier, valueToAssign)
+		  Else
+		    Return New ObjoScript.MethodInvocationExpr(left, identifier, arguments)
 		  End If
 		End Function
 	#tag EndMethod

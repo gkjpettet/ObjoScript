@@ -1867,9 +1867,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120676574746572206D6574686F6420696E766F636174696F6E2E
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732061206D6574686F6420696E766F636174696F6E2E
 		Function VisitMethodInvocation(m As ObjoScript.MethodInvocationExpr) As Variant
-		  /// Compiles a getter method invocation.
+		  /// Compiles a method invocation.
 		  ///
 		  /// E.g: operand.method(arg1, arg2)
 		  /// The OP_INVOKE instruction is a fusion of OP_GETTER and OP_CALL.

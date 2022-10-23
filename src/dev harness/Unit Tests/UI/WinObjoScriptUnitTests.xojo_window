@@ -1605,24 +1605,6 @@ End
 		End Sub
 	#tag EndEvent
 	#tag Event
-		Function PaintCellBackground(g As Graphics, row As Integer, column As Integer) As Boolean
-		  #Pragma Unused column
-		  
-		  #If TargetMacOS Then
-		    If row Mod 2 = 0 And Not Me.RowSelectedAt(row) Then
-		      g.DrawingColor = Color.FromString("&h00EDF3FE")
-		      g.FillRectangle(0, 0, g.Width, g.Height)
-		    End If
-		    
-		    Return True
-		  #Else
-		    #Pragma Unused g
-		    #Pragma Unused row
-		  #Endif
-		  
-		End Function
-	#tag EndEvent
-	#tag Event
 		Function ContextualMenuItemSelected(selectedItem As DesktopMenuItem) As Boolean
 		  Select Case selectedItem.Text
 		  Case kCMSelectAllGroups
@@ -1744,26 +1726,12 @@ End
 		  #Pragma Unused x
 		  #Pragma Unused y
 		  
-		  Const kRedColor As Color = &cFF000000
-		  Const kBlackColor As Color = &c00000000
-		  Static kGreyColor As Color = Color.DisabledTextColor // Pseudo-constant
-		  
 		  If Me.RowTagAt(row) IsA TestResult Then
-		    
 		    Var tr As TestResult = Me.RowTagAt(row)
 		    
 		    If tr.Result = TestResult.Failed Then
-		      g.DrawingColor = kRedColor
+		      g.DrawingColor = &cFF000000
 		      g.Bold = True
-		      
-		    Else
-		      If tr.Result = TestResult.NotImplemented Then
-		        g.DrawingColor = kGreyColor
-		      Else
-		        g.DrawingColor = kBlackColor
-		      End If
-		      g.Bold = Not tr.Message.IsEmpty
-		      
 		    End If
 		    
 		  End If
