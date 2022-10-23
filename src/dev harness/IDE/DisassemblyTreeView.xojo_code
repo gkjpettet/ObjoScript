@@ -11,7 +11,7 @@ Inherits DesktopTreeView
 		  If f.Chunk = Nil Then Return
 		  
 		  Var debugger As New ObjoScript.Debugger
-		  Me.AppendNode(debugger.FunctionToTreeViewNode(f, includeStandardLibraryBytecode))
+		  Me.AppendNode(debugger.DisassembleFunction(f, includeStandardLibraryBytecode))
 		  
 		End Sub
 	#tag EndMethod

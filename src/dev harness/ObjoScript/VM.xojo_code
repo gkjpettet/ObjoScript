@@ -602,7 +602,8 @@ Protected Class VM
 		  // Disassemble each instruction if requested.
 		  If TraceExecution And frameScriptID <> -1 Then
 		    RaiseEvent DebugPrint(StackDump)
-		    RaiseEvent DebugPrint(Self.Debugger.DisassembleInstruction(-1, -1, CurrentChunk, CurrentFrame.IP))
+		    Var offset As Integer = CurrentFrame.IP // New variable as DisassembleInstruction mutates the offset.
+		    RaiseEvent DebugPrint(Self.Debugger.DisassembleInstruction(CurrentChunk, offset))
 		  End If
 		  
 		  Return False
