@@ -73,56 +73,6 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 42696E6473206120726567756C6172206D6574686F64206E616D656420606E616D656020746F2074686520636C617373206F7220696E7374616E6365206F6E2074686520746F70206F662074686520737461636B2E20417373657274732074686520746F70206F662074686520737461636B20697320616E20696E7374616E6365206F7220636C6173732E
-		Private Sub BindMethod(name As String)
-		  /// Binds a regular method named `name` to the class or instance on the top of the stack.
-		  /// Asserts the top of the stack is an instance or class.
-		  
-		  // Check we have an instance or a class on the top of the stack.
-		  Var receiver As Variant = Peek(0)
-		  Var isStatic As Boolean = False
-		  If receiver IsA ObjoScript.Klass Then
-		    isStatic = True
-		  ElseIf receiver IsA ObjoScript.Instance = False Then
-		    Error("Methods can only be invoked on classes and instances.")
-		  End If
-		  
-		  // Get the correct method. It might be Objo native or foreign.
-		  // It's either on the instance's class
-		  // or it'll be a static method on the class on the top of the stack.
-		  Var method As Variant
-		  If isStatic Then
-		    method = ObjoScript.Klass(receiver).StaticMethods.Lookup(name, Nil)
-		    If method = Nil Then
-		      Error("Undefined static method `" + name + "` on " + ObjoScript.Klass(receiver).ToString + ".")
-		    End If
-		    
-		  Else
-		    method = ObjoScript.Instance(receiver).klass.Methods.Lookup(name, Nil)
-		    If method = Nil Then
-		      Error("Undefined instance method `" + name + "` on " + ObjoScript.Instance(receiver).klass.ToString + ".")
-		    End If
-		  End If
-		  
-		  // Bind this method to the class/instance which is currently on the top of the stack.
-		  Var bound As Variant
-		  If method IsA ObjoScript.Func Then
-		    bound = New ObjoScript.BoundMethod(receiver, method, isStatic, False)
-		  ElseIf method IsA ObjoScript.ForeignMethod Then
-		    bound = New ObjoScript.BoundMethod(receiver, method, isStatic, True)
-		  Else
-		    Error("Expected either a compiled function or a foreign method.")
-		  End If
-		  
-		  // Pop off the class/instance.
-		  Call Pop
-		  
-		  // Push the bound method on to the stack.
-		  Push(bound)
-		  
-		End Sub
-	#tag EndMethod
-
 	#tag Method, Flags = &h21, Description = 2243616C6C7322206120636C6173732E20457373656E7469616C6C79207468697320637265617465732061206E657720696E7374616E63652E20446F6573202A2A6E6F742A2A20757064617465206043757272656E744672616D65602E
 		Private Sub CallClass(klass As ObjoScript.Klass, argCount As Integer)
 		  /// "Calls" a class. Essentially this creates a new instance.
@@ -1392,18 +1342,6 @@ Protected Class VM
 		    Case OP_METHOD
 		      DefineMethod(ReadConstantLong, If(ReadByte = 0, False, True))
 		      
-		    Case OP_GETTER
-		      BindMethod(ReadConstant)
-		      
-		    Case OP_GETTER_LONG
-		      BindMethod(ReadConstantLong)
-		      
-		    Case OP_SETTER
-		      Setter(ReadConstant)
-		      
-		    Case OP_SETTER_LONG
-		      Setter(ReadConstantLong)
-		      
 		    Case OP_GET_FIELD
 		      GetField(ReadConstant)
 		      
@@ -1592,67 +1530,6 @@ Protected Class VM
 		  
 		  // Push the value back on the stack (since this is an expression).
 		  Push(value)
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21, Description = 43616C6C73207468652073657474657220666F722074686520696E7374616E6365206F6E652066726F6D2074686520746F70206F662074686520737461636B2C2070617373696E6720696E207468652076616C7565206F6E2074686520746F70206F662074686520737461636B2061732074686520706172616D657465722E
-		Private Sub Setter(signature As String)
-		  /// Calls the setter for the instance or class one from the top of the stack, passing in the 
-		  /// value on the top of the stack as the parameter.
-		  ///
-		  /// |
-		  /// | ValueToAssign   <-- top of the stack
-		  /// | instance or class
-		  
-		  // Check we have a class/instance in the correct place.
-		  Var receiver As Variant = Peek(1)
-		  Var isStatic As Boolean = False
-		  If receiver IsA ObjoScript.Klass Then
-		    isStatic = True
-		  ElseIf receiver IsA ObjoScript.Instance = False Then
-		    Error("Setters can only be invoked on classes or instances.")
-		  End If
-		  
-		  // Get the value to assign. This will be the parameter to the setter method.
-		  Var value As Variant = Pop
-		  
-		  // Get the correct method. It's either on the instance or a class.
-		  Var setter As Variant
-		  If isStatic Then
-		    setter = ObjoScript.Klass(receiver).StaticMethods.Lookup(signature, Nil)
-		    If setter = Nil Then
-		      Error("Undefined static setter `" + signature + "` on " + ObjoScript.Klass(receiver).ToString + ".")
-		    End If
-		    
-		  Else
-		    setter = ObjoScript.Instance(receiver).klass.Methods.Lookup(signature, Nil)
-		    If setter = Nil Then
-		      Error("Undefined instance setter `" + signature + "` on " + ObjoScript.Instance(receiver).klass.ToString + ".")
-		    End If
-		  End If
-		  
-		  Var bound As Variant
-		  // Bind this method to the instance which is currently on the top of the stack.
-		  If setter IsA ObjoScript.Func Then
-		    bound = New ObjoScript.BoundMethod(receiver, setter, isStatic, False)
-		  ElseIf setter IsA ObjoScript.ForeignMethod Then
-		    bound = New ObjoScript.BoundMethod(receiver, setter, isStatic, True)
-		  Else
-		    Error("Expected either a compiled function or a foreign method.")
-		  End If
-		  
-		  // Pop off of the class/instance
-		  Call Pop
-		  
-		  // Push the bound method on to the stack.
-		  Push(bound)
-		  
-		  // Push the value to assign back on the stack.
-		  Push(value)
-		  
-		  // Call the method.
-		  CallValue(bound, 1)
 		  
 		End Sub
 	#tag EndMethod
@@ -1934,10 +1811,10 @@ Protected Class VM
 		49: OP_GET_LOCAL_CLASS (1)
 		50: OP_METHOD (3)
 		51: OP_IS (0)
-		52: OP_SETTER (1)
-		53: OP_SETTER_LONG (2)
-		54: OP_GETTER (1)
-		55: OP_GETTER_LONG (2)
+		52: *Unused*
+		53: *Unused*
+		54: *Unused*
+		55: *Unused*
 		56: OP_GET_FIELD (1)
 		57: OP_GET_FIELD_LONG (2)
 		58: OP_SET_FIELD (1)
@@ -2075,10 +1952,6 @@ Protected Class VM
 			  OP_CALL                   : 1, _
 			  OP_CLASS                  : 3, _
 			  OP_METHOD                 : 3, _
-			  OP_SETTER                 : 1, _
-			  OP_SETTER_LONG            : 2, _
-			  OP_GETTER                 : 1, _
-			  OP_GETTER_LONG            : 2, _
 			  OP_GET_FIELD              : 1, _
 			  OP_GET_FIELD_LONG         : 2, _
 			  OP_SET_FIELD              : 1, _
@@ -2194,12 +2067,6 @@ Protected Class VM
 	#tag Constant, Name = OP_FOREIGN_METHOD, Type = Double, Dynamic = False, Default = \"76", Scope = Public
 	#tag EndConstant
 
-	#tag Constant, Name = OP_GETTER, Type = Double, Dynamic = False, Default = \"54", Scope = Public
-	#tag EndConstant
-
-	#tag Constant, Name = OP_GETTER_LONG, Type = Double, Dynamic = False, Default = \"55", Scope = Public
-	#tag EndConstant
-
 	#tag Constant, Name = OP_GET_FIELD, Type = Double, Dynamic = False, Default = \"56", Scope = Public
 	#tag EndConstant
 
@@ -2309,12 +2176,6 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_RETURN, Type = Double, Dynamic = False, Default = \"0", Scope = Public, Description = 5468652072657475726E206F70636F64652E
-	#tag EndConstant
-
-	#tag Constant, Name = OP_SETTER, Type = Double, Dynamic = False, Default = \"52", Scope = Public
-	#tag EndConstant
-
-	#tag Constant, Name = OP_SETTER_LONG, Type = Double, Dynamic = False, Default = \"53", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SET_FIELD, Type = Double, Dynamic = False, Default = \"58", Scope = Public

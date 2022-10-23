@@ -91,26 +91,6 @@ Protected Class Debugger
 		    newOffset = offset + 3
 		    name = "CONSTRUCTOR"
 		    
-		  Case ObjoScript.VM.OP_GETTER
-		    constantIndex = chunk.ReadByte(offset + 1)
-		    newOffset = offset + 2
-		    name = "GETTER"
-		    
-		  Case ObjoScript.VM.OP_GETTER_LONG
-		    constantIndex = chunk.ReadUInt16(offset + 1)
-		    newOffset = offset + 3
-		    name = "GETTER_LONG"
-		    
-		  Case ObjoScript.VM.OP_SETTER
-		    constantIndex = chunk.ReadByte(offset + 1)
-		    newOffset = offset + 2
-		    name = "SETTER"
-		    
-		  Case ObjoScript.VM.OP_SETTER_LONG
-		    constantIndex = chunk.ReadUInt16(offset + 1)
-		    newOffset = offset + 3
-		    name = "SETTER_LONG"
-		    
 		  Case ObjoScript.VM.OP_SET_FIELD
 		    constantIndex = chunk.ReadByte(offset + 1)
 		    newOffset = offset + 2
@@ -177,17 +157,15 @@ Protected Class Debugger
 		  
 		  Select Case opcode
 		  Case ObjoScript.VM.OP_CONSTANT, ObjoScript.VM.OP_DEFINE_GLOBAL, ObjoScript.VM.OP_GET_GLOBAL, _
-		    ObjoScript.VM.OP_SET_GLOBAL, ObjoScript.VM.OP_GETTER, ObjoScript.VM.OP_SETTER, _
-		    ObjoScript.VM.OP_SET_FIELD, ObjoScript.VM.OP_GET_FIELD, _
+		    ObjoScript.VM.OP_SET_GLOBAL, ObjoScript.VM.OP_SET_FIELD, ObjoScript.VM.OP_GET_FIELD, _
 		    ObjoScript.VM.OP_GET_STATIC_FIELD
 		    constantIndex = chunk.ReadByte(offset + 1)
 		    offset = offset + 2
 		    
 		  Case ObjoScript.VM.OP_CONSTANT_LONG, ObjoScript.VM.OP_DEFINE_GLOBAL_LONG, _
 		    ObjoScript.VM.OP_GET_GLOBAL_LONG, ObjoScript.VM.OP_SET_GLOBAL_LONG, ObjoScript.VM.OP_CONSTRUCTOR, _
-		    ObjoScript.VM.OP_GETTER_LONG, ObjoScript.VM.OP_SETTER_LONG, ObjoScript.VM.OP_SET_FIELD_LONG, _
-		    ObjoScript.VM.OP_GET_FIELD_LONG, _
-		    ObjoScript.VM.OP_GET_STATIC_FIELD_LONG
+		    ObjoScript.VM.OP_SET_FIELD_LONG, _
+		    ObjoScript.VM.OP_GET_FIELD_LONG, ObjoScript.VM.OP_GET_STATIC_FIELD_LONG
 		    constantIndex = chunk.ReadUInt16(offset + 1)
 		    offset = offset + 3
 		    
@@ -531,18 +509,6 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_METHOD
 		    Return MethodInstruction(opcode, chunk, offset, line, s)
 		    
-		  Case ObjoScript.VM.OP_SETTER
-		    Return ConstantInstruction(opcode, chunk, offset, line, s)
-		    
-		  Case ObjoScript.VM.OP_SETTER_LONG
-		    Return ConstantInstruction(opcode, chunk, offset, line, s)
-		    
-		  Case ObjoScript.VM.OP_GETTER
-		    Return ConstantInstruction(opcode, chunk, offset, line, s)
-		    
-		  Case ObjoScript.VM.OP_GETTER_LONG
-		    Return ConstantInstruction(opcode, chunk, offset, line, s)
-		    
 		  Case ObjoScript.VM.OP_GET_FIELD
 		    Return ConstantInstruction(opcode, chunk, offset, line, s)
 		    
@@ -567,14 +533,8 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_INHERIT
 		    Return SimpleInstruction("INHERIT", offset, line, s)
 		    
-		  Case ObjoScript.VM.OP_GETTER_LONG
-		    Return ConstantInstruction(opcode, chunk, offset, line, s)
-		    
 		  Case ObjoScript.VM.OP_SUPER_SETTER
 		    Return SuperSetterInstruction(chunk, offset, line, s)
-		    
-		  Case ObjoScript.VM.OP_SETTER_LONG
-		    Return ConstantInstruction(opcode, chunk, offset, line, s)
 		    
 		  Case ObjoScript.VM.OP_SUPER_INVOKE
 		    Return SuperInvokeInstruction(chunk, offset, line, s)
@@ -862,18 +822,6 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_METHOD
 		    details = MethodInstructionDetails(opcode, chunk, offset)
 		    
-		  Case ObjoScript.VM.OP_SETTER
-		    details = ConstantInstructionDetails(opcode, chunk, "SETTER", offset)
-		    
-		  Case ObjoScript.VM.OP_SETTER_LONG
-		    details = ConstantInstructionDetails(opcode, chunk, "SETTER_LONG", offset)
-		    
-		  Case ObjoScript.VM.OP_GETTER
-		    details = ConstantInstructionDetails(opcode, chunk, "GETTER", offset)
-		    
-		  Case ObjoScript.VM.OP_GETTER_LONG
-		    details = ConstantInstructionDetails(opcode, chunk, "GETTER_LONG", offset)
-		    
 		  Case ObjoScript.VM.OP_GET_FIELD
 		    details = ConstantInstructionDetails(opcode, chunk, "GET_FIELD", offset)
 		    
@@ -898,14 +846,8 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_INHERIT
 		    details = SimpleInstructionDetails("INHERIT", offset)
 		    
-		  Case ObjoScript.VM.OP_GETTER_LONG
-		    details = ConstantInstructionDetails(opcode, chunk, "GETTER_LONG", offset)
-		    
 		  Case ObjoScript.VM.OP_SUPER_SETTER
 		    details = SuperSetterDetails(chunk, offset)
-		    
-		  Case ObjoScript.VM.OP_SETTER_LONG
-		    details = ConstantInstructionDetails(opcode, chunk, "SETTER_LONG", offset)
 		    
 		  Case ObjoScript.VM.OP_SUPER_INVOKE
 		    details = SuperInvokeDetails(chunk, offset)

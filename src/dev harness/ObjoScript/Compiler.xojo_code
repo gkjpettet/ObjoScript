@@ -628,7 +628,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  Var iter As New ObjoScript.VariableExpr(SyntheticToken("iter*"))
 		  Var seq As New ObjoScript.VariableExpr(SyntheticToken("seq*"))
-		  Var invocation As New ObjoScript.MethodInvocationExpr(seq, SyntheticToken("iterate"), Array(iter))
+		  Var invocation As New ObjoScript.MethodInvocationExpr(seq, SyntheticToken("iterate"), Array(iter), False)
 		  Var assign As New AssignmentExpr(SyntheticToken("iter*"), invocation)
 		  
 		  Call assign.Accept(Self)
@@ -643,7 +643,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  Var iter As New ObjoScript.VariableExpr(SyntheticToken("iter*"))
 		  Var seq As New ObjoScript.VariableExpr(SyntheticToken("seq*"))
-		  Var invocation As New ObjoScript.MethodInvocationExpr(seq, SyntheticToken("iteratorValue"), Array(iter))
+		  Var invocation As New ObjoScript.MethodInvocationExpr(seq, SyntheticToken("iteratorValue"), Array(iter), False)
 		  Var dec As New ObjoScript.VarDeclStmt(SyntheticToken(loopCounter.Lexeme), invocation, mLocation)
 		  
 		  Call dec.Accept(Self)
@@ -1416,31 +1416,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C65206120646F742065787072657373696F6E2E
-		Function VisitDot(dot As ObjoScript.DotExpr) As Variant
-		  /// Compile a dot expression.
-		  ///
-		  /// Part of the ObjoScript.ExprVisitor interface.
-		  
-		  mLocation = dot.Location
-		  
-		  // Compile the operand to put it on the stack.
-		  Call dot.Operand.Accept(Self)
-		  
-		  // Load the signature into the constant pool.
-		  Var index As Integer = AddConstant(dot.Signature)
-		  
-		  If dot.IsSetter Then
-		    // Compile the value to assign.
-		    Call dot.ValueToAssign.Accept(Self)
-		    EmitIndexedOpcode(ObjoScript.VM.OP_SETTER, ObjoScript.VM.OP_SETTER_LONG, index)
-		  Else
-		    EmitIndexedOpcode(ObjoScript.VM.OP_GETTER, ObjoScript.VM.OP_GETTER_LONG, index)
-		  End If
-		  
-		End Function
-	#tag EndMethod
-
 	#tag Method, Flags = &h0, Description = 436F6D70696C6520616E206065786974602073746174656D656E742E
 		Function VisitExitStmt(stmt As ObjoScript.ExitStmt) As Variant
 		  /// Compile an `exit` statement.
@@ -1872,7 +1847,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles a method invocation.
 		  ///
 		  /// E.g: operand.method(arg1, arg2)
-		  /// The OP_INVOKE instruction is a fusion of OP_GETTER and OP_CALL.
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
 		  mLocation = m.Location

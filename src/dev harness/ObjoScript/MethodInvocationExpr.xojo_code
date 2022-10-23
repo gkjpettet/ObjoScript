@@ -10,11 +10,11 @@ Implements ObjoScript.Expr
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(operand As ObjoScript.Expr, identifier As ObjoScript.Token, arguments() As ObjoScript.Expr)
+		Sub Constructor(operand As ObjoScript.Expr, identifier As ObjoScript.Token, arguments() As ObjoScript.Expr, isSetter As Boolean)
 		  Self.Operand = operand
 		  Self.Arguments = arguments
 		  mIdentifier = identifier
-		  mSignature = ObjoScript.Func.ComputeSignature(identifier.Lexeme, arguments.Count, False)
+		  mSignature = ObjoScript.Func.ComputeSignature(identifier.Lexeme, arguments.Count, isSetter)
 		End Sub
 	#tag EndMethod
 
@@ -104,6 +104,22 @@ Implements ObjoScript.Expr
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="MethodName"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="String"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Signature"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="String"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

@@ -217,28 +217,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function VisitDot(dot As ObjoScript.DotExpr) As Variant
-		  Var type As String = If(dot.IsSetter, "setter", "regular")
-		  Var node As New TreeViewNode("Dot (" + type + ")")
-		  
-		  node.AppendNode(New TreeViewNode("Identifier: " + dot.Identifier.Lexeme))
-		  
-		  Var operandNode As New TreeViewNode("Operand")
-		  operandNode.AppendNode(dot.Operand.Accept(Self))
-		  node.AppendNode(operandNode)
-		  
-		  If dot.IsSetter Then
-		    Var setter As New TreeViewNode("Value to assign")
-		    setter.AppendNode(dot.ValueToAssign.Accept(Self))
-		    node.AppendNode(setter)
-		  End If
-		  
-		  Return node
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
 		Function VisitExitStmt(stmt As ObjoScript.ExitStmt) As Variant
 		  #Pragma Unused stmt
 		  

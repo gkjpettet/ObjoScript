@@ -12,24 +12,13 @@ Implements ObjoScript.InfixParselet
 		  Var identifier As ObjoScript.Token = parser.Consume(ObjoScript.TokenTypes.Identifier, "Expected a method name after the dot.")
 		  
 		  // This may be a setter call so parse the value to assign if the precedence allows.
-		  Var valueToAssign As ObjoScript.Expr = Nil
+		  // The value to assign becomes the argument.
 		  Var arguments() As ObjoScript.Expr
 		  Var isSetter As Boolean = False
 		  If canAssign And parser.Match(ObjoScript.TokenTypes.Equal) Then
 		    isSetter = True
-		    valueToAssign = parser.Expression
+		    arguments.Add(parser.Expression)
 		    
-		    ' ElseIf parser.Match(ObjoScript.TokenTypes.LParen) Then
-		    ' isMethodInvocation = True
-		    ' // Assume this is an immediate method invocation on an instance since we're seeing: "left.identifier("
-		    ' // This provides a runtime performance boost.
-		    ' If Not parser.Check(ObjoScript.TokenTypes.RParen) Then
-		    ' Do
-		    ' arguments.Add(parser.Expression)
-		    ' Loop Until Not parser.Match(ObjoScript.TokenTypes.Comma)
-		    ' End If
-		    ' parser.Consume(ObjoScript.TokenTypes.RParen, "Expected a `)` after the method call's arguments.")
-		    ' End If
 		  ElseIf parser.Match(ObjoScript.TokenTypes.LParen) Then
 		    If Not parser.Check(ObjoScript.TokenTypes.RParen) Then
 		      Do
@@ -39,17 +28,8 @@ Implements ObjoScript.InfixParselet
 		    parser.Consume(ObjoScript.TokenTypes.RParen, "Expected a `)` after the method call's arguments.")
 		  End If
 		  
-		  ' If isMethodInvocation Then
-		  ' Return New ObjoScript.MethodInvocationExpr(left, identifier, arguments)
-		  ' Else
-		  ' Return New ObjoScript.DotExpr(left, identifier, valueToAssign)
-		  ' End If
+		  Return New ObjoScript.MethodInvocationExpr(left, identifier, arguments, isSetter)
 		  
-		  If isSetter Then
-		    Return New ObjoScript.DotExpr(left, identifier, valueToAssign)
-		  Else
-		    Return New ObjoScript.MethodInvocationExpr(left, identifier, arguments)
-		  End If
 		End Function
 	#tag EndMethod
 
