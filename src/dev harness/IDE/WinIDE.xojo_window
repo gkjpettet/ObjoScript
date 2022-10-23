@@ -1607,8 +1607,7 @@ End
 #tag Events Editor
 	#tag Event , Description = 54686520656469746F722069732061626F757420746F20626520646973706C617965642E
 		Sub Opening()
-		  Editor.ContentType = XUICodeEditor.ContentTypes.SourceCode
-		  
+		  Me.ContentType = XUICodeEditor.ContentTypes.SourceCode
 		  Me.BorderColor = New ColorGroup(&cD7D9D9, &c2A2A2A)
 		End Sub
 	#tag EndEvent

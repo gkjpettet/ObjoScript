@@ -23,7 +23,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
    Title           =   "ObjoScript Unit Tests"
    Type            =   0
    Visible         =   True
-   Width           =   1316
+   Width           =   1400
    Begin DesktopGroupBox GroupBoxes
       AllowAutoDeactivate=   True
       Bold            =   False
@@ -51,7 +51,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
       Transparent     =   False
       Underline       =   False
       Visible         =   True
-      Width           =   977
+      Width           =   1061
       Begin DesktopLabel Labels
          AllowAutoDeactivate=   True
          Bold            =   False
@@ -542,7 +542,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
       Transparent     =   False
       Underline       =   False
       Visible         =   True
-      Width           =   983
+      Width           =   1067
       Begin DesktopLabel TestNameLabel
          AllowAutoDeactivate=   True
          Bold            =   True
@@ -574,7 +574,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Transparent     =   False
          Underline       =   False
          Visible         =   True
-         Width           =   725
+         Width           =   809
       End
       Begin DesktopLabel Labels
          AllowAutoDeactivate=   True
@@ -642,53 +642,59 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Visible         =   True
          Width           =   100
       End
-      Begin DesktopTextArea TestSourceCodeArea
-         AllowAutoDeactivate=   True
-         AllowFocusRing  =   True
-         AllowSpellChecking=   True
-         AllowStyledText =   True
-         AllowTabs       =   False
+      Begin XUICodeEditor TestSourceCodeArea
+         AllowAutocomplete=   False
+         AllowAutoCompleteInComments=   False
+         AllowInertialScrolling=   True
+         AutocloseBrackets=   False
+         AutocompleteCombo=   1
+         AutocompletePopupFontName=   "System"
+         AutocompletePopupFontSize=   12
+         AutoDeactivate  =   True
          BackgroundColor =   &cFFFFFF00
-         Bold            =   False
+         BlinkCaret      =   True
+         BorderColor     =   &c00000000
+         CaretColour     =   &c00000000
+         CaretType       =   2
+         ContentType     =   "XUICodeEditor.ContentTypes.SourceCode"
+         CurrentLineHighlightColor=   &c00000000
+         CurrentLineNumberColor=   &c00000000
+         DisplayLineNumbers=   True
+         DrawBlockLines  =   True
          Enabled         =   True
          FontName        =   "System"
-         FontSize        =   0.0
-         FontUnit        =   0
-         Format          =   ""
-         HasBorder       =   True
-         HasHorizontalScrollbar=   False
-         HasVerticalScrollbar=   True
+         FontSize        =   0
+         HasBottomBorder =   False
+         HasLeftBorder   =   False
+         HasRightBorder  =   False
+         HasTopBorder    =   False
          Height          =   403
-         HideSelection   =   True
+         HighlightCurrentLine=   False
+         HighlightDelimitersAroundCaret=   False
          Index           =   -2147483648
          InitialParent   =   "GroupBoxes$1"
-         Italic          =   False
          Left            =   339
-         LineHeight      =   0.0
-         LineSpacing     =   0.0
+         LineNumberColor =   &c00000000
+         LineNumberFontSize=   12
          LockBottom      =   True
          LockedInPosition=   True
          LockLeft        =   True
          LockRight       =   False
          LockTop         =   True
-         MaximumCharactersAllowed=   0
-         Multiline       =   True
+         MinimumAutocompletionLength=   2
+         MinimumParseInterval=   500
          ReadOnly        =   True
          Scope           =   0
+         SelectionColour =   &c00000000
+         SpacesPerTab    =   4
          TabIndex        =   3
          TabPanelIndex   =   0
          TabStop         =   True
-         Text            =   ""
-         TextAlignment   =   0
-         TextColor       =   &c00000000
          Tooltip         =   ""
          Top             =   341
-         Transparent     =   False
-         Underline       =   False
-         UnicodeMode     =   0
-         ValidationMask  =   ""
+         VerticalLinePadding=   0
          Visible         =   True
-         Width           =   466
+         Width           =   501
       End
       Begin DesktopLabel LabelSourceCode
          AllowAutoDeactivate=   True
@@ -734,7 +740,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   -2147483648
          InitialParent   =   "GroupBoxes$1"
          Italic          =   False
-         Left            =   1183
+         Left            =   1267
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   False
@@ -777,7 +783,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   -2147483648
          InitialParent   =   "GroupBoxes$1"
          Italic          =   False
-         Left            =   817
+         Left            =   852
          LineHeight      =   0.0
          LineSpacing     =   1.0
          LockBottom      =   True
@@ -802,7 +808,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          UnicodeMode     =   1
          ValidationMask  =   ""
          Visible         =   True
-         Width           =   465
+         Width           =   514
       End
       Begin DesktopLabel LabelMessages
          AllowAutoDeactivate=   True
@@ -815,7 +821,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   -2147483648
          InitialParent   =   "GroupBoxes$1"
          Italic          =   False
-         Left            =   817
+         Left            =   852
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   True
@@ -870,7 +876,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
       Height          =   16
       Index           =   -2147483648
       InitialParent   =   ""
-      Left            =   1280
+      Left            =   1364
       LockBottom      =   False
       LockedInPosition=   True
       LockLeft        =   False
@@ -946,6 +952,12 @@ End
 #tag WindowCode
 	#tag Event
 		Sub Opening()
+		  TestSourceCodeArea.Formatter = New XUICEObjoScriptFormatter
+		  TestSourceCodeArea.Theme = XUICETheme.FromFile(SpecialFolder.Resource("EditorTheme.toml"))
+		  
+		  
+		  
+		  
 		  Controller.LoadTestGroups
 		  
 		  PopulateTestGroups
@@ -1405,7 +1417,9 @@ End
 		  TestResultLabel.Text = result
 		  TestResultsArea.Text = message
 		  TestDurationLabel.Text = duration
-		  TestSourceCodeArea.Text = sourcecode
+		  
+		  TestSourceCodeArea.Clear
+		  TestSourceCodeArea.Insert(sourcecode, 0, False)
 		  
 		End Sub
 	#tag EndMethod
@@ -1496,6 +1510,14 @@ End
 
 #tag EndWindowCode
 
+#tag Events TestSourceCodeArea
+	#tag Event , Description = 54686520656469746F722069732061626F757420746F20626520646973706C617965642E
+		Sub Opening()
+		  Me.ContentType = XUICodeEditor.ContentTypes.SourceCode
+		  Me.BorderColor = New ColorGroup(&cD7D9D9, &c2A2A2A)
+		End Sub
+	#tag EndEvent
+#tag EndEvents
 #tag Events TestToolbar1
 	#tag Event
 		Sub Pressed(item As DesktopToolbarItem)
