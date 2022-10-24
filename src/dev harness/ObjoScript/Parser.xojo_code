@@ -925,7 +925,7 @@ Protected Class Parser
 		  // Check the correct number of parameters have been specified.
 		  If params.Count = 0 Then
 		    // Only overloadable unary operators may have zero parameters.
-		     If Not OverloadableUnaryOperator(operator.Type) Then
+		    If Not OverloadableUnaryOperator(operator.Type) Then
 		      Error("`" + operator.Type.ToString + "` is not an overloadable unary operator.")
 		    End If
 		  ElseIf params.Count > 1 And operator.Type <> ObjoScript.TokenTypes.LSquare Then

@@ -53,10 +53,10 @@ Begin DesktopWindow WinIDE
       FirstVisibleLine=   0
       FontName        =   "System"
       FontSize        =   12
-      HasBottomBorder =   False
+      HasBottomBorder =   True
       HasFocus        =   False
       HasLeftBorder   =   False
-      HasRightBorder  =   False
+      HasRightBorder  =   True
       HasTopBorder    =   False
       Height          =   564
       HighlightCurrentLine=   True
@@ -435,7 +435,7 @@ Begin DesktopWindow WinIDE
          HasNodeTextColor=   False
          HasSelectionColor=   False
          HasSelectionTextColor=   False
-         Height          =   490
+         Height          =   510
          InactiveSelectionColor=   &cD3D3D300
          Index           =   -2147483648
          InitialParent   =   "Panel"
@@ -826,7 +826,7 @@ Begin DesktopWindow WinIDE
       UnicodeMode     =   1
       ValidationMask  =   ""
       Visible         =   True
-      Width           =   674
+      Width           =   678
    End
    Begin DesktopCheckBox CheckBoxDebugMode
       AllowAutoDeactivate=   True

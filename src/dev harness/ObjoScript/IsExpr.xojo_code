@@ -42,6 +42,14 @@ Implements ObjoScript.Expr
 
 	#tag ViewBehavior
 		#tag ViewProperty
+			Name="Left"
+			Visible=true
+			Group="Position"
+			InitialValue="0"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
 			Name="Name"
 			Visible=true
 			Group="ID"
@@ -63,14 +71,6 @@ Implements ObjoScript.Expr
 			Group="ID"
 			InitialValue=""
 			Type="String"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Value"
-			Visible=true
-			Group="Position"
-			InitialValue=""
-			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty

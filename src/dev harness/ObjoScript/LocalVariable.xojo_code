@@ -74,6 +74,14 @@ Protected Class LocalVariable
 			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Depth"
+			Visible=false
+			Group="Behavior"
+			InitialValue="-1"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class
 #tag EndClass

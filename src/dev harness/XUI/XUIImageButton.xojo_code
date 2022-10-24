@@ -650,18 +650,6 @@ Inherits DesktopCanvas
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Type"
-			Visible=true
-			Group="Behavior"
-			InitialValue=""
-			Type="XUIImageButton.Types"
-			EditorType="Enum"
-			#tag EnumValues
-				"0 - PushButton"
-				"1 - ToggleButton"
-			#tag EndEnumValues
-		#tag EndViewProperty
-		#tag ViewProperty
 			Name="DefaultImage"
 			Visible=true
 			Group="Images"
@@ -700,6 +688,18 @@ Inherits DesktopCanvas
 			InitialValue="0"
 			Type="Integer"
 			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Type"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="XUIImageButton.Types"
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - PushButton"
+				"1 - ToggleButton"
+			#tag EndEnumValues
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class

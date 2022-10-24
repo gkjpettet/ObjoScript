@@ -80,8 +80,8 @@ Implements ObjoScript.Expr
 			Visible=false
 			Group="Behavior"
 			InitialValue=""
-			Type="Boolean"
-			EditorType=""
+			Type="String"
+			EditorType="MultiLineEditor"
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class

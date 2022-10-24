@@ -80,7 +80,7 @@ Implements ObjoScript.Expr
 			Visible=false
 			Group="Behavior"
 			InitialValue=""
-			Type="Double"
+			Type="Boolean"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

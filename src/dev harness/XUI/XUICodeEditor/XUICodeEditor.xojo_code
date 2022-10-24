@@ -858,8 +858,7 @@ Implements XUINotificationListener
 		  
 		  #Pragma Unused caretBlinker
 		  
-		  // The caret is hidden if there is selected text or the editor
-		  // is in read-only mode.
+		  // The caret is hidden if there is selected text or the editor is read-only.
 		  If mCurrentSelection <> Nil Or Me.ReadOnly Then
 		    mCaretVisible = False
 		  Else
@@ -873,8 +872,6 @@ Implements XUINotificationListener
 		  
 		  // Redraw the canvas.
 		  Refresh
-		  
-		  
 		End Sub
 	#tag EndMethod
 
@@ -4579,6 +4576,118 @@ Implements XUINotificationListener
 
 	#tag ViewBehavior
 		#tag ViewProperty
+			Name="InitialParent"
+			Visible=false
+			Group="Position"
+			InitialValue=""
+			Type="String"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="AutoDeactivate"
+			Visible=true
+			Group="Appearance"
+			InitialValue="True"
+			Type="Boolean"
+			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Width"
+			Visible=true
+			Group="Position"
+			InitialValue="100"
+			Type="Integer"
+			EditorType="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Height"
+			Visible=true
+			Group="Position"
+			InitialValue="100"
+			Type="Integer"
+			EditorType="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="LockLeft"
+			Visible=true
+			Group="Position"
+			InitialValue="True"
+			Type="Boolean"
+			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="LockTop"
+			Visible=true
+			Group="Position"
+			InitialValue="True"
+			Type="Boolean"
+			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="LockRight"
+			Visible=true
+			Group="Position"
+			InitialValue="False"
+			Type="Boolean"
+			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="LockBottom"
+			Visible=true
+			Group="Position"
+			InitialValue="False"
+			Type="Boolean"
+			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="TabIndex"
+			Visible=true
+			Group="Position"
+			InitialValue="0"
+			Type="Integer"
+			EditorType="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="TabStop"
+			Visible=true
+			Group="Position"
+			InitialValue="True"
+			Type="Boolean"
+			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Enabled"
+			Visible=true
+			Group="Appearance"
+			InitialValue="True"
+			Type="Boolean"
+			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Tooltip"
+			Visible=true
+			Group="Appearance"
+			InitialValue=""
+			Type="String"
+			EditorType="MultiLineEditor"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Visible"
+			Visible=true
+			Group="Appearance"
+			InitialValue="True"
+			Type="Boolean"
+			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="TabPanelIndex"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Integer"
+			EditorType="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
 			Name="Name"
 			Visible=true
 			Group="ID"
@@ -4617,118 +4726,6 @@ Implements XUINotificationListener
 			InitialValue=""
 			Type="Integer"
 			EditorType="Integer"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Width"
-			Visible=true
-			Group="Position"
-			InitialValue="100"
-			Type="Integer"
-			EditorType="Integer"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Height"
-			Visible=true
-			Group="Position"
-			InitialValue="100"
-			Type="Integer"
-			EditorType="Integer"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="LockLeft"
-			Visible=true
-			Group="Position"
-			InitialValue=""
-			Type="Boolean"
-			EditorType="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="LockTop"
-			Visible=true
-			Group="Position"
-			InitialValue=""
-			Type="Boolean"
-			EditorType="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="LockRight"
-			Visible=true
-			Group="Position"
-			InitialValue=""
-			Type="Boolean"
-			EditorType="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="LockBottom"
-			Visible=true
-			Group="Position"
-			InitialValue=""
-			Type="Boolean"
-			EditorType="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="TabPanelIndex"
-			Visible=false
-			Group="Position"
-			InitialValue="0"
-			Type="Integer"
-			EditorType="Integer"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="TabIndex"
-			Visible=true
-			Group="Position"
-			InitialValue="0"
-			Type="Integer"
-			EditorType="Integer"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="TabStop"
-			Visible=true
-			Group="Position"
-			InitialValue="True"
-			Type="Boolean"
-			EditorType="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="InitialParent"
-			Visible=false
-			Group="Position"
-			InitialValue=""
-			Type="String"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Visible"
-			Visible=true
-			Group="Appearance"
-			InitialValue="True"
-			Type="Boolean"
-			EditorType="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Tooltip"
-			Visible=true
-			Group="Appearance"
-			InitialValue=""
-			Type="String"
-			EditorType="MultiLineEditor"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="AutoDeactivate"
-			Visible=true
-			Group="Appearance"
-			InitialValue="True"
-			Type="Boolean"
-			EditorType="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Enabled"
-			Visible=true
-			Group="Appearance"
-			InitialValue="True"
-			Type="Boolean"
-			EditorType="Boolean"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="BlinkCaret"
@@ -5109,7 +5106,11 @@ Implements XUINotificationListener
 			Group="Behavior"
 			InitialValue="XUICodeEditor.AutocompleteCombos.Tab"
 			Type="XUICodeEditor.AutocompleteCombos"
-			EditorType=""
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - CtrlSpace"
+				"1 - Tab"
+			#tag EndEnumValues
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="ContentType"
@@ -5117,7 +5118,11 @@ Implements XUINotificationListener
 			Group="Behavior"
 			InitialValue="XUICodeEditor.ContentTypes.SourceCode"
 			Type="XUICodeEditor.ContentTypes"
-			EditorType=""
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - Markdown"
+				"1 - SourceCode"
+			#tag EndEnumValues
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class

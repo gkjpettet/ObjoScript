@@ -1,6 +1,6 @@
 #tag Class
 Protected Class ForeignMethod
-Implements ObjoScript.Value, ObjoScript.Method
+Implements ObjoScript.Value,ObjoScript.Method
 	#tag Method, Flags = &h0
 		Sub Constructor(signature As String, arity As Integer, method As ObjoScript.ForeignMethodDelegate)
 		  mSignature = signature
