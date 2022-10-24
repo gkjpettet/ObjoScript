@@ -10,7 +10,7 @@ Protected Module List
 		    Var data() As Variant
 		    instance.ForeignData = data
 		    instance.Fields.Value("_next") = False
-		    instance.Fields.Value("_index") = -1
+		    instance.Fields.Value("_index") = CType(-1, Double)
 		  Else
 		    vm.Error("Invalid number of arguments (expected 0, got " + args.Count.ToString + ").")
 		  End If

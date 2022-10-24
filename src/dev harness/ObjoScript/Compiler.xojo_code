@@ -866,9 +866,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Assumes `postfix` is a "++" or "--" expression.
 		  
 		  // The "++" and "--" operators require a variable name as their left hand operand.
-		  If postfix.Operand IsA ObjoScript.VariableExpr = False Then
+		  Select Case postfix.Operand
+		  Case IsA ObjoScript.VariableExpr, IsA ObjoScript.FieldExpr, IsA ObjoScript.StaticFieldExpr
+		    // Allowed.
+		  Else
 		    Error("The postfix `" + postfix.Operator.ToString + "` operator expects a variable name as its operand.")
-		  End If
+		  End Select
 		  
 		  // Compile the operand.
 		  Call postfix.Operand.Accept(Self)
@@ -886,8 +889,19 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  End Select
 		  
 		  // Do the assignment.
-		  Assignment(ObjoScript.VariableExpr(postfix.Operand).Name)
-		  
+		  Select Case postfix.Operand
+		  Case IsA ObjoScript.VariableExpr
+		    Assignment(ObjoScript.VariableExpr(postfix.Operand).Name)
+		    
+		  Case IsA ObjoScript.FieldExpr
+		    #Pragma Warning "TODO"
+		    Error("Postfix increment/decrement not yet implemented for instance fields.")
+		    
+		  Case IsA ObjoScript.StaticFieldExpr
+		    #Pragma Warning "TODO"
+		    Error("Postfix increment/decrement not yet implemented for static fields.")
+		    
+		  End Select
 		End Sub
 	#tag EndMethod
 

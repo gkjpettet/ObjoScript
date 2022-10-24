@@ -1,0 +1,4 @@
+foreach i in ["a", "b", "c"] {
+System.print(i)
+}
+// expect: "a", "b", "c"

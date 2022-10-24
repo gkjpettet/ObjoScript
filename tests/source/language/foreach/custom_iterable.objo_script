@@ -1,0 +1,29 @@
+class Iterable {
+constructor(item1, item2, item3) {
+ _items = [item1, item2, item3]
+_index = 0
+}
+
+iterate(iter) {
+if iter == nothing {
+_next =  _items[0]
+
+} else if _index < 2 {
+_index = _index + 1
+_next = _items[_index]
+} else {
+_next = false
+}
+
+return _next
+}
+
+iteratorValue(value) {
+return _next
+}
+}
+
+var iterable = Iterable(6, 7, 8)
+foreach i in iterable {
+System.print(i)
+}
