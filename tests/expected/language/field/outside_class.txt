@@ -1,1 +1,1 @@
-Instance fields can only be accessed from within a method or constructor.
+Fields can only be accessed from within a method or constructor.

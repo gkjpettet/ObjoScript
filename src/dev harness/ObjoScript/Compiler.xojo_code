@@ -594,6 +594,31 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 41737369676E207468652076616C7565206F6E2074686520746F70206F662074686520737461636B20746F2074686520737065636966696564206669656C642E
+		Private Sub FieldAssignment(fieldName As String, staticField As Boolean)
+		  /// Assign the value on the top of the stack to the specified field.
+		  
+		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		    Error("Fields can only be accessed from within a method or constructor.")
+		  End If
+		  
+		  If Self.IsStaticMethod And Not staticField Then
+		    Error("Instance fields can only be accessed from within an instance method, not a static method.")
+		  End If
+		  
+		  // Add the name of the field to the constant pool and get its index.
+		  Var index As Integer = AddConstant(fieldName)
+		  
+		  // Emit the correct set field instruction.
+		  If staticField Then
+		    EmitIndexedOpcode(ObjoScript.VM.OP_SET_STATIC_FIELD, ObjoScript.VM.OP_SET_STATIC_FIELD_LONG, index)
+		  Else
+		    EmitIndexedOpcode(ObjoScript.VM.OP_SET_FIELD, ObjoScript.VM.OP_SET_FIELD_LONG, index)
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 436865636B73207468697320636F6D70696C65722773206B6E6F776E20636C617373657320616E6420616C6C206F662069747320656E636C6F73696E6720636F6D70696C65727320666F72206120636C617373206E616D65642060636C6173734E616D65602E2052657475726E732074686520636C617373206465636C61726174696F6E2073746174656D656E74206F72204E696C206966206E6F7420666F756E642E
 		Private Function FindClass(className As String) As ObjoScript.ClassDeclStmt
 		  /// Checks this compiler's known classes and all of its enclosing compilers for a class named `className`.
@@ -865,17 +890,18 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles a "++" or "--" postfix expression.
 		  /// Assumes `postfix` is a "++" or "--" expression.
 		  
-		  // The "++" and "--" operators require a variable name as their left hand operand.
+		  // The "++" and "--" operators require a variable or field as their left hand operand.
 		  Select Case postfix.Operand
 		  Case IsA ObjoScript.VariableExpr, IsA ObjoScript.FieldExpr, IsA ObjoScript.StaticFieldExpr
 		    // Allowed.
 		  Else
-		    Error("The postfix `" + postfix.Operator.ToString + "` operator expects a variable name as its operand.")
+		    Error("The postfix `" + postfix.Operator.ToString + "` operator expects a variable or field as its operand.")
 		  End Select
 		  
 		  // Compile the operand.
 		  Call postfix.Operand.Accept(Self)
 		  
+		  // Manipulate the operand.
 		  Select Case postfix.Operator
 		  Case ObjoScript.TokenTypes.PlusPlus
 		    // Increment the value on the top of the stack by 1.
@@ -894,13 +920,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Assignment(ObjoScript.VariableExpr(postfix.Operand).Name)
 		    
 		  Case IsA ObjoScript.FieldExpr
-		    #Pragma Warning "TODO"
-		    Error("Postfix increment/decrement not yet implemented for instance fields.")
+		    FieldAssignment(ObjoScript.FieldExpr(postfix.Operand).Name, False)
 		    
 		  Case IsA ObjoScript.StaticFieldExpr
-		    #Pragma Warning "TODO"
-		    Error("Postfix increment/decrement not yet implemented for static fields.")
-		    
+		    FieldAssignment(ObjoScript.StaticFieldExpr(postfix.Operand).Name, True)
 		  End Select
 		End Sub
 	#tag EndMethod
@@ -1503,19 +1526,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Evaluate the value to assign, leaving it on the top of the stack.
 		  Call expr.Value.Accept(Self)
 		  
-		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
-		    Error("Instance fields can only be accessed from within a method or constructor.")
-		  End If
-		  
-		  If Self.IsStaticMethod Then
-		    Error("Instance fields can only be accessed from within an instance method, not a static method.")
-		  End If
-		  
-		  // Add the name of the field to the constant pool and get its index.
-		  Var index As Integer = AddConstant(expr.Name)
-		  
-		  // Emit the set field instruction.
-		  EmitIndexedOpcode(ObjoScript.VM.OP_SET_FIELD, ObjoScript.VM.OP_SET_FIELD_LONG, index)
+		  // Assign the value on the top of the stack to this field.
+		  FieldAssignment(expr.Name, False)
 		  
 		End Function
 	#tag EndMethod
@@ -2021,15 +2033,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Evaluate the value to assign, leaving it on the top of the stack.
 		  Call expr.Value.Accept(Self)
 		  
-		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
-		    Error("Static fields can only be accessed from within a method or constructor.")
-		  End If
-		  
-		  // Add the name of the field to the constant pool and get its index.
-		  Var index As Integer = AddConstant(expr.Name)
-		  
-		  // Emit the set static field instruction.
-		  EmitIndexedOpcode(ObjoScript.VM.OP_SET_STATIC_FIELD, ObjoScript.VM.OP_SET_STATIC_FIELD_LONG, index)
+		  // Assign the value on the top of the stack to this field.
+		  FieldAssignment(expr.Name, True)
 		  
 		End Function
 	#tag EndMethod

@@ -314,7 +314,7 @@ Begin DesktopWindow WinIDE
       Tooltip         =   ""
       Top             =   54
       Transparent     =   False
-      Value           =   1
+      Value           =   4
       Visible         =   True
       Width           =   678
       Begin DesktopListBox TokensListbox
@@ -493,7 +493,7 @@ Begin DesktopWindow WinIDE
          HasNodeTextColor=   False
          HasSelectionColor=   False
          HasSelectionTextColor=   False
-         Height          =   490
+         Height          =   510
          InactiveSelectionColor=   &cD3D3D300
          Index           =   -2147483648
          InitialParent   =   "Panel"

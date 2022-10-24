@@ -38,14 +38,14 @@ Protected Class Debugger
 		  
 		  Select Case opcode
 		  Case ObjoScript.VM.OP_CONSTANT, ObjoScript.VM.OP_DEFINE_GLOBAL, ObjoScript.VM.OP_GET_GLOBAL, _
-		    ObjoScript.VM.OP_SET_GLOBAL, ObjoScript.VM.OP_SET_FIELD, ObjoScript.VM.OP_GET_FIELD, _
-		    ObjoScript.VM.OP_GET_STATIC_FIELD
+		    ObjoScript.VM.OP_SET_GLOBAL, ObjoScript.VM.OP_SET_FIELD, ObjoScript.VM.OP_SET_STATIC_FIELD, _
+		    ObjoScript.VM.OP_GET_FIELD, ObjoScript.VM.OP_GET_STATIC_FIELD
 		    constantIndex = chunk.ReadByte(offset + 1)
 		    offset = offset + 2
 		    
 		  Case ObjoScript.VM.OP_CONSTANT_LONG, ObjoScript.VM.OP_DEFINE_GLOBAL_LONG, _
 		    ObjoScript.VM.OP_GET_GLOBAL_LONG, ObjoScript.VM.OP_SET_GLOBAL_LONG, ObjoScript.VM.OP_CONSTRUCTOR, _
-		    ObjoScript.VM.OP_SET_FIELD_LONG, _
+		    ObjoScript.VM.OP_SET_FIELD_LONG, ObjoScript.VM.OP_SET_STATIC_FIELD_LONG, _
 		    ObjoScript.VM.OP_GET_FIELD_LONG, ObjoScript.VM.OP_GET_STATIC_FIELD_LONG
 		    constantIndex = chunk.ReadUInt16(offset + 1)
 		    offset = offset + 3
@@ -320,6 +320,12 @@ Protected Class Debugger
 		    
 		  Case ObjoScript.VM.OP_SET_FIELD_LONG
 		    Return ConstantInstruction(opcode, chunk, "SET_FIELD_LONG", offset)
+		    
+		  Case ObjoScript.VM.OP_SET_STATIC_FIELD
+		    Return ConstantInstruction(opcode, chunk, "SET_STATIC_FIELD", offset)
+		    
+		  Case ObjoScript.VM.OP_SET_STATIC_FIELD_LONG
+		    Return ConstantInstruction(opcode, chunk, "SET_STATIC_FIELD_LONG", offset)
 		    
 		  Case ObjoScript.VM.OP_CONSTRUCTOR
 		    Return Instruction8BitOperand("CONSTRUCTOR", chunk, offset)
