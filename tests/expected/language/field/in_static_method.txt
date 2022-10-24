@@ -1,0 +1,1 @@
+Instance fields can only be accessed from within an instance method, not a static method.

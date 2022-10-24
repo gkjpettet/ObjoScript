@@ -1464,7 +1464,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
 		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
-		    Error("Fields can only be accessed from within a method or constructor.")
+		    Error("Instance fields can only be accessed from within an instance method or constructor.")
+		  End If
+		  
+		  If Self.IsStaticMethod Then
+		    Error("Instance fields can only be accessed from within an instance method, not a static method.")
 		  End If
 		  
 		  // Add the name of the field to the constant pool and get its index.
@@ -1486,7 +1490,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Call expr.Value.Accept(Self)
 		  
 		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
-		    Error("Fields can only be accessed from within a method or constructor.")
+		    Error("Instance fields can only be accessed from within a method or constructor.")
+		  End If
+		  
+		  If Self.IsStaticMethod Then
+		    Error("Instance fields can only be accessed from within an instance method, not a static method.")
 		  End If
 		  
 		  // Add the name of the field to the constant pool and get its index.

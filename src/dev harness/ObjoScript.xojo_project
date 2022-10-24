@@ -127,6 +127,7 @@ Class=XojoUnitTestFailedException;Unit Tests/TestFramework/XojoUnitTestFailedExc
 Class=ObjoScriptTestController;Unit Tests/Tests/ObjoScriptTestController.xojo_code;&h000000003FC78D4E;&h000000000BB987FF;false
 Class=LanguageAssignmentTests;Unit Tests/Tests/LanguageAssignmentTests.xojo_code;&h0000000064D907FF;&h000000000BB987FF;false
 Class=LanguageExitTests;Unit Tests/Tests/LanguageExitTests.xojo_code;&h000000000195C7FF;&h000000000BB987FF;false
+Class=LanguageFieldTests;Unit Tests/Tests/LanguageFieldTests.xojo_code;&h0000000031258FFF;&h000000000BB987FF;false
 Class=LanguageSuperTests;Unit Tests/Tests/LanguageSuperTests.xojo_code;&h000000003F3897FF;&h000000000BB987FF;false
 Class=LanguageCommentTests;Unit Tests/Tests/LanguageCommentTests.xojo_code;&h00000000357EE7FF;&h000000000BB987FF;false
 Class=LanguageConditionalTests;Unit Tests/Tests/LanguageConditionalTests.xojo_code;&h0000000005DE07FF;&h000000000BB987FF;false

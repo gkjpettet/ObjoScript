@@ -1,0 +1,7 @@
+class Foo {
+  constructor() {}
+  
+write() { System.print(_field) }
+}
+
+Foo().write() // expect: nothing.

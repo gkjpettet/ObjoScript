@@ -470,6 +470,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  node.AppendNode(New TreeViewNode("Is setter: " + If(m.IsSetter, "True", "False")))
 		  
+		  node.AppendNode(New TreeViewNode("Static: " + If(m.IsStatic, "True", "False")))
+		  
 		  // Parameters.
 		  Var paramsNode As TreeViewNode
 		  If m.Parameters.Count = 0 Then
