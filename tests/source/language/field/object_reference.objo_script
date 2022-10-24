@@ -1,0 +1,32 @@
+class Node {
+  constructor(left, value, right) {
+    _left = left
+    _value = value
+    _right = right
+  }
+
+  write() {
+    if (_left is Node) {
+      _left.write()
+    }
+
+    System.print(_value)
+
+    if (_right is Node) {
+      _right.write()
+    }
+  }
+}
+
+var a = Node(nothing, "a", nothing)
+var b = Node(nothing, "b", nothing)
+var c = Node(a, "c", b)
+a = nothing
+b = nothing
+var d = Node(c, "d", nothing)
+c = nothing
+d.write()
+// expect: a
+// expect: c
+// expect: b
+// expect: d

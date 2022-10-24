@@ -1,0 +1,4 @@
+for // expect error as condition on new line.
+(var i = 0; i < 10; i++) {
+System.print(i)
+}

@@ -15,6 +15,33 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub MultipleTest()
+		  AssertOutputsEqual("language.field.multiple")
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ObjectReferenceTest()
+		  AssertOutputsEqual("language.field.object_reference")
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub OutsideClassTest()
+		  AssertCompilerError("language.field.outside_class")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub UseBeforeSetTest()
+		  AssertOutputsEqual("language.field.use_before_set")
+		  
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

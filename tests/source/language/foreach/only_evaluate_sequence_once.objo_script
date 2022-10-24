@@ -1,0 +1,12 @@
+function f() {
+  System.print("evaluate sequence")
+  return [1, 2, 3]
+}
+
+foreach i in f() {
+ System.print(i)
+}
+// expect: evaluate sequence
+// expect: 1
+// expect: 2
+// expect: 3

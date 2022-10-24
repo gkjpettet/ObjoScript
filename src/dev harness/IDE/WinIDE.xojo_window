@@ -60,7 +60,7 @@ Begin DesktopWindow WinIDE
       HasTopBorder    =   False
       Height          =   564
       HighlightCurrentLine=   True
-      HighlightDelimitersAroundCaret=   True
+      HighlightDelimitersAroundCaret=   False
       Index           =   -2147483648
       InitialParent   =   ""
       JustTokenised   =   False
