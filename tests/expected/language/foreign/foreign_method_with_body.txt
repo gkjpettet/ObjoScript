@@ -1,0 +1,1 @@
+Expected a new line after foreign method declaration.
