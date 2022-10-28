@@ -1,0 +1,5 @@
+false
+nothing
+true
+0
+empty

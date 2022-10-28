@@ -1,0 +1,11 @@
+if true {
+System.print("good") // expect: good
+} else {
+ System.print("bad")
+}
+
+if false {
+System.print("bad") 
+} else {
+System.print("good") // expect: good
+}

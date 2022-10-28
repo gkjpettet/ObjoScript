@@ -136,6 +136,7 @@ Class=LanguageCommentTests;Unit Tests/Tests/LanguageCommentTests.xojo_code;&h000
 Class=LanguageConditionalTests;Unit Tests/Tests/LanguageConditionalTests.xojo_code;&h0000000005DE07FF;&h000000000BB987FF;false
 Class=LanguageConstructorTests;Unit Tests/Tests/LanguageConstructorTests.xojo_code;&h00000000242847FF;&h000000000BB987FF;false
 Class=LanguageClassTests;Unit Tests/Tests/LanguageClassTests.xojo_code;&h000000003DBFFFFF;&h000000000BB987FF;false
+Class=LanguageIfTests;Unit Tests/Tests/LanguageIfTests.xojo_code;&h0000000056B50FFF;&h000000000BB987FF;false
 Folder=UI;Unit Tests/UI;&h0000000003D06FFF;&h000000002516B04D;false
 MenuBar=MenuBarTests;Unit Tests/UI/MenuBarTests.xojo_menu;&h000000002BBD1FFF;&h0000000003D06FFF;false
 DesktopWindow=WinObjoScriptUnitTests;Unit Tests/UI/WinObjoScriptUnitTests.xojo_window;&h000000005E851226;&h0000000003D06FFF;false

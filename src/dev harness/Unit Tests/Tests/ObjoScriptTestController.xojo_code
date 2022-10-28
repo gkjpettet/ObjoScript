@@ -19,6 +19,7 @@ Inherits TestController
 		  group = New LanguageForEachTests(Self, "Language - ForEach")
 		  group = New LanguageForeignTests(Self, "Language - Foreign")
 		  group = New LanguageFunctionTests(Self, "Language - Function")
+		  group = New LanguageIfTests(Self, "Language - If")
 		End Sub
 	#tag EndEvent
 

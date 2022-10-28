@@ -1,39 +1,39 @@
 #tag Class
-Protected Class LanguageFunctionTests
+Protected Class LanguageIfTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
-		Sub BlockOnNewlineTest()
-		  AssertCompilerError("language.function.block_on_newline")
+		Sub ChainedSingleLineTest()
+		  AssertOutputsEqual("language.if.chained_single_line")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub EmptyBodyTest()
-		  AssertOutputsEqual("language.function.empty_body")
+		Sub ElseTest()
+		  AssertOutputsEqual("language.if.else")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub NewlineBodyTest()
-		  AssertOutputsEqual("language.function.newline_body")
+		Sub IfTest()
+		  AssertOutputsEqual("language.if.if")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub NoParametersTest()
-		  AssertCompilerError("language.function.no_parameters")
+		Sub MissingThenTest()
+		  AssertCompilerError("language.if.missing_then")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub ParametersTest()
-		  AssertOutputsEqual("language.function.parameters")
+		Sub NewlineAfterIfTest()
+		  AssertCompilerError("language.if.newline_after_if")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub SyntaxTest()
-		  AssertOutputsEqual("language.function.syntax")
+		Sub TruthTest()
+		  AssertOutputsEqual("language.if.truth")
 		End Sub
 	#tag EndMethod
 

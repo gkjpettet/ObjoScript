@@ -1,0 +1,2 @@
+if // expect error
+(true) then System.print("bad")
