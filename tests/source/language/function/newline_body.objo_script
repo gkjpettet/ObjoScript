@@ -1,0 +1,5 @@
+function f() {
+  // Hi.
+}
+
+System.print(f()) // expect: nothing.

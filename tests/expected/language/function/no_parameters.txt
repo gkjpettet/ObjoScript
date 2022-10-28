@@ -1,0 +1,1 @@
+Expected an opening parenthesis after the function's name.
