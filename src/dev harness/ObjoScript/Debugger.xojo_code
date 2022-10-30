@@ -369,6 +369,9 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_LIST
 		    Return Instruction8BitOperand("LIST", chunk, offset)
 		    
+		  Case ObjoScript.VM.OP_SWAP
+		    Return SimpleInstruction("SWAP", offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select

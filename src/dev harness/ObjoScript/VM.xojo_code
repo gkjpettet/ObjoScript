@@ -1398,8 +1398,15 @@ Protected Class VM
 		      
 		    Case OP_LIST
 		      CreateListLiteral(ReadByte)
-		      ' Var elementCount As Integer = ReadByte
-		      ' Call CallValue(Peek(elementCount), 0)
+		      
+		    Case OP_SWAP
+		      // Swap the two values on the top of the stack.
+		      // Do this in-place to avoid Push/Pop calls.
+		      ' b        a
+		      ' a   -->  b
+		      Var b As Variant = Stack(StackTop - 1)
+		      Stack(StackTop - 1) = Stack(StackTop - 2)
+		      Stack(StackTop - 2) = b
 		      
 		    End Select
 		  Wend
@@ -1812,7 +1819,7 @@ Protected Class VM
 		49: OP_GET_LOCAL_CLASS (1)
 		50: OP_METHOD (3)
 		51: OP_IS (0)
-		52: *Unused*
+		52: OP_SWAP (0)
 		53: *Unused*
 		54: *Unused*
 		55: *Unused*
@@ -1973,7 +1980,8 @@ Protected Class VM
 			  OP_LOCAL_VAR_DEC          : 3, _
 			  OP_BITWISE_NOT            : 0, _
 			  OP_SUPER_CONSTRUCTOR      : 3, _
-			  OP_LIST                   : 1 _
+			  OP_LIST                   : 1, _
+			  OP_SWAP                   : 0 _
 			  )
 			  
 			  Return d
@@ -2216,6 +2224,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SUPER_SETTER, Type = Double, Dynamic = False, Default = \"66", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SWAP, Type = Double, Dynamic = False, Default = \"52", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_TRUE, Type = Double, Dynamic = False, Default = \"16", Scope = Public

@@ -1,0 +1,27 @@
+class Foo {
+  constructor() {}
+
+  getter() {
+    System.print("getter")
+  }
+
+  setter=(value) {
+    System.print("setter")
+  }
+
+  method(a) {
+    System.print("method")
+  }
+}
+
+class Bar is Foo {
+  constructor() {}
+
+  test() {
+    getter()          // expect: getter
+    setter = "value"  // expect: setter
+    method("arg")     // expect: method
+  }
+}
+
+Bar().test()

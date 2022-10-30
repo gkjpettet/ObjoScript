@@ -30,29 +30,68 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 436F6D70696C657320616E2061737369676E6D656E7420746F2061207661726961626C65206E616D656420606E616D65602E
+	#tag Method, Flags = &h21, Description = 436F6D70696C657320616E2061737369676E6D656E7420746F2061207661726961626C65206F7220736574746572206E616D656420606E616D65602E
 		Private Sub Assignment(name As String)
-		  /// Compiles an assignment to a variable named `name`.
+		  /// Compiles an assignment to a variable or setter named `name`.
 		  ///
 		  /// The value to assign will already be on the top of the stack.
 		  
+		  // This might be a setter call so compute its signature now.
+		  Var signature As String = ObjoScript.Func.ComputeSignature(name, 1, True)
+		  Var isSetter As Boolean = False
+		  
 		  Var arg As Integer = ResolveLocal(name)
 		  If arg <> -1 Then
-		    // Set a local variable.
+		    // Simplest case - set a local variable.
 		    EmitBytes(ObjoScript.VM.OP_SET_LOCAL, arg)
+		    
+		  ElseIf (Self.Type = ObjoScript.FunctionTypes.Method Or Self.Type = ObjoScript.FunctionTypes.Constructor) And _
+		    ClassHierarchyHasInstanceMethodWithSignature(CurrentClass, signature) Then
+		    // This is a call to an instance setter method.
+		    If Self.IsStaticMethod Then
+		      Error("Cannot call an instance setter method from within a static method.")
+		    Else
+		      // Slot 0 of the call frame will be the instance. Push it onto the stack.
+		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		    End If
+		    isSetter = True
+		    
+		  ElseIf (Self.Type = ObjoScript.FunctionTypes.Method Or Self.Type = ObjoScript.FunctionTypes.Constructor) And _
+		    ClassHierarchyHasStaticMethodWithSignature(CurrentClass, signature) Then
+		    // This is a call to a static setter method.
+		    If Self.IsStaticMethod Then
+		      // We're calling a static method from within a static method. Therefore, slot 0 of the call frame 
+		      // will be the class. Push it onto the stack.
+		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		    Else
+		      // We're calling a static method from within an instance method. Therefore, slot 0 of the 
+		      // call frame will be the instance. Push its class onto the stack.
+		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL_CLASS, 0)
+		    End If
+		    isSetter = True
+		    
 		  Else
-		    // Set a global variable.
+		    // Can't find a local variable or setter with this name. Assumes it's a global variable.
 		    // Add the name of the variable to the constant pool and get its index.
 		    Var index As Integer = AddConstant(name)
-		    If index <= 255 Then
-		      // We only need a single byte operand to specify the index of the assignee's name in the constant pool.
-		      EmitBytes(ObjoScript.VM.OP_SET_GLOBAL, index)
-		    Else
-		      // We need two bytes for the operand.
-		      EmitByte(ObjoScript.VM.OP_SET_GLOBAL_LONG)
-		      EmitUInt16(index)
-		    End If
+		    EmitIndexedOpcode(ObjoScript.VM.OP_SET_GLOBAL, ObjoScript.VM.OP_SET_GLOBAL_LONG, index)
 		  End If
+		  
+		  If isSetter Then
+		    // Currently, the top of the stack is the class (if this is a static method) or the instance
+		    // containing the setter and underneath it is the setter's argument. We need to swap this.
+		    EmitByte(ObjoScript.VM.OP_SWAP)
+		    
+		    // Load the method's signature into the constant pool.
+		    Var index As Integer = AddConstant(signature)
+		    
+		    // Emit the OP_INVOKE instruction and the index of the setter's signature in the constant pool
+		    EmitIndexedOpcode(ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_INVOKE_LONG, index)
+		    
+		    // Emit the argument count (always 1 for setters).
+		    EmitByte(1)
+		  End If
+		  
 		End Sub
 	#tag EndMethod
 
@@ -101,6 +140,46 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  EmitBytes(ObjoScript.VM.OP_CALL, arguments.Count)
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060737562636C617373602068617360206F722068617320696E686572697465646020616E20696E7374616E6365206D6574686F64207769746820607369676E6174757265602E
+		Private Function ClassHierarchyHasInstanceMethodWithSignature(subclass As ObjoScript.ClassDeclStmt, signature As String) As Boolean
+		  /// Returns True if `subclass` has` or has inherited` an instance method with `signature`.
+		  
+		  If subclass = Nil Then Return False
+		  
+		  If subclass.HasInstanceMethodWithSignature(signature) Then
+		    Return True
+		  Else
+		    If subclass.HasSuperclass Then
+		      Return ClassHierarchyHasInstanceMethodWithSignature(FindClass(subclass.Superclass), signature)
+		    Else
+		      Return False
+		    End If
+		  End If
+		  
+		  Return False
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060737562636C617373602068617360206F722068617320696E6865726974656460206120737461746963206D6574686F64207769746820607369676E6174757265602E
+		Private Function ClassHierarchyHasStaticMethodWithSignature(subclass As ObjoScript.ClassDeclStmt, signature As String) As Boolean
+		  /// Returns True if `subclass` has` or has inherited` a static method with `signature`.
+		  
+		  If subclass = Nil Then Return False
+		  
+		  If subclass.HasStaticMethodWithSignature(signature) Then
+		    Return True
+		  Else
+		    If subclass.HasSuperclass Then
+		      Return ClassHierarchyHasStaticMethodWithSignature(FindClass(subclass.Superclass), signature)
+		    Else
+		      Return False
+		    End If
+		  End If
+		  
+		  Return False
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320726177204F626A6F20736F7572636520636F646520696E746F206120746F70206C6576656C2066756E6374696F6E2E204D6179207261697365206120604C65786572457863657074696F6E602C2060506172736572457863657074696F6E60206F722060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
@@ -1095,9 +1174,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C652061207661726961626C652061737369676E6D656E742E
+	#tag Method, Flags = &h0, Description = 436F6D70696C652061207661726961626C65206F72207365747465722061737369676E6D656E742E
 		Function VisitAssignment(expr As ObjoScript.AssignmentExpr) As Variant
-		  /// Compile a variable assignment.
+		  /// Compile a variable or setter assignment.
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
@@ -1123,9 +1202,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // a global function call.
 		  Var isMethod, isStatic As Boolean = False
 		  If CurrentClass <> Nil Then
-		    If CurrentClass.HasInstanceMethodWithSignature(bi.Signature) Then
+		    If ClassHierarchyHasInstanceMethodWithSignature(CurrentClass, bi.Signature) Then
 		      isMethod = True
-		    ElseIf CurrentClass.HasStaticMethodWithSignature(bi.Signature) Then
+		    ElseIf ClassHierarchyHasStaticMethodWithSignature(CurrentClass, bi.Signature) Then
 		      isMethod = True
 		      isStatic = True
 		    End If
@@ -1139,11 +1218,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ElseIf isStatic Then
 		    // This is a call to a static method.
 		    If Self.IsStaticMethod Then
-		      // We're calling a static method from within a static method. Therefore, slot 0 of the call frame will be the class.
+		      // We're calling a static method from within a static method. Therefore, slot 0 of the call frame 
+		      // will be the class.
 		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
 		    Else
-		      // We're calling a static method from within an instance method. Therefore, slot 0 of the call frame will be the instance.
-		      // Push its class onto the stack.
+		      // We're calling a static method from within an instance method. Therefore, slot 0 of the 
+		      // call frame will be the instance. Push its class onto the stack.
 		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL_CLASS, 0)
 		    End If
 		    
