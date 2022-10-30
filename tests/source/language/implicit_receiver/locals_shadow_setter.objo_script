@@ -1,0 +1,19 @@
+class Foo {
+bar=(value) {
+System.print("setter")
+return value
+}
+
+test() {
+bar = "value" // expect: setter
+{
+bar = "value" // expect: setter
+var bar = "local"
+bar = "value" // no expectation
+System.print(bar) // expect: value
+}
+bar = "value" // expect: setter
+}
+}
+
+Foo().test()

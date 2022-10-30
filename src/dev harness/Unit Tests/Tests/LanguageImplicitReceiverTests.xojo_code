@@ -19,6 +19,18 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub LocalsShadowSetterTest()
+		  AssertOutputsEqual("language.implicit_receiver.locals_shadow_setter")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub StaticMethodsTest()
+		  AssertOutputsEqual("language.implicit_receiver.static_methods")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
