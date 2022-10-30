@@ -818,6 +818,19 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 526574726965766573206120676C6F62616C207661726961626C65206E616D656420606E616D65602E
+		Private Sub GlobalVariable(name As String)
+		  /// Retrieves a global variable named `name`.
+		  
+		  // Add the name of the variable to the constant pool and get its index.
+		  Var index As Integer = AddConstant(name)
+		  
+		  // Push the variable on to the stack.
+		  EmitGetGlobal(index)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 436F6D70696C65732061206C6F676963616C2060616E64602065787072657373696F6E2E
 		Private Sub LogicalAnd(logical As ObjoScript.LogicalExpr)
 		  /// Compiles a logical `and` expression.
@@ -896,24 +909,61 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 436F6D70696C65732072657472696576696E672061207661726961626C65206E616D656420606E616D65602E
+	#tag Method, Flags = &h21, Description = 436F6D70696C65732072657472696576696E672061207661726961626C65206E616D656420606E616D6560206F722074686520696E766F636174696F6E206F662061206D6574686F642077697468206E6F20617267756D656E7473206E616D656420606E616D65602E
 		Private Sub NamedVariable(name As String)
-		  /// Compiles retrieving a variable named `name`.
+		  /// Compiles retrieving a variable named `name` or the invocation of a method with no arguments 
+		  /// named `name`.
+		  
+		  // This might be a getter call so compute its signature now.
+		  Var signature As String = ObjoScript.Func.ComputeSignature(name, 0, False)
+		  Var isGetter As Boolean = False
 		  
 		  Var arg As Integer = ResolveLocal(name)
 		  If arg <> -1 Then
-		    // Retrieve a local variable.
+		    // Simplest case - retrieve a local variable.
 		    // Tell the VM to push the value at slot `arg` on to the top of the stack.
 		    EmitBytes(ObjoScript.VM.OP_GET_LOCAL, arg)
 		    
+		  ElseIf (Self.Type = ObjoScript.FunctionTypes.Method Or Self.Type = ObjoScript.FunctionTypes.Constructor) And _
+		    ClassHierarchyHasInstanceMethodWithSignature(CurrentClass, signature) Then
+		    // This is a call to an instance getter method.
+		    If Self.IsStaticMethod Then
+		      Error("Cannot call an instance getter method from within a static method.")
+		    Else
+		      // Slot 0 of the call frame will be the instance. Push it onto the stack.
+		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		    End If
+		    isGetter = True
+		    
+		  ElseIf (Self.Type = ObjoScript.FunctionTypes.Method Or Self.Type = ObjoScript.FunctionTypes.Constructor) And _
+		    ClassHierarchyHasStaticMethodWithSignature(CurrentClass, signature) Then
+		    // This is a call to a static getter method.
+		    If Self.IsStaticMethod Then
+		      // We're calling a static method from within a static method. Therefore, slot 0 of the call frame 
+		      // will be the class. Push it onto the stack.
+		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		    Else
+		      // We're calling a static method from within an instance method. Therefore, slot 0 of the 
+		      // call frame will be the instance. Push its class onto the stack.
+		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL_CLASS, 0)
+		    End If
+		    isGetter = True
+		    
 		  Else
-		    // Retrieve a global variable.
-		    // Add the name of the variable to the constant pool and get its index.
-		    Var index As Integer = AddConstant(name)
-		    // Push the variable on to the stack.
-		    EmitGetGlobal(index)
+		    // Not a local variable or a getter method - assume we're retrieving a global variable.
+		    GlobalVariable(name)
 		  End If
 		  
+		  If isGetter Then
+		    // Load the getter's signature into the constant pool.
+		    Var index As Integer = AddConstant(signature)
+		    
+		    // Emit the OP_INVOKE instruction and the index of the getter's signature in the constant pool
+		    EmitIndexedOpcode(ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_INVOKE_LONG, index)
+		    
+		    // Emit the argument count (always 0 for setters).
+		    EmitByte(0)
+		  End If
 		End Sub
 	#tag EndMethod
 
@@ -1435,8 +1485,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Emit the "declare class" opcode. This will push the class on to the top of the stack.
 		  EmitByte(VM.OP_CLASS, c.Location)
+		  
 		  // The first operand is the index of the name of the class.
 		  EmitUInt16(index, c.Location)
+		  
 		  // The second operand tells the VM if this is a foreign class (1) or not (0).
 		  EmitByte(If(c.IsForeign, 1, 0))
 		  
@@ -1447,8 +1499,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  EmitGetGlobal(index)
 		  
 		  If c.HasSuperclass Then
-		    // Look up the superclass and push it on to the stack.
-		    NamedVariable(c.Superclass)
+		    // Look up the superclass by name and push it on to the stack. Classes are always globally defined.
+		    GlobalVariable(c.Superclass)
 		    // Tell the VM that this class inherits from the class on the stack.
 		    // The VM will pop the superclass off the stack when its done handling the inheritance.
 		    EmitByte(ObjoScript.VM.OP_INHERIT, c.Location)
@@ -1878,7 +1930,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  mLocation = expr.Location
 		  
 		  // Retrieve the List class. It should have been defined globally in the standard library.
-		  NamedVariable("List")
+		  GlobalVariable("List")
 		  
 		  // Make sure no more than 255 initial elements are defined.
 		  If expr.Elements.Count > 255 Then
@@ -2037,7 +2089,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  mLocation = r.Location
 		  
 		  // Retrieve the Range class. It should have been defined globally in the standard library.
-		  NamedVariable("Range")
+		  GlobalVariable("Range")
 		  
 		  // The lower and upper bounds need compiling to leave them on the top of the stack.
 		  // The lower bounds is compiled as is.
@@ -2512,9 +2564,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C65732072657472696576696E672061206E616D6564207661726961626C652E
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732072657472696576696E672061206E616D6564207661726961626C65206F7220616E20696E766F636174696F6E20746F2061206D6574686F642077697468206E6F20617267756D656E74732E
 		Function VisitVariable(expr As ObjoScript.VariableExpr) As Variant
-		  /// Compiles retrieving a named variable.
+		  /// Compiles retrieving a named variable or an invocation to a method with no arguments.
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  

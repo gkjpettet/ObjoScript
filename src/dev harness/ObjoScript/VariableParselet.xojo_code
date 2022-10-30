@@ -26,8 +26,8 @@ Implements ObjoScript.PrefixParselet
 		    parser.Consume(ObjoScript.TokenTypes.RParen, "Expected a `)` after the method call's arguments.")
 		    Return New ObjoScript.BareInvocationExpr(identifier, arguments)
 		  Else
-		    // This is the lookup of a variable named `identifier.Lexeme`.
-		    Return New VariableExpr(identifier)
+		    // This is the lookup of a variable named `identifier.Lexeme` or a call to a method with no arguments.
+		    Return New ObjoScript.VariableExpr(identifier)
 		  End If
 		  
 		  
