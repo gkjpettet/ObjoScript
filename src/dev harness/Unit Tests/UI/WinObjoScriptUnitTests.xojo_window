@@ -1435,6 +1435,7 @@ End
 		  
 		  TestSourceCodeArea.Clear
 		  TestSourceCodeArea.Insert(sourcecode, 0, False)
+		  TestSourceCodeArea.SetFocus
 		  
 		End Sub
 	#tag EndMethod

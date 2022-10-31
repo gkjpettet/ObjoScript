@@ -1632,6 +1632,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
+		  #Pragma Warning "TODO: Need to completely rethink fields"
+		  ' They probably need to be an array, not a dictionary.
+		  ' Need to be able to access the fields of all superclasses in the class hierarchy.
+		  ' Currently they are overwritten which is not the desired effect.s
+		  
+		  
+		  
 		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
 		    Error("Instance fields can only be accessed from within an instance method or constructor.")
 		  End If

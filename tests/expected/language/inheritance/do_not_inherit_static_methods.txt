@@ -1,0 +1,1 @@
+There is no static method with signature `methodOnFoo()` on `Bar class`.
