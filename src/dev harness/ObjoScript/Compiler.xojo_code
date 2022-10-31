@@ -1497,6 +1497,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  #Pragma Warning "TODO: Prevent fields in foreign classes"
 		  #Pragma Warning "TODO: Prevent foreign classes inheriting from classes with fields"
 		  #Pragma Warning "TODO: Prevent inheriting from a foreign class"
+		  #Pragma Warning "TODO: Prevent inheriting from built-in classes."
 		  
 		  mLocation = c.Location
 		  
