@@ -142,9 +142,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060737562636C617373602068617360206F722068617320696E686572697465646020616E20696E7374616E6365206D6574686F64207769746820607369676E6174757265602E
+	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060737562636C617373602068617320286F722068617320696E686572697465642920616E20696E7374616E6365206D6574686F64207769746820607369676E6174757265602E
 		Private Function ClassHierarchyHasInstanceMethodWithSignature(subclass As ObjoScript.ClassData, signature As String) As Boolean
-		  /// Returns True if `subclass` has` or has inherited` an instance method with `signature`.
+		  /// Returns True if `subclass` has (or has inherited) an instance method with `signature`.
 		  
 		  If subclass = Nil Then Return False
 		  
@@ -152,6 +152,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Return True
 		  Else
 		    If subclass.Superclass <> Nil Then
+		      // Recurse.
 		      Return ClassHierarchyHasInstanceMethodWithSignature(FindClass(subclass.Superclass.Name), signature)
 		    Else
 		      Return False
@@ -162,9 +163,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060737562636C617373602068617360206F722068617320696E6865726974656460206120737461746963206D6574686F64207769746820607369676E6174757265602E
+	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060737562636C617373602068617320286F722068617320696E6865726974656429206120737461746963206D6574686F64207769746820607369676E6174757265602E
 		Private Function ClassHierarchyHasStaticMethodWithSignature(subclass As ObjoScript.ClassData, signature As String) As Boolean
-		  /// Returns True if `subclass` has` or has inherited` a static method with `signature`.
+		  /// Returns True if `subclass` has (or has inherited) a static method with `signature`.
 		  
 		  If subclass = Nil Then Return False
 		  
@@ -172,6 +173,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Return True
 		  Else
 		    If subclass.Superclass <> Nil Then
+		      // Recurse.
 		      Return ClassHierarchyHasStaticMethodWithSignature(FindClass(subclass.Superclass.Name), signature)
 		    Else
 		      Return False
@@ -1494,10 +1496,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.StmtVisitor interface.
 		  
-		  #Pragma Warning "TODO: Prevent fields in foreign classes"
-		  #Pragma Warning "TODO: Prevent foreign classes inheriting from classes with fields"
 		  #Pragma Warning "TODO: Prevent inheriting from a foreign class"
-		  #Pragma Warning "TODO: Prevent inheriting from built-in classes."
+		  #Pragma Warning "TODO: Prevent inheriting from built-in classes?"
 		  
 		  mLocation = c.Location
 		  
@@ -1525,6 +1525,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  CurrentClass = New ObjoScript.ClassData(c, superclass)
 		  KnownClasses.Value(c.Name) = CurrentClass
 		  
+		  // Declare the class name as a global variable.
 		  DeclareVariable(c.Identifier)
 		  
 		  // Add the name of the class to the function's constants pool.
@@ -1540,7 +1541,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  EmitByte(If(c.IsForeign, 1, 0))
 		  
 		  // The third operand is the total number of fields the class contains (for the entire hierarchy).
-		  // We don't know this yet so we will need to back patch this with the actual number after we're
+		  // We don't know this yet so we will need to back-patch this with the actual number after we're
 		  // done compiling the methods and constructors.
 		  // For now, we'll emit the max number or permitted fields.
 		  EmitByte(255)
@@ -1586,6 +1587,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Validate the field count.
 		  If CurrentClass.TotalFieldCount > 255 Then
 		    Error("Class `" + c.Name + "` has exceed the maximum number of fields (255). This includes inherited ones.")
+		  End If
+		  
+		  // Disallow foreign classes from inheriting from classes with fields. 
+		  // I'm doing this because Wren does and Bob Nystrom must have a good reason for this :)
+		  If c.IsForeign And CurrentClass.TotalFieldCount > CurrentClass.FieldCount Then
+		    Error("Foreign class `" + CurrentClass.Name + "` may not inherit from a class with fields.")
 		  End If
 		  
 		  // Replace our placeholder with the actual number of fields for this class.
@@ -1694,10 +1701,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
+		  // Assert that field access is valid.
 		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
 		    Error("Instance fields can only be accessed from within an instance method or constructor.")
 		  End If
-		  
 		  If Self.IsStaticMethod Then
 		    Error("Instance fields can only be accessed from within an instance method, not a static method.")
 		  End If
@@ -1708,6 +1715,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Error("Classes cannot have more than 255 fields, including inherited ones.")
 		  End If
 		  
+		  // Tell the VM to produce the field's value.
 		  EmitBytes(ObjoScript.VM.OP_GET_FIELD, fieldIndex)
 		  
 		End Function
@@ -2207,6 +2215,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
+		  // Assert that static field access is valid.
 		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
 		    Error("Static fields can only be accessed from within a method or a constructor.")
 		  End If
@@ -2214,7 +2223,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Add the name of the field to the constant pool and get its index.
 		  Var index As Integer = AddConstant(expr.Name)
 		  
-		  // Push the field on to the stack.
+		  // Tell the VM to push the field's value on to the stack.
 		  EmitIndexedOpcode(ObjoScript.VM.OP_GET_STATIC_FIELD, ObjoScript.VM.OP_GET_STATIC_FIELD_LONG, index)
 		  
 		End Function
