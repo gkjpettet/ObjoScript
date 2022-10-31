@@ -7,8 +7,11 @@ Protected Module Range
 		  /// constructor()
 		  /// constructor(lower, upper)
 		  
+		  // We need three fields: _lower, _upper and _next.
+		  instance.Fields.ResizeTo(2)
+		  
 		  If args.Count = 0 Then
-		    instance.ForeignData = 0 : 0
+		    instance.ForeignData = New RangeData(0, 0)
 		    
 		  ElseIf args.Count = 2 Then
 		    // Ensure we've been passed two numbers.
@@ -18,9 +21,7 @@ Protected Module Range
 		    If args(1).Type <> Variant.TypeDouble Then
 		      vm.Error("The `upper` bounds argument should be a number. Instead got " + ObjoScript.VM.ValueToString(args(1)) + ".")
 		    End If
-		    instance.Fields.Value("_lower") = args(0).DoubleValue
-		    instance.Fields.Value("_upper") = args(1).DoubleValue
-		    instance.Fields.Value("_next") = CType(0, Double)
+		    instance.ForeignData = New RangeData(args(0).DoubleValue, args(1).DoubleValue)
 		  Else
 		    vm.Error("Invalid number of arguments (expected 0 or 2, got " + args.Count.ToString + ").")
 		  End If
@@ -54,21 +55,19 @@ Protected Module Range
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
 		  Var iter As Variant = vm.GetSlotValue(1)
 		  
-		  Var next_ As Variant = instance.Fields.Value("_next")
+		  Var data As ObjoScript.LibraryCore.Range.RangeData = instance.ForeignData
 		  
 		  If iter IsA ObjoScript.Nothing Then
-		    next_ = instance.Fields.Value("_lower").DoubleValue
+		    data.NextValue = data.LowerBound
 		  Else
-		    If next_ < instance.Fields.Value("_upper") Then
-		      next_ = next_.DoubleValue + 1
+		    If data.NextValue < data.UpperBound Then
+		      data.NextValue = data.NextValue.DoubleValue + 1
 		    Else
-		      next_ = False
+		      data.NextValue = False
 		    End If
 		  End If
 		  
-		  instance.Fields.Value("_next") = next_
-		  
-		  vm.SetReturn(next_)
+		  vm.SetReturn(data.NextValue)
 		  
 		End Sub
 	#tag EndMethod
@@ -83,7 +82,7 @@ Protected Module Range
 		  
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
 		  
-		  vm.SetReturn(instance.Fields.Value("_next"))
+		  vm.SetReturn(ObjoScript.LibraryCore.Range.RangeData(instance.ForeignData).NextValue)
 		  
 		End Sub
 	#tag EndMethod

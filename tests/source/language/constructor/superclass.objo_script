@@ -27,16 +27,6 @@ class C is B {
   cField() { return _field }
 }
 
-var b = B("one", "two")
-// expect: new A one
-// expect: new B two
-System.print(b is A) // expect: true
-System.print(b is B) // expect: true
-System.print(b is C) // expect: false
-
-System.print(b.aField()) // expect: one
-System.print(b.bField()) // expect: one
-
 var c = C()
 // expect: new A two
 // expect: new B one
@@ -45,6 +35,6 @@ System.print(c is A) // expect: true
 System.print(c is B) // expect: true
 System.print(c is C) // expect: true
 
-System.print(c.aField()) // expect: two
-System.print(c.bField()) // expect: one
-System.print(c.cField()) // expect: c
+System.print(c.aField) // expect: two
+System.print(c.bField) // expect: one
+System.print(c.cField) // expect: c

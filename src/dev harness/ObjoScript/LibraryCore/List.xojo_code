@@ -7,10 +7,7 @@ Protected Module List
 		  /// constructor()
 		  
 		  If args.Count = 0 Then
-		    Var data() As Variant
-		    instance.ForeignData = data
-		    instance.Fields.Value("_next") = False
-		    instance.Fields.Value("_index") = CType(-1, Double)
+		    instance.ForeignData = New ObjoScript.LibraryCore.List.ListData
 		  Else
 		    vm.Error("Invalid number of arguments (expected 0, got " + args.Count.ToString + ").")
 		  End If
@@ -51,34 +48,28 @@ Protected Module List
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
 		  Var iter As Variant = vm.GetSlotValue(1)
 		  
-		  Var next_ As Variant = instance.Fields.Value("_next")
-		  Var index_ As Double = instance.Fields.Value("_index")
-		  
-		  Var elements() As Variant = instance.ForeignData
+		  Var data As ObjoScript.LibraryCore.List.ListData = instance.ForeignData
 		  
 		  If iter IsA ObjoScript.Nothing Then
-		    // Return the first element.
-		    If elements.Count = 0 Then
+		    // Return the first item.
+		    If data.Items.Count = 0 Then
 		      // This is an empty list.
-		      next_ = False
+		      data.NextValue = False
 		    Else
-		      index_ = 0
-		      next_ = elements(0)
+		      data.Index = 0
+		      data.NextValue = data.Items(0)
 		    End If
 		  Else
 		    // Return the next element.
-		    index_ = index_ + 1
-		    If index_ <= elements.LastIndex Then
-		      next_ = elements(index_)
+		    data.Index = data.Index + 1.0
+		    If data.Index <= data.Items.LastIndex Then
+		      data.NextValue = data.Items(data.Index)
 		    Else
-		      next_ = False
+		      data.NextValue = False
 		    End If
 		  End If
 		  
-		  instance.Fields.Value("_next") = next_
-		  instance.Fields.Value("_index") = index_
-		  
-		  vm.SetReturn(next_)
+		  vm.SetReturn(data.NextValue)
 		  
 		End Sub
 	#tag EndMethod
@@ -93,7 +84,7 @@ Protected Module List
 		  
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
 		  
-		  vm.SetReturn(instance.Fields.Value("_next"))
+		  vm.SetReturn(ObjoScript.LibraryCore.List.ListData(instance.ForeignData).NextValue)
 		  
 		End Sub
 	#tag EndMethod
@@ -116,19 +107,17 @@ Protected Module List
 		  End If
 		  Var index As Integer = rawIndex
 		  
-		  // A List's foreign data is an array of variants.
-		  // We need to declare this as a local variable because there is 
-		  // no way in Xojo to case a Variant to a Variant array.
-		  Var data() As Variant = instance.ForeignData
+		  Var data As ObjoScript.LibraryCore.List.ListData = instance.ForeignData
 		  
 		  // Bounds check.
 		  If index < 0 Then
 		    vm.Error("Subscript index must be >= 0.")
-		  ElseIf index > data.LastIndex Then
+		  ElseIf index > data.Items.LastIndex Then
 		    vm.Error("Subscript index out of bounds (" + index.ToString + ").")
 		  End If
 		  
-		  vm.SetReturn(data(index))
+		  vm.SetReturn(data.Items(index))
+		  
 		End Sub
 	#tag EndMethod
 
@@ -152,19 +141,16 @@ Protected Module List
 		  End If
 		  Var index As Integer = rawIndex
 		  
-		  // A List's foreign data is an array of variants.
-		  // We need to declare this as a local variable because there is 
-		  // no way in Xojo to case a Variant to a Variant array.
-		  Var data() As Variant = instance.ForeignData
+		  Var data As ObjoScript.LibraryCore.List.ListData = instance.ForeignData
 		  
 		  // Bounds check.
 		  If index < 0 Then
 		    vm.Error("Subscript index must be >= 0.")
-		  ElseIf index > data.LastIndex Then
+		  ElseIf index > data.Items.LastIndex Then
 		    vm.Error("Subscript index out of bounds (" + index.ToString + ").")
 		  End If
 		  
-		  data(index) = value
+		  data.Items(index) = value
 		  
 		End Sub
 	#tag EndMethod

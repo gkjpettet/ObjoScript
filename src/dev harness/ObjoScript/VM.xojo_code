@@ -85,7 +85,7 @@ Protected Class VM
 		  /// | klass
 		  
 		  // Replace the class with a new blank instance of that class.
-		  Stack(StackTop - argCount - 1) = New ObjoScript.Instance(klass)
+		  Stack(StackTop - argCount - 1) = New ObjoScript.Instance(Self, klass)
 		  
 		  // Invoke the constructor (if defined).
 		  Var constructor As ObjoScript.Func
@@ -301,14 +301,14 @@ Protected Class VM
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 4372656174652061206E6577206C697374206C69746572616C2E2054686520636F6D70696C65722077696C6C206861766520706C6163656420746865204C69737420636C617373206F6E2074686520737461636B20616E6420616E7920696E697469616C20656C656D656E74732061626F766520746869732E
-		Private Sub CreateListLiteral(elementCount As Integer)
+		Private Sub CreateListLiteral(itemCount As Integer)
 		  /// Create a new list literal. The compiler will have placed the List class on the stack
 		  /// and any initial elements above this.
 		  
 		  // Pop and store any optional initial elements.
-		  Var elements() As Variant
-		  For i As Integer = 1 To elementCount
-		    elements.AddAt(0, Pop)
+		  Var items() As Variant
+		  For i As Integer = 1 To itemCount
+		    items.AddAt(0, Pop)
 		  Next i
 		  
 		  // Call the default list constructor.
@@ -317,7 +317,7 @@ Protected Class VM
 		  // The top of the stack will now be a List instance.
 		  // Add the initial elements to it's foreign data.
 		  Var list As ObjoScript.Instance = Stack(StackTop - 1)
-		  list.ForeignData = elements
+		  ObjoScript.LibraryCore.List.ListData(list.ForeignData).Items = items
 		  
 		End Sub
 	#tag EndMethod
@@ -465,9 +465,9 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 526574726965766573207468652076616C7565206F6620616E20696E7374616E6365206669656C64206E616D656420606E616D6560206F6E2074686520696E7374616E63652063757272656E746C79206F6E2074686520746F70206F662074686520737461636B20616E64207468656E20707573686573206974206F6E20746F2074686520746F70206F662074686520737461636B2E
-		Private Sub GetField(name As String)
-		  /// Retrieves the value of an instance field named `name` on the instance currently on the top of the 
+	#tag Method, Flags = &h21, Description = 526574726965766573207468652076616C7565206F6620616E20696E7374616E6365206669656C6420617420606669656C64496E646578602066726F6D2074686520696E7374616E63652063757272656E746C79206F6E2074686520746F70206F662074686520737461636B20616E64207468656E20707573686573206974206F6E20746F2074686520746F70206F662074686520737461636B2E
+		Private Sub GetField(fieldIndex As Integer)
+		  /// Retrieves the value of an instance field at `fieldIndex` from the instance currently on the top of the 
 		  /// stack and then pushes it on to the top of the stack.
 		  
 		  // Since instance fields can only be retrieved from within a method we can safely assume that `this` should be in the 
@@ -484,14 +484,17 @@ Protected Class VM
 		    End If
 		  End If
 		  
-		  // Get the value of the field from the instance.
-		  Var value As Variant = instance.Fields.Lookup(name, Nil)
+		  ' // Get the value of the field from the instance.
+		  ' Var value As Variant = instance.Fields.Lookup(name, Nil)
+		  ' 
+		  ' // If the field doesn't exist then we create it.
+		  ' If value = Nil Then
+		  ' instance.Fields.Value(name) = Nothing
+		  ' value = Nothing
+		  ' End If
 		  
-		  // If the field doesn't exist then we create it.
-		  If value = Nil Then
-		    instance.Fields.Value(name) = Nothing
-		    value = Nothing
-		  End If
+		  // Get the value of the field from the instance.
+		  Var value As Variant = instance.Fields(fieldIndex)
 		  
 		  // Push the value on to the stack.
 		  Push(value)
@@ -810,7 +813,7 @@ Protected Class VM
 		  Case VM.StepModes.StepInto
 		    Select Case opcode
 		    Case OP_ASSERT, OP_SET_LOCAL, OP_SET_GLOBAL, OP_SET_GLOBAL_LONG, _
-		      OP_DEFINE_GLOBAL, OP_DEFINE_GLOBAL_LONG, OP_SET_FIELD, OP_SET_FIELD_LONG, _
+		      OP_DEFINE_GLOBAL, OP_DEFINE_GLOBAL_LONG, OP_SET_FIELD, _
 		      OP_SET_STATIC_FIELD, OP_SET_STATIC_FIELD_LONG, OP_RETURN, OP_LOOP, OP_CALL, _
 		      OP_INVOKE, OP_INVOKE_LONG
 		      Return True
@@ -1335,7 +1338,8 @@ Protected Class VM
 		    Case OP_CLASS
 		      Var className As String = ReadConstantLong
 		      Var isForeign As Boolean = ReadByte = 1
-		      Push(New ObjoScript.Klass(className, isForeign))
+		      Var fieldCount As Integer = ReadByte
+		      Push(New ObjoScript.Klass(className, isForeign, fieldCount))
 		      If isForeign Then
 		        DefineForeignClass
 		      End If
@@ -1344,16 +1348,10 @@ Protected Class VM
 		      DefineMethod(ReadConstantLong, If(ReadByte = 0, False, True))
 		      
 		    Case OP_GET_FIELD
-		      GetField(ReadConstant)
-		      
-		    Case OP_GET_FIELD_LONG
-		      GetField(ReadConstantLong)
+		      GetField(ReadByte)
 		      
 		    Case OP_SET_FIELD
-		      SetField(ReadConstant)
-		      
-		    Case OP_SET_FIELD_LONG
-		      SetField(ReadConstantLong)
+		      SetField(ReadByte)
 		      
 		    Case OP_CONSTRUCTOR
 		      DefineConstructor(ReadByte)
@@ -1414,13 +1412,13 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 536574732061206669656C64206E616D656420606E616D6560206F6E2074686520696E7374616E63652074686174206973206F6E652066726F6D2074686520746F70206F662074686520737461636B20746F207468652076616C7565206F6E2074686520746F70206F662074686520737461636B2E
-		Private Sub SetField(name As String)
-		  /// Sets a field named `name` on the instance that is one from the top of the stack to the value on the top of the stack.
+	#tag Method, Flags = &h21, Description = 5365747320746865206669656C6420617420606669656C64496E64657860206F6E2074686520696E7374616E63652074686174206973206F6E652066726F6D2074686520746F70206F662074686520737461636B20746F207468652076616C7565206F6E2074686520746F70206F662074686520737461636B2E
+		Private Sub SetField(fieldIndex As Integer)
+		  /// Sets the field at `fieldIndex` on the instance that is one from the top of the stack to the value on the top of the stack.
 		  ///
 		  /// |
 		  /// | ValueToAssign   <-- top of the stack
-		  /// | Instance        <-- the instance that should have the field named `name`.
+		  /// | Instance        <-- the instance that should have the field at `fieldIndex`.
 		  /// |
 		  
 		  // Since fields can only be set from within a method we can safely assume that `this` should be in the 
@@ -1437,14 +1435,17 @@ Protected Class VM
 		    End If
 		  End If
 		  
+		  ' // Set the field to the value on the top of the stack and pop it off.
+		  ' // If the field has never been assigned to before then we create it.
+		  ' Var value As Variant = Pop
+		  ' instance.Fields.Value(name) = value
+		  
 		  // Set the field to the value on the top of the stack and pop it off.
-		  // If the field has never been assigned to before then we create it.
 		  Var value As Variant = Pop
-		  instance.Fields.Value(name) = value
+		  instance.Fields(fieldIndex) = value
 		  
 		  // Push the value back on the stack (since this is an expression).
 		  Push(value)
-		  
 		  
 		End Sub
 	#tag EndMethod
@@ -1815,7 +1816,7 @@ Protected Class VM
 		45: OP_BITWISE_NOT (0)
 		46: OP_EXIT (0)
 		47: OP_CALL (1)
-		48: OP_CLASS (3)
+		48: OP_CLASS (4)
 		49: OP_GET_LOCAL_CLASS (1)
 		50: OP_METHOD (3)
 		51: OP_IS (0)
@@ -1824,9 +1825,9 @@ Protected Class VM
 		54: *Unused*
 		55: *Unused*
 		56: OP_GET_FIELD (1)
-		57: OP_GET_FIELD_LONG (2)
+		57: *Unused*
 		58: OP_SET_FIELD (1)
-		59: OP_SET_FIELD_LONG (2)
+		59: *Unused*
 		60: OP_CONSTRUCTOR (1)
 		61: OP_INVOKE (2)
 		62: OP_INVOKE_LONG (3)
@@ -1904,8 +1905,8 @@ Protected Class VM
 		Private mShouldStop As Boolean = False
 	#tag EndProperty
 
-	#tag Property, Flags = &h21, Description = 53696E676C65746F6E20696E7374616E6365206F6620224E6F7468696E67222E
-		Private Nothing As ObjoScript.Nothing
+	#tag Property, Flags = &h0, Description = 53696E676C65746F6E20696E7374616E6365206F6620224E6F7468696E67222E
+		Nothing As ObjoScript.Nothing
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0, Description = 4B6579203D206F70636F64652028496E7465676572292C2056616C7565203D206E756D626572206F66206279746573207573656420666F72206F706572616E64732E
@@ -1958,12 +1959,10 @@ Protected Class VM
 			  OP_RANGE                  : 0, _
 			  OP_EXIT                   : 0, _
 			  OP_CALL                   : 1, _
-			  OP_CLASS                  : 3, _
+			  OP_CLASS                  : 4, _
 			  OP_METHOD                 : 3, _
 			  OP_GET_FIELD              : 1, _
-			  OP_GET_FIELD_LONG         : 2, _
 			  OP_SET_FIELD              : 1, _
-			  OP_SET_FIELD_LONG         : 2, _
 			  OP_CONSTRUCTOR            : 1, _
 			  OP_INVOKE                 : 2, _
 			  OP_INVOKE_LONG            : 3, _
@@ -2079,9 +2078,6 @@ Protected Class VM
 	#tag Constant, Name = OP_GET_FIELD, Type = Double, Dynamic = False, Default = \"56", Scope = Public
 	#tag EndConstant
 
-	#tag Constant, Name = OP_GET_FIELD_LONG, Type = Double, Dynamic = False, Default = \"57", Scope = Public
-	#tag EndConstant
-
 	#tag Constant, Name = OP_GET_GLOBAL, Type = Double, Dynamic = False, Default = \"32", Scope = Public
 	#tag EndConstant
 
@@ -2188,9 +2184,6 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SET_FIELD, Type = Double, Dynamic = False, Default = \"58", Scope = Public
-	#tag EndConstant
-
-	#tag Constant, Name = OP_SET_FIELD_LONG, Type = Double, Dynamic = False, Default = \"59", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SET_GLOBAL, Type = Double, Dynamic = False, Default = \"34", Scope = Public

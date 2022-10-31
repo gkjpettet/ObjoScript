@@ -25,6 +25,43 @@ Protected Class Debugger
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 52657475726E73207468652064657461696C73206F66206120636C61737320696E737472756374696F6E20617420606F66667365746020616E6420696E6372656D656E747320606F66667365746020746F20706F696E7420746F20746865206E65787420696E737472756374696F6E2E
+		Private Function ClassInstruction(chunk As ObjoScript.Chunk, ByRef offset As Integer) As String
+		  /// Returns the details of a class instruction at `offset` and increments `offset` to point to the next instruction.
+		  ///
+		  /// We return the instruction's name, the index of the class' name in the constant pool, the class name, whether
+		  /// it's a foreign class and the total number of fields used by the class.
+		  /// Format:
+		  /// INSTRUCTION_NAME  POOL_INDEX  CLASS_NAME  FIELD_COUNT
+		  
+		  // Get index of the constant.
+		  Var constantIndex As Integer = chunk.ReadUInt16(offset + 1)
+		  
+		  Var isForeign As Boolean = If(chunk.ReadByte(offset + 3) = 1, True, False)
+		  Var name As String = "CLASS" + If(isForeign, " (foreign)", "")
+		  
+		  Var fieldCount As Integer = chunk.ReadByte(offset + 4)
+		  
+		  offset = offset + 5
+		  
+		  // The instruction's name.
+		  Var details As String = name.JustifyLeft(2 * COL_WIDTH)
+		  
+		  // Its index in the pool.
+		  Var indexCol As String = constantIndex.ToString(Locale.Current, "#####")
+		  details = details + indexCol.JustifyLeft(COL_WIDTH)
+		  
+		  // The class' name.
+		  Var className As Variant = chunk.Constants(constantIndex)
+		  details = details + (ObjoScript.VM.ValueToString(className).JustifyLeft(COL_WIDTH))
+		  
+		  details = details + fieldCount.ToString
+		  
+		  Return details
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E73207468652064657461696C73206F66206120636F6E7374616E74206C6F6164696E6720696E737472756374696F6E20617420606F66667365746020616E6420696E6372656D656E747320606F66667365746020746F20706F696E7420746F20746865206E65787420696E737472756374696F6E2E
 		Private Function ConstantInstruction(opcode As UInt8, chunk As ObjoScript.Chunk, name As String, ByRef offset As Integer) As String
 		  /// Returns the details of a constant loading instruction at `offset` and increments `offset` to point to the next instruction.
@@ -45,8 +82,8 @@ Protected Class Debugger
 		    
 		  Case ObjoScript.VM.OP_CONSTANT_LONG, ObjoScript.VM.OP_DEFINE_GLOBAL_LONG, _
 		    ObjoScript.VM.OP_GET_GLOBAL_LONG, ObjoScript.VM.OP_SET_GLOBAL_LONG, ObjoScript.VM.OP_CONSTRUCTOR, _
-		    ObjoScript.VM.OP_SET_FIELD_LONG, ObjoScript.VM.OP_SET_STATIC_FIELD_LONG, _
-		    ObjoScript.VM.OP_GET_FIELD_LONG, ObjoScript.VM.OP_GET_STATIC_FIELD_LONG
+		    ObjoScript.VM.OP_SET_STATIC_FIELD_LONG, _
+		    ObjoScript.VM.OP_GET_STATIC_FIELD_LONG
 		    constantIndex = chunk.ReadUInt16(offset + 1)
 		    offset = offset + 3
 		    
@@ -60,7 +97,7 @@ Protected Class Debugger
 		    Raise New UnsupportedOperationException("Unknown constant opcode.")
 		  End Select
 		  
-		  // The instruction' name.
+		  // The instruction's name.
 		  Var details As String = name.JustifyLeft(2 * COL_WIDTH)
 		  
 		  // Its index in the pool.
@@ -304,22 +341,16 @@ Protected Class Debugger
 		    Return Instruction8BitOperand("CALL", chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_CLASS
-		    Return ConstantInstruction(opcode, chunk, "CLASS", offset)
+		    Return ClassInstruction(chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_METHOD
 		    Return MethodInstruction(opcode, chunk, offset)
 		    
 		  Case ObjoScript.VM.OP_GET_FIELD
-		    Return ConstantInstruction(opcode, chunk, "GET_FIELD", offset)
-		    
-		  Case ObjoScript.VM.OP_GET_FIELD_LONG
-		    Return ConstantInstruction(opcode, chunk, "GET_FIELD_LONG", offset)
+		    Return FieldInstruction(chunk, "GET_FIELD", offset)
 		    
 		  Case ObjoScript.VM.OP_SET_FIELD
-		    Return ConstantInstruction(opcode, chunk, "SET_FIELD", offset)
-		    
-		  Case ObjoScript.VM.OP_SET_FIELD_LONG
-		    Return ConstantInstruction(opcode, chunk, "SET_FIELD_LONG", offset)
+		    Return FieldInstruction(chunk, "SET_FIELD", offset)
 		    
 		  Case ObjoScript.VM.OP_SET_STATIC_FIELD
 		    Return ConstantInstruction(opcode, chunk, "SET_STATIC_FIELD", offset)
@@ -375,6 +406,31 @@ Protected Class Debugger
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E73207468652064657461696C73206F662061206669656C64206765742F73657420696E737472756374696F6E20617420606F66667365746020616E6420696E6372656D656E747320606F66667365746020746F20706F696E7420746F20746865206E65787420696E737472756374696F6E2E
+		Private Function FieldInstruction(chunk As ObjoScript.Chunk, name As String, ByRef offset As Integer) As String
+		  /// Returns the details of a field get/set instruction at `offset` and increments `offset` to point to the next instruction.
+		  ///
+		  /// The operand is the index of the field in the instance's `Fields` array.
+		  /// Format:
+		  /// INSTRUCTION_NAME  FIELDS_INDEX
+		  
+		  // Get index of the constant.
+		  Var fieldIndex As Integer = chunk.ReadByte(offset + 1)
+		  
+		  // The instruction's name.
+		  Var details As String = name.JustifyLeft(2 * COL_WIDTH)
+		  
+		  // The field index.
+		  Var fieldIndexCol As String = fieldIndex.ToString(Locale.Current, "#####")
+		  details = details + fieldIndexCol
+		  
+		  offset = offset + 2
+		  
+		  Return details
+		  
 		End Function
 	#tag EndMethod
 

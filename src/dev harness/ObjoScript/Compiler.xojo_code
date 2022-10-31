@@ -143,16 +143,16 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060737562636C617373602068617360206F722068617320696E686572697465646020616E20696E7374616E6365206D6574686F64207769746820607369676E6174757265602E
-		Private Function ClassHierarchyHasInstanceMethodWithSignature(subclass As ObjoScript.ClassDeclStmt, signature As String) As Boolean
+		Private Function ClassHierarchyHasInstanceMethodWithSignature(subclass As ObjoScript.ClassData, signature As String) As Boolean
 		  /// Returns True if `subclass` has` or has inherited` an instance method with `signature`.
 		  
 		  If subclass = Nil Then Return False
 		  
-		  If subclass.HasInstanceMethodWithSignature(signature) Then
+		  If subclass.Declaration.HasInstanceMethodWithSignature(signature) Then
 		    Return True
 		  Else
-		    If subclass.HasSuperclass Then
-		      Return ClassHierarchyHasInstanceMethodWithSignature(FindClass(subclass.Superclass), signature)
+		    If subclass.Superclass <> Nil Then
+		      Return ClassHierarchyHasInstanceMethodWithSignature(FindClass(subclass.Superclass.Name), signature)
 		    Else
 		      Return False
 		    End If
@@ -163,16 +163,16 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060737562636C617373602068617360206F722068617320696E6865726974656460206120737461746963206D6574686F64207769746820607369676E6174757265602E
-		Private Function ClassHierarchyHasStaticMethodWithSignature(subclass As ObjoScript.ClassDeclStmt, signature As String) As Boolean
+		Private Function ClassHierarchyHasStaticMethodWithSignature(subclass As ObjoScript.ClassData, signature As String) As Boolean
 		  /// Returns True if `subclass` has` or has inherited` a static method with `signature`.
 		  
 		  If subclass = Nil Then Return False
 		  
-		  If subclass.HasStaticMethodWithSignature(signature) Then
+		  If subclass.Declaration.HasStaticMethodWithSignature(signature) Then
 		    Return True
 		  Else
-		    If subclass.HasSuperclass Then
-		      Return ClassHierarchyHasStaticMethodWithSignature(FindClass(subclass.Superclass), signature)
+		    If subclass.Superclass <> Nil Then
+		      Return ClassHierarchyHasStaticMethodWithSignature(FindClass(subclass.Superclass.Name), signature)
 		    Else
 		      Return False
 		    End If
@@ -227,7 +227,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320612066756E6374696F6E206465636C61726174696F6E20696E746F20612066756E6374696F6E2E2052616973657320612060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
-		Function Compile(name As String, parameters() As ObjoScript.Token, body As ObjoScript.BlockStmt, type As ObjoScript.FunctionTypes, currentClass As ObjoScript.ClassDeclStmt, isStaticMethod As Boolean, debugMode As Boolean, shouldResetFirst As Boolean, enclosingCompiler As ObjoScript.Compiler) As ObjoScript.Func
+		Function Compile(name As String, parameters() As ObjoScript.Token, body As ObjoScript.BlockStmt, type As ObjoScript.FunctionTypes, currentClass As ObjoScript.ClassData, isStaticMethod As Boolean, debugMode As Boolean, shouldResetFirst As Boolean, enclosingCompiler As ObjoScript.Compiler) As ObjoScript.Func
 		  /// Compiles a function declaration into a function. Raises a `CompilerException` if an error occurs.
 		  ///
 		  /// Resets by default but if this is being called internally (after the compiler has tokenised and parsed the source) 
@@ -674,34 +674,52 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 41737369676E207468652076616C7565206F6E2074686520746F70206F662074686520737461636B20746F2074686520737065636966696564206669656C642E
-		Private Sub FieldAssignment(fieldName As String, staticField As Boolean)
+		Private Sub FieldAssignment(fieldName As String)
 		  /// Assign the value on the top of the stack to the specified field.
 		  
 		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
 		    Error("Fields can only be accessed from within a method or constructor.")
 		  End If
 		  
-		  If Self.IsStaticMethod And Not staticField Then
+		  If Self.IsStaticMethod Then
 		    Error("Instance fields can only be accessed from within an instance method, not a static method.")
 		  End If
 		  
-		  // Add the name of the field to the constant pool and get its index.
-		  Var index As Integer = AddConstant(fieldName)
-		  
-		  // Emit the correct set field instruction.
-		  If staticField Then
-		    EmitIndexedOpcode(ObjoScript.VM.OP_SET_STATIC_FIELD, ObjoScript.VM.OP_SET_STATIC_FIELD_LONG, index)
-		  Else
-		    EmitIndexedOpcode(ObjoScript.VM.OP_SET_FIELD, ObjoScript.VM.OP_SET_FIELD_LONG, index)
+		  // Get the index of the field to access at runtime.
+		  Var fieldIndex As Integer = FieldIndex(fieldName)
+		  If fieldIndex > 255 Then
+		    Error("Classes cannot have more than 255 fields, including inherited ones.")
 		  End If
+		  
+		  EmitBytes(ObjoScript.VM.OP_SET_FIELD, fieldIndex)
+		  
+		  
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 436865636B73207468697320636F6D70696C65722773206B6E6F776E20636C617373657320616E6420616C6C206F662069747320656E636C6F73696E6720636F6D70696C65727320666F72206120636C617373206E616D65642060636C6173734E616D65602E2052657475726E732074686520636C617373206465636C61726174696F6E2073746174656D656E74206F72204E696C206966206E6F7420666F756E642E
-		Private Function FindClass(className As String) As ObjoScript.ClassDeclStmt
+	#tag Method, Flags = &h21, Description = 52657475726E7320746865206669656C6420696E646578206F6620606669656C644E616D656020666F72202A746869732A20636C61737320286E6F74207375706572636C6173736573292E20546869732069732074686520696E646578207468652072756E74696D652077696C6C206163636573732E
+		Private Function FieldIndex(fieldName As String) As Integer
+		  /// Returns the field index of `fieldName` for *this* class (not any superclasses). This is the index the runtime will access.
+		  
+		  For i As Integer = 0 To CurrentClass.Fields.LastIndex
+		    If CurrentClass.Fields(i).CompareCase(fieldName) Then
+		      Return CurrentClass.FieldStartIndex + i
+		    End If
+		  Next i
+		  
+		  // Doesn't exist yet. Add it.
+		  CurrentClass.Fields.Add(fieldName)
+		  
+		  Return CurrentClass.FieldStartIndex + CurrentClass.Fields.LastIndex
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 436865636B73207468697320636F6D70696C65722773206B6E6F776E20636C617373657320616E6420616C6C206F662069747320656E636C6F73696E6720636F6D70696C65727320666F72206120636C617373206E616D65642060636C6173734E616D65602E2052657475726E732074686520636C6173732064617461206F72204E696C206966206E6F7420666F756E642E
+		Private Function FindClass(className As String) As ObjoScript.ClassData
 		  /// Checks this compiler's known classes and all of its enclosing compilers for a class named `className`.
-		  /// Returns the class declaration statement or Nil if not found.
+		  /// Returns the class data or Nil if not found.
 		  
 		  // Known to this compiler?
 		  If KnownClasses.HasKey(className) Then
@@ -1049,10 +1067,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Assignment(ObjoScript.VariableExpr(postfix.Operand).Name)
 		    
 		  Case IsA ObjoScript.FieldExpr
-		    FieldAssignment(ObjoScript.FieldExpr(postfix.Operand).Name, False)
+		    FieldAssignment(ObjoScript.FieldExpr(postfix.Operand).Name)
 		    
 		  Case IsA ObjoScript.StaticFieldExpr
-		    FieldAssignment(ObjoScript.StaticFieldExpr(postfix.Operand).Name, True)
+		    StaticFieldAssignment(ObjoScript.StaticFieldExpr(postfix.Operand).Name)
 		  End Select
 		End Sub
 	#tag EndMethod
@@ -1138,6 +1156,22 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  Self.CurrentLoop = newLoop
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 41737369676E73207468652076616C7565206F6E2074686520746F70206F662074686520737461636B20746F2074686520737461746963206669656C64206E616D656420606669656C644E616D65602E
+		Private Sub StaticFieldAssignment(fieldName As String)
+		  /// Assigns the value on the top of the stack to the static field named `fieldName`.
+		  
+		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		    Error("Static fields can only be accessed from within a method or constructor.")
+		  End If
+		  
+		  // Add the name of the field to the constant pool and get its index.
+		  Var index As Integer = AddConstant(fieldName)
+		  
+		  // Assign the value on the top of the stack to this field.
+		  EmitIndexedOpcode(ObjoScript.VM.OP_SET_STATIC_FIELD, ObjoScript.VM.OP_SET_STATIC_FIELD_LONG, index)
 		End Sub
 	#tag EndMethod
 
@@ -1462,21 +1496,29 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = c.Location
 		  
-		  // Store data about the class we're about to compile.
-		  If KnownClasses.HasKey(c.Name) Then
+		  If FindClass(c.Name) <> Nil Then
 		    Error("Redefined class `" + c.Name + "`.")
-		  Else
-		    KnownClasses.Value(c.Name) = c
 		  End If
-		  CurrentClass = c
 		  
+		  // We only allow classes to be declared at the top level of a script.
 		  If Self.Type <> ObjoScript.FunctionTypes.TopLevel Then
 		    Error("Classes can only be declared within the top level of a script.")
 		  End If
 		  
-		  If c.HasSuperclass And c.Name.Compare(c.Superclass, ComparisonOptions.CaseSensitive) = 0 Then
+		  // If the class has a superclass, check it's valid and store a reference to it.
+		  Var superclass As ObjoScript.ClassData = Nil
+		  If c.HasSuperclass And c.Name.CompareCase(c.Superclass) Then
 		    Error("A class cannot inherit from itself.")
+		  ElseIf c.HasSuperclass Then
+		    superclass = FindClass(c.Superclass)
+		    If superclass = Nil Then
+		      Error("Class `" + c.Name + "` inherits class `" + c.Superclass + "` but there is no class with this name.")
+		    End If
 		  End If
+		  
+		  // Store data about the class we're about to compile.
+		  CurrentClass = New ObjoScript.ClassData(c, superclass)
+		  KnownClasses.Value(c.Name) = CurrentClass
 		  
 		  DeclareVariable(c.Identifier)
 		  
@@ -1491,6 +1533,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // The second operand tells the VM if this is a foreign class (1) or not (0).
 		  EmitByte(If(c.IsForeign, 1, 0))
+		  
+		  // The third operand is the total number of fields the class contains (for the entire hierarchy).
+		  // We don't know this yet so we will need to back patch this with the actual number after we're
+		  // done compiling the methods and constructors.
+		  // For now, we'll emit the max number or permitted fields.
+		  EmitByte(255)
+		  Var numFieldsOffset As UInt8 = CurrentChunk.Code.LastIndex
 		  
 		  // Define the class as a global variable.
 		  DefineVariable(index)
@@ -1528,6 +1577,14 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Var m As ObjoScript.MethodDeclStmt = entry.Value
 		    Call m.Accept(Self)
 		  Next entry
+		  
+		  // Validate the field count.
+		  If CurrentClass.TotalFieldCount > 255 Then
+		    Error("Class `" + c.Name + "` has exceed the maximum number of fields (255). This includes inherited ones.")
+		  End If
+		  
+		  // Replace our placeholder with the actual number of fields for this class.
+		  CurrentChunk.Code(numFieldsOffset) = CurrentClass.TotalFieldCount
 		  
 		  // Pop the class off the stack.
 		  EmitByte(ObjoScript.VM.OP_POP)
@@ -1632,13 +1689,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
-		  #Pragma Warning "TODO: Need to completely rethink fields"
-		  ' They probably need to be an array, not a dictionary.
-		  ' Need to be able to access the fields of all superclasses in the class hierarchy.
-		  ' Currently they are overwritten which is not the desired effect.s
-		  
-		  
-		  
 		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
 		    Error("Instance fields can only be accessed from within an instance method or constructor.")
 		  End If
@@ -1647,11 +1697,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Error("Instance fields can only be accessed from within an instance method, not a static method.")
 		  End If
 		  
-		  // Add the name of the field to the constant pool and get its index.
-		  Var index As Integer = AddConstant(expr.Name)
+		  // Get the index in this class' Fields array to access at runtime.
+		  Var fieldIndex As Integer = FieldIndex(expr.Name)
+		  If fieldIndex > 255 Then
+		    Error("Classes cannot have more than 255 fields, including inherited ones.")
+		  End If
 		  
-		  // Push the field on to the stack.
-		  EmitIndexedOpcode(ObjoScript.VM.OP_GET_FIELD, ObjoScript.VM.OP_GET_FIELD_LONG, index)
+		  EmitBytes(ObjoScript.VM.OP_GET_FIELD, fieldIndex)
 		  
 		End Function
 	#tag EndMethod
@@ -1666,7 +1718,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Call expr.Value.Accept(Self)
 		  
 		  // Assign the value on the top of the stack to this field.
-		  FieldAssignment(expr.Name, False)
+		  FieldAssignment(expr.Name)
 		  
 		End Function
 	#tag EndMethod
@@ -2172,8 +2224,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Evaluate the value to assign, leaving it on the top of the stack.
 		  Call expr.Value.Accept(Self)
 		  
-		  // Assign the value on the top of the stack to this field.
-		  FieldAssignment(expr.Name, True)
+		  StaticFieldAssignment(expr.Name)
 		  
 		End Function
 	#tag EndMethod
@@ -2265,32 +2316,26 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  End If
 		  
 		  // Check this class actually has a superclass.
-		  If CurrentClass.Superclass = "" Then
+		  If CurrentClass.Superclass = Nil Then
 		    Error("Class `" + CurrentClass.Name + "` does not have a superclass.")
-		  End If
-		  
-		  // Get the class declaration for this class' superclass, if it exists.
-		  Var superclassDecl As ObjoScript.ClassDeclStmt = FindClass(CurrentClass.Superclass)
-		  If superclassDecl = Nil Then
-		    Error("Class `" + CurrentClass.Name + "` inherits `" + CurrentClass.Superclass + "` but there is no class with this name.")
 		  End If
 		  
 		  // Check the superclass has a constructor with this many arguments.
 		  If s.Arguments.Count > 0 Then
 		    Var superHasMatchingConstructor As Boolean = False
-		    For Each constructor As ObjoScript.ConstructorDeclStmt In superclassDecl.Constructors
+		    For Each constructor As ObjoScript.ConstructorDeclStmt In CurrentClass.Superclass.Declaration.Constructors
 		      If constructor.Arity = s.Arguments.Count Then
 		        superHasMatchingConstructor = True
 		        Exit
 		      End If
 		    Next constructor
 		    If Not superHasMatchingConstructor Then
-		      Error("The superclass (`" + CurrentClass.Superclass + "`) of `" + CurrentClass.Name + "` does not define a constructor with " + s.Arguments.Count.ToString + " arguments.")
+		      Error("The superclass (`" + CurrentClass.Superclass.Name + "`) of `" + CurrentClass.Name + "` does not define a constructor with " + s.Arguments.Count.ToString + " arguments.")
 		    End If
 		  End If
 		  
 		  // Load the superclass' name into the constant pool.
-		  Var superNameIndex As Integer = AddConstant(CurrentClass.Superclass)
+		  Var superNameIndex As Integer = AddConstant(CurrentClass.Superclass.Name)
 		  
 		  // Push `this` onto the stack. It's always at slot 0 of the call frame.
 		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
@@ -2324,19 +2369,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  End If
 		  
 		  // Check this class actually has a superclass.
-		  If CurrentClass.Superclass = "" Then
+		  If CurrentClass.Superclass = Nil Then
 		    Error("Class `" + CurrentClass.Name + "` does not have a superclass.")
-		  End If
-		  
-		  // Get the class declaration for this class' superclass, if it exists.
-		  Var superclassDecl As ObjoScript.ClassDeclStmt = FindClass(CurrentClass.Superclass)
-		  If superclassDecl = Nil Then
-		    Error("Class `" + CurrentClass.Name + "` inherits `" + CurrentClass.Superclass + "` but there is no class with this name.")
 		  End If
 		  
 		  // Check the superclass has a matching method.
 		  Var superHasMatchingMethod As Boolean = False
-		  For Each entry As DictionaryEntry In superclassDecl.Methods
+		  For Each entry As DictionaryEntry In CurrentClass.Superclass.Declaration.Methods
 		    Var method As ObjoScript.MethodDeclStmt = entry.Value
 		    If method.Signature.CompareCase(s.Signature) Then
 		      superHasMatchingMethod = True
@@ -2344,11 +2383,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    End If
 		  Next entry
 		  If Not superHasMatchingMethod Then
-		    Error("The superclass (`" + CurrentClass.Superclass + "`) of `" + CurrentClass.Name + "` does not define `" + s.Signature + "`.")
+		    Error("The superclass (`" + CurrentClass.Superclass.Name + "`) of `" + CurrentClass.Name + "` does not define `" + s.Signature + "`.")
 		  End If
 		  
 		  // Load the superclass' name into the constant pool.
-		  Var superNameIndex As Integer = AddConstant(CurrentClass.Superclass)
+		  Var superNameIndex As Integer = AddConstant(CurrentClass.Superclass.Name)
 		  
 		  // Push `this` onto the stack. It's always at slot 0 of the call frame.
 		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
@@ -2389,19 +2428,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  End If
 		  
 		  // Check this class actually has a superclass.
-		  If CurrentClass.Superclass = "" Then
+		  If CurrentClass.Superclass = Nil Then
 		    Error("Class `" + CurrentClass.Name + "` does not have a superclass.")
-		  End If
-		  
-		  // Get the class declaration for this class' superclass, if it exists.
-		  Var superclassDecl As ObjoScript.ClassDeclStmt = FindClass(CurrentClass.Superclass)
-		  If superclassDecl = Nil Then
-		    Error("Class `" + CurrentClass.Name + "` inherits `" + CurrentClass.Superclass + "` but there is no class with this name.")
 		  End If
 		  
 		  // Check the superclass has a matching setter.
 		  Var superHasMatchingSetter As Boolean = False
-		  For Each entry As DictionaryEntry In superclassDecl.Methods
+		  For Each entry As DictionaryEntry In CurrentClass.Superclass.Declaration.Methods
 		    Var method As ObjoScript.MethodDeclStmt = entry.Value
 		    If Not method.IsSetter Then Continue
 		    If method.Signature.CompareCase(s.Signature) Then
@@ -2410,11 +2443,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    End If
 		  Next entry
 		  If Not superHasMatchingSetter Then
-		    Error("The superclass (`" + CurrentClass.Superclass + "`) of `" + CurrentClass.Name + "` does not define a setter `" + s.Signature + "`.")
+		    Error("The superclass (`" + CurrentClass.Superclass.Name + "`) of `" + CurrentClass.Name + "` does not define a setter `" + s.Signature + "`.")
 		  End If
 		  
 		  // Load the superclass' name into the constant pool.
-		  Var superNameIndex As Integer = AddConstant(CurrentClass.Superclass)
+		  Var superNameIndex As Integer = AddConstant(CurrentClass.Superclass.Name)
 		  
 		  // Push `this` onto the stack. It's always at slot 0 of the call frame.
 		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
@@ -2616,8 +2649,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		CompileTime As Double
 	#tag EndComputedProperty
 
-	#tag Property, Flags = &h21, Description = 49662074686520636F6D70696C65722069732063757272656E746C7920636F6D70696C696E67206120636C6173732C207468697320697320697473206465636C61726174696F6E2E204D6179206265204E696C2E
-		Private CurrentClass As ObjoScript.ClassDeclStmt
+	#tag Property, Flags = &h21, Description = 49662074686520636F6D70696C65722069732063757272656E746C7920636F6D70696C696E67206120636C6173732C207468697320646174612061626F75742069742028696E636C7564696E6720697473206465636C61726174696F6E292E204D6179206265204E696C2E
+		Private CurrentClass As ObjoScript.ClassData
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 5468652063757272656E7420696E6E65726D6F7374206C6F6F70206265696E6720636F6D70696C65642C206F72204E696C206966206E6F7420696E2061206C6F6F702E
@@ -2640,7 +2673,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		IsStaticMethod As Boolean = False
 	#tag EndProperty
 
-	#tag Property, Flags = &h0, Description = 54686520636C617373657320616C726561647920636F6D70696C65642062792074686520636F6D70696C65722E204B6579203D20436C617373206E616D652C2056616C7565203D204F626A6F5363726970742E436C6173734465636C53746D742E
+	#tag Property, Flags = &h0, Description = 54686520636C617373657320616C726561647920636F6D70696C65642062792074686520636F6D70696C65722E204B6579203D20436C617373206E616D652C2056616C7565203D204F626A6F5363726970742E436C61737344617461
 		KnownClasses As Dictionary
 	#tag EndProperty
 

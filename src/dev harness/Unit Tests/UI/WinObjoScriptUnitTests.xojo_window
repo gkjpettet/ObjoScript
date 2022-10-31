@@ -1072,6 +1072,34 @@ End
 	#tag EndMenuHandler
 
 	#tag MenuHandler
+		Function FileNewEditor() As Boolean Handles FileNewEditor.Action
+		  // Create a new IDE window instance.
+		  
+		  Var w As New WinIDE(Nil)
+		  w.Show
+		  
+		  Return True
+		  
+		End Function
+	#tag EndMenuHandler
+
+	#tag MenuHandler
+		Function FileOpenScript() As Boolean Handles FileOpenScript.Action
+		  /// Open an ObjoScript file.
+		  
+		  Var f As FolderItem = FolderItem.ShowOpenFileDialog(DocumentTypes.ObjoScript)
+		  
+		  If f = Nil Then Return True
+		  
+		  Var w As New WinIDE(f)
+		  w.Show
+		  
+		  Return True
+		  
+		End Function
+	#tag EndMenuHandler
+
+	#tag MenuHandler
 		Function FileRunTests() As Boolean Handles FileRunTests.Action
 		  RunTests
 		  

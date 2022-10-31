@@ -2,11 +2,17 @@
 Protected Class Instance
 Implements ObjoScript.Value
 	#tag Method, Flags = &h0
-		Sub Constructor(klass As ObjoScript.Klass)
+		Sub Constructor(vm As ObjoScript.VM, klass As ObjoScript.Klass)
 		  Self.Klass = klass
 		  mName = Self.Klass.Name + " instance"
-		  Self.Fields = ParseJSON("{}") // HACK: Case sensitive.
 		  
+		  'Self.Fields = ParseJSON("{}") // HACK: Case sensitive.
+		  
+		  // Fields are initialised to nothing.
+		  Fields.ResizeTo(klass.FieldCount - 1)
+		  For i As Integer = 0 To Fields.LastIndex
+		    Fields(i) = vm.Nothing
+		  Next i
 		End Sub
 	#tag EndMethod
 
@@ -32,8 +38,8 @@ Implements ObjoScript.Value
 	#tag EndMethod
 
 
-	#tag Property, Flags = &h0, Description = 5468697320696E7374616E636527732070726976617465206669656C647320284B6579203D206E616D652C2056616C7565203D2056617269616E74292E
-		Fields As Dictionary
+	#tag Property, Flags = &h0, Description = 5468697320696E7374616E63652773206669656C64732E204C6F77657220696E6465786573206D6179206265206669656C6473207574696C69736564206279207375706572636C61737365732E
+		Fields() As Variant
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 4966207468697320697320616E20696E7374616E6365206F66206120666F726569676E20636C6173732C2074686973206973207573656420746F2073746F726520616E7920696E7374616E636520646174612E204974206973206F6E6C792061636365737365642062792074686520686F7374206170706C69636174696F6E2E
