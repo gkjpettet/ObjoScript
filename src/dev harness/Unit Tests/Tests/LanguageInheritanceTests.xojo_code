@@ -13,6 +13,12 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub InheritFromBooleanTest()
+		  AssertCompilerError("language.inheritance.inherit_from_boolean")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

@@ -46,7 +46,6 @@ Protected Class VM
 		    
 		  ElseIf className.CompareCase("List") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.LibraryCore.List.Allocate, Nil)
-		    
 		  End If
 		  
 		End Function
@@ -67,7 +66,6 @@ Protected Class VM
 		    
 		  ElseIf className.CompareCase("List") Then
 		    Return LibraryCore.List.BindForeignMethod(signature, isStatic)
-		    
 		  End If
 		  
 		End Function

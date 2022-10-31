@@ -1,0 +1,2 @@
+// Expect runtime error: Classes cannot inherit from built-in types.
+class Subclass is Boolean {}

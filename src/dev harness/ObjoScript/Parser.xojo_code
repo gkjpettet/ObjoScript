@@ -138,6 +138,10 @@ Protected Class Parser
 		  // Optional superclass.
 		  Var superClass As String = ""
 		  If Match(ObjoScript.TokenTypes.Is_) Then
+		    // Edge case: Attempting to inherit from a built-in type.
+		    If Match(ObjoScript.TokenTypes.ReservedType) Then
+		      Error("Classes cannot inherit from built-in types.")
+		    End If
 		    superClass = Consume(ObjoScript.TokenTypes.UppercaseIdentifier, _
 		    "Expected a superclass name. Superclasses must begin with an uppercase letter.").Lexeme
 		  End If

@@ -1496,9 +1496,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.StmtVisitor interface.
 		  
-		  #Pragma Warning "TODO: Prevent inheriting from a foreign class"
-		  #Pragma Warning "TODO: Prevent inheriting from built-in classes?"
-		  
 		  mLocation = c.Location
 		  
 		  If FindClass(c.Name) <> Nil Then
@@ -1518,6 +1515,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    superclass = FindClass(c.Superclass)
 		    If superclass = Nil Then
 		      Error("Class `" + c.Name + "` inherits class `" + c.Superclass + "` but there is no class with this name.")
+		    End If
+		    
+		    // Assert this class does not inherit from a foreign class.
+		    If superclass.Declaration.IsForeign Then
+		      Error("Class `" + c.Name + "` cannot inherit from foreign class `" + c.Superclass + "`.")
 		    End If
 		  End If
 		  
