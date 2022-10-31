@@ -1516,11 +1516,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    If superclass = Nil Then
 		      Error("Class `" + c.Name + "` inherits class `" + c.Superclass + "` but there is no class with this name.")
 		    End If
-		    
-		    // Assert this class does not inherit from a foreign class.
-		    If superclass.Declaration.IsForeign Then
-		      Error("Class `" + c.Name + "` cannot inherit from foreign class `" + c.Superclass + "`.")
-		    End If
 		  End If
 		  
 		  // Store data about the class we're about to compile.

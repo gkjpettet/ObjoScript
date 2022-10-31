@@ -581,7 +581,7 @@ Protected Class Parser
 		  Var funcLocation As ObjoScript.Token = Previous
 		  
 		  // Get the name of the function.
-		  Var name As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier, "Expected a function name.")
+		  Var name As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier, "Expected a function name. They must begin with a lowercase letter.")
 		  
 		  Consume(ObjoScript.TokenTypes.LParen, "Expected an opening parenthesis after the function's name.")
 		  
@@ -1178,7 +1178,7 @@ Protected Class Parser
 		  // Store the location of the var keyword.
 		  Var varLocation As ObjoScript.Token = Previous
 		  
-		  Var identifier As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier, "Expected a lowercase identifier (variable name).")
+		  Var identifier As ObjoScript.Token = Consume(ObjoScript.TokenTypes.Identifier, "Expected a variable name. Variable names must be lowercase.")
 		  
 		  Var initialiser As ObjoScript.Expr = New ObjoScript.NothingLiteral(varLocation)
 		  If Match(ObjoScript.TokenTypes.Equal) Then

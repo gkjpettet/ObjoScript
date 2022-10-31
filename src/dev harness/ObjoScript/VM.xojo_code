@@ -630,6 +630,8 @@ Protected Class VM
 		  Var superclass As ObjoScript.Klass = Peek(0)
 		  Var subclass As ObjoScript.Klass = Peek(1)
 		  
+		  #Pragma Warning "TODO: Prevent classes from inheriting from core library classes"
+		  
 		  // At this point, no methods have been defined on the subclass (since this
 		  // opcode should only occur within a class declaration). Therefore, copy all the 
 		  // superclass' methods to the class on the stack.
