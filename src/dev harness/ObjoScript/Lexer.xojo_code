@@ -501,6 +501,8 @@ Protected Class Lexer
 		  /// Scans `mChars` from the current character and adds the next token to `mTokens`.
 		  /// May raise a `LexerException`.
 		  
+		  #Pragma Warning "TODO: Ignore EOLs when parsing a list literal"
+		  
 		  // Store the current position so we know where in `mChars` this token begins.
 		  mTokenStart = mCurrent
 		  

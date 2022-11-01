@@ -31,6 +31,18 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub GrowShrinkTest()
+		  AssertOutputsEqual("language.list.grow_shrink")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub NewlineBeforeCommaTest()
+		  AssertCompilerError("language.list.newline_before_comma")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

@@ -1,17 +1,14 @@
 // The List class represents a single dimension array.
 foreign class List {
+foreign add(item)
+foreign removeAt(index)
+foreign toString()
+
+// Iterator protocol.
 foreign iterate(iter)
 foreign iteratorValue(iter)
 
+// Operator overloads.
 foreign [index]
 foreign [index]=(value)
-  
-toString() {
-var s = "["
-foreach element in this {
-s = s + element + ","
-}
-s = s + "]"
-return s
-}
 }
