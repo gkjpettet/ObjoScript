@@ -1,0 +1,2 @@
+// Expect parsing error - Cannot inherit from built-in type.
+class Foo is Number {}

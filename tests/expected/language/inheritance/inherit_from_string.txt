@@ -1,0 +1,1 @@
+Classes cannot inherit from built-in types.

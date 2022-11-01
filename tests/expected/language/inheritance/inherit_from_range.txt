@@ -1,0 +1,1 @@
+Class `Foo` cannot inherit from built-in class `Range`.

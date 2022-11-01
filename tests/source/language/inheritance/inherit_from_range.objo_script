@@ -1,0 +1,2 @@
+// Expect runtime error - Cannot inherit from built-in Range class.
+class Foo is Range {}

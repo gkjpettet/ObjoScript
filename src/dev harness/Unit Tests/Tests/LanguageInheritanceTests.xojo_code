@@ -25,6 +25,48 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub InheritFromNonClassTest()
+		  AssertCompilerError("language.inheritance.inherit_from_nonclass")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub InheritFromNothingTest()
+		  AssertCompilerError("language.inheritance.inherit_from_nothing")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub InheritFromNumberTest()
+		  AssertCompilerError("language.inheritance.inherit_from_number")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub InheritFromRangeTest()
+		  AssertRuntimeError("language.inheritance.inherit_from_range")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub InheritFromStringTest()
+		  AssertCompilerError("language.inheritance.inherit_from_string")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub InheritMethodsTest()
+		  AssertOutputsEqual("language.inheritance.inherit_methods")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub IsTest()
+		  AssertOutputsEqual("language.inheritance.is")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

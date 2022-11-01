@@ -1,0 +1,1 @@
+Expected a superclass name. Superclasses must begin with an uppercase letter.

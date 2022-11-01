@@ -41,6 +41,8 @@ Protected Class VM
 		  ///
 		  /// We check our standard libraries.
 		  
+		  #Pragma Warning "TODO: Implement the `Map` class"
+		  
 		  If className.CompareCase("Range") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.LibraryCore.Range.Allocate, Nil)
 		    
