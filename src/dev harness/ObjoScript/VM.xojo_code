@@ -630,7 +630,7 @@ Protected Class VM
 		  Var superclass As ObjoScript.Klass = Peek(0)
 		  Var subclass As ObjoScript.Klass = Peek(1)
 		  
-		  #Pragma Warning "TODO: Prevent classes from inheriting from core library classes"
+		  #Pragma Warning "TODO: Prevent classes from inheriting from certain (all?) core library classes"
 		  
 		  // At this point, no methods have been defined on the subclass (since this
 		  // opcode should only occur within a class declaration). Therefore, copy all the 
@@ -1005,6 +1005,8 @@ Protected Class VM
 	#tag Method, Flags = &h0, Description = 52756E732074686520696E7465727072657465722E20417373756D657320697420686173206265656E20696E697469616C69736564207072696F7220746F207468697320616E642068617320612076616C69642063616C6C206672616D6520746F20657865637574652E
 		Sub Run(stepMode As ObjoScript.VM.StepModes = ObjoScript.VM.StepModes.None)
 		  /// Runs the interpreter. Assumes it has been initialised prior to this and has a valid call frame to execute.
+		  
+		  #Pragma Warning "TODO: Convert the stack and APISlots to hold only ObjoScript.Values, not variants"
 		  
 		  // Make sure we don't try to step in with an out of bounds instruction pointer.
 		  If CurrentFrame.IP > CurrentChunk.Code.LastIndex Then Return

@@ -967,11 +967,11 @@ End
 #tag WindowCode
 	#tag Event
 		Sub Opening()
+		  Me.Center
+		  
+		  // Setup the editor.
 		  TestSourceCodeArea.Formatter = New XUICEObjoScriptFormatter
 		  TestSourceCodeArea.Theme = XUICETheme.FromFile(SpecialFolder.Resource("EditorTheme.toml"))
-		  
-		  
-		  
 		  
 		  Controller.LoadTestGroups
 		  

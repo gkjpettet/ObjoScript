@@ -1544,6 +1544,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  EmitByte(255)
 		  Var numFieldsOffset As UInt8 = CurrentChunk.Code.LastIndex
 		  
+		  #Pragma Warning "TODO: Emit the index of the first field used by this class when debugging"
+		  
 		  // Define the class as a global variable.
 		  DefineVariable(index)
 		  
