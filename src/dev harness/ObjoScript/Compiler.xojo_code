@@ -695,8 +695,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  EmitBytes(ObjoScript.VM.OP_SET_FIELD, fieldIndex)
 		  
-		  
-		  
+		  #Pragma Warning "TODO: Emit the field's name when debugging"
+		  ' This will allow the VM to display the field's name in it's debugger when stepping code.
+		  ' Similar to what we do for local variables.
 		End Sub
 	#tag EndMethod
 
@@ -1544,7 +1545,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  EmitByte(255)
 		  Var numFieldsOffset As UInt8 = CurrentChunk.Code.LastIndex
 		  
-		  #Pragma Warning "TODO: Emit the index of the first field used by this class when debugging"
+		  #Pragma Warning "TODO: Emit the index of the first field"
+		  ' This can then be used by the VM when stepping code to figure out the fields visible to
+		  ' the class in the debugger.
 		  
 		  // Define the class as a global variable.
 		  DefineVariable(index)
@@ -1717,6 +1720,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Tell the VM to produce the field's value.
 		  EmitBytes(ObjoScript.VM.OP_GET_FIELD, fieldIndex)
 		  
+		  #Pragma Warning "TODO: Emit the field's name when debugging"
+		  ' This will allow the VM to display the field's name in it's debugger when stepping code.
+		  ' Similar to what we do for local variables.
 		End Function
 	#tag EndMethod
 
