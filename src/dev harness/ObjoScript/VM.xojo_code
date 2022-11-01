@@ -630,17 +630,32 @@ Protected Class VM
 		  Var superclass As ObjoScript.Klass = Peek(0)
 		  Var subclass As ObjoScript.Klass = Peek(1)
 		  
-		  #Pragma Warning "TODO: Prevent classes from inheriting from certain (all?) core library classes"
+		  // Make sure that this class isn't trying to inherit from a prohibited class.
+		  If IsProhibitedSuperClass(superclass.Name) Then
+		    Error("Class `" + subclass.Name + "` cannot inherit from built-in class `" + superclass.Name + "`.")
+		  End If
 		  
 		  // At this point, no methods have been defined on the subclass (since this
 		  // opcode should only occur within a class declaration). Therefore, copy all the 
 		  // superclass' methods to the class on the stack.
-		  // NB: We **don't** inherit static methods and setters or constructors.
+		  // NB: We **don't** inherit static methods or constructors.
 		  subclass.Methods = superclass.Methods.Clone
 		  
 		  // This class should keep a reference to its superclass. Do this and pop it off the stack.
 		  subclass.Superclass = Pop
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 496E697469616C697365732074686520617272617920636F6E7461696E696E672074686520636C6173736573207768696368206D6179202A2A6E6F742A2A20626520696E686572697465642066726F6D2E
+		Private Sub InitialiseProhibitedSuperClasses()
+		  /// Initialises the array containing the classes which may **not** be inherited from.
+		  
+		  ProhibitedSuperClasses.ResizeTo(-1)
+		  
+		  ProhibitedSuperClasses.Add("List")
+		  ProhibitedSuperClasses.Add("Range")
+		  ProhibitedSuperClasses.Add("System")
 		End Sub
 	#tag EndMethod
 
@@ -799,6 +814,21 @@ Protected Class VM
 		  #Pragma StackOverflowChecking False
 		  
 		  Return (v.Type = Variant.TypeBoolean And v = False) Or v IsA ObjoScript.Nothing
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060636C6173734E616D6560206973206120636C61737320746861742063616E202A2A6E6F742A2A20626520696E686572697465642066726F6D2E
+		Private Function IsProhibitedSuperClass(className As String) As Boolean
+		  /// Returns True if `className` is a class that can **not** be inherited from.
+		  
+		  For Each c As String In ProhibitedSuperClasses
+		    If c.CompareCase(className) Then
+		      Return True
+		    End If
+		  Next c
+		  
+		  Return False
 		  
 		End Function
 	#tag EndMethod
@@ -999,6 +1029,9 @@ Protected Class VM
 		  LastInstructionFrame = Nil
 		  
 		  Self.Debugger = New ObjoScript.Debugger
+		  
+		  InitialiseProhibitedSuperClasses
+		  
 		End Sub
 	#tag EndMethod
 
@@ -1991,6 +2024,10 @@ Protected Class VM
 		#tag EndGetter
 		Shared OpcodeOperandMap As Dictionary
 	#tag EndComputedProperty
+
+	#tag Property, Flags = &h0, Description = 546865206E616D6573206F6620746865206275696C742D696E20636C61737365732074686174206D6179202A2A6E6F742A2A20626520696E686572697465642066726F6D2E
+		ProhibitedSuperClasses() As String
+	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 54686520564D277320737461636B2E
 		Private Stack(-1) As Variant
