@@ -1138,6 +1138,8 @@ Protected Class Parser
 		  ///
 		  /// We do this by discarding tokens until we hit a statement boundary.
 		  
+		  If AtEnd Then Return
+		  
 		  Advance
 		  
 		  While Not AtEnd

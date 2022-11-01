@@ -1,6 +1,37 @@
 #tag Class
 Protected Class LanguageListTests
 Inherits ObjoScriptTestGroupBase
+	#tag Method, Flags = &h0
+		Sub DuplicateCommaTest()
+		  AssertCompilerError("language.list.duplicate_comma")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub DuplicateTrailingCommaTest()
+		  AssertCompilerError("language.list.duplicate_trailing_comma")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub EmptyListWithCommaTest()
+		  AssertCompilerError("language.list.empty_list_with_comma")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub EOFAfterCommaTest()
+		  AssertCompilerError("language.list.eof_after_comma")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub EOFAfterElementTest()
+		  AssertCompilerError("language.list.eof_after_element")
+		End Sub
+	#tag EndMethod
+
+
 	#tag ViewBehavior
 		#tag ViewProperty
 			Name="Duration"
