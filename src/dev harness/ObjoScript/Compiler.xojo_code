@@ -1602,6 +1602,18 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Replace our placeholder with the actual number of fields for this class.
 		  CurrentChunk.Code(numFieldsOffset) = CurrentClass.TotalFieldCount
 		  
+		  If DebugMode Then
+		    // Tell the VM the name and index of all of this class' fields so we can see them in the debugger.
+		    // The first operand is the index of the field's name in the constant pool.
+		    // The second operand is the index of the field in `Klass.Fields`.
+		    For i As Integer = 0 To CurrentClass.Fields.LastIndex
+		      Var fieldNameIndex As Integer = AddConstant(CurrentClass.Fields(i))
+		      EmitByte(ObjoScript.VM.OP_DEBUG_FIELD_NAME)
+		      EmitUInt16(fieldNameIndex)
+		      EmitByte(CurrentClass.FieldStartIndex + i)
+		    Next i
+		  End If
+		  
 		  // Pop the class off the stack.
 		  EmitByte(ObjoScript.VM.OP_POP)
 		  

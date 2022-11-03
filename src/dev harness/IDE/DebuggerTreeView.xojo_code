@@ -44,7 +44,7 @@ Inherits DesktopTreeView
 		      
 		      // Fields.
 		      For i As Integer = instance.Klass.FirstFieldIndex To instance.Fields.LastIndex
-		        node.AppendNode(VariableToNode(i.ToString, instance.Fields(i)))
+		        node.AppendNode(VariableToNode(instance.Klass.Fields(i), instance.Fields(i)))
 		      Next i
 		      
 		    ElseIf value IsA ObjoScript.Klass Then

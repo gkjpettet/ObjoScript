@@ -154,6 +154,42 @@ Protected Class Debugger
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 52657475726E73207468652064657461696C73206F6620746865204F505F44454255475F4649454C445F4E414D4520696E737472756374696F6E20617420606F66667365746020616E6420696E6372656D656E747320606F66667365746020746F20706F696E7420746F20746865206E65787420696E737472756374696F6E2E
+		Private Function DebugFieldName(chunk As ObjoScript.Chunk, ByRef offset As Integer) As String
+		  /// Returns the details of the OP_DEBUG_FIELD_NAME instruction at `offset` and increments `offset` to point to the next instruction.
+		  /// 
+		  /// This instruction takes a two byte (field name index) and a one byte (`Klass.Fields` index) operand.
+		  ///
+		  /// Format:
+		  /// FIELD_NAME  INDEX
+		  
+		  Var name As String = "DEBUG_FIELD_NAME"
+		  
+		  // The instruction's name.
+		  Var details As String = name.JustifyLeft(2 * COL_WIDTH)
+		  
+		  // Get the index of the name of the field in the chunk's constant pool.
+		  Var poolIndex As Integer = chunk.ReadUInt16(offset + 1)
+		  
+		  // Get the `Klass.Fields` index.
+		  Var index As Integer = chunk.ReadByte(offset + 3)
+		  
+		  // Append the name of the field.
+		  Var fieldName As String = chunk.Constants(poolIndex)
+		  fieldName = fieldName.JustifyLeft(2 * COL_WIDTH)
+		  details = details + fieldName
+		  
+		  // Append the index.
+		  details = details + index.ToString
+		  
+		  // Adjust the offset.
+		  offset = offset + 4
+		  
+		  Return details
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 446973617373656D626C65732066756E6374696F6E2060666020746F2061206054726565566965774E6F64656020666F7220646973706C617920696E206120604465736B746F705472656556696577602E
 		Function DisassembleFunction(f As ObjoScript.Func, includeStandardLibraryBytecode As Boolean = True) As TreeViewNode
 		  /// Disassembles function `f` to a `TreeViewNode` for display in a `DesktopTreeView`.
@@ -414,6 +450,9 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_SWAP
 		    Return SimpleInstruction("SWAP", offset)
 		    
+		  Case ObjoScript.VM.OP_DEBUG_FIELD_NAME
+		    Return DebugFieldName(chunk, offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
@@ -567,7 +606,7 @@ Protected Class Debugger
 		Private Function LocalVarDec(chunk As ObjoScript.Chunk, ByRef offset As Integer) As String
 		  /// Returns the details of the OP_LOCAL_VAR_DEC instruction at `offset` and increments `offset` to point to the next instruction.
 		  /// 
-		  /// This instruction takes a 2 bytes (name index) and a one byte (slot index) operand.
+		  /// This instruction takes a two byte (name index) and a one byte (slot index) operand.
 		  ///
 		  /// Format:
 		  /// VAR_NAME  SLOT

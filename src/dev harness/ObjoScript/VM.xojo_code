@@ -1,5 +1,20 @@
 #tag Class
 Protected Class VM
+	#tag Method, Flags = &h21
+		Private Sub AddFieldNameToClass(fieldName As String, fieldIndex As Integer)
+		  /// Add a named field to the class on the top of the stack.
+		  ///
+		  /// When the compiler is building a debuggable chunk, it will emit the names and indexes 
+		  /// of all of a class' fields. 
+		  /// The compiler will have ensured that the class to add to is on the top of the stack.
+		  
+		  Var klass As ObjoScript.Klass = Peek(0)
+		  
+		  klass.Fields(fieldIndex) = fieldName
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 4173736572747320746861742060616020616E64206062602061726520626F746820646F75626C65732C206F74686572776973652072616973657320612072756E74696D65206572726F722E
 		Private Sub AssertNumbers(a As Variant, b As Variant)
 		  /// Asserts that `a` and `b` are both doubles, otherwise raises a runtime error.
@@ -1444,6 +1459,9 @@ Protected Class VM
 		      Stack(StackTop - 1) = Stack(StackTop - 2)
 		      Stack(StackTop - 2) = b
 		      
+		    Case OP_DEBUG_FIELD_NAME
+		      AddFieldNameToClass(ReadConstantLong, ReadByte)
+		      
 		    End Select
 		  Wend
 		  
@@ -1862,7 +1880,7 @@ Protected Class VM
 		50: OP_METHOD (3)
 		51: OP_IS (0)
 		52: OP_SWAP (0)
-		53: *Unused*
+		53: OP_DEBUG_FIELD_NAME (3)
 		54: *Unused*
 		55: *Unused*
 		56: OP_GET_FIELD (1)
@@ -2021,7 +2039,8 @@ Protected Class VM
 			  OP_BITWISE_NOT            : 0, _
 			  OP_SUPER_CONSTRUCTOR      : 3, _
 			  OP_LIST                   : 1, _
-			  OP_SWAP                   : 0 _
+			  OP_SWAP                   : 0, _
+			  OP_DEBUG_FIELD_NAME       : 3 _
 			  )
 			  
 			  Return d
@@ -2097,6 +2116,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_CONSTRUCTOR, Type = Double, Dynamic = False, Default = \"60", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_DEBUG_FIELD_NAME, Type = Double, Dynamic = False, Default = \"53", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_DEFINE_GLOBAL, Type = Double, Dynamic = False, Default = \"30", Scope = Public
