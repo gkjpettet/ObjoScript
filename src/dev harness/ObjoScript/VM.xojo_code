@@ -1770,9 +1770,6 @@ Protected Class VM
 		Shared Function ValueToString(v As Variant) As String
 		  /// Returns a string representation of a VM value.
 		  
-		  #Pragma Warning "TODO: Figure out a way to call `toString()` on instances if they possess this method"
-		  ' Would require ValueToString() to be an instance method on VM, not a shared method as it is at present.
-		  
 		  Select Case v.Type
 		  Case Variant.TypeString
 		    Return v.StringValue
