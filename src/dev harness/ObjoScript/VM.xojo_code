@@ -8,6 +8,10 @@ Protected Class VM
 		  /// of all of a class' fields. 
 		  /// The compiler will have ensured that the class to add to is on the top of the stack.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  Var klass As ObjoScript.Klass = Peek(0)
 		  
 		  klass.Fields(fieldIndex) = fieldName
@@ -56,6 +60,10 @@ Protected Class VM
 		  ///
 		  /// We check our standard libraries.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  #Pragma Warning "TODO: Implement the `Map` class"
 		  
 		  If className.CompareCase("Range") Then
@@ -74,6 +82,10 @@ Protected Class VM
 		  /// The host application will have failed to provide one. Returns Nil if none defined.
 		  ///
 		  /// We check our standard libraries.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  If className.CompareCase("System") Then
 		    Return Core.System_.BindForeignMethod(signature, isStatic)
@@ -98,6 +110,10 @@ Protected Class VM
 		  /// | argN      
 		  /// | arg1
 		  /// | klass
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  // Replace the class with a new blank instance of that class.
 		  Stack(StackTop - argCount - 1) = New ObjoScript.Instance(Self, klass)
@@ -139,6 +155,10 @@ Protected Class VM
 		  /// | argN      
 		  /// | arg1
 		  /// | receiver
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  // Check we have the correct number of arguments.
 		  If argCount <> fm.Arity Then
@@ -256,6 +276,10 @@ Protected Class VM
 		  ///
 		  /// The method can then be called again in the future using `VM.InvokeHandle()`.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  Var argCount As Integer = ObjoScript.Func.ComputeArityFromSignature(signature, Self)
 		  
 		  // Check we have an instance or a class in slot 0.
@@ -320,6 +344,10 @@ Protected Class VM
 		  /// Create a new list literal. The compiler will have placed the List class on the stack
 		  /// and any initial elements above this.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  // Pop and store any optional initial elements.
 		  Var items() As Variant
 		  For i As Integer = 1 To itemCount
@@ -357,6 +385,10 @@ Protected Class VM
 		  ///
 		  /// The constructor's body should be on the top of the stack with its class just beneath it.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  Var constructor As ObjoScript.Func = Peek(0)
 		  Var klass As ObjoScript.Klass = Peek(1)
 		  
@@ -375,6 +407,10 @@ Protected Class VM
 	#tag Method, Flags = &h21, Description = 446566696E6573206120666F726569676E20636C6173732E20417373756D657320746861742074686520636C61737320697320616C7265616479206F6E2074686520746F70206F662074686520737461636B2E
 		Private Sub DefineForeignClass()
 		  /// Defines a foreign class. Assumes that the class is already on the top of the stack.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  Var klass As ObjoScript.Klass = Peek(0)
 		  
@@ -398,6 +434,10 @@ Protected Class VM
 	#tag Method, Flags = &h21, Description = 446566696E65732061206D6574686F64207769746820607369676E61747572656020616E642060617269747960206F6E2074686520636C617373206F6E2074686520746F70206F662074686520737461636B2E
 		Private Sub DefineForeignMethod(signature As String, arity As UInt8, isStatic As Boolean)
 		  /// Defines a method with `signature` and `arity` on the class on the top of the stack.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  Var klass As ObjoScript.Klass = Peek(0)
 		  
@@ -430,6 +470,10 @@ Protected Class VM
 		  /// Defines a method with `signature` on the class just below the method's body on the stack.
 		  ///
 		  /// The method's body should be on the top of the stack with its class just beneath it.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  Var method As ObjoScript.Func = Peek(0)
 		  Var klass As ObjoScript.Klass = Peek(1)
@@ -485,6 +529,10 @@ Protected Class VM
 		  /// Retrieves the value of an instance field at `fieldIndex` from the instance currently on the top of the 
 		  /// stack and then pushes it on to the top of the stack.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  // Since instance fields can only be retrieved from within a method we can safely assume that `this` should be in the 
 		  // method callframe's slot 0 (it should have been placed there by `CallValue()`).
 		  Var instance As ObjoScript.Instance
@@ -512,6 +560,10 @@ Protected Class VM
 		Function GetSlotAsString(slot As Integer) As String
 		  /// Returns the string representation of the value in `slot`.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  Return ValueToString(APISlots(slot))
 		  
 		End Function
@@ -520,6 +572,10 @@ Protected Class VM
 	#tag Method, Flags = &h0, Description = 52657475726E73207468652076616C756520696E2060736C6F74602E204974206D6179206265206120646F75626C652C20737472696E67206F7220616E20604F626A6F5363726970742E56616C7565602E
 		Function GetSlotValue(slot As Integer) As Variant
 		  /// Returns the value in `slot`. It may be a double, string or an `ObjoScript.Value`.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  Return APISlots(slot)
 		  
@@ -530,6 +586,10 @@ Protected Class VM
 		Private Sub GetStaticField(name As String)
 		  /// Retrieves the value of a static field named `name` on the instance or class currently on the top of the 
 		  /// stack and then pushes it on to the top of the stack.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  // The compiler guarantees that static fields can only be retrieved from within an instance 
 		  // method/constructor or a static method, we can safely assume that either `this` or the class 
@@ -564,6 +624,10 @@ Protected Class VM
 		  /// Returns the value in the stack at the `frame` `slot`. `slot 0` is the function and, 
 		  /// Then we have optional function arguments and then any locals defined in the function.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  Return Stack(frame.StackBase + slot)
 		  
 		End Function
@@ -573,6 +637,10 @@ Protected Class VM
 		Function GetVariable(name As String, slot As Integer) As Boolean
 		  /// Looks up a top-level variable named `name` and puts it in the API slot `slot`.
 		  /// Returns True if found or False if the variable does not exist.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  Var value As Variant = Globals.Lookup(name, Nil)
 		  If value <> Nil Then
@@ -723,6 +791,10 @@ Protected Class VM
 		  /// | arg1
 		  /// | instance/class
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  // Grab the receiver from the stack. It should be beneath any arguments to the invocation.
 		  Var receiver As Variant = Peek(argCount)
 		  Var isStatic As Boolean = False
@@ -754,6 +826,10 @@ Protected Class VM
 		  /// | argN <-- top of stack
 		  /// | arg1
 		  /// | instance or class
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  Var method As Variant
 		  If isStatic Then
@@ -1046,6 +1122,10 @@ Protected Class VM
 	#tag Method, Flags = &h0, Description = 52756E732074686520696E7465727072657465722E20417373756D657320697420686173206265656E20696E697469616C69736564207072696F7220746F207468697320616E642068617320612076616C69642063616C6C206672616D6520746F20657865637574652E
 		Sub Run(stepMode As ObjoScript.VM.StepModes = ObjoScript.VM.StepModes.None)
 		  /// Runs the interpreter. Assumes it has been initialised prior to this and has a valid call frame to execute.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  // Make sure we don't try to step in with an out of bounds instruction pointer.
 		  If CurrentFrame.IP > CurrentChunk.Code.LastIndex Then Return
@@ -1466,6 +1546,10 @@ Protected Class VM
 		  /// | Instance        <-- the instance that should have the field at `fieldIndex`.
 		  /// |
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  // Since fields can only be set from within a method we can safely assume that `this` should be in the 
 		  // method callframe's slot 0/StackBase (it should have been placed there by `CallValue()`).
 		  Var instance As ObjoScript.Instance
@@ -1498,6 +1582,10 @@ Protected Class VM
 		  /// Before a foreign method is called the VM has cleared the call frame stack and pushed nothing on to it.
 		  /// Setting a return value just requires us to replace the pushed nothing object with `value`.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  Stack(StackTop - 1) = value
 		  
 		End Sub
@@ -1506,6 +1594,10 @@ Protected Class VM
 	#tag Method, Flags = &h0, Description = 536574732060736C6F746020746F20646F75626C652076616C7565206064602E
 		Sub SetSlot(slot As Integer, d As Double)
 		  /// Sets `slot` to double value `d`.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  APISlots(slot) = d
 		  
@@ -1516,6 +1608,10 @@ Protected Class VM
 		Sub SetSlot(slot As Integer, instance As ObjoScript.Instance)
 		  /// Sets `slot` to `instance`.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  APISlots(slot) = instance
 		  
 		End Sub
@@ -1524,6 +1620,10 @@ Protected Class VM
 	#tag Method, Flags = &h0, Description = 536574732060736C6F746020746F20606B6C617373602E
 		Sub SetSlot(slot As Integer, klass As ObjoScript.Klass)
 		  /// Sets `slot` to `klass`.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  APISlots(slot) = klass
 		  
@@ -1534,6 +1634,10 @@ Protected Class VM
 		Sub SetSlot(slot As Integer, s As String)
 		  /// Sets `slot` to string value `s`.
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  APISlots(slot) = s
 		  
 		End Sub
@@ -1542,6 +1646,10 @@ Protected Class VM
 	#tag Method, Flags = &h0, Description = 536574732060736C6F746020746F20606E6F7468696E67602E
 		Sub SetSlotNothing(slot As Integer)
 		  /// Sets `slot` to `nothing`.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  APISlots(slot) = Nothing
 		  
@@ -1557,6 +1665,10 @@ Protected Class VM
 		  /// | ValueToAssign       <-- top of the stack
 		  /// | class or instance   <-- should have the static field named `name`.
 		  /// |
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  // The compiler guarantees that static fields can only be set from within a method or constructor 
 		  // so we can safely assume that `this` should be in the 
@@ -1616,6 +1728,10 @@ Protected Class VM
 		  /// | arg1
 		  /// | instance
 		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
 		  // Get the super class. Since classes are all declared in the top level, it should be in Globals.
 		  // The compiler will have checked that the superclass exists during compilation.
 		  Var superclass As ObjoScript.Klass = Globals.Value(superclassName)
@@ -1636,6 +1752,10 @@ Protected Class VM
 		  /// | argN <-- top of stack
 		  /// | arg1
 		  /// | instance
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
 		  
 		  // Get the super class. Since classes are all declared in the top level, it should be in Globals.
 		  // The compiler will have checked that the superclass exists during compilation.
