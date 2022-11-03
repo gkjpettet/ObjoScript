@@ -36,14 +36,16 @@ Inherits DesktopTreeView
 		  Select Case value.Type
 		  Case Variant.TypeBoolean, Variant.TypeDouble, Variant.TypeString
 		    node = New TreeViewNode(name + ": " + value.StringValue)
+		    
 		  Else
 		    If value IsA ObjoScript.Instance Then
 		      Var instance As ObjoScript.Instance = ObjoScript.Instance(value)
 		      node = New TreeViewNode(name + ": " + instance.Klass.Name + " instance")
+		      
 		      // Fields.
-		      For Each entry As DictionaryEntry In instance.Fields
-		        node.AppendNode(VariableToNode(entry.Key, entry.Value))
-		      Next entry
+		      For i As Integer = instance.Klass.FirstFieldIndex To instance.Fields.LastIndex
+		        node.AppendNode(VariableToNode(i.ToString, instance.Fields(i)))
+		      Next i
 		      
 		    ElseIf value IsA ObjoScript.Klass Then
 		      Var klass As ObjoScript.Klass = ObjoScript.Klass(value)

@@ -6,8 +6,6 @@ Implements ObjoScript.Value
 		  Self.Klass = klass
 		  mName = Self.Klass.Name + " instance"
 		  
-		  'Self.Fields = ParseJSON("{}") // HACK: Case sensitive.
-		  
 		  // Fields are initialised to nothing.
 		  Fields.ResizeTo(klass.FieldCount - 1)
 		  For i As Integer = 0 To Fields.LastIndex

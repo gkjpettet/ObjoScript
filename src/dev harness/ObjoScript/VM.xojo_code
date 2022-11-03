@@ -1376,7 +1376,8 @@ Protected Class VM
 		      Var className As String = ReadConstantLong
 		      Var isForeign As Boolean = ReadByte = 1
 		      Var fieldCount As Integer = ReadByte
-		      Push(New ObjoScript.Klass(className, isForeign, fieldCount))
+		      Var firstFieldIndex As Integer = ReadByte
+		      Push(New ObjoScript.Klass(className, isForeign, fieldCount, firstFieldIndex))
 		      If isForeign Then
 		        DefineForeignClass
 		      End If
@@ -1856,7 +1857,7 @@ Protected Class VM
 		45: OP_BITWISE_NOT (0)
 		46: OP_EXIT (0)
 		47: OP_CALL (1)
-		48: OP_CLASS (4)
+		48: OP_CLASS (5)
 		49: OP_GET_LOCAL_CLASS (1)
 		50: OP_METHOD (3)
 		51: OP_IS (0)
@@ -1999,7 +2000,7 @@ Protected Class VM
 			  OP_RANGE                  : 0, _
 			  OP_EXIT                   : 0, _
 			  OP_CALL                   : 1, _
-			  OP_CLASS                  : 4, _
+			  OP_CLASS                  : 5, _
 			  OP_METHOD                 : 3, _
 			  OP_GET_FIELD              : 1, _
 			  OP_SET_FIELD              : 1, _

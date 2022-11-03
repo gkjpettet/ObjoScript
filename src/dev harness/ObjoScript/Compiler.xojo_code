@@ -1545,9 +1545,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  EmitByte(255)
 		  Var numFieldsOffset As UInt8 = CurrentChunk.Code.LastIndex
 		  
-		  #Pragma Warning "TODO: Emit the index of the first field"
-		  ' This can then be used by the VM when stepping code to figure out the fields visible to
-		  ' the class in the debugger.
+		  // The fourth operand is the index in Klass.Fields of the first of *this* class' fields.
+		  // Earlier indexes are the fields of superclasses.
+		  // Strictly speaking, this is only needed for debug stepping in the VM but we'll emit it
+		  // even for production code to simplify the VM's implementation.
+		  EmitByte(CurrentClass.FieldStartIndex)
 		  
 		  // Define the class as a global variable.
 		  DefineVariable(index)

@@ -30,19 +30,26 @@ Protected Class Debugger
 		  /// Returns the details of a class instruction at `offset` and increments `offset` to point to the next instruction.
 		  ///
 		  /// We return the instruction's name, the index of the class' name in the constant pool, the class name, whether
-		  /// it's a foreign class and the total number of fields used by the class.
+		  /// it's a foreign class, the total number of fields used by the class and the index of the first field in 
+		  /// `Klass.Fields`.
 		  /// Format:
-		  /// INSTRUCTION_NAME  POOL_INDEX  CLASS_NAME  FIELD_COUNT
+		  /// INSTRUCTION_NAME  POOL_INDEX  CLASS_NAME  FIELD_COUNT  FIRST_FIELD_INDEX
 		  
 		  // Get index of the constant.
 		  Var constantIndex As Integer = chunk.ReadUInt16(offset + 1)
 		  
+		  // Compute the name and whether the class is foreign.
 		  Var isForeign As Boolean = If(chunk.ReadByte(offset + 3) = 1, True, False)
 		  Var name As String = "CLASS" + If(isForeign, " (foreign)", "")
 		  
+		  // Get the number of fields.
 		  Var fieldCount As Integer = chunk.ReadByte(offset + 4)
 		  
-		  offset = offset + 5
+		  // Get the index of the first field.
+		  Var fieldFirstIndex As Integer = chunk.ReadByte(offset + 5)
+		  
+		  // Adjust the offset to the new value.
+		  offset = offset + 6
 		  
 		  // The instruction's name.
 		  Var details As String = name.JustifyLeft(2 * COL_WIDTH)
@@ -55,7 +62,11 @@ Protected Class Debugger
 		  Var className As Variant = chunk.Constants(constantIndex)
 		  details = details + (ObjoScript.VM.ValueToString(className).JustifyLeft(COL_WIDTH))
 		  
-		  details = details + fieldCount.ToString
+		  // Append the field count.
+		  details = details + fieldCount.ToString.JustifyLeft(COL_WIDTH)
+		  
+		  // Append the first field index.
+		  details = details + fieldFirstIndex.ToString
 		  
 		  Return details
 		  
