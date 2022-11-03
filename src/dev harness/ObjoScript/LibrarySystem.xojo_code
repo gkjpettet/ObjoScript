@@ -35,6 +35,8 @@ Protected Module LibrarySystem
 		  ///
 		  /// System.print(what) -> string
 		  
+		  #Pragma Warning "TODO: Should we return the argument?"
+		  
 		  vm.RaisePrint(vm.GetSlotAsString(1))
 		  
 		End Sub

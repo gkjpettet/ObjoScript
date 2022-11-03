@@ -574,7 +574,7 @@ Implements XUICEFormatter
 		    
 		  Case "["
 		    Var t As XUICELineToken = _
-		    MakeGenericToken(XUICELineToken.TYPE_OPERATOR, "delimiterType" : XUICEDelimiter.Types.LSquare)
+		    MakeGenericToken(XUICELineToken.TYPE_OPERATOR, "delimiterType" : XUICEDelimiter.Types.LSquare, "canBeContinued" : True)
 		    mLine.Tokens.Add(t)
 		    Delimiters.Add(t)
 		    Return
@@ -602,7 +602,7 @@ Implements XUICEFormatter
 		  // LINE CONTINUATION
 		  // =====================================
 		  If c = "_" Then
-		    mLine.Tokens.Add(MakeGenericToken(XUICELineToken.TYPE_OPERATOR, "isLineContination" : True))
+		    mLine.Tokens.Add(MakeGenericToken(XUICELineToken.TYPE_OPERATOR, "canBeContinued" : True))
 		    Return
 		  End If
 		  
@@ -700,8 +700,6 @@ Implements XUICEFormatter
 		  ///
 		  /// Assumes `line` is not Nil.
 		  /// `previousLineLastToken` may be Nil.
-		  
-		  #Pragma Warning "TODO: Broken if a comment occurs after a line continuation marker"
 		  
 		  If previousLineLastToken = Nil Then
 		    line.IsContinuation = False
