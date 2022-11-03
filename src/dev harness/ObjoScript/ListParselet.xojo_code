@@ -19,6 +19,7 @@ Implements ObjoScript.PrefixParselet
 		      values.Add(parser.Expression)
 		    Loop Until Not parser.Match(ObjoScript.TokenTypes.Comma)
 		  End If
+		  
 		  parser.Consume(ObjoScript.TokenTypes.RSquare, "Expected a `]` after the List's values.")
 		  
 		  Return New ObjoScript.ListLiteral(lsquare, values)

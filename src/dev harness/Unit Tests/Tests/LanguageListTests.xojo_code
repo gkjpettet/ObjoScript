@@ -38,8 +38,8 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub NewlineBeforeCommaTest()
-		  AssertCompilerError("language.list.newline_before_comma")
+		Sub NewlinesTest()
+		  AssertOutputsEqual("language.list.newlines")
 		End Sub
 	#tag EndMethod
 

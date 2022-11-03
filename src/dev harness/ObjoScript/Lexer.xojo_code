@@ -248,6 +248,12 @@ Protected Class Lexer
 		    If mTokens.Count = 0 Then
 		      // Prevent the first token from being an EOL.
 		      Return 
+		      
+		    ElseIf mParsingList Then
+		      // Don't add EOLs when parsing a list literal.
+		      // This allows them to spread over multiple lines.
+		      Return
+		      
 		    Else
 		      // Disallow contiguous EOLs.
 		      If mTokens(mTokens.LastIndex).Type = ObjoScript.TokenTypes.EOL Then
@@ -501,8 +507,6 @@ Protected Class Lexer
 		  /// Scans `mChars` from the current character and adds the next token to `mTokens`.
 		  /// May raise a `LexerException`.
 		  
-		  #Pragma Warning "TODO: Ignore EOLs when parsing a list literal"
-		  
 		  // Store the current position so we know where in `mChars` this token begins.
 		  mTokenStart = mCurrent
 		  
@@ -561,12 +565,14 @@ Protected Class Lexer
 		  Case "["
 		    AddToken(MakeToken(ObjoScript.TokenTypes.LSquare, c))
 		    mUnclosedSquareCount = mUnclosedSquareCount + 1
+		    mParsingList = True
 		    Return
 		    
 		  Case "]"
 		    AddToken(MakeToken(ObjoScript.TokenTypes.RSquare, c))
 		    mUnclosedSquareCount = mUnclosedSquareCount - 1
 		    If mUnclosedSquareCount < 0 Then Error("Syntax error. Unmatched closing square bracket.")
+		    If mUnclosedSquareCount = 0 Then mParsingList = False
 		    Return
 		    
 		  Case ","
@@ -811,6 +817,7 @@ Protected Class Lexer
 		  mUnclosedParenCount = 0
 		  mUnclosedCurlyCount = 0
 		  mUnclosedSquareCount = 0
+		  mParsingList = False
 		End Sub
 	#tag EndMethod
 
@@ -908,6 +915,10 @@ Protected Class Lexer
 
 	#tag Property, Flags = &h21, Description = 54686520312D6261736564206E756D626572206F6620746865206C696E652063757272656E746C79206265696E672070726F6365737365642E
 		Private mLineNumber As Integer = 1
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 5472756520696620746865206C6578657220697320696E20746865206D6964646C65206F662070617273696E672061206C6973742E
+		Private mParsingList As Boolean = False
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 54686520286F7074696F6E616C29204944206F6620746865207363726970742063757272656E746C79206265696E67207061727365642E

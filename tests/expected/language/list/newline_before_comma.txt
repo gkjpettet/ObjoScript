@@ -1,1 +1,0 @@
-Expected a `]` after the List's values.

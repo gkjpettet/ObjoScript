@@ -4,10 +4,14 @@ Protected Class Parser
 		Private Sub Advance()
 		  /// Advances to the next token, storing a reference to the previous token.
 		  
+		  #Pragma BreakOnExceptions False
+		  
 		  Previous = Current
 		  mCurrentIndex = mCurrentIndex + 1
 		  Current = mTokens(mCurrentIndex)
 		  
+		  Exception e As OutOfBoundsException
+		    Error("Unexpected end of file.")
 		End Sub
 	#tag EndMethod
 
@@ -15,10 +19,15 @@ Protected Class Parser
 		Private Function Advance() As ObjoScript.Token
 		  /// Advances to the next token, storing and returning reference to the previous token.
 		  
+		  #Pragma BreakOnExceptions False
+		  
 		  Previous = Current
 		  mCurrentIndex = mCurrentIndex + 1
 		  Current = mTokens(mCurrentIndex)
 		  Return Previous
+		  
+		  Exception e As OutOfBoundsException
+		    Error("Unexpected end of file.")
 		End Function
 	#tag EndMethod
 
