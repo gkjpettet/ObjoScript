@@ -59,10 +59,10 @@ Protected Class VM
 		  #Pragma Warning "TODO: Implement the `Map` class"
 		  
 		  If className.CompareCase("Range") Then
-		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.LibraryCore.Range.Allocate, Nil)
+		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Range.Allocate, Nil)
 		    
 		  ElseIf className.CompareCase("List") Then
-		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.LibraryCore.List.Allocate, Nil)
+		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.List.Allocate, Nil)
 		  End If
 		  
 		End Function
@@ -76,13 +76,13 @@ Protected Class VM
 		  /// We check our standard libraries.
 		  
 		  If className.CompareCase("System") Then
-		    Return LibrarySystem.BindForeignMethod(signature, isStatic)
+		    Return Core.System_.BindForeignMethod(signature, isStatic)
 		    
 		  ElseIf className.CompareCase("Range") Then
-		    Return LibraryCore.Range.BindForeignMethod(signature, isStatic)
+		    Return Core.Range.BindForeignMethod(signature, isStatic)
 		    
 		  ElseIf className.CompareCase("List") Then
-		    Return LibraryCore.List.BindForeignMethod(signature, isStatic)
+		    Return Core.List.BindForeignMethod(signature, isStatic)
 		  End If
 		  
 		End Function
@@ -332,7 +332,7 @@ Protected Class VM
 		  // The top of the stack will now be a List instance.
 		  // Add the initial elements to it's foreign data.
 		  Var list As ObjoScript.Instance = Stack(StackTop - 1)
-		  ObjoScript.LibraryCore.List.ListData(list.ForeignData).Items = items
+		  ObjoScript.Core.List.ListData(list.ForeignData).Items = items
 		  
 		End Sub
 	#tag EndMethod
@@ -498,15 +498,6 @@ Protected Class VM
 		      Error("Only instances have fields.")
 		    End If
 		  End If
-		  
-		  ' // Get the value of the field from the instance.
-		  ' Var value As Variant = instance.Fields.Lookup(name, Nil)
-		  ' 
-		  ' // If the field doesn't exist then we create it.
-		  ' If value = Nil Then
-		  ' instance.Fields.Value(name) = Nothing
-		  ' value = Nothing
-		  ' End If
 		  
 		  // Get the value of the field from the instance.
 		  Var value As Variant = instance.Fields(fieldIndex)
@@ -1056,8 +1047,6 @@ Protected Class VM
 		Sub Run(stepMode As ObjoScript.VM.StepModes = ObjoScript.VM.StepModes.None)
 		  /// Runs the interpreter. Assumes it has been initialised prior to this and has a valid call frame to execute.
 		  
-		  #Pragma Warning "TODO: Convert the stack and APISlots to hold only ObjoScript.Values, not variants"
-		  
 		  // Make sure we don't try to step in with an out of bounds instruction pointer.
 		  If CurrentFrame.IP > CurrentChunk.Code.LastIndex Then Return
 		  
@@ -1491,11 +1480,6 @@ Protected Class VM
 		    End If
 		  End If
 		  
-		  ' // Set the field to the value on the top of the stack and pop it off.
-		  ' // If the field has never been assigned to before then we create it.
-		  ' Var value As Variant = Pop
-		  ' instance.Fields.Value(name) = value
-		  
 		  // Set the field to the value on the top of the stack and pop it off.
 		  Var value As Variant = Pop
 		  instance.Fields(fieldIndex) = value
@@ -1679,19 +1663,19 @@ Protected Class VM
 		  
 		  If value = Nil Then Return False
 		  
-		  If value.Type = Variant.TypeDouble And type.Compare("Number", ComparisonOptions.CaseSensitive) = 0 Then
+		  If value.Type = Variant.TypeDouble And type.CompareCase("Number") Then
 		    Return True
 		  End If
 		  
-		  If value.Type = Variant.TypeString And type.Compare("String", ComparisonOptions.CaseSensitive) = 0 Then
+		  If value.Type = Variant.TypeString And type.CompareCase("String") Then
 		    Return True
 		  End If
 		  
-		  If value.Type = Variant.TypeBoolean And type.Compare("Boolean", ComparisonOptions.CaseSensitive) = 0 Then
+		  If value.Type = Variant.TypeBoolean And type.CompareCase("Boolean") Then
 		    Return True
 		  End If
 		  
-		  If value IsA ObjoScript.Klass And ObjoScript.Klass(value).Name.Compare(type, ComparisonOptions.CaseSensitive) = 0 Then
+		  If value IsA ObjoScript.Klass And ObjoScript.Klass(value).Name.CompareCase(type) Then
 		    Return True
 		  End If
 		  
@@ -1699,11 +1683,11 @@ Protected Class VM
 		    Return InstanceIsOfType(value, type)
 		  End If
 		  
-		  If value IsA ObjoScript.Nothing And type.Compare("nothing", ComparisonOptions.CaseSensitive) = 0 Then
+		  If value IsA ObjoScript.Nothing And type.CompareCase("nothing") Then
 		    Return True
 		  End If
 		  
-		  If value IsA ObjoScript.Func And type.Compare("Function", ComparisonOptions.CaseSensitive) = 0 Then
+		  If value IsA ObjoScript.Func And type.CompareCase("Function") Then
 		    Return True
 		  End If
 		  
@@ -1775,11 +1759,7 @@ Protected Class VM
 		    Return v.StringValue
 		    
 		  Case Variant.TypeBoolean
-		    If v Then
-		      Return "true"
-		    Else
-		      Return "false"
-		    End If
+		    Return If(v, "true", "false")
 		    
 		  Case Variant.TypeDouble
 		    If v.DoubleValue.IsInteger Then

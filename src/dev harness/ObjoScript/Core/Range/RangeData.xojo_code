@@ -63,6 +63,22 @@ Protected Class RangeData
 			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty
+		#tag ViewProperty
+			Name="LowerBound"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Double"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="UpperBound"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Double"
+			EditorType=""
+		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class
 #tag EndClass

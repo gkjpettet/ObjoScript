@@ -55,7 +55,7 @@ Protected Module Range
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
 		  Var iter As Variant = vm.GetSlotValue(1)
 		  
-		  Var data As ObjoScript.LibraryCore.Range.RangeData = instance.ForeignData
+		  Var data As ObjoScript.Core.Range.RangeData = instance.ForeignData
 		  
 		  If iter IsA ObjoScript.Nothing Then
 		    data.NextValue = data.LowerBound
@@ -82,7 +82,7 @@ Protected Module Range
 		  
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
 		  
-		  vm.SetReturn(ObjoScript.LibraryCore.Range.RangeData(instance.ForeignData).NextValue)
+		  vm.SetReturn(ObjoScript.Core.Range.RangeData(instance.ForeignData).NextValue)
 		  
 		End Sub
 	#tag EndMethod

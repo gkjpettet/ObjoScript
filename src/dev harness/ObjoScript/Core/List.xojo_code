@@ -11,7 +11,7 @@ Protected Module List
 		  
 		  Var item As Variant = vm.GetSlotValue(1)
 		  
-		  Var data As ObjoScript.LibraryCore.List.ListData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
+		  Var data As ObjoScript.Core.List.ListData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
 		  data.Items.Add(item)
 		  
 		  vm.SetReturn(item)
@@ -26,7 +26,7 @@ Protected Module List
 		  /// constructor()
 		  
 		  If args.Count = 0 Then
-		    instance.ForeignData = New ObjoScript.LibraryCore.List.ListData
+		    instance.ForeignData = New ObjoScript.Core.List.ListData
 		  Else
 		    vm.Error("Invalid number of arguments (expected 0, got " + args.Count.ToString + ").")
 		  End If
@@ -75,7 +75,7 @@ Protected Module List
 		  /// Assumes slot 0 contains a List instance.
 		  /// List.count() -> count
 		  
-		  Var data As ObjoScript.LibraryCore.List.ListData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
+		  Var data As ObjoScript.Core.List.ListData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
 		  
 		  vm.SetReturn(CType(data.Items.Count, Double))
 		  
@@ -93,10 +93,9 @@ Protected Module List
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
 		  Var iter As Variant = vm.GetSlotValue(1)
 		  
-		  Var data As ObjoScript.LibraryCore.List.ListData = instance.ForeignData
+		  Var data As ObjoScript.Core.List.ListData = instance.ForeignData
 		  
-		  If iter IsA ObjoScript.Nothing Then
-		    // Return the first item.
+		  If iter IsA ObjoScript.Nothing Then // Return the first item.
 		    If data.Items.Count = 0 Then
 		      // This is an empty list.
 		      data.NextValue = False
@@ -104,8 +103,8 @@ Protected Module List
 		      data.Index = 0
 		      data.NextValue = data.Items(0)
 		    End If
-		  Else
-		    // Return the next element.
+		    
+		  Else // Return the next element.
 		    data.Index = data.Index + 1.0
 		    If data.Index <= data.Items.LastIndex Then
 		      data.NextValue = data.Items(data.Index)
@@ -129,7 +128,7 @@ Protected Module List
 		  
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
 		  
-		  vm.SetReturn(ObjoScript.LibraryCore.List.ListData(instance.ForeignData).NextValue)
+		  vm.SetReturn(ObjoScript.Core.List.ListData(instance.ForeignData).NextValue)
 		  
 		End Sub
 	#tag EndMethod
@@ -148,7 +147,7 @@ Protected Module List
 		  /// - Slot 1 is the index.
 		  /// List.removeAt(index) -> item
 		  
-		  Var data As ObjoScript.LibraryCore.List.ListData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
+		  Var data As ObjoScript.Core.List.ListData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
 		  
 		  // Determine the index, accounting for backwards counting.
 		  Var index As Integer = vm.GetSlotValue(1)
@@ -190,7 +189,7 @@ Protected Module List
 		  End If
 		  Var index As Integer = rawIndex
 		  
-		  Var data As ObjoScript.LibraryCore.List.ListData = instance.ForeignData
+		  Var data As ObjoScript.Core.List.ListData = instance.ForeignData
 		  
 		  // Bounds check.
 		  If index < 0 Then
@@ -224,7 +223,7 @@ Protected Module List
 		  End If
 		  Var index As Integer = rawIndex
 		  
-		  Var data As ObjoScript.LibraryCore.List.ListData = instance.ForeignData
+		  Var data As ObjoScript.Core.List.ListData = instance.ForeignData
 		  
 		  // Bounds check.
 		  If index < 0 Then
@@ -246,7 +245,7 @@ Protected Module List
 		  /// - Slot 0 contains a List instance.
 		  /// List.toString -> String
 		  
-		  Var data As ObjoScript.LibraryCore.List.ListData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
+		  Var data As ObjoScript.Core.List.ListData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
 		  
 		  vm.SetReturn(data.ToString)
 		  

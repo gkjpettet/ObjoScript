@@ -1,5 +1,5 @@
 #tag Module
-Protected Module LibraryCore
+Protected Module Core
 	#tag ViewBehavior
 		#tag ViewProperty
 			Name="Name"

@@ -1,5 +1,5 @@
 #tag Module
-Protected Module LibrarySystem
+Protected Module System_
 	#tag Method, Flags = &h1, Description = 52657475726E7320746865206D6574686F6420746F20696E766F6B6520666F72206120666F726569676E206D6574686F64207769746820607369676E617475726560206F6E20746865206053797374656D6020636C617373206F72204E696C206966207468657265206973206E6F2073756368206D6574686F642E
 		Protected Function BindForeignMethod(signature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
 		  /// Returns the method to invoke for a foreign method with `signature` on the `System` class or Nil if there is no such method.
