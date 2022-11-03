@@ -5,8 +5,8 @@ Protected Module List
 		  /// Appends an item to the end of the list. Returns the added item.
 		  ///
 		  /// Assumes:
-		  /// - slot 0 contains a List instance.
-		  /// - slot 1 is the item to append.
+		  /// - Slot 0 contains a List instance.
+		  /// - Slot 1 is the item to append.
 		  /// List.add(item) -> item
 		  
 		  Var item As Variant = vm.GetSlotValue(1)
@@ -43,6 +43,9 @@ Protected Module List
 		  If signature.CompareCase("add(_)") Then
 		    Return AddressOf Add
 		    
+		  ElseIf signature.CompareCase("count()") Then
+		    Return AddressOf Count
+		    
 		  ElseIf signature.CompareCase("iterate(_)") Then
 		    Return AddressOf Iterate
 		    
@@ -63,6 +66,20 @@ Protected Module List
 		  End If
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320746865206E756D626572206F66206974656D7320696E20746865206C6973742E
+		Protected Sub Count(vm As ObjoScript.VM)
+		  /// Returns the number of items in the list.
+		  ///
+		  /// Assumes slot 0 contains a List instance.
+		  /// List.count() -> count
+		  
+		  Var data As ObjoScript.LibraryCore.List.ListData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
+		  
+		  vm.SetReturn(CType(data.Items.Count, Double))
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h1, Description = 52657475726E732066616C736520696620746865726520617265206E6F206D6F7265206974656D7320746F2069746572617465206F722072657475726E7320746865206E6578742076616C756520696E207468652073657175656E63652E

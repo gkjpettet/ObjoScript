@@ -1,6 +1,7 @@
 // The List class represents a single dimension array.
 foreign class List {
 foreign add(item)
+foreign count()
 foreign removeAt(index)
 foreign toString()
 
