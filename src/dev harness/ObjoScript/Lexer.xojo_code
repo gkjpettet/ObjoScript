@@ -741,6 +741,20 @@ Protected Class Lexer
 		      // Edge case: Discard trailing whitespace between the underscore and the newline character.
 		      While MatchSpaceOrTab
 		      Wend
+		      
+		      // Edge case: Comment after the line continuation marker.
+		      If Match("/") And Match("/") Then
+		        Do
+		          If Peek = EndOfLine.UNIX Then
+		            Exit
+		          ElseIf AtEnd Then
+		            Exit
+		          Else
+		            Call Advance
+		          End If
+		        Loop
+		      End If
+		      
 		      If Match(EndOfLine.UNIX) Then // Line continuation marker.
 		        HandleLineContinuation
 		        Return

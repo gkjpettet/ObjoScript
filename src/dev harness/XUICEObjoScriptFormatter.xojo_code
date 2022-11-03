@@ -701,6 +701,8 @@ Implements XUICEFormatter
 		  /// Assumes `line` is not Nil.
 		  /// `previousLineLastToken` may be Nil.
 		  
+		  #Pragma Warning "TODO: Broken if a comment occurs after a line continuation marker"
+		  
 		  If previousLineLastToken = Nil Then
 		    line.IsContinuation = False
 		    Return
