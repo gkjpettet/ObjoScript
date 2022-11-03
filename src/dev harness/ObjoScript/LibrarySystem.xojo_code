@@ -28,17 +28,17 @@ Protected Module LibrarySystem
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h1, Description = 52657475726E7320746865206E756D626572206F66206D6963726F7365636F6E64732073696E63652074686520686F7374206170706C69636174696F6E20737461727465642E
+	#tag Method, Flags = &h1, Description = 436F6D7075746573206120737472696E6720726570726573656E746174696F6E206F66207468652070617373656420617267756D656E7420616E64207261697365732074686520564D2773205072696E74206576656E742E2052657475726E73207468652076616C7565207072696E7465642E
 		Protected Sub Print(vm As ObjoScript.VM)
 		  /// Computes a string representation of the passed argument and raises the VM's 
-		  /// Print event.
+		  /// Print event. Returns the value printed.
 		  ///
-		  /// System.print(what) -> string
-		  
-		  #Pragma Warning "TODO: Should we return the argument?"
+		  /// System.print(what) -> what
 		  
 		  vm.RaisePrint(vm.GetSlotAsString(1))
 		  
+		  // Return the value printed.
+		  vm.SetReturn(vm.GetSlotValue(1))
 		End Sub
 	#tag EndMethod
 

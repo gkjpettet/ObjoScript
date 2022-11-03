@@ -23,6 +23,7 @@ Inherits TestController
 		  group = New LanguageImplicitReceiverTests(Self, "Language - Implicit Receiver")
 		  group = New LanguageInheritanceTests(Self, "Language - Inheritance")
 		  group = New LanguageListTests(Self, "Language - List")
+		  group = New LanguageLogicalOperatorTests(Self, "Language - Logical Operator")
 		  
 		End Sub
 	#tag EndEvent
