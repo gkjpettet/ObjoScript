@@ -1,0 +1,16 @@
+// Note: These tests implicitly depend on numbers being truthy.
+// Also relies on System.print() returning its argument.
+
+// Return the first true argument.
+System.print(1 or true) // expect: 1
+System.print(false or 1) // expect: 1
+System.print(false or false or true) // expect: true
+
+// Return the last argument if all are false.
+System.print(false or false) // expect: false
+System.print(false or false or false) // expect: false
+
+// Short-circuit at the first true argument.
+System.print(false) or _ // expect: false
+System.print(true) or _ // expect: true
+System.print(true) // should not print

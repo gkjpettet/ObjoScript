@@ -7,6 +7,24 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub AndTruthTest()
+		  AssertOutputsEqual("language.logical_operator.and_truth")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub OrTest()
+		  AssertOutputsEqual("language.logical_operator.or")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub OrTruthTest()
+		  AssertOutputsEqual("language.logical_operator.or_truth")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

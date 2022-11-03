@@ -1,0 +1,8 @@
+// False and null are false.
+System.print(false and "bad") // expect: false
+System.print(nothing and "bad") // expect: nothing
+
+// Everything else is true.
+System.print(true and "ok") // expect: ok
+System.print(0 and "ok") // expect: ok
+System.print("" and "ok") // expect: ok
