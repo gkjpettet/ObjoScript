@@ -1352,9 +1352,9 @@ End
 		  Output.Text = ""
 		  DebuggerOutput.Text = ""
 		  
-		  // Create a new compiler in debug mode.
+		  // Create a new compiler.
 		  Compiler = New ObjoScript.Compiler
-		  Compiler.DebugMode = True
+		  Compiler.DebugMode = CheckBoxDebugMode.Value
 		  
 		  // If the VM has been instantiated, remove any handlers we added.
 		  If VM <> Nil Then
@@ -1756,6 +1756,10 @@ End
 		  If VM <> Nil Then
 		    VM.DebugMode = Me.Value
 		    VM.TraceExecution = Me.Value
+		  End If
+		  
+		  If Compiler <> Nil Then
+		    Compiler.DebugMode = Me.Value
 		  End If
 		  
 		  ButtonStepIn.Enabled = Me.Value
