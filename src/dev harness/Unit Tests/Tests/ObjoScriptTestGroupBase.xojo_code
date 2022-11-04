@@ -85,10 +85,6 @@ Inherits TestGroup
 	#tag Method, Flags = &h0, Description = 436F6D70696C65732060736F75726365602028616C6F6E6720776974682074686520564D2773207374616E64617264206C6962726172792920616E642072657475726E732074686520726573756C74696E672066756E6374696F6E2E
 		Function CompileTest(source As String) As ObjoScript.Func
 		  /// Compiles `source` (along with the VM's standard library) and returns the resulting function.
-		  ///
-		  /// Expects `testName` to be in the format: topic.subtopic.testName
-		  /// This mirrors the folder structure of the bundled tests (which are in tests/source/topic/subtopic/)
-		  /// NB: We do not expect `.objo_script` to be appended to testName.
 		  
 		  Compiler = New ObjoScript.Compiler
 		  Return Compiler.Compile(source)
@@ -150,7 +146,7 @@ Inherits TestGroup
 		  ///
 		  /// Expects `testName` to be in the format: topic.subtopic.testName
 		  /// This mirrors the folder structure of the bundled tests (which are in tests/source/topic/subtopic/)
-		  /// NB: We do not expect `.objo_script` to be appended to testName.
+		  /// NB: We do not expect `.objo` to be appended to testName.
 		  
 		  // Get the required test.
 		  Var parts() As String = testName.Split(".")
@@ -158,8 +154,8 @@ Inherits TestGroup
 		    Raise New InvalidArgumentException("Invalid testName format (" + testName + "). Expected topic.subtopic.testName")
 		  End If
 		  
-		  // Add the .objo_script extension to the test name.
-		  parts(2) = parts(2) + ".objo_script"
+		  // Add the .objo extension to the test name.
+		  parts(2) = parts(2) + ".objo"
 		  
 		  Var f As FolderItem = SpecialFolder.Resource("tests")
 		  If f = Nil Then

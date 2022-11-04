@@ -795,6 +795,10 @@ Protected Class VM
 		  #Pragma NilObjectChecking False
 		  #Pragma StackOverflowChecking False
 		  
+		  #Pragma Warning "TODO: Figure out a way to hande invocations on numbers/strings and booleans"
+		  ' Should be able to just pass the required Klass for these native types to InvokeFromClass.
+		  ' Need a way to define these native Klasses though...
+		  
 		  // Grab the receiver from the stack. It should be beneath any arguments to the invocation.
 		  Var receiver As Variant = Peek(argCount)
 		  Var isStatic As Boolean = False

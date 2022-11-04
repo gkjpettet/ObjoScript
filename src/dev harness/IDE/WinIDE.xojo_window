@@ -1412,7 +1412,7 @@ End
 		  Self.Changed = True
 		  
 		  If f = Nil Or Not f.Exists Then
-		    f = FolderItem.ShowSaveFileDialog(DocumentTypes.ObjoScript, "New ObjoScript file.objo_script")
+		    f = FolderItem.ShowSaveFileDialog(DocumentTypes.ObjoScript, "New ObjoScript file.objo")
 		  End If
 		  
 		  If f = Nil Then Return False

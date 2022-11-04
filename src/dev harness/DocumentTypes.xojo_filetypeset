@@ -1,7 +1,7 @@
 #tag FileTypeSet
 	#tag FileType
 		CodeName=ObjoScript
-		Extension=.objo_script
+		Extension=.objo
 		Flags=&h5
 		MacCreator=
 		MacType=
