@@ -1,0 +1,4 @@
+// All numbers in Objo belong to this class.
+foreign class Number {
+foreign sqrt()
+}

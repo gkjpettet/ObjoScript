@@ -66,11 +66,20 @@ Protected Class VM
 		  
 		  #Pragma Warning "TODO: Implement the `Map` class"
 		  
-		  If className.CompareCase("Range") Then
-		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Range.Allocate, Nil)
+		  If className.CompareCase("Boolean") Then
+		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Boolean_.Allocate, Nil)
 		    
 		  ElseIf className.CompareCase("List") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.List.Allocate, Nil)
+		    
+		  ElseIf className.CompareCase("Number") Then
+		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Number.Allocate, Nil)
+		    
+		  ElseIf className.CompareCase("Range") Then
+		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Range.Allocate, Nil)
+		    
+		  ElseIf className.CompareCase("String") Then
+		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.String_.Allocate, Nil)
 		  End If
 		  
 		End Function
@@ -87,14 +96,23 @@ Protected Class VM
 		  #Pragma NilObjectChecking False
 		  #Pragma StackOverflowChecking False
 		  
-		  If className.CompareCase("System") Then
-		    Return Core.System_.BindForeignMethod(signature, isStatic)
+		  If className.CompareCase("Boolean") Then
+		    Return Core.Boolean_.BindForeignMethod(signature, isStatic)
+		    
+		  ElseIf className.CompareCase("List") Then
+		    Return Core.List.BindForeignMethod(signature, isStatic)
+		    
+		  ElseIf className.CompareCase("Number") Then
+		    Return Core.Number.BindForeignMethod(signature, isStatic)
 		    
 		  ElseIf className.CompareCase("Range") Then
 		    Return Core.Range.BindForeignMethod(signature, isStatic)
 		    
-		  ElseIf className.CompareCase("List") Then
-		    Return Core.List.BindForeignMethod(signature, isStatic)
+		  ElseIf className.CompareCase("String") Then
+		    Return Core.String_.BindForeignMethod(signature, isStatic)
+		    
+		  ElseIf className.CompareCase("System") Then
+		    Return Core.System_.BindForeignMethod(signature, isStatic)
 		  End If
 		  
 		End Function
@@ -428,6 +446,17 @@ Protected Class VM
 		  
 		  klass.ForeignDelegates = fcd
 		  
+		  // If this is one of Objo's built-in types we keep a reference to the class for use elsewhere.
+		  If klass.Name.CompareCase("Boolean") Then
+		    BooleanClass = klass
+		    
+		  ElseIf klass.Name.CompareCase("Number") Then
+		    NumberClass = klass
+		    
+		  ElseIf klass.Name.CompareCase("String") Then
+		    StringClass = klass
+		  End If
+		  
 		End Sub
 	#tag EndMethod
 
@@ -727,6 +756,8 @@ Protected Class VM
 		Private Sub InitialiseProhibitedSuperClasses()
 		  /// Initialises the array containing the classes which may **not** be inherited from.
 		  
+		  #Pragma Warning "TODO: Remove? Isn't this handled in the parser?"
+		  
 		  ProhibitedSuperClasses.ResizeTo(-1)
 		  
 		  ProhibitedSuperClasses.Add("List")
@@ -795,27 +826,37 @@ Protected Class VM
 		  #Pragma NilObjectChecking False
 		  #Pragma StackOverflowChecking False
 		  
-		  #Pragma Warning "TODO: Figure out a way to hande invocations on numbers/strings and booleans"
-		  ' Should be able to just pass the required Klass for these native types to InvokeFromClass.
-		  ' Need a way to define these native Klasses though...
-		  
 		  // Grab the receiver from the stack. It should be beneath any arguments to the invocation.
 		  Var receiver As Variant = Peek(argCount)
 		  Var isStatic As Boolean = False
-		  If receiver IsA ObjoScript.Klass Then
+		  Var klass As ObjoScript.Klass
+		  If receiver.Type = Variant.TypeDouble Then
+		    klass = NumberClass
+		    
+		  ElseIf receiver.Type = Variant.TypeString Then
+		    klass = StringClass
+		    
+		  ElseIf receiver IsA ObjoScript.Klass Then
+		    klass = ObjoScript.Klass(receiver)
 		    isStatic = True
 		    
-		  ElseIf receiver IsA ObjoScript.Instance = False Then
+		  ElseIf receiver IsA ObjoScript.Instance Then
+		    klass = ObjoScript.Instance(receiver).Klass
+		    
+		  ElseIf receiver.Type = Variant.TypeBoolean Then
+		    klass = BooleanClass
+		    
+		  Else
 		    Error("Only classes and instances have methods.")
 		  End If
 		  
 		  If isStatic Then
 		    // This is a static method invocation.
-		    InvokeFromClass(ObjoScript.Klass(receiver), signature, argCount, True)
+		    InvokeFromClass(klass, signature, argCount, True)
 		    
 		  Else
 		    // The method is directly on the instance.
-		    InvokeFromClass(ObjoScript.Instance(receiver).Klass, signature, argCount, False)
+		    InvokeFromClass(klass, signature, argCount, False)
 		  End If
 		  
 		End Sub
@@ -2012,6 +2053,10 @@ Protected Class VM
 		Private APISlots(-1) As Variant
 	#tag EndProperty
 
+	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E20426F6F6C65616E206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
+		Private BooleanClass As ObjoScript.Klass
+	#tag EndProperty
+
 	#tag Property, Flags = &h21, Description = 436F6E7461696E7320616C6C20626F756E64206D6574686F647320637265617465642061732043616C6C48616E646C65732062792074686520564D2E
 		Private CallHandles() As ObjoScript.BoundMethod
 	#tag EndProperty
@@ -2067,6 +2112,10 @@ Protected Class VM
 
 	#tag Property, Flags = &h0, Description = 53696E676C65746F6E20696E7374616E6365206F6620224E6F7468696E67222E
 		Nothing As ObjoScript.Nothing
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E204E756D626572206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
+		Private NumberClass As ObjoScript.Klass
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0, Description = 4B6579203D206F70636F64652028496E7465676572292C2056616C7565203D206E756D626572206F66206279746573207573656420666F72206F706572616E64732E
@@ -2161,6 +2210,10 @@ Protected Class VM
 
 	#tag Property, Flags = &h21, Description = 506F696E747320746F2074686520696E64657820696E2060537461636B60206A757374202A706173742A2074686520656C656D656E7420636F6E7461696E696E672074686520746F702076616C75652E205468657265666F726520603060206D65616E732074686520737461636B20697320656D7074792E20497427732074686520696E64657820746865206E6578742076616C75652077696C6C2062652070757368656420746F2E
 		Private StackTop As Integer = 0
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E20537472696E67206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
+		Private StringClass As ObjoScript.Klass
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 49662054727565207468656E2074686520564D2077696C6C206F75747075742028766961206974732044656275675072696E74206576656E74292074686520737461636B20636F6E74656E747320616E642063757272656E74206F70636F64652061732069742065786563757465732E

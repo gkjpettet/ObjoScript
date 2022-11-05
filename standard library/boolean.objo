@@ -1,0 +1,3 @@
+foreign class Boolean {
+foreign toString()
+}
