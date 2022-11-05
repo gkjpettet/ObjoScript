@@ -854,7 +854,9 @@ Protected Class Parser
 		  "Map", _
 		  "Nothing", _
 		  "Number", _
-		  "String" _
+		  "Range", _
+		  "String", _
+		  "System" _
 		  )
 		  
 		  Return types

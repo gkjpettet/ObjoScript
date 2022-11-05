@@ -45,7 +45,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub InheritFromRangeTest()
-		  AssertRuntimeError("language.inheritance.inherit_from_range")
+		  AssertCompilerError("language.inheritance.inherit_from_range")
 		End Sub
 	#tag EndMethod
 
