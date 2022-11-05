@@ -24,7 +24,7 @@ Inherits TestController
 		  group = New LanguageInheritanceTests(Self, "Language - Inheritance")
 		  group = New LanguageListTests(Self, "Language - List")
 		  group = New LanguageLogicalOperatorTests(Self, "Language - Logical Operator")
-		  
+		  group = New LanguageMethodTests(Self, "Language - Methods")
 		End Sub
 	#tag EndEvent
 

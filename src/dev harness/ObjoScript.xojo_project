@@ -142,6 +142,7 @@ Class=LanguageIfTests;Unit Tests/Tests/LanguageIfTests.xojo_code;&h0000000056B50
 Class=LanguageImplicitReceiverTests;Unit Tests/Tests/LanguageImplicitReceiverTests.xojo_code;&h0000000073303FFF;&h000000000BB987FF;false
 Class=LanguageInheritanceTests;Unit Tests/Tests/LanguageInheritanceTests.xojo_code;&h000000006A30DFFF;&h000000000BB987FF;false
 Class=LanguageListTests;Unit Tests/Tests/LanguageListTests.xojo_code;&h000000006DE5C7FF;&h000000000BB987FF;false
+Class=LanguageMethodTests;Unit Tests/Tests/LanguageMethodTests.xojo_code;&h000000006D21D7FF;&h000000000BB987FF;false
 Class=LanguageLogicalOperatorTests;Unit Tests/Tests/LanguageLogicalOperatorTests.xojo_code;&h000000001453A7FF;&h000000000BB987FF;false
 Folder=UI;Unit Tests/UI;&h0000000003D06FFF;&h000000002516B04D;false
 MenuBar=MenuBarTests;Unit Tests/UI/MenuBarTests.xojo_menu;&h000000002BBD1FFF;&h0000000003D06FFF;false
