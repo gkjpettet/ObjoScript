@@ -10,33 +10,18 @@ Implements ObjoScript.Stmt
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(superclass As String, identifier As ObjoScript.Token, constructors() As ObjoScript.ConstructorDeclStmt, staticMethods As Dictionary, methods As Dictionary, foreignMethods As Dictionary, classKeyword As ObjoScript.Token, isForeign As Boolean)
+		Sub Constructor(superclass As String, identifier As ObjoScript.Token, constructors() As ObjoScript.ConstructorDeclStmt, staticMethods As Dictionary, methods As Dictionary, foreignInstanceMethods As Dictionary, foreignStaticMethods As Dictionary, classKeyword As ObjoScript.Token, isForeign As Boolean)
 		  Self.Superclass = superclass
 		  Self.Identifier = identifier
 		  Self.Constructors = constructors
 		  Self.StaticMethods = staticMethods
 		  Self.Methods = methods
-		  Self.ForeignMethods = foreignMethods
+		  Self.ForeignInstanceMethods = foreignInstanceMethods
+		  Self.ForeignStaticMethods = foreignStaticMethods
 		  mClassKeyword = classKeyword
 		  Self.IsForeign = isForeign
 		  
 		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = 52657475726E732054727565206966207468697320636C61737320686173206120666F726569676E206D6574686F64207769746820607369676E6174757265602E
-		Function HasForeignMethodWithSignature(signature As String) As Boolean
-		  /// Returns True if this class has a foreign method with `signature`.
-		  
-		  For Each entry As DictionaryEntry In Self.ForeignMethods
-		    Var m As ObjoScript.ForeignMethodDeclStmt = entry.Value
-		    If m.Signature.CompareCase(signature) Then
-		      Return True
-		    End If
-		  Next entry
-		  
-		  Return False
-		  
-		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 52657475726E732054727565206966207468697320636C6173732068617320616E20696E7374616E6365206D6574686F64207769746820607369676E6174757265602E
@@ -87,8 +72,12 @@ Implements ObjoScript.Stmt
 		Constructors() As ObjoScript.ConstructorDeclStmt
 	#tag EndProperty
 
-	#tag Property, Flags = &h0, Description = 5468697320636C6173732720666F726569676E206D6574686F64206465636C61726174696F6E732E204B6579203D207369676E61747572652C2056616C7565203D20466F726569676E4D6574686F644465636C53746D742E
-		ForeignMethods As Dictionary
+	#tag Property, Flags = &h0, Description = 5468697320636C6173732720666F726569676E20696E7374616E6365206D6574686F64206465636C61726174696F6E732E204B6579203D207369676E61747572652C2056616C7565203D20466F726569676E4D6574686F644465636C53746D742E
+		ForeignInstanceMethods As Dictionary
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 5468697320636C6173732720666F726569676E20737461746963206D6574686F64206465636C61726174696F6E732E204B6579203D207369676E61747572652C2056616C7565203D20466F726569676E4D6574686F644465636C53746D742E
+		ForeignStaticMethods As Dictionary
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0, Description = 54727565206966207468697320636C617373206861732061207375706572636C6173732E

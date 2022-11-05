@@ -161,10 +161,18 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    node.AppendNode(staticMethods)
 		  End If
 		  
-		  // Foreign methods
-		  If c.ForeignMethods.Count > 0 Then
-		    Var foreignMethods As New TreeViewNode("Foreign methods")
-		    For Each entry As DictionaryEntry In c.ForeignMethods
+		  // Foreign methods.
+		  If c.ForeignInstanceMethods.Count > 0 Then
+		    Var foreignMethods As New TreeViewNode("Foreign instance methods")
+		    For Each entry As DictionaryEntry In c.ForeignInstanceMethods
+		      Var m As ObjoScript.ForeignMethodDeclStmt = entry.Value
+		      foreignMethods.AppendNode(m.Accept(Self))
+		    Next entry
+		    node.AppendNode(foreignMethods)
+		  End If
+		  If c.ForeignStaticMethods.Count > 0 Then
+		    Var foreignMethods As New TreeViewNode("Foreign static methods")
+		    For Each entry As DictionaryEntry In c.ForeignStaticMethods
 		      Var m As ObjoScript.ForeignMethodDeclStmt = entry.Value
 		      foreignMethods.AppendNode(m.Accept(Self))
 		    Next entry

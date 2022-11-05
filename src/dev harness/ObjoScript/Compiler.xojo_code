@@ -1563,7 +1563,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  End If
 		  
 		  // Compile any foreign method declarations.
-		  For Each entry As DictionaryEntry In c.ForeignMethods
+		  For Each entry As DictionaryEntry In c.ForeignInstanceMethods
+		    Var fmd As ObjoScript.ForeignMethodDeclStmt = entry.Value
+		    Call fmd.Accept(Self)
+		  Next entry
+		  For Each entry As DictionaryEntry In c.ForeignStaticMethods
 		    Var fmd As ObjoScript.ForeignMethodDeclStmt = entry.Value
 		    Call fmd.Accept(Self)
 		  Next entry
