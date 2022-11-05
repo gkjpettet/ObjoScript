@@ -1,0 +1,8 @@
+class Foo {
+  thisHasAMethodNameThatIsExactly64CharactersLongWhichIsReallyLong() {
+    return "result"
+  }
+}
+
+ // expect: result
+System.print(Foo().thisHasAMethodNameThatIsExactly64CharactersLongWhichIsReallyLong)

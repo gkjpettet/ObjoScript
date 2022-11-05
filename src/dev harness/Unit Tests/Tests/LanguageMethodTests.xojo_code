@@ -8,6 +8,66 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub DuplicateInstanceMethodsTest()
+		  AssertCompilerError("language.method.duplicate_instance_methods")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub DuplicateStaticMethodsTest()
+		  AssertCompilerError("language.method.duplicate_static_methods")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub EmptyBlockTest()
+		  AssertOutputsEqual("language.method.empty_block")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub EmptySubscriptDefinitionTest()
+		  AssertCompilerError("language.method.empty_subscript_definition")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub EmptySubscriptTest()
+		  AssertCompilerError("language.method.empty_subscript")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub LongNameTest()
+		  AssertOutputsEqual("language.method.long_name")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ManyMethodsTest()
+		  AssertOutputsEqual("language.method.many_methods")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub NotFoundElevenArgumentsTest()
+		  AssertRuntimeError("language.method.not_found_eleven_arguments")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub NotFoundOneArgumentTest()
+		  AssertRuntimeError("language.method.not_found_one_argument")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub NotFoundTwoArgumentsTest()
+		  AssertRuntimeError("language.method.not_found_two_arguments")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub PermittedDuplicateMethodsTest()
 		  AssertOutputsEqual("language.method.permitted_duplicate_methods")
 		End Sub
