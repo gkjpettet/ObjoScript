@@ -1,5 +1,20 @@
 #tag Module
 Protected Module ObjoScript
+	#tag Method, Flags = &h0, Description = 52657475726E732054727565206966206073602065786163746C79206D61746368657320616E797468696E6720696E206076616C756573602E
+		Function ExactlyMatches(Extends s As String, values() As String) As Boolean
+		  /// Returns True if `s` exactly matches anything in `values`.
+		  
+		  For Each value As String In values
+		    If s.CompareCase(value) Then
+		      Return True
+		    End If
+		  Next value
+		  
+		  Return False
+		  
+		End Function
+	#tag EndMethod
+
 	#tag DelegateDeclaration, Flags = &h1, Description = 496E766F6B6564207768656E20616E20696E7374616E6365206F66206120666F726569676E20636C61737320697320636F6E73747275637465642E204F6363757273206265666F726520616E79204F626A6F2D646566696E656420636C61737320636F6E7374727563746F72732061726520696E766F6B65642E
 		Protected Delegate Sub ForeignAllocateDelegate(vm As ObjoScript . VM, instance As ObjoScript . Instance, arguments() As Variant)
 	#tag EndDelegateDeclaration
@@ -247,9 +262,6 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.RCurly
 		    Return "rcurly"
 		    
-		  Case ObjoScript.TokenTypes.ReservedType
-		    Return "reserved type"
-		    
 		  Case ObjoScript.TokenTypes.Return_
 		    Return "return"
 		    
@@ -495,7 +507,6 @@ Protected Module ObjoScript
 		  PlusPlus
 		  Query
 		  RCurly
-		  ReservedType
 		  Return_
 		  RParen
 		  RSquare

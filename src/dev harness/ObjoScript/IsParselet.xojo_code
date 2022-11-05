@@ -15,7 +15,7 @@ Implements ObjoScript.InfixParselet
 		  
 		  // Get the type.
 		  Var type As ObjoScript.Token = parser.Consume("Expected a type name after the `is` keyword.", _
-		  ObjoScript.TokenTypes.UppercaseIdentifier, ObjoScript.TokenTypes.ReservedType, ObjoScript.TokenTypes.Nothing)
+		  ObjoScript.TokenTypes.UppercaseIdentifier, ObjoScript.TokenTypes.Nothing)
 		  
 		  Return New IsExpr(left, type, isKeyword)
 		  

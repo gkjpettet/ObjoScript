@@ -148,7 +148,7 @@ Protected Class Parser
 		  Var superClass As String = ""
 		  If Match(ObjoScript.TokenTypes.Is_) Then
 		    // Edge case: Attempting to inherit from a built-in type.
-		    If Match(ObjoScript.TokenTypes.ReservedType) Then
+		    If Current.Lexeme.ExactlyMatches(ObjoTypes) Then
 		      Error("Classes cannot inherit from built-in types.")
 		    End If
 		    superClass = Consume(ObjoScript.TokenTypes.UppercaseIdentifier, _
@@ -840,6 +840,24 @@ Protected Class Parser
 		  /// Convenience method for creating a new GrammarRule with a slightly shorter syntax.
 		  
 		  Return New ObjoScript.GrammarRule(prefix, infix, precedence)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E7320616E206172726179206F66204F626A6F2773206275696C742D696E20747970657320746861742063616E6E6F7420626520696E686572697465642066726F6D2E
+		Private Shared Function ObjoTypes() As String()
+		  /// Returns an array of Objo's built-in types that cannot be inherited from.
+		  
+		  Static types() As String = Array( _
+		  "Boolean", _
+		  "List", _
+		  "Map", _
+		  "Nothing", _
+		  "Number", _
+		  "String" _
+		  )
+		  
+		  Return types
 		  
 		End Function
 	#tag EndMethod

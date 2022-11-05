@@ -21,7 +21,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub InheritFromListTest()
-		  AssertRuntimeError("language.inheritance.inherit_from_list")
+		  AssertCompilerError("language.inheritance.inherit_from_list")
 		End Sub
 	#tag EndMethod
 
