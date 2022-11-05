@@ -178,11 +178,15 @@ Protected Class Parser
 		      
 		    ElseIf Match(ObjoScript.TokenTypes.Static_) Then
 		      Var sm As ObjoScript.MethodDeclStmt = MethodDeclaration(className, True)
-		      If staticMethods.HasKey(sm.Signature) Or methods.HasKey(sm.Signature) Or foreignMethods.HasKey(sm.Signature) Then
+		      
+		      If staticMethods.HasKey(sm.Signature) Then
 		        Error("Duplicate method definition: " + sm.Signature, sm.Location)
-		      Else
-		        staticMethods.Value(sm.Signature) = sm
 		      End If
+		      If foreignMethods.HasKey(sm.Signature) And ObjoScript.ForeignMethodDeclStmt(foreignMethods.Value(sm.Signature)).IsStatic Then
+		        Error("Duplicate method definition: " + sm.Signature, sm.Location)
+		      End If
+		      
+		      staticMethods.Value(sm.Signature) = sm
 		      
 		    ElseIf Match(ObjoScript.TokenTypes.Foreign) Then
 		      Var f As ObjoScript.ForeignMethodDeclStmt
@@ -200,11 +204,15 @@ Protected Class Parser
 		      
 		    Else
 		      Var m As ObjoScript.MethodDeclStmt = MethodDeclaration(className, False)
-		      If staticMethods.HasKey(m.Signature) Or methods.HasKey(m.Signature) Or foreignMethods.HasKey(m.Signature) Then
+		      
+		      If methods.HasKey(m.Signature) Then
 		        Error("Duplicate method definition: " + m.Signature, m.Location)
-		      Else
-		        methods.Value(m.Signature) = m
 		      End If
+		      If foreignMethods.HasKey(m.Signature) And Not ObjoScript.ForeignMethodDeclStmt(foreignMethods.Value(m.Signature)).IsStatic Then
+		        Error("Duplicate method definition: " + m.Signature, m.Location)
+		      End If
+		      methods.Value(m.Signature) = m
+		      
 		    End If
 		    
 		    // Optional new line.

@@ -7,6 +7,12 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub PermittedDuplicateMethodsTest()
+		  AssertOutputsEqual("language.method.permitted_duplicate_methods")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

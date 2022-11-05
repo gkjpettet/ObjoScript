@@ -1,0 +1,5 @@
+class Foo {
+// No error on instance and static method with same signature.
+baz() {}
+static baz() {}
+}
