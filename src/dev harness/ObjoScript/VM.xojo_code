@@ -217,7 +217,7 @@ Protected Class VM
 		  
 		  // Make sure we don't overflow with a deep call frame (most likely a user error with 
 		  // a runaway recursive issue).
-		  If FrameCount = MAX_FRAMES Then
+		  If FrameCount >= MAX_FRAMES Then
 		    Error("Stack overflow.")
 		  End If
 		  
