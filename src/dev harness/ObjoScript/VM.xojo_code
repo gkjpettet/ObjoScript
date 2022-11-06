@@ -1171,6 +1171,9 @@ Protected Class VM
 		  // Make sure we don't try to step in with an out of bounds instruction pointer.
 		  If CurrentFrame.IP > CurrentChunk.Code.LastIndex Then Return
 		  
+		  // Some temporary variables.
+		  Var a, b As Variant
+		  
 		  While True
 		    
 		    If Self.DebugMode And CurrentChunk.IsDebug Then
@@ -1231,8 +1234,8 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_ADD
-		      Var a As Variant = Peek(1)
-		      Var b As Variant = Peek(0)
+		      a = Peek(1)
+		      b = Peek(0)
 		      If a.Type = Variant.TypeDouble And b.Type = Variant.TypeDouble Then
 		        PopAndReplaceTop(a.DoubleValue + b.DoubleValue)
 		      Else
@@ -1248,8 +1251,8 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_SUBTRACT
-		      Var a As Variant = Peek(1)
-		      Var b As Variant = Peek(0)
+		      a = Peek(1)
+		      b = Peek(0)
 		      If a.Type = Variant.TypeDouble And b.Type = Variant.TypeDouble Then
 		        PopAndReplaceTop(a.DoubleValue - b.DoubleValue)
 		      ElseIf a IsA ObjoScript.Instance Then
@@ -1259,20 +1262,20 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_DIVIDE
-		      Var b As Variant = Pop
-		      Var a As Variant = Pop
+		      b = Pop
+		      a = Pop
 		      AssertNumbers(a, b)
 		      Push(a.DoubleValue / b.DoubleValue)
 		      
 		    Case OP_MULTIPLY
-		      Var b As Variant = Pop
-		      Var a As Variant = Pop
+		      b = Pop
+		      a = Pop
 		      AssertNumbers(a, b)
 		      Push(a.DoubleValue * b.DoubleValue)
 		      
 		    Case OP_MODULO
-		      Var b As Variant = Pop
-		      Var a As Variant = Pop
+		      b = Pop
+		      a = Pop
 		      AssertNumbers(a, b)
 		      Push(CType(a.DoubleValue Mod b.DoubleValue, Double))
 		      
@@ -1284,36 +1287,36 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_EQUAL
-		      Var b As Variant = Pop
-		      Var a As Variant = Pop
+		      b = Pop
+		      a = Pop
 		      Push(ValuesEqual(a, b))
 		      
 		    Case OP_NOT_EQUAL
-		      Var b As Variant = Pop
-		      Var a As Variant = Pop
+		      b = Pop
+		      a = Pop
 		      Push(Not ValuesEqual(a, b))
 		      
 		    Case OP_GREATER
-		      Var b As Variant = Pop
-		      Var a As Variant = Pop
+		      b = Pop
+		      a = Pop
 		      AssertNumbers(a, b)
 		      Push(a > b)
 		      
 		    Case OP_GREATER_EQUAL
-		      Var b As Variant = Pop
-		      Var a As Variant = Pop
+		      b = Pop
+		      a = Pop
 		      AssertNumbers(a, b)
 		      Push(a >= b)
 		      
 		    Case OP_LESS
-		      Var b As Variant = Pop
-		      Var a As Variant = Pop
+		      b = Pop
+		      a = Pop
 		      AssertNumbers(a, b)
 		      Push(a < b)
 		      
 		    Case OP_LESS_EQUAL
-		      Var b As Variant = Pop
-		      Var a As Variant = Pop
+		      b = Pop
+		      a = Pop
 		      AssertNumbers(a, b)
 		      Push(a <= b)
 		      
@@ -1334,36 +1337,36 @@ Protected Class VM
 		      StackTop = StackTop - ReadByte
 		      
 		    Case OP_SHIFT_LEFT
-		      Var b As Variant = Pop
-		      Var a As Variant = Pop
+		      b = Pop
+		      a = Pop
 		      AssertNumbers(a, b)
 		      // If a or b are doubles, they are truncated to integers.
 		      Push(Ctype(Bitwise.ShiftLeft(a.IntegerValue, b.IntegerValue), Double))
 		      
 		    Case OP_SHIFT_RIGHT
-		      Var b As Variant = Pop
-		      Var a As Variant = Pop
+		      b = Pop
+		      a = Pop
 		      AssertNumbers(a, b)
 		      // If a or b are doubles, they are truncated to integers.
 		      Push(Ctype(Bitwise.ShiftRight(a.IntegerValue, b.IntegerValue), Double))
 		      
 		    Case OP_BITWISE_AND
-		      Var b As Variant = Pop
-		      Var a As Variant = Pop
+		      b = Pop
+		      a = Pop
 		      AssertNumbers(a, b)
 		      // Bitwise operators always work on 32-bit unsigned integers.
 		      Push(Ctype(a.UInt32Value And b.UInt32Value, Double))
 		      
 		    Case OP_BITWISE_OR
-		      Var b As Variant = Pop
-		      Var a As Variant = Pop
+		      b = Pop
+		      a = Pop
 		      AssertNumbers(a, b)
 		      // Bitwise operators always work on 32-bit unsigned integers.
 		      Push(Ctype(a.UInt32Value Or b.UInt32Value, Double))
 		      
 		    Case OP_BITWISE_XOR
-		      Var b As Variant = Pop
-		      Var a As Variant = Pop
+		      b = Pop
+		      a = Pop
 		      AssertNumbers(a, b)
 		      // Bitwise operators always work on 32-bit unsigned integers.
 		      Push(Ctype(a.UInt32Value Xor b.UInt32Value, Double))
@@ -1484,8 +1487,8 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_LOGICAL_XOR
-		      Var b As Variant = Pop
-		      Var a As Variant = Pop
+		      b = Pop
+		      a = Pop
 		      Push(IsTruthy(a) Xor IsTruthy(b))
 		      
 		    Case OP_LOOP
@@ -1574,7 +1577,7 @@ Protected Class VM
 		      // Do this in-place to avoid Push/Pop calls.
 		      ' b        a
 		      ' a   -->  b
-		      Var b As Variant = Stack(StackTop - 1)
+		      b = Stack(StackTop - 1)
 		      Stack(StackTop - 1) = Stack(StackTop - 2)
 		      Stack(StackTop - 2) = b
 		      
