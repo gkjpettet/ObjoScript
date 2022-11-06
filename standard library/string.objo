@@ -1,4 +1,5 @@
 // The built-in String class.
 foreign class String {
 foreign beginsWith(prefix)
+foreign +(other)
 }

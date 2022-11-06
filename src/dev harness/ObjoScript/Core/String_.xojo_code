@@ -1,5 +1,23 @@
 #tag Module
 Protected Module String_
+	#tag Method, Flags = &h1, Description = 436F6E636174656E61746573207468697320737472696E6720776974682074686520617267756D656E7420696E20736C6F74203120616E642072657475726E732074686520726573756C742E
+		Protected Sub Add(vm As ObjoScript.VM)
+		  /// Concatenates this string with the argument in slot 1 and returns the result.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is value to append.
+		  ///
+		  /// String.+(other) -> string
+		  
+		  /// Since this is a built-in type, slot 0 will be a string (not an instance object).
+		  Var s As String = vm.GetSlotValue(0)
+		  
+		  vm.SetReturn(s + vm.GetSlotAsString(1))
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 54686520757365722069732063616C6C696E672074686520537472696E6720636C61737320636F6E7374727563746F722E
 		Protected Sub Allocate(vm As ObjoScript.VM, instance As ObjoScript.Instance, args() As Variant)
 		  /// The user is calling the String class constructor.
@@ -36,7 +54,10 @@ Protected Module String_
 		  If isStatic Then
 		    
 		  Else
-		    If signature.CompareCase("beginsWith(_)") Then
+		    If signature = "+(_)" Then
+		      Return AddressOf Add
+		      
+		    ElseIf signature.CompareCase("beginsWith(_)") Then
 		      Return AddressOf BeginsWith
 		    End If
 		  End If

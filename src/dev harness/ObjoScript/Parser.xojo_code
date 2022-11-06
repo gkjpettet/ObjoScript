@@ -898,13 +898,14 @@ Protected Class Parser
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52657475726E7320616E206172726179206F6620746865206F70657261746F72732074686174206D6179206265206F7665726C6F616465642E
-		Private Function OverloadableOperators() As ObjoScript.TokenTypes()
+	#tag Method, Flags = &h0, Description = 52657475726E7320616E206172726179206F6620746865206F70657261746F72732074686174206D6179206265206F7665726C6F616465642E
+		Shared Function OverloadableOperators() As ObjoScript.TokenTypes()
 		  /// Returns an array of the operators that may be overloaded.
 		  
-		  Var operators() As ObjoScript.TokenTypes
-		  
-		  operators.Add(ObjoScript.TokenTypes.LSquare)
+		  Static operators() As ObjoScript.TokenTypes = Array( _
+		  ObjoScript.TokenTypes.LSquare, _
+		  ObjoScript.TokenTypes.Plus _
+		  )
 		  
 		  Return operators
 		End Function

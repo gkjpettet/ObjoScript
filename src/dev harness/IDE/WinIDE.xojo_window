@@ -855,7 +855,7 @@ Begin DesktopWindow WinIDE
       Underline       =   False
       Value           =   False
       Visible         =   True
-      VisualState     =   1
+      VisualState     =   0
       Width           =   108
    End
    Begin DesktopBevelButton ButtonDebugger

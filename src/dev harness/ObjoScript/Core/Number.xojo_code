@@ -1,5 +1,28 @@
 #tag Module
 Protected Module Number
+	#tag Method, Flags = &h1, Description = 52657475726E73207468652073717561726520726F6F74206F6620746865206E756D6265722E
+		Protected Sub Add(vm As ObjoScript.VM)
+		  /// Converts this number to a string and adds a value to it.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Note: Number + Number is handled within the VM for performance reasons.
+		  /// Number.+(value) -> string
+		  
+		  Var d As Variant = vm.GetSlotValue(0)
+		  Var s As String
+		  
+		  // Format integers nicely.
+		  If d.DoubleValue.IsInteger Then
+		    s = d.IntegerValue.ToString
+		  Else
+		    s = d.DoubleValue.ToString(Locale.Current, "#.##")
+		  End If
+		  
+		  vm.SetReturn(s + vm.GetSlotAsString(1))
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 54686520757365722069732063616C6C696E6720746865204E756D62657220636C61737320636F6E7374727563746F722E
 		Protected Sub Allocate(vm As ObjoScript.VM, instance As ObjoScript.Instance, args() As Variant)
 		  /// The user is calling the Number class constructor.
@@ -18,7 +41,10 @@ Protected Module Number
 		  If isStatic Then
 		    
 		  Else
-		    If signature.CompareCase("sqrt()") Then
+		    If signature = "+(_)" Then
+		      Return AddressOf Add
+		      
+		    ElseIf signature.CompareCase("sqrt()") Then
 		      Return AddressOf Sqrt_
 		    End If
 		  End If

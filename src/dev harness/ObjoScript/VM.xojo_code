@@ -19,6 +19,23 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060616020616E64206062602061726520626F746820646F75626C65732E
+		Private Function AreNumbers(a As Variant, b As Variant) As Boolean
+		  /// Returns True if `a` and `b` are both doubles.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
+		  If a.Type <> Variant.TypeDouble Or b.Type <> Variant.TypeDouble Then
+		    Return False
+		  End If
+		  
+		  Return True
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 4173736572747320746861742060616020616E64206062602061726520626F746820646F75626C65732C206F74686572776973652072616973657320612072756E74696D65206572726F722E
 		Private Sub AssertNumbers(a As Variant, b As Variant)
 		  /// Asserts that `a` and `b` are both doubles, otherwise raises a runtime error.
@@ -999,6 +1016,20 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 506F70732074686520746F702076616C7565206F66662074686520737461636B20616E64207265706C61636573207468652076616C756520756E6465726E656174682077697468206076602E205468652065666665637420697320746F207265647563652074686520737461636B2068656967687420627920312E
+		Private Sub PopAndReplaceTop(v As Variant)
+		  /// Pops the top value off the stack and replaces the value underneath with `v`.
+		  /// The effect is to reduce the stack height by 1.
+		  ///
+		  /// This method exists but several operations require us to pop two values off the stack
+		  /// and then immediately push one back. This method saves a few method calls.
+		  
+		  Stack(StackTop - 2) = v
+		  StackTop = StackTop - 1
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 50757368657320612076616C7565206F6E746F2074686520737461636B2E
 		Private Sub Push(value As Variant)
 		  /// Pushes a value onto the stack.
@@ -1199,19 +1230,20 @@ Protected Class VM
 		      Stack(StackTop - 1) = -Stack(StackTop - 1).DoubleValue
 		      
 		    Case OP_ADD
-		      Var b As Variant = Pop
-		      Var a As Variant = Pop
+		      Var a As Variant = Peek(1)
+		      Var b As Variant = Peek(0)
 		      If a.Type = Variant.TypeDouble And b.Type = Variant.TypeDouble Then
-		        // Both numbers.
-		        Push(a.DoubleValue + b.DoubleValue)
-		      ElseIf a.Type = Variant.TypeString And b.Type = Variant.TypeString Then
-		        // Both strings.
-		        Push(a.StringValue + b.StringValue)
-		      ElseIf a.Type = Variant.TypeString Or b.Type = Variant.TypeString Then
-		        // One of the operands is a string.
-		        Push(ValueToString(a) + ValueToString(b))
+		        PopAndReplaceTop(a.DoubleValue + b.DoubleValue)
 		      Else
-		        Error("Both operands must be numbers or at least one operand must be a string.")
+		        If a.Type = Variant.TypeString Then
+		          InvokeFromClass(StringClass, "+(_)", 1, False)
+		        ElseIf a.Type = Variant.TypeDouble Then
+		          InvokeFromClass(NumberClass, "+(_)", 1, False)
+		        ElseIf a IsA ObjoScript.Instance Then
+		          InvokeFromClass(ObjoScript.Instance(a).Klass, "+(_)", 1, False)
+		        Else
+		          Error(ValueToString(a) + " does not implement `+(_)`.")
+		        End If
 		      End If
 		      
 		    Case OP_SUBTRACT
@@ -1895,7 +1927,7 @@ Protected Class VM
 		    If v.DoubleValue.IsInteger Then
 		      Return CType(v, Integer).ToString
 		    Else
-		      Return v.DoubleValue.ToString
+		      Return v.DoubleValue.ToString(Locale.Current, "#.##")
 		    End If
 		    
 		  Else
