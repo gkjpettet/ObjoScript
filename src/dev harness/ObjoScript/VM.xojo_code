@@ -1248,10 +1248,15 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_SUBTRACT
-		      Var b As Variant = Pop
-		      Var a As Variant = Pop
-		      AssertNumbers(a, b)
-		      Push(a.DoubleValue - b.DoubleValue)
+		      Var a As Variant = Peek(1)
+		      Var b As Variant = Peek(0)
+		      If a.Type = Variant.TypeDouble And b.Type = Variant.TypeDouble Then
+		        PopAndReplaceTop(a.DoubleValue - b.DoubleValue)
+		      ElseIf a IsA ObjoScript.Instance Then
+		        InvokeFromClass(ObjoScript.Instance(a).Klass, "-(_)", 1, False)
+		      Else
+		        Error(ValueToString(a) + " does not implement `-(_)`.")
+		      End If
 		      
 		    Case OP_DIVIDE
 		      Var b As Variant = Pop
