@@ -1222,12 +1222,22 @@ Protected Class VM
 		      Push(CType(-1, Double))
 		      
 		    Case OP_NEGATE
-		      If Peek(0).Type <> Variant.TypeDouble Then
-		        Error("Operand must be a number.")
+		      If Peek(0).Type = Variant.TypeDouble Then
+		         Stack(StackTop - 1) = -Stack(StackTop - 1).DoubleValue
+		        
+		      ElseIf Peek(0) IsA ObjoScript.Instance Then
+		        InvokeFromClass(ObjoScript.Instance(Peek(0)).Klass, "-()", 0, False)
+		        
+		      Else
+		        Error(ValueToString(Peek(0)) + " does not implement `+(_)`.")
 		      End If
-		      // In this instruction, the answer replaces what's currently at the top of the stack.
-		      // Rather than pop, negate then push we'll do it in situ as it's ~6x faster.
-		      Stack(StackTop - 1) = -Stack(StackTop - 1).DoubleValue
+		      
+		      ' If Peek(0).Type <> Variant.TypeDouble Then
+		      ' Error("Operand must be a number.")
+		      ' End If
+		      ' // In this instruction, the answer replaces what's currently at the top of the stack.
+		      ' // Rather than pop, negate then push we'll do it in situ as it's ~6x faster.
+		      ' Stack(StackTop - 1) = -Stack(StackTop - 1).DoubleValue
 		      
 		    Case OP_ADD
 		      Var a As Variant = Peek(1)
