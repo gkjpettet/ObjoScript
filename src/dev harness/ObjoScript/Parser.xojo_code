@@ -905,6 +905,7 @@ Protected Class Parser
 		  Static operators() As ObjoScript.TokenTypes = Array( _
 		  ObjoScript.TokenTypes.LSquare, _
 		  ObjoScript.TokenTypes.Minus, _
+		  ObjoScript.TokenTypes.Not_, _
 		  ObjoScript.TokenTypes.Plus _
 		  )
 		  
@@ -917,7 +918,7 @@ Protected Class Parser
 		  /// Returns True if `type` is an overloadable unary operator type.
 		  
 		  Select Case type
-		  Case ObjoScript.TokenTypes.Minus
+		  Case ObjoScript.TokenTypes.Minus, ObjoScript.TokenTypes.Not_
 		    Return True
 		    
 		  Else

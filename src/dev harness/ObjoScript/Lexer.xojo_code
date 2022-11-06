@@ -103,13 +103,21 @@ Protected Class Lexer
 		  Select Case type
 		  Case ObjoScript.TokenTypes.Boolean_
 		    mTokens.Add(MakeToken(type, lexeme))
+		    
 		  Case ObjoScript.TokenTypes.This
 		    mTokens.Add(MakeToken(type, "this"))
+		    
+		  Case ObjoScript.TokenTypes.Not_
+		    // Lexeme required for overloading the `not` keyword by classes.
+		    mTokens.Add(MakeToken(type, "not"))
+		    
 		  Else
 		    If type <> ObjoScript.TokenTypes.Identifier Then
 		      mTokens.Add(MakeToken(type))
+		      
 		    ElseIf lexeme.Left(1).IsUppercaseASCIILetter Then
 		      mTokens.Add(MakeToken(ObjoScript.TokenTypes.UppercaseIdentifier, lexeme))
+		      
 		    Else
 		      mTokens.Add(MakeToken(ObjoScript.TokenTypes.Identifier, lexeme))
 		    End If
