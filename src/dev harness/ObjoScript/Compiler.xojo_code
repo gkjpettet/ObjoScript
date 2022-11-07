@@ -1229,7 +1229,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Get the contents of all the other standard library source code files and concatenate them.
 		  For Each sourceFile As FolderItem In librarySourceFolder.Children
-		    If Not sourceFile.IsFolder Then
+		    If Not sourceFile.IsFolder And sourceFile.Name.EndsWith("objo") Then
 		      
 		      // Don't re-add the object class file.
 		      If sourceFile.NativePath = objectFile.NativePath Then Continue

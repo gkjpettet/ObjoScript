@@ -1,3 +1,4 @@
 foreign class Object {
 foreign toString()
+foreign type()
 }

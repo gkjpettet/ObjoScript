@@ -1,8 +1,8 @@
 #tag Module
 Protected Module Object_
-	#tag Method, Flags = &h1, Description = 54686520757365722069732063616C6C696E6720746865204F626A65637420636C61737320636F6E7374727563746F722E
+	#tag Method, Flags = &h1, Description = 54686520757365722069732063616C6C696E672074686520604F626A6563746020636C61737320636F6E7374727563746F722E
 		Protected Sub Allocate(vm As ObjoScript.VM, instance As ObjoScript.Instance, args() As Variant)
-		  /// The user is calling the Object class constructor.
+		  /// The user is calling the `Object` class constructor.
 		  
 		  #Pragma Unused instance
 		  #Pragma Unused args
@@ -11,15 +11,18 @@ Protected Module Object_
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h1, Description = 52657475726E7320746865206D6574686F6420746F20696E766F6B6520666F72206120666F726569676E206D6574686F64207769746820607369676E617475726560206F6E207468652060426F6F6C65616E6020636C617373206F72204E696C206966207468657265206973206E6F2073756368206D6574686F642E
+	#tag Method, Flags = &h1, Description = 52657475726E7320746865206D6574686F6420746F20696E766F6B6520666F72206120666F726569676E206D6574686F64207769746820607369676E617475726560206F6E2074686520604F626A6563746020636C617373206F72204E696C206966207468657265206973206E6F2073756368206D6574686F642E
 		Protected Function BindForeignMethod(signature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
-		  /// Returns the method to invoke for a foreign method with `signature` on the `Boolean` class or Nil if there is no such method.
+		  /// Returns the method to invoke for a foreign method with `signature` on the `Object` class or Nil if there is no such method.
 		  
 		  
 		  If isStatic Then
 		    
 		  ElseIf signature.CompareCase("toString()") Then
 		    Return AddressOf ToString
+		    
+		  ElseIf signature.CompareCase("type()") Then
+		    Return AddressOf Type
 		  End If
 		  
 		End Function
@@ -37,6 +40,34 @@ Protected Module Object_
 		  Var instance As ObjoScript.Instance = ObjoScript.Instance(vm.GetSlotValue(0))
 		  
 		  vm.SetReturn(instance.Klass.Name + " instance")
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E732074686973206F626A65637427732074797065206173206120537472696E672E
+		Protected Sub Type(vm As ObjoScript.VM)
+		  /// Returns this object's type as a String.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is the value / instance.
+		  ///
+		  /// Object.type() -> string
+		  
+		  Var value As Variant = vm.GetSlotValue(0)
+		  
+		  Var type As String
+		  If value.Type = Variant.TypeDouble Then
+		    type = "Number"
+		  ElseIf value.Type = Variant.TypeBoolean Then
+		    type = "Boolean"
+		  ElseIf value.Type = Variant.TypeString Then
+		    type = "String"
+		  Else
+		    // Assume slot 0 is an instance.
+		    type = ObjoScript.Instance(value).Klass.Name
+		  End If
+		  
+		  vm.SetReturn(type)
 		  
 		End Sub
 	#tag EndMethod
