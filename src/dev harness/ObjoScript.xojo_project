@@ -14,6 +14,7 @@ Module=Number;ObjoScript/Core/Number.xojo_code;&h0000000044515FFF;&h000000003F75
 Module=String_;ObjoScript/Core/String_.xojo_code;&h00000000247787FF;&h000000003F7567FF;false
 Module=Boolean_;ObjoScript/Core/Boolean_.xojo_code;&h0000000004D23FFF;&h000000003F7567FF;false
 Module=Object_;ObjoScript/Core/Object_.xojo_code;&h0000000031658FFF;&h000000003F7567FF;false
+Module=Nothing;ObjoScript/Core/Nothing.xojo_code;&h00000000448E67FF;&h000000003F7567FF;false
 Class=Lexer;ObjoScript/Lexer.xojo_code;&h000000004F5657FF;&h000000004D1497FF;false
 Class=Token;ObjoScript/Token.xojo_code;&h000000002664F7FF;&h000000004D1497FF;false
 Class=LexerException;ObjoScript/LexerException.xojo_code;&h0000000065E8FFFF;&h000000004D1497FF;false

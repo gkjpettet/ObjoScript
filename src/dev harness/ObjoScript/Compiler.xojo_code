@@ -314,14 +314,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 52657475726E7320746865206368756E6B207468697320636F6D70696C65722069732063757272656E746C7920636F6D70696C696E6720696E746F2E
-		Function CurrentChunk() As ObjoScript.Chunk
-		  /// Returns the chunk this compiler is currently compiling into.
-		  
-		  Return Func.Chunk
-		End Function
-	#tag EndMethod
-
 	#tag Method, Flags = &h0, Description = 466F72206C6F63616C207661726961626C65732C20746869732069732074686520706F696E742061742077686963682074686520636F6D70696C6572207265636F726473207468656972206578697374656E63652E
 		Sub DeclareVariable(identifier As ObjoScript.Token, initialised As Boolean = False)
 		  /// For local variables, this is the point at which the compiler records their existence.
@@ -1220,6 +1212,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // All of the standard library files are bundled with the application.
 		  Var librarySourceFolder As FolderItem = SpecialFolder.Resource("standard library")
 		  
+		  // The order of class loading in the standard library is important.
 		  // The first file we need to include is `object.objo` as the `Object` class
 		  // is the base of all other classes.
 		  Var objectFile As FolderItem = librarySourceFolder.Child("object.objo")
@@ -1227,12 +1220,19 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  standardLib = standardLib + tin.ReadAll + EndOfLine
 		  tin.Close
 		  
+		  // Now define `Nothing`.
+		  Var nothingFile As FolderItem = librarySourceFolder.Child("nothing.objo")
+		  tin = TextInputStream.Open(nothingFile)
+		  standardLib = standardLib + tin.ReadAll + EndOfLine
+		  tin.Close
+		  
 		  // Get the contents of all the other standard library source code files and concatenate them.
 		  For Each sourceFile As FolderItem In librarySourceFolder.Children
 		    If Not sourceFile.IsFolder And sourceFile.Name.EndsWith("objo") Then
 		      
-		      // Don't re-add the object class file.
+		      // Don't re-add the object and nothing class files.
 		      If sourceFile.NativePath = objectFile.NativePath Then Continue
+		      If sourceFile.NativePath = nothingFile.NativePath Then Continue
 		      
 		      tin = TextInputStream.Open(sourceFile)
 		      standardLib = standardLib + tin.ReadAll + EndOfLine
@@ -1569,7 +1569,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // done compiling the methods and constructors.
 		  // For now, we'll emit the max number or permitted fields.
 		  EmitByte(255)
-		  Var numFieldsOffset As UInt8 = CurrentChunk.Code.LastIndex
+		  Var numFieldsOffset As Integer = CurrentChunk.Code.LastIndex
 		  
 		  // The fourth operand is the index in Klass.Fields of the first of *this* class' fields.
 		  // Earlier indexes are the fields of superclasses.
@@ -1646,11 +1646,20 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Next i
 		  End If
 		  
+		  // Edge case: We are compiling the built-in type `Nothing`.
+		  // Since the VM keeps just one instance of Nothing, we need to tell it to create it now that
+		  // the class has been defined.
+		  // There's a special instruction for that.
+		  If c.Name.CompareCase("Nothing") Then
+		    EmitByte(ObjoScript.VM.OP_DEFINE_NOTHING)
+		  End If
+		  
 		  // Pop the class off the stack.
 		  EmitByte(ObjoScript.VM.OP_POP)
 		  
 		  // We're done compiling this class.
 		  CurrentClass = Nil
+		  
 		End Function
 	#tag EndMethod
 
@@ -2709,6 +2718,15 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 			End Get
 		#tag EndGetter
 		CompileTime As Double
+	#tag EndComputedProperty
+
+	#tag ComputedProperty, Flags = &h0, Description = 52657475726E7320746865206368756E6B207468697320636F6D70696C65722069732063757272656E746C7920636F6D70696C696E6720696E746F2E
+		#tag Getter
+			Get
+			  Return Func.Chunk
+			End Get
+		#tag EndGetter
+		CurrentChunk As ObjoScript.Chunk
 	#tag EndComputedProperty
 
 	#tag Property, Flags = &h21, Description = 49662074686520636F6D70696C65722069732063757272656E746C7920636F6D70696C696E67206120636C6173732C207468697320646174612061626F75742069742028696E636C7564696E6720697473206465636C61726174696F6E292E204D6179206265204E696C2E

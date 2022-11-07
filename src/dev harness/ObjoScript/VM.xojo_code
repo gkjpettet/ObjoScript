@@ -89,6 +89,10 @@ Protected Class VM
 		  ElseIf className.CompareCase("List") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.List.Allocate, Nil)
 		    
+		  ElseIf className.CompareCase("Nothing") Then
+		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Nothing.Allocate, Nil)
+		    
+		    
 		  ElseIf className.CompareCase("Number") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Number.Allocate, Nil)
 		    
@@ -121,6 +125,9 @@ Protected Class VM
 		    
 		  ElseIf className.CompareCase("List") Then
 		    Return Core.List.BindForeignMethod(signature, isStatic)
+		    
+		  ElseIf className.CompareCase("Nothing") Then
+		    Return Core.Nothing.BindForeignMethod(signature, isStatic)
 		    
 		  ElseIf className.CompareCase("Number") Then
 		    Return Core.Number.BindForeignMethod(signature, isStatic)
@@ -470,8 +477,12 @@ Protected Class VM
 		  klass.ForeignDelegates = fcd
 		  
 		  // If this is one of Objo's built-in types we keep a reference to the class for use elsewhere.
+		  // All the built-in types are foreign classes.
 		  If klass.Name.CompareCase("Boolean") Then
 		    BooleanClass = klass
+		    
+		  ElseIf klass.Name.CompareCase("Nothing") Then
+		    NothingClass = klass
 		    
 		  ElseIf klass.Name.CompareCase("Number") Then
 		    NumberClass = klass
@@ -540,6 +551,18 @@ Protected Class VM
 		  
 		  // Pop the method's body off the stack.
 		  Call Pop
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 54686520636F6D70696C657220686173206A75737420646566696E65642074686520604E6F7468696E676020636C61737320616E64206C656674206974206F6E2074686520746F70206F662074686520737461636B20666F722075732E20437265617465206F75722073696E676C6520696E7374616E6365206F66204E6F7468696E6720666F7220757365207468726F7567686F75742074686520564D2E
+		Private Sub DefineNothing()
+		  /// The compiler has just defined the `Nothing` class and left it on the top of the stack for us.
+		  /// Create our single instance of Nothing for use throughout the VM.
+		  ///
+		  /// We'll leave the Nothing class on the stack - the compiler will pop it off for us momentarily.
+		  
+		  Nothing = New ObjoScript.Nothing(Self, NothingClass)
 		  
 		End Sub
 	#tag EndMethod
@@ -1143,7 +1166,8 @@ Protected Class VM
 		    Frames(i) = New ObjoScript.CallFrame
 		  Next i
 		  
-		  Nothing = New ObjoScript.Nothing
+		  // This will be set by the VM once it has defined the `Nothing` class within the runtime.
+		  Nothing = Nil
 		  
 		  Self.Globals = ParseJSON("{}") // HACK: Case sensitive.
 		  
@@ -1173,8 +1197,6 @@ Protected Class VM
 		  #Pragma DisableBoundsChecking
 		  #Pragma NilObjectChecking False
 		  #Pragma StackOverflowChecking False
-		  
-		  #Pragma Warning "TODO: Consider making `nothing` an instance"
 		  
 		  // Make sure we don't try to step in with an out of bounds instruction pointer.
 		  If CurrentFrame.IP > CurrentChunk.Code.LastIndex Then Return
@@ -1596,6 +1618,9 @@ Protected Class VM
 		      
 		    Case OP_DEBUG_FIELD_NAME
 		      AddFieldNameToClass(ReadConstantLong, ReadByte)
+		      
+		    Case OP_DEFINE_NOTHING
+		      DefineNothing
 		      
 		    End Select
 		  Wend
@@ -2053,7 +2078,7 @@ Protected Class VM
 		51: OP_IS (0)
 		52: OP_SWAP (0)
 		53: OP_DEBUG_FIELD_NAME (3)
-		54: *Unused*
+		54: OP_DEFINE_NOTHING (0)
 		55: *Unused*
 		56: OP_GET_FIELD (1)
 		57: *Unused*
@@ -2144,6 +2169,10 @@ Protected Class VM
 		Nothing As ObjoScript.Nothing
 	#tag EndProperty
 
+	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E204E6F7468696E67206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
+		Private NothingClass As ObjoScript.Klass
+	#tag EndProperty
+
 	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E204E756D626572206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
 		Private NumberClass As ObjoScript.Klass
 	#tag EndProperty
@@ -2220,7 +2249,8 @@ Protected Class VM
 			  OP_SUPER_CONSTRUCTOR      : 3, _
 			  OP_LIST                   : 1, _
 			  OP_SWAP                   : 0, _
-			  OP_DEBUG_FIELD_NAME       : 3 _
+			  OP_DEBUG_FIELD_NAME       : 3, _
+			  OP_DEFINE_NOTHING         : 0 _
 			  )
 			  
 			  Return d
@@ -2305,6 +2335,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_DEFINE_GLOBAL_LONG, Type = Double, Dynamic = False, Default = \"31", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_DEFINE_NOTHING, Type = Double, Dynamic = False, Default = \"54", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_DIVIDE, Type = Double, Dynamic = False, Default = \"6", Scope = Public

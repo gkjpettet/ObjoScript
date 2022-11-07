@@ -453,6 +453,9 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_DEBUG_FIELD_NAME
 		    Return DebugFieldName(chunk, offset)
 		    
+		  Case ObjoScript.VM.OP_DEFINE_NOTHING
+		    Return SimpleInstruction("DEFINE_NOTHING", offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
