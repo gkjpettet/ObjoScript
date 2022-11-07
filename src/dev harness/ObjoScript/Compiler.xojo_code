@@ -1214,14 +1214,27 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// We use a scriptID of -1.
 		  
 		  Var lex As New ObjoScript.Lexer
-		  
 		  Var standardLib As String
+		  Var tin As TextInputStream
 		  
-		  // Get the contents of all standard library source code files and concatenate them.
+		  // All of the standard library files are bundled with the application.
 		  Var librarySourceFolder As FolderItem = SpecialFolder.Resource("standard library")
+		  
+		  // The first file we need to include is `object.objo` as the `Object` class
+		  // is the base of all other classes.
+		  Var objectFile As FolderItem = librarySourceFolder.Child("object.objo")
+		  tin = TextInputStream.Open(objectFile)
+		  standardLib = standardLib + tin.ReadAll + EndOfLine
+		  tin.Close
+		  
+		  // Get the contents of all the other standard library source code files and concatenate them.
 		  For Each sourceFile As FolderItem In librarySourceFolder.Children
 		    If Not sourceFile.IsFolder Then
-		      Var tin As TextInputStream = TextInputStream.Open(sourceFile)
+		      
+		      // Don't re-add the object class file.
+		      If sourceFile.NativePath = objectFile.NativePath Then Continue
+		      
+		      tin = TextInputStream.Open(sourceFile)
 		      standardLib = standardLib + tin.ReadAll + EndOfLine
 		      tin.Close
 		    End If
@@ -1506,18 +1519,30 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Error("Classes can only be declared within the top level of a script.")
 		  End If
 		  
-		  // If the class has a superclass, check it's valid and store a reference to it.
 		  Var superclass As ObjoScript.ClassData = Nil
-		  If c.HasSuperclass And c.Name.CompareCase(c.Superclass) Then
-		    Error("A class cannot inherit from itself.")
-		  ElseIf c.HasSuperclass Then
-		    superclass = FindClass(c.Superclass)
-		    If superclass = Nil Then
-		      Error("Class `" + c.Name + "` inherits class `" + c.Superclass + "` but there is no class with this name.")
+		  
+		  // Are we bootstrapping (i.e. compiling `Object` for the first time)?
+		  Var bootStrapping As Boolean = False
+		  If c.Name.CompareCase("Object") And FindClass("Object") = Nil Then
+		    Bootstrapping = True
+		  End If
+		  
+		  // Validate the superclass as long as we're not bootstrapping (compiling the native `Object` class).
+		  If Not bootstrapping Then
+		    If Not c.HasSuperclass Then
+		      // All classes (except for `Object`) implicitly inherit `Object`.
+		      c.Superclass = "Object"
 		    End If
-		  Else
-		    // No superclass defined. Make it inherit from the base `Object` class.
-		    #Pragma Warning "TODO: Implement a base `Object` class."
+		    
+		    // Check the superclass is valid and store a reference to it.
+		    If c.Name.CompareCase(c.Superclass) Then
+		      Error("A class cannot inherit from itself.")
+		    Else
+		      superclass = FindClass(c.Superclass)
+		      If superclass = Nil Then
+		        Error("Class `" + c.Name + "` inherits class `" + c.Superclass + "` but there is no class with this name.")
+		      End If
+		    End If
 		  End If
 		  
 		  // Store data about the class we're about to compile.
@@ -1558,12 +1583,14 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Push the class back on to the stack so the methods can find it.
 		  EmitGetGlobal(index)
 		  
-		  If c.HasSuperclass Then
-		    // Look up the superclass by name and push it on to the stack. Classes are always globally defined.
-		    GlobalVariable(c.Superclass)
-		    // Tell the VM that this class inherits from the class on the stack.
-		    // The VM will pop the superclass off the stack when its done handling the inheritance.
-		    EmitByte(ObjoScript.VM.OP_INHERIT, c.Location)
+		  If Not bootstrapping Then
+		    If c.HasSuperclass Then
+		      // Look up the superclass by name and push it on to the stack. Classes are always globally defined.
+		      GlobalVariable(c.Superclass)
+		      // Tell the VM that this class inherits from the class on the stack.
+		      // The VM will pop the superclass off the stack when its done handling the inheritance.
+		      EmitByte(ObjoScript.VM.OP_INHERIT, c.Location)
+		    End If
 		  End If
 		  
 		  // Compile any foreign method declarations.

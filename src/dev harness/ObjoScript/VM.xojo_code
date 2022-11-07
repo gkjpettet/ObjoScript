@@ -92,6 +92,9 @@ Protected Class VM
 		  ElseIf className.CompareCase("Number") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Number.Allocate, Nil)
 		    
+		  ElseIf className.CompareCase("Object") Then
+		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Object_.Allocate, Nil)
+		    
 		  ElseIf className.CompareCase("Range") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Range.Allocate, Nil)
 		    
@@ -121,6 +124,9 @@ Protected Class VM
 		    
 		  ElseIf className.CompareCase("Number") Then
 		    Return Core.Number.BindForeignMethod(signature, isStatic)
+		    
+		  ElseIf className.CompareCase("Object") Then
+		    Return Core.Object_.BindForeignMethod(signature, isStatic)
 		    
 		  ElseIf className.CompareCase("Range") Then
 		    Return Core.Range.BindForeignMethod(signature, isStatic)
@@ -1226,7 +1232,7 @@ Protected Class VM
 		      
 		    Case OP_NEGATE
 		      If Peek(0).Type = Variant.TypeDouble Then
-		         Stack(StackTop - 1) = -Stack(StackTop - 1).DoubleValue
+		        Stack(StackTop - 1) = -Stack(StackTop - 1).DoubleValue
 		      ElseIf Peek(0) IsA ObjoScript.Instance Then
 		        InvokeFromClass(ObjoScript.Instance(Peek(0)).Klass, "-()", 0, False)
 		      Else
