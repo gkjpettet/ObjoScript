@@ -1174,6 +1174,8 @@ Protected Class VM
 		  #Pragma NilObjectChecking False
 		  #Pragma StackOverflowChecking False
 		  
+		  #Pragma Warning "TODO: Consider making `nothing` an instance"
+		  
 		  // Make sure we don't try to step in with an out of bounds instruction pointer.
 		  If CurrentFrame.IP > CurrentChunk.Code.LastIndex Then Return
 		  
@@ -1296,13 +1298,13 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_EQUAL
-		      #Pragma Warning "TODO: Make this a method call for instances"
+		      #Pragma Warning "TODO: Make this a method call to `==()` for instances"
 		      b = Pop
 		      a = Pop
 		      Push(ValuesEqual(a, b))
 		      
 		    Case OP_NOT_EQUAL
-		      #Pragma Warning "TODO: Make this a method call for instances"
+		      #Pragma Warning "TODO: Make this an inverse method call to `==()` for instances"
 		      b = Pop
 		      a = Pop
 		      Push(Not ValuesEqual(a, b))
