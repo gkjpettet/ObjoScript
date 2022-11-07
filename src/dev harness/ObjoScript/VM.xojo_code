@@ -1274,10 +1274,13 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_MODULO
-		      b = Pop
-		      a = Pop
-		      AssertNumbers(a, b)
-		      Push(CType(a.DoubleValue Mod b.DoubleValue, Double))
+		      If TopOfStackAreNumbers Then
+		        PopAndReplaceTop(Peek(1).DoubleValue Mod Peek(0).DoubleValue)
+		      ElseIf Peek(1) IsA ObjoScript.Instance Then
+		        InvokeFromClass(ObjoScript.Instance(a).Klass, "%(_)", 1, False)
+		      Else
+		        Error(ValueToString(Peek(1)) + " does not implement `%(_)`.")
+		      End If
 		      
 		    Case OP_NOT
 		      If Peek(0) Isa ObjoScript.Instance Then

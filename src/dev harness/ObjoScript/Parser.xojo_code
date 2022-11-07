@@ -906,6 +906,7 @@ Protected Class Parser
 		  ObjoScript.TokenTypes.ForwardSlash, _
 		  ObjoScript.TokenTypes.LSquare, _
 		  ObjoScript.TokenTypes.Minus, _
+		  ObjoScript.TokenTypes.Percent, _
 		  ObjoScript.TokenTypes.Not_, _
 		  ObjoScript.TokenTypes.Plus, _
 		  ObjoScript.TokenTypes.Star _
