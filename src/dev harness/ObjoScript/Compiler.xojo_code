@@ -1496,6 +1496,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = c.Location
 		  
+		  // Make sure this class is unique.
 		  If FindClass(c.Name) <> Nil Then
 		    Error("Redefined class `" + c.Name + "`.")
 		  End If
@@ -1514,6 +1515,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    If superclass = Nil Then
 		      Error("Class `" + c.Name + "` inherits class `" + c.Superclass + "` but there is no class with this name.")
 		    End If
+		  Else
+		    // No superclass defined. Make it inherit from the base `Object` class.
+		    #Pragma Warning "TODO: Implement a base `Object` class."
 		  End If
 		  
 		  // Store data about the class we're about to compile.

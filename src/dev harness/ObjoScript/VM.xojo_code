@@ -1290,11 +1290,13 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_EQUAL
+		      #Pragma Warning "TODO: Make this a method call for instances"
 		      b = Pop
 		      a = Pop
 		      Push(ValuesEqual(a, b))
 		      
 		    Case OP_NOT_EQUAL
+		      #Pragma Warning "TODO: Make this a method call for instances"
 		      b = Pop
 		      a = Pop
 		      Push(Not ValuesEqual(a, b))
