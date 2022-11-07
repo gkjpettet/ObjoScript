@@ -903,10 +903,12 @@ Protected Class Parser
 		  /// Returns an array of the operators that may be overloaded.
 		  
 		  Static operators() As ObjoScript.TokenTypes = Array( _
+		  ObjoScript.TokenTypes.ForwardSlash, _
 		  ObjoScript.TokenTypes.LSquare, _
 		  ObjoScript.TokenTypes.Minus, _
 		  ObjoScript.TokenTypes.Not_, _
-		  ObjoScript.TokenTypes.Plus _
+		  ObjoScript.TokenTypes.Plus, _
+		  ObjoScript.TokenTypes.Star _
 		  )
 		  
 		  Return operators

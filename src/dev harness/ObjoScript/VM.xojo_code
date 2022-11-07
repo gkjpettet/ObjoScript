@@ -1234,44 +1234,44 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_ADD
-		      a = Peek(1)
-		      b = Peek(0)
-		      If a.Type = Variant.TypeDouble And b.Type = Variant.TypeDouble Then
-		        PopAndReplaceTop(a.DoubleValue + b.DoubleValue)
+		      If TopOfStackAreNumbers Then
+		        PopAndReplaceTop(Peek(1).DoubleValue + Peek(0).DoubleValue)
+		      ElseIf Peek(1).Type = Variant.TypeString Then
+		        InvokeFromClass(StringClass, "+(_)", 1, False)
+		      ElseIf Peek(1).Type = Variant.TypeDouble Then
+		        InvokeFromClass(NumberClass, "+(_)", 1, False)
+		      ElseIf Peek(1) IsA ObjoScript.Instance Then
+		        InvokeFromClass(ObjoScript.Instance(a).Klass, "+(_)", 1, False)
 		      Else
-		        If a.Type = Variant.TypeString Then
-		          InvokeFromClass(StringClass, "+(_)", 1, False)
-		        ElseIf a.Type = Variant.TypeDouble Then
-		          InvokeFromClass(NumberClass, "+(_)", 1, False)
-		        ElseIf a IsA ObjoScript.Instance Then
-		          InvokeFromClass(ObjoScript.Instance(a).Klass, "+(_)", 1, False)
-		        Else
-		          Error(ValueToString(a) + " does not implement `+(_)`.")
-		        End If
+		        Error(ValueToString(Peek(1)) + " does not implement `+(_)`.")
 		      End If
 		      
 		    Case OP_SUBTRACT
-		      a = Peek(1)
-		      b = Peek(0)
-		      If a.Type = Variant.TypeDouble And b.Type = Variant.TypeDouble Then
-		        PopAndReplaceTop(a.DoubleValue - b.DoubleValue)
-		      ElseIf a IsA ObjoScript.Instance Then
+		      If TopOfStackAreNumbers Then
+		        PopAndReplaceTop(Peek(1).DoubleValue - Peek(0).DoubleValue)
+		      ElseIf Peek(1) IsA ObjoScript.Instance Then
 		        InvokeFromClass(ObjoScript.Instance(a).Klass, "-(_)", 1, False)
 		      Else
-		        Error(ValueToString(a) + " does not implement `-(_)`.")
+		        Error(ValueToString(Peek(1)) + " does not implement `-(_)`.")
 		      End If
 		      
 		    Case OP_DIVIDE
-		      b = Pop
-		      a = Pop
-		      AssertNumbers(a, b)
-		      Push(a.DoubleValue / b.DoubleValue)
+		      If TopOfStackAreNumbers Then
+		        PopAndReplaceTop(Peek(1).DoubleValue / Peek(0).DoubleValue)
+		      ElseIf Peek(1) IsA ObjoScript.Instance Then
+		        InvokeFromClass(ObjoScript.Instance(a).Klass, "/(_)", 1, False)
+		      Else
+		        Error(ValueToString(Peek(1)) + " does not implement `/(_)`.")
+		      End If
 		      
 		    Case OP_MULTIPLY
-		      b = Pop
-		      a = Pop
-		      AssertNumbers(a, b)
-		      Push(a.DoubleValue * b.DoubleValue)
+		      If TopOfStackAreNumbers Then
+		        PopAndReplaceTop(Peek(1).DoubleValue * Peek(0).DoubleValue)
+		      ElseIf Peek(1) IsA ObjoScript.Instance Then
+		        InvokeFromClass(ObjoScript.Instance(a).Klass, "*(_)", 1, False)
+		      Else
+		        Error(ValueToString(Peek(1)) + " does not implement `*(_)`.")
+		      End If
 		      
 		    Case OP_MODULO
 		      b = Pop
@@ -1819,6 +1819,15 @@ Protected Class VM
 		  CallValue(superclass.Methods.Value(signature), argCount)
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662074686520746F702074776F2076616C75657320617265206E756D626572732E20417373756D657320746865726520617265206174206C656173742074776F2076616C756573206F6E2074686520737461636B2E
+		Private Function TopOfStackAreNumbers() As Boolean
+		  /// Returns True if the top two values are numbers.
+		  /// Assumes there are at least two values on the stack.
+		  
+		  Return Peek(1).Type = Variant.TypeDouble And Peek(0).Type = Variant.TypeDouble
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 52657475726E73205472756520696620746865204F626A6F53637269707420737461636B206076616C756560206973206F66206074797065602E
