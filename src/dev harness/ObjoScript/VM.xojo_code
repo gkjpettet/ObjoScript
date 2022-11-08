@@ -19,55 +19,6 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060616020616E64206062602061726520626F746820646F75626C65732E
-		Private Function AreNumbers(a As Variant, b As Variant) As Boolean
-		  /// Returns True if `a` and `b` are both doubles.
-		  
-		  #Pragma DisableBoundsChecking
-		  #Pragma NilObjectChecking False
-		  #Pragma StackOverflowChecking False
-		  
-		  If a.Type <> Variant.TypeDouble Or b.Type <> Variant.TypeDouble Then
-		    Return False
-		  End If
-		  
-		  Return True
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21, Description = 4173736572747320746861742060616020616E64206062602061726520626F746820646F75626C65732C206F74686572776973652072616973657320612072756E74696D65206572726F722E
-		Private Sub AssertNumbers(a As Variant, b As Variant)
-		  /// Asserts that `a` and `b` are both doubles, otherwise raises a runtime error.
-		  
-		  #Pragma DisableBoundsChecking
-		  #Pragma NilObjectChecking False
-		  #Pragma StackOverflowChecking False
-		  
-		  If a.Type <> Variant.TypeDouble Or b.Type <> Variant.TypeDouble Then
-		    Error("Both operands must be numbers. Instead got " + ValueToString(a) + " and " + ValueToString(b))
-		  End If
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21, Description = 52616973657320612072756E74696D65206572726F722069662060616020616E642060626020617265206E6F74207468652073616D6520747970652E
-		Private Sub AssertSameType(a As Variant, b As Variant)
-		  /// Raises a runtime error if `a` and `b` are not the same type.
-		  ///
-		  /// Assumes neither `a` or `b` are Nil.
-		  
-		  #Pragma DisableBoundsChecking
-		  #Pragma NilObjectChecking False
-		  #Pragma StackOverflowChecking False
-		  
-		  If a.Type <> b.Type Then
-		    Error("Both operands must be the same type. Instead got " + ValueToString(a) + " and " + ValueToString(b))
-		  End If
-		  
-		End Sub
-	#tag EndMethod
-
 	#tag Method, Flags = &h21, Description = 54686520564D2069732072657175657374696E67207468652064656C656761746520746F20757365207768656E2063616C6C696E67207468652073706563696669656420666F726569676E206D6574686F64206F6E206120636C6173732E2054686520686F7374206170706C69636174696F6E2077696C6C2068617665206661696C656420746F2070726F76696465206F6E652E2052657475726E73204E696C206966206E6F6E6520646566696E65642E
 		Private Function BindCoreForeignClass(className As String) As ObjoScript.ForeignClassDelegates
 		  /// The VM is requesting the delegates to use when instantiating a new foreign class and when an instance of a 
@@ -791,29 +742,6 @@ Protected Class VM
 		  subclass.Superclass = Pop
 		  
 		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = 52657475726E7320547275652069662060696E737460206973206F66206074797065602E2057616C6B7320746865207375706572636C61737320686965726172636879206966206E65636573736172792E
-		Shared Function InstanceIsOfType(inst As ObjoScript.Instance, type As String) As Boolean
-		  /// Returns True if `inst` is of `type`. Walks the superclass hierarchy if necessary.
-		  
-		  If inst.Klass.Name.CompareCase(type) Then
-		    Return True
-		  Else
-		    // Check the class hierarchy.
-		    Var parent As ObjoScript.Klass = inst.Klass.Superclass
-		    While parent <> Nil
-		      If parent.Name.CompareCase(type) Then
-		        Return True
-		      Else
-		        parent = parent.Superclass
-		      End If
-		    Wend
-		  End If
-		  
-		  Return False
-		  
-		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 496E697469616C697365732074686520564D20616E6420696E7465727072657473206066756E63602E20557365207468697320746F20696E74657270726574206120746F70206C6576656C2066756E6374696F6E2E
@@ -1912,54 +1840,6 @@ Protected Class VM
 		  /// Assumes there are at least two values on the stack.
 		  
 		  Return Peek(1).Type = Variant.TypeDouble And Peek(0).Type = Variant.TypeDouble
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = 52657475726E73205472756520696620746865204F626A6F53637269707420737461636B206076616C756560206973206F66206074797065602E
-		Shared Function ValueIsType(type As String, value As Variant) As Boolean
-		  /// Returns True if the ObjoScript stack `value` is of `type`.
-		  ///
-		  /// `value` should be one of the following:
-		  /// 1. Double.
-		  /// 2. String.
-		  /// 3. Boolean.
-		  /// 4. Klass.
-		  /// 5. Instance.
-		  /// 6. nothing.
-		  /// 7. Func.
-		  
-		  If value = Nil Then Return False
-		  
-		  If value.Type = Variant.TypeDouble And type.CompareCase("Number") Then
-		    Return True
-		  End If
-		  
-		  If value.Type = Variant.TypeString And type.CompareCase("String") Then
-		    Return True
-		  End If
-		  
-		  If value.Type = Variant.TypeBoolean And type.CompareCase("Boolean") Then
-		    Return True
-		  End If
-		  
-		  If value IsA ObjoScript.Klass And ObjoScript.Klass(value).Name.CompareCase(type) Then
-		    Return True
-		  End If
-		  
-		  If value IsA ObjoScript.Instance Then
-		    Return InstanceIsOfType(value, type)
-		  End If
-		  
-		  If value IsA ObjoScript.Nothing And type.CompareCase("nothing") Then
-		    Return True
-		  End If
-		  
-		  If value IsA ObjoScript.Func And type.CompareCase("Function") Then
-		    Return True
-		  End If
-		  
-		  Return False
-		  
 		End Function
 	#tag EndMethod
 
