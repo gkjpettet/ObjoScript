@@ -10,7 +10,7 @@ Implements ObjoScript.Expr
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(value As ObjoScript.Expr, type As ObjoScript.Token, isKeyword As ObjoScript.Token)
+		Sub Constructor(value As ObjoScript.Expr, type As ObjoScript.Expr, isKeyword As ObjoScript.Token)
 		  Self.Value = value
 		  mIsKeyword = isKeyword
 		  Self.Type = type
@@ -31,8 +31,8 @@ Implements ObjoScript.Expr
 		Private mIsKeyword As ObjoScript.Token
 	#tag EndProperty
 
-	#tag Property, Flags = &h0, Description = 546865207479706520746F6B656E2E
-		Type As ObjoScript.Token
+	#tag Property, Flags = &h0, Description = 54686520747970652E
+		Type As ObjoScript.Expr
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 5468652076616C756520746F20746865206C656674206F66207468652060697360206B6579776F72642E

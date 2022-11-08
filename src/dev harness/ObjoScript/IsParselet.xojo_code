@@ -6,7 +6,7 @@ Implements ObjoScript.InfixParselet
 		  /// Parses the `is` operator.
 		  /// Assumes the parser has just consumed the `is` keyword.
 		  ///
-		  /// `value is type` (where type is an identifier or a reserved type name).
+		  /// `value is type`.
 		  /// Part of the ObjoScript.InfixParselet interface.
 		  
 		  #Pragma Unused canAssign
@@ -14,8 +14,7 @@ Implements ObjoScript.InfixParselet
 		  Var isKeyword As ObjoScript.Token = parser.Previous
 		  
 		  // Get the type.
-		  Var type As ObjoScript.Token = parser.Consume("Expected a type name after the `is` keyword.", _
-		  ObjoScript.TokenTypes.UppercaseIdentifier, ObjoScript.TokenTypes.Nothing)
+		  Var type As ObjoScript.Expr = parser.ParsePrecedence(Precedences.Is_)
 		  
 		  Return New IsExpr(left, type, isKeyword)
 		  

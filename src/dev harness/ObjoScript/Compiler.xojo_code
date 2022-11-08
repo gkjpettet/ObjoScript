@@ -2039,8 +2039,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Compile the value operand - this will leave it on the stack.
 		  Call expr.Value.Accept(Self)
 		  
-		  // Add the type name to the constants pool and load it onto the stack.
-		  Call EmitConstant(expr.Type.Lexeme, expr.Type)
+		  // Compile the type to put it on the stack.
+		  Call expr.Type.Accept(Self)
+		  
+		  ' // Add the type name to the constants pool and load it onto the stack.
+		  ' Call EmitConstant(expr.Type.Lexeme, expr.Type)
 		  
 		  // Emit the instruction.
 		  EmitByte(VM.OP_IS, expr.Location)

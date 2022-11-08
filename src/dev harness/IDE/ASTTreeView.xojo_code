@@ -419,7 +419,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var value As TreeViewNode = expr.Value.Accept(Self)
 		  value.Text = "Value: " + value.Text
 		  
-		  Var type As New TreeViewNode("Type: " + expr.Type.Lexeme)
+		  Var type As TreeViewNode = expr.Type.Accept(Self)
+		  type.Text = "Type: " + type.Text
 		  
 		  node.AppendNode(value)
 		  node.AppendNode(type)

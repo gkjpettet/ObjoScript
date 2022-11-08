@@ -77,31 +77,75 @@ Protected Module Object_
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h1, Description = 52657475726E7320547275652069662074686973206F626A656374277320636C617373206F72206F6E65206F6620697473207375706572636C6173736573206973206074797065602E
+	#tag Method, Flags = &h1, Description = 52657475726E7320547275652069662074686973206F626A656374277320636C617373206F72206F6E65206F6620697473207375706572636C617373657320697320606F74686572602E
 		Protected Sub Is_(vm As ObjoScript.VM)
-		  /// Returns True if this object's class or one of its superclasses is `type`.
+		  /// Returns True if this object's class or one of its superclasses is `other`.
 		  ///
 		  /// Assumes: 
 		  /// - Slot 0 is a Xojo double/string/boolean, an instance or a class.
-		  /// - Slot 1 is a string
+		  /// - Slot 1 is a Xojo double/string/boolean, an instance or a class.
 		  ///
-		  /// Object.is(type) -> boolean
+		  /// Object.is(other) -> boolean
 		  
 		  Var this As Variant = vm.GetSlotValue(0)
-		  Var type As String = vm.GetSlotValue(1)
+		  Var other As Variant = vm.GetSlotValue(1)
 		  
-		  If this.Type = Variant.TypeDouble And type.CompareCase("Number") Then
-		    vm.SetReturn(True)
-		  ElseIf this.Type = Variant.TypeString And type.CompareCase("String") Then
-		    vm.SetReturn(True)
-		  ElseIf this.Type = Variant.TypeBoolean And type.CompareCase("Boolean") Then
-		    vm.SetReturn(True)
-		  ElseIf this IsA ObjoScript.Klass And ObjoScript.Klass(this).Name.CompareCase(type) Then
-		    vm.SetReturn(True)
-		  ElseIf this IsA ObjoScript.Instance Then
-		    vm.SetReturn(InstanceIsOfType(this, type))
-		  ElseIf this IsA ObjoScript.Func And type.CompareCase("Function") Then
-		    vm.SetReturn(True)
+		  Select Case this.Type
+		  Case Variant.TypeDouble
+		    If other.Type = Variant.TypeDouble Then
+		      vm.SetReturn(True)
+		      Return
+		    ElseIf other.Type = Variant.TypeString And other.StringValue.CompareCase("Number") Then
+		      vm.SetReturn(True)
+		      Return
+		    Else
+		      vm.SetReturn(TypeFromVariant(other).CompareCase("Number"))
+		      Return
+		    End If
+		    
+		  Case Variant.TypeBoolean
+		    If other.Type = Variant.TypeBoolean Then
+		      vm.SetReturn(True)
+		      Return
+		    ElseIf other.Type = Variant.TypeString And other.StringValue.CompareCase("Boolean") Then
+		      vm.SetReturn(True)
+		      Return
+		    Else
+		      vm.SetReturn(TypeFromVariant(other).CompareCase("Boolean"))
+		      Return
+		    End If
+		    
+		  Case Variant.TypeString
+		    If other.Type = Variant.TypeString Then
+		      vm.SetReturn(True)
+		      Return
+		    ElseIf other.Type = Variant.TypeString And other.StringValue.CompareCase("String") Then
+		      vm.SetReturn(True)
+		      Return
+		    Else
+		      vm.SetReturn(TypeFromVariant(other).CompareCase("String"))
+		      Return
+		    End If
+		  End Select
+		  
+		  If this IsA ObjoScript.Instance Then
+		    If other.Type = Variant.TypeString Then
+		      vm.SetReturn(InstanceIsOfType(ObjoScript.Instance(this), other))
+		      Return
+		    Else
+		      vm.SetReturn(InstanceIsOfType(ObjoScript.Instance(this), TypeFromVariant(other)))
+		      Return
+		    End If
+		    
+		  ElseIf this IsA ObjoScript.Klass Then
+		    If other.Type = Variant.TypeString Then
+		      vm.SetReturn(ObjoScript.Klass(this).Name.CompareCase(other))
+		      Return
+		    Else
+		      vm.SetReturn(ObjoScript.Klass(this).Name.CompareCase(TypeFromVariant(other)))
+		      Return
+		    End If
+		    
 		  Else
 		    vm.SetReturn(False)
 		  End If
@@ -168,6 +212,37 @@ Protected Module Object_
 		  vm.SetReturn(type)
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E73207468652074797065206F66206076616C756560206173206120537472696E672E
+		Private Function TypeFromVariant(value As Variant) As String
+		  /// Returns the type of `value` as a String.
+		  ///
+		  /// Assumes:`v` is not Nil.
+		  
+		  If value.Type = Variant.TypeDouble Then
+		    Return "Number"
+		    
+		  ElseIf value.Type = Variant.TypeBoolean Then
+		    Return "Boolean"
+		    
+		  ElseIf value.Type = Variant.TypeString Then
+		    Return "String"
+		    
+		  ElseIf value IsA ObjoScript.Instance Then
+		    Return ObjoScript.Instance(value).Klass.Name
+		    
+		  ElseIf value IsA ObjoScript.Klass Then
+		    Return ObjoScript.Klass(value).Name
+		    
+		  ElseIf value IsA ObjoScript.Func Then
+		    Return "Function"
+		    
+		  Else
+		    Raise New InvalidArgumentException("Unknown value type.")
+		  End If
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
