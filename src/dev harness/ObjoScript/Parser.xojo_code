@@ -914,7 +914,8 @@ Protected Class Parser
 		  ObjoScript.TokenTypes.Pipe, _
 		  ObjoScript.TokenTypes.Not_, _
 		  ObjoScript.TokenTypes.Plus, _
-		  ObjoScript.TokenTypes.Star _
+		  ObjoScript.TokenTypes.Star, _
+		  ObjoScript.TokenTypes.Tilde _
 		  )
 		  
 		  Return operators
@@ -926,7 +927,7 @@ Protected Class Parser
 		  /// Returns True if `type` is an overloadable unary operator type.
 		  
 		  Select Case type
-		  Case ObjoScript.TokenTypes.Minus, ObjoScript.TokenTypes.Not_
+		  Case ObjoScript.TokenTypes.Minus, ObjoScript.TokenTypes.Not_, ObjoScript.TokenTypes.Tilde
 		    Return True
 		    
 		  Else

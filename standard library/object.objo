@@ -1,4 +1,9 @@
 foreign class Object {
+not() {
+// Returns false since most objects are considered true.
+return true
+}
+
 foreign toString()
 foreign type()
 }

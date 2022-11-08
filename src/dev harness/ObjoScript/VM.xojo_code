@@ -990,6 +990,37 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 496E766F6B6573206120756E617279206F70657261746F72206F7665726C6F6164206D6574686F64207769746820607369676E617475726560206F6E2074686520696E7374616E63652F636C617373206F6E2074686520746F70206F662074686520737461636B2E
+		Private Sub InvokeUnaryOperator(signature As String)
+		  /// Invokes a unary operator overload method with `signature` on the instance/class on the top of the stack.
+		  ///
+		  /// Raises a VM runtime error if the instance/class doesn't implement the operator overload.
+		  /// value   <---- top of the stack
+		  
+		  Var value As Variant = Peek(0)
+		  
+		  If value.Type = Variant.TypeDouble Then
+		    InvokeFromClass(NumberClass, signature, 0, False)
+		    
+		  ElseIf value.Type = Variant.TypeString Then
+		    InvokeFromClass(StringClass, signature, 0, False)
+		    
+		  ElseIf value.Type = Variant.TypeBoolean Then
+		    InvokeFromClass(BooleanClass, signature, 0, False)
+		    
+		  ElseIf value IsA ObjoScript.Instance Then
+		    InvokeFromClass(ObjoScript.Instance(value).Klass, signature, 0, False)
+		    
+		  ElseIf value IsA ObjoScript.Klass Then
+		    InvokeFromClass(ObjoScript.Klass(value), signature, 0, True)
+		    
+		  Else
+		    Error(ValueToString(value) + " does not implement `" + signature + "`.")
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060766020697320636F6E73696465726564202266616C736579222E
 		Private Function IsFalsey(v As Variant) As Boolean
 		  /// Returns True if `v` is considered "falsey".
@@ -1330,12 +1361,11 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_NOT
-		      If Peek(0) Isa ObjoScript.Instance Then
-		        InvokeFromClass(ObjoScript.Instance(Peek(0)).Klass, "not()", 0, False)
-		      ElseIf Peek(0) Isa ObjoScript.Klass Then
-		        InvokeFromClass(ObjoScript.Klass(Peek(0)), "not()", 0, True)
+		      If Stack(StackTop - 1).Type = Variant.TypeBoolean Then
+		        // "notting" a boolean is so common we'll implement it inline.
+		        Stack(StackTop - 1) = Not Stack(StackTop - 1).BooleanValue
 		      Else
-		        Stack(StackTop - 1) = IsFalsey(Stack(StackTop - 1))
+		        InvokeUnaryOperator("not()")
 		      End If
 		      
 		    Case OP_EQUAL
@@ -1429,12 +1459,11 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_BITWISE_NOT
-		      // Bitwise operators always work on 32-bit unsigned integers.
-		      Var v As Variant = Pop
-		      If v.Type <> Variant.TypeDouble Then
-		        Error("Expected a number. Instead got `" + ValueToString(v) + "`.")
+		      If Stack(StackTop - 1).Type = Variant.TypeDouble Then
+		        // Do the "bitwise not" operation in place for speed.
+		        Stack(StackTop - 1) = CType(Not Stack(StackTop - 1).UInt32Value, Double)
 		      Else
-		        Push(CType(Not v.UInt32Value, Double))
+		        InvokeUnaryOperator("~()")
 		      End If
 		      
 		    Case OP_ASSERT

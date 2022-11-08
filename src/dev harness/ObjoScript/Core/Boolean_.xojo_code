@@ -18,11 +18,28 @@ Protected Module Boolean_
 		  // All methods on `Boolean` are instance methods.
 		  If isStatic Then Return Nil
 		  
-		  If signature.CompareCase("toString()") Then
+		  If signature.CompareCase("not()") Then
+		    Return AddressOf Not_
+		    
+		  ElseIf signature.CompareCase("toString()") Then
 		    Return AddressOf ToString
 		  End If
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320746865206C6F676963616C20636F6D706C656D656E74206F66207468652076616C75652E
+		Protected Sub Not_(vm As ObjoScript.VM)
+		  /// Returns the logical complement of the value.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a Xojo Boolean
+		  ///
+		  /// Boolean.not() -> boolean
+		  
+		  vm.SetReturn(Not vm.GetSlotValue(0).BooleanValue)
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h1, Description = 52657475726E73207468697320626F6F6C65616E27732076616C7565206173206120737472696E672028227472756522206F72202266616C736522292E
