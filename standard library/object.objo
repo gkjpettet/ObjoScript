@@ -1,4 +1,7 @@
 foreign class Object {
+foreign ==(other)
+foreign <>(other)
+
 not() {
 // Returns false since most objects are considered true.
 return true

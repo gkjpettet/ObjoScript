@@ -910,6 +910,7 @@ Protected Class Parser
 		  ObjoScript.TokenTypes.LessLess, _
 		  ObjoScript.TokenTypes.LSquare, _
 		  ObjoScript.TokenTypes.Minus, _
+		  ObjoScript.TokenTypes.NotEqual, _
 		  ObjoScript.TokenTypes.Percent, _
 		  ObjoScript.TokenTypes.Pipe, _
 		  ObjoScript.TokenTypes.Not_, _

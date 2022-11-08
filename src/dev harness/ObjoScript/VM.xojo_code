@@ -1369,16 +1369,10 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_EQUAL
-		      #Pragma Warning "TODO: Make this a method call to `==()`"
-		      Var b As Variant = Pop
-		      Var a As Variant  = Pop
-		      Push(ValuesEqual(a, b))
+		      InvokeBinaryOperator("==(_)")
 		      
 		    Case OP_NOT_EQUAL
-		      #Pragma Warning "TODO: Make this an inverse method call to `==()`"
-		      Var b As Variant  = Pop
-		      Var a As Variant  = Pop
-		      Push(Not ValuesEqual(a, b))
+		      InvokeBinaryOperator("<>(_)")
 		      
 		    Case OP_GREATER
 		      Var b As Variant  = Pop
@@ -1961,60 +1955,6 @@ Protected Class VM
 		  If value IsA ObjoScript.Func And type.CompareCase("Function") Then
 		    Return True
 		  End If
-		  
-		  Return False
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21, Description = 547275652069662076616C7565732060616020616E64206062602061726520636F6E7369646572656420657175616C2062792074686520564D2E
-		Private Function ValuesEqual(a As Variant, b As Variant) As Boolean
-		  /// True if values `a` and `b` are considered equal by the VM.
-		  ///
-		  /// Assumes neither `a` or `b` are Nil.
-		  
-		  #Pragma DisableBoundsChecking
-		  #Pragma NilObjectChecking False
-		  #Pragma StackOverflowChecking False
-		  
-		  If a.Type <> b.Type Then Return False
-		  
-		  Select Case a.Type
-		    // ===================
-		    // Doubles & Booleans.
-		    // ===================
-		  Case Variant.TypeDouble, Variant.TypeBoolean
-		    Return a = b
-		    
-		  Case Variant.TypeString
-		    // ===================
-		    // Strings.
-		    // ===================
-		    // Case sensitive comparison.
-		    Return a.StringValue.Compare(b.StringValue, ComparisonOptions.CaseSensitive) = 0
-		    
-		  Else
-		    // ===================
-		    // "Nothing".
-		    // ===================
-		    If a IsA ObjoScript.Nothing And b IsA ObjoScript.Nothing Then
-		      Return True
-		    End If
-		    
-		    // ===================
-		    // Instances.
-		    // ===================
-		    If a IsA ObjoScript.Instance And b IsA ObjoScript.Instance Then
-		      Return a = b
-		    End If
-		    
-		    // ===================
-		    // Klasses.
-		    // ===================
-		    If a IsA ObjoScript.Klass And b IsA ObjoScript.Klass Then
-		      Return ObjoScript.Klass(a).Name.CompareCase(ObjoScript.Klass(b).Name)
-		    End If
-		  End Select
 		  
 		  Return False
 		  

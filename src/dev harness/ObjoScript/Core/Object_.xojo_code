@@ -18,6 +18,12 @@ Protected Module Object_
 		  
 		  If isStatic Then
 		    
+		  ElseIf signature = "==(_)" Then
+		    Return AddressOf Equal
+		    
+		  ElseIf signature = "<>(_)" Then
+		    Return AddressOf NotEqual
+		    
 		  ElseIf signature.CompareCase("toString()") Then
 		    Return AddressOf ToString
 		    
@@ -26,6 +32,40 @@ Protected Module Object_
 		  End If
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320612064656661756C7420726570726573656E746174696F6E206F6620746865206F626A656374206173206120737472696E672E
+		Protected Sub Equal(vm As ObjoScript.VM)
+		  /// Compares two objects using built-in equality. This compares value types by value 
+		  /// and all other objects are compared by reference: two objects are equal only if they are the exact 
+		  /// same object.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a Xojo double/string/boolean, an instance or a class.
+		  /// - Slot 1 is a Xojo double/string/boolean, an instance or a class.
+		  ///
+		  /// Object.==(other) -> boolean
+		  
+		  vm.SetReturn(ValuesEqual(vm.GetSlotValue(0), vm.GetSlotValue(1)))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320612064656661756C7420726570726573656E746174696F6E206F6620746865206F626A656374206173206120737472696E672E
+		Protected Sub NotEqual(vm As ObjoScript.VM)
+		  /// Compares two objects using built-in equality. This compares value types by value 
+		  /// and all other objects are compared by reference: two objects are equal only if they are the exact 
+		  /// same object.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a Xojo double/string/boolean, an instance or a class.
+		  /// - Slot 1 is a Xojo double/string/boolean, an instance or a class.
+		  ///
+		  /// Object.<>(other) -> boolean
+		  
+		  vm.SetReturn(Not ValuesEqual(vm.GetSlotValue(0), vm.GetSlotValue(1)))
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h1, Description = 52657475726E7320612064656661756C7420726570726573656E746174696F6E206F6620746865206F626A656374206173206120737472696E672E
@@ -70,6 +110,53 @@ Protected Module Object_
 		  vm.SetReturn(type)
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
+		Protected Function ValuesEqual(a As Variant, b As Variant) As Boolean
+		  /// Returns True if `a` and `b` are considered equal.
+		  ///
+		  /// Compares two objects using built-in equality. This compares value types by value 
+		  /// and all other objects are compared by reference: two objects are equal only if they are the exact 
+		  /// same object.
+		  
+		  Select Case a.Type
+		    // ===================
+		    // Doubles & Booleans.
+		    // ===================
+		  Case Variant.TypeDouble, Variant.TypeBoolean
+		    Return a = b
+		    
+		  Case Variant.TypeString
+		    // ===================
+		    // Strings.
+		    // ===================
+		    // Case sensitive comparison.
+		    Return a.StringValue.CompareCase(b.StringValue)
+		    
+		  Else
+		    // ===================
+		    // "Nothing".
+		    // ===================
+		    If a IsA ObjoScript.Nothing And b IsA ObjoScript.Nothing Then
+		      Return True
+		    End If
+		    
+		    // ===================
+		    // Instances.
+		    // ===================
+		    If a IsA ObjoScript.Instance And b IsA ObjoScript.Instance Then
+		      Return a = b
+		    End If
+		    
+		    // ===================
+		    // Klasses.
+		    // ===================
+		    If a IsA ObjoScript.Klass And b IsA ObjoScript.Klass Then
+		      Return ObjoScript.Klass(a).Name.CompareCase(ObjoScript.Klass(b).Name)
+		    End If
+		  End Select
+		End Function
 	#tag EndMethod
 
 
