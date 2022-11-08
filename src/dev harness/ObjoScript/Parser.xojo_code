@@ -905,6 +905,8 @@ Protected Class Parser
 		  Static operators() As ObjoScript.TokenTypes = Array( _
 		  ObjoScript.TokenTypes.EqualEqual, _
 		  ObjoScript.TokenTypes.ForwardSlash, _
+		  ObjoScript.TokenTypes.GreaterGreater, _
+		  ObjoScript.TokenTypes.LessLess, _
 		  ObjoScript.TokenTypes.LSquare, _
 		  ObjoScript.TokenTypes.Minus, _
 		  ObjoScript.TokenTypes.Percent, _

@@ -958,6 +958,38 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 496E766F6B657320616E206F70657261746F72206F7665726C6F6164206D6574686F64207769746820607369676E617475726560206F6E2074686520696E7374616E63652F636C61737320616E64206F706572616E64206F6E2074686520737461636B2E
+		Private Sub InvokeOperator(signature As String)
+		  /// Invokes an operator overload method with `signature` on the instance/class and operand on the stack.
+		  ///
+		  /// Raises a VM runtime error if the value doesn't implement the operator overload.
+		  /// operand             <---- top of the stack
+		  /// value to invoke on  <---- should be class/instance
+		  
+		  Var value As Variant = Peek(1)
+		  
+		  If value.Type = Variant.TypeDouble Then
+		    InvokeFromClass(NumberClass, signature, 1, False)
+		    
+		  ElseIf value.Type = Variant.TypeString Then
+		    InvokeFromClass(StringClass, signature, 1, False)
+		    
+		  ElseIf value.Type = Variant.TypeBoolean Then
+		    InvokeFromClass(BooleanClass, signature, 1, False)
+		    
+		  ElseIf value IsA ObjoScript.Instance Then
+		    InvokeFromClass(ObjoScript.Instance(value).Klass, signature, 1, False)
+		    
+		  ElseIf value IsA ObjoScript.Klass Then
+		    InvokeFromClass(ObjoScript.Klass(value), signature, 1, True)
+		    
+		  Else
+		    Error(ValueToString(value) + " does not implement `" + signature + "`.")
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060766020697320636F6E73696465726564202266616C736579222E
 		Private Function IsFalsey(v As Variant) As Boolean
 		  /// Returns True if `v` is considered "falsey".
@@ -1202,6 +1234,7 @@ Protected Class VM
 		  If CurrentFrame.IP > CurrentChunk.Code.LastIndex Then Return
 		  
 		  // Some temporary variables.
+		  #Pragma Warning "TODO: Remove these when finished implemented overloaded operators"
 		  Var a, b As Variant
 		  
 		  While True
@@ -1259,6 +1292,8 @@ Protected Class VM
 		        Stack(StackTop - 1) = -Stack(StackTop - 1).DoubleValue
 		      ElseIf Peek(0) IsA ObjoScript.Instance Then
 		        InvokeFromClass(ObjoScript.Instance(Peek(0)).Klass, "-()", 0, False)
+		      ElseIf Peek(0) IsA ObjoScript.Klass Then
+		        InvokeFromClass(ObjoScript.Klass(Peek(0)), "-()", 0, True)
 		      Else
 		        Error(ValueToString(Peek(0)) + " does not implement `+(_)`.")
 		      End If
@@ -1266,60 +1301,36 @@ Protected Class VM
 		    Case OP_ADD
 		      If TopOfStackAreNumbers Then
 		        PopAndReplaceTop(Peek(1).DoubleValue + Peek(0).DoubleValue)
-		      ElseIf Peek(1).Type = Variant.TypeString Then
-		        InvokeFromClass(StringClass, "+(_)", 1, False)
-		      ElseIf Peek(1).Type = Variant.TypeDouble Then
-		        InvokeFromClass(NumberClass, "+(_)", 1, False)
-		      ElseIf Peek(1) IsA ObjoScript.Instance Then
-		        InvokeFromClass(ObjoScript.Instance(a).Klass, "+(_)", 1, False)
-		      ElseIf Peek(1) IsA ObjoScript.Klass Then
-		        InvokeFromClass(ObjoScript.Klass(a), "+(_)", 1, True)
 		      Else
-		        Error(ValueToString(Peek(1)) + " does not implement `+(_)`.")
+		        InvokeOperator("+(_)")
 		      End If
 		      
 		    Case OP_SUBTRACT
 		      If TopOfStackAreNumbers Then
 		        PopAndReplaceTop(Peek(1).DoubleValue - Peek(0).DoubleValue)
-		      ElseIf Peek(1) IsA ObjoScript.Instance Then
-		        InvokeFromClass(ObjoScript.Instance(a).Klass, "-(_)", 1, False)
-		      ElseIf Peek(1) IsA ObjoScript.Klass Then
-		        InvokeFromClass(ObjoScript.Klass(a), "-(_)", 1, True)
 		      Else
-		        Error(ValueToString(Peek(1)) + " does not implement `-(_)`.")
+		        InvokeOperator("-(_)")
 		      End If
 		      
 		    Case OP_DIVIDE
 		      If TopOfStackAreNumbers Then
 		        PopAndReplaceTop(Peek(1).DoubleValue / Peek(0).DoubleValue)
-		      ElseIf Peek(1) IsA ObjoScript.Instance Then
-		        InvokeFromClass(ObjoScript.Instance(a).Klass, "/(_)", 1, False)
-		      ElseIf Peek(1) IsA ObjoScript.Klass Then
-		        InvokeFromClass(ObjoScript.Klass(a), "/(_)", 1, True)
 		      Else
-		        Error(ValueToString(Peek(1)) + " does not implement `/(_)`.")
+		        InvokeOperator("/(_)")
 		      End If
 		      
 		    Case OP_MULTIPLY
 		      If TopOfStackAreNumbers Then
 		        PopAndReplaceTop(Peek(1).DoubleValue * Peek(0).DoubleValue)
-		      ElseIf Peek(1) IsA ObjoScript.Instance Then
-		        InvokeFromClass(ObjoScript.Instance(a).Klass, "*(_)", 1, False)
-		      ElseIf Peek(1) IsA ObjoScript.Klass Then
-		        InvokeFromClass(ObjoScript.Klass(a), "*(_)", 1, True)
 		      Else
-		        Error(ValueToString(Peek(1)) + " does not implement `*(_)`.")
+		        InvokeOperator("*(_)")
 		      End If
 		      
 		    Case OP_MODULO
 		      If TopOfStackAreNumbers Then
 		        PopAndReplaceTop(Peek(1).DoubleValue Mod Peek(0).DoubleValue)
-		      ElseIf Peek(1) IsA ObjoScript.Instance Then
-		        InvokeFromClass(ObjoScript.Instance(a).Klass, "%(_)", 1, False)
-		      ElseIf Peek(1) IsA ObjoScript.Klass Then
-		        InvokeFromClass(ObjoScript.Klass(a), "%(_)", 1, True)
 		      Else
-		        Error(ValueToString(Peek(1)) + " does not implement `%(_)`.")
+		        InvokeOperator("%(_)")
 		      End If
 		      
 		    Case OP_NOT
@@ -1332,13 +1343,13 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_EQUAL
-		      #Pragma Warning "TODO: Make this a method call to `==()` for instances"
+		      #Pragma Warning "TODO: Make this a method call to `==()`"
 		      b = Pop
 		      a = Pop
 		      Push(ValuesEqual(a, b))
 		      
 		    Case OP_NOT_EQUAL
-		      #Pragma Warning "TODO: Make this an inverse method call to `==()` for instances"
+		      #Pragma Warning "TODO: Make this an inverse method call to `==()`"
 		      b = Pop
 		      a = Pop
 		      Push(Not ValuesEqual(a, b))
@@ -1384,18 +1395,18 @@ Protected Class VM
 		      StackTop = StackTop - ReadByte
 		      
 		    Case OP_SHIFT_LEFT
-		      b = Pop
-		      a = Pop
-		      AssertNumbers(a, b)
-		      // If a or b are doubles, they are truncated to integers.
-		      Push(Ctype(Bitwise.ShiftLeft(a.IntegerValue, b.IntegerValue), Double))
+		      If TopOfStackAreNumbers Then
+		        PopAndReplaceTop(Ctype(Bitwise.ShiftLeft(Peek(1).IntegerValue, Peek(0).IntegerValue), Double))
+		      Else
+		        InvokeOperator("<<(_)")
+		      End If
 		      
 		    Case OP_SHIFT_RIGHT
-		      b = Pop
-		      a = Pop
-		      AssertNumbers(a, b)
-		      // If a or b are doubles, they are truncated to integers.
-		      Push(Ctype(Bitwise.ShiftRight(a.IntegerValue, b.IntegerValue), Double))
+		      If TopOfStackAreNumbers Then
+		        PopAndReplaceTop(Ctype(Bitwise.ShiftRight(Peek(1).IntegerValue, Peek(0).IntegerValue), Double))
+		      Else
+		        InvokeOperator(">>(_)")
+		      End If
 		      
 		    Case OP_BITWISE_AND
 		      b = Pop
