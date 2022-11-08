@@ -1272,6 +1272,8 @@ Protected Class VM
 		        InvokeFromClass(NumberClass, "+(_)", 1, False)
 		      ElseIf Peek(1) IsA ObjoScript.Instance Then
 		        InvokeFromClass(ObjoScript.Instance(a).Klass, "+(_)", 1, False)
+		      ElseIf Peek(1) IsA ObjoScript.Klass Then
+		        InvokeFromClass(ObjoScript.Klass(a), "+(_)", 1, True)
 		      Else
 		        Error(ValueToString(Peek(1)) + " does not implement `+(_)`.")
 		      End If
@@ -1281,6 +1283,8 @@ Protected Class VM
 		        PopAndReplaceTop(Peek(1).DoubleValue - Peek(0).DoubleValue)
 		      ElseIf Peek(1) IsA ObjoScript.Instance Then
 		        InvokeFromClass(ObjoScript.Instance(a).Klass, "-(_)", 1, False)
+		      ElseIf Peek(1) IsA ObjoScript.Klass Then
+		        InvokeFromClass(ObjoScript.Klass(a), "-(_)", 1, True)
 		      Else
 		        Error(ValueToString(Peek(1)) + " does not implement `-(_)`.")
 		      End If
@@ -1290,6 +1294,8 @@ Protected Class VM
 		        PopAndReplaceTop(Peek(1).DoubleValue / Peek(0).DoubleValue)
 		      ElseIf Peek(1) IsA ObjoScript.Instance Then
 		        InvokeFromClass(ObjoScript.Instance(a).Klass, "/(_)", 1, False)
+		      ElseIf Peek(1) IsA ObjoScript.Klass Then
+		        InvokeFromClass(ObjoScript.Klass(a), "/(_)", 1, True)
 		      Else
 		        Error(ValueToString(Peek(1)) + " does not implement `/(_)`.")
 		      End If
@@ -1299,6 +1305,8 @@ Protected Class VM
 		        PopAndReplaceTop(Peek(1).DoubleValue * Peek(0).DoubleValue)
 		      ElseIf Peek(1) IsA ObjoScript.Instance Then
 		        InvokeFromClass(ObjoScript.Instance(a).Klass, "*(_)", 1, False)
+		      ElseIf Peek(1) IsA ObjoScript.Klass Then
+		        InvokeFromClass(ObjoScript.Klass(a), "*(_)", 1, True)
 		      Else
 		        Error(ValueToString(Peek(1)) + " does not implement `*(_)`.")
 		      End If
@@ -1308,6 +1316,8 @@ Protected Class VM
 		        PopAndReplaceTop(Peek(1).DoubleValue Mod Peek(0).DoubleValue)
 		      ElseIf Peek(1) IsA ObjoScript.Instance Then
 		        InvokeFromClass(ObjoScript.Instance(a).Klass, "%(_)", 1, False)
+		      ElseIf Peek(1) IsA ObjoScript.Klass Then
+		        InvokeFromClass(ObjoScript.Klass(a), "%(_)", 1, True)
 		      Else
 		        Error(ValueToString(Peek(1)) + " does not implement `%(_)`.")
 		      End If
@@ -1315,6 +1325,8 @@ Protected Class VM
 		    Case OP_NOT
 		      If Peek(0) Isa ObjoScript.Instance Then
 		        InvokeFromClass(ObjoScript.Instance(Peek(0)).Klass, "not()", 0, False)
+		      ElseIf Peek(0) Isa ObjoScript.Klass Then
+		        InvokeFromClass(ObjoScript.Klass(Peek(0)), "not()", 0, True)
 		      Else
 		        Stack(StackTop - 1) = IsFalsey(Stack(StackTop - 1))
 		      End If
