@@ -909,6 +909,7 @@ Protected Class Parser
 		  ObjoScript.TokenTypes.Greater, _
 		  ObjoScript.TokenTypes.GreaterEqual, _
 		  ObjoScript.TokenTypes.GreaterGreater, _
+		  ObjoScript.TokenTypes.Is_, _
 		  ObjoScript.TokenTypes.Less, _
 		  ObjoScript.TokenTypes.LessEqual, _
 		  ObjoScript.TokenTypes.LessLess, _

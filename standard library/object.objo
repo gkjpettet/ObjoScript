@@ -1,6 +1,8 @@
 foreign class Object {
+// Overloaded operators.
 foreign ==(other)
 foreign <>(other)
+foreign is(other)
 
 not() {
 // Returns false since most objects are considered true.

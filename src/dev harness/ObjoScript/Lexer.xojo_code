@@ -111,6 +111,10 @@ Protected Class Lexer
 		    // Lexeme required for overloading the `not` keyword by classes.
 		    mTokens.Add(MakeToken(type, "not"))
 		    
+		  Case ObjoScript.TokenTypes.Is_
+		    // Lexeme required for overloading the `is` keyword by classes.
+		    mTokens.Add(MakeToken(type, "is"))
+		    
 		  Else
 		    If type <> ObjoScript.TokenTypes.Identifier Then
 		      mTokens.Add(MakeToken(type))

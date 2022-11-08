@@ -1649,9 +1649,8 @@ Protected Class VM
 		      DefineForeignMethod(ReadConstantLong, ReadByte, If(ReadByte = 1, True, False))
 		      
 		    Case OP_IS
-		      // value `is` type
 		      // The compiler will have ensured that `type` is a string.
-		      Push(ValueIsType(Pop, Pop))
+		      InvokeBinaryOperator("is(_)")
 		      
 		    Case OP_LIST
 		      CreateListLiteral(ReadByte)

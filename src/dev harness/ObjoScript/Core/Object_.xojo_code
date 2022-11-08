@@ -24,6 +24,9 @@ Protected Module Object_
 		  ElseIf signature = "<>(_)" Then
 		    Return AddressOf NotEqual
 		    
+		  ElseIf signature.CompareCase("is(_)") Then
+		    Return AddressOf Is_
+		    
 		  ElseIf signature.CompareCase("toString()") Then
 		    Return AddressOf ToString
 		    
@@ -47,6 +50,61 @@ Protected Module Object_
 		  /// Object.==(other) -> boolean
 		  
 		  vm.SetReturn(ValuesEqual(vm.GetSlotValue(0), vm.GetSlotValue(1)))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060696E737460206973206F66206074797065602E2057616C6B7320746865207375706572636C61737320686965726172636879206966206E65636573736172792E
+		Private Function InstanceIsOfType(inst As ObjoScript.Instance, type As String) As Boolean
+		  /// Returns True if `inst` is of `type`. Walks the superclass hierarchy if necessary.
+		  
+		  If inst.Klass.Name.CompareCase(type) Then
+		    Return True
+		  Else
+		    // Check the class hierarchy.
+		    Var parent As ObjoScript.Klass = inst.Klass.Superclass
+		    While parent <> Nil
+		      If parent.Name.CompareCase(type) Then
+		        Return True
+		      Else
+		        parent = parent.Superclass
+		      End If
+		    Wend
+		  End If
+		  
+		  Return False
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320547275652069662074686973206F626A656374277320636C617373206F72206F6E65206F6620697473207375706572636C6173736573206973206074797065602E
+		Protected Sub Is_(vm As ObjoScript.VM)
+		  /// Returns True if this object's class or one of its superclasses is `type`.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a Xojo double/string/boolean, an instance or a class.
+		  /// - Slot 1 is a string
+		  ///
+		  /// Object.is(type) -> boolean
+		  
+		  Var this As Variant = vm.GetSlotValue(0)
+		  Var type As String = vm.GetSlotValue(1)
+		  
+		  If this.Type = Variant.TypeDouble And type.CompareCase("Number") Then
+		    vm.SetReturn(True)
+		  ElseIf this.Type = Variant.TypeString And type.CompareCase("String") Then
+		    vm.SetReturn(True)
+		  ElseIf this.Type = Variant.TypeBoolean And type.CompareCase("Boolean") Then
+		    vm.SetReturn(True)
+		  ElseIf this IsA ObjoScript.Klass And ObjoScript.Klass(this).Name.CompareCase(type) Then
+		    vm.SetReturn(True)
+		  ElseIf this IsA ObjoScript.Instance Then
+		    vm.SetReturn(InstanceIsOfType(this, type))
+		  ElseIf this IsA ObjoScript.Func And type.CompareCase("Function") Then
+		    vm.SetReturn(True)
+		  Else
+		    vm.SetReturn(False)
+		  End If
 		  
 		End Sub
 	#tag EndMethod
