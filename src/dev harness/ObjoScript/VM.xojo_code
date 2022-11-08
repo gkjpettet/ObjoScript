@@ -889,6 +889,38 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 496E766F6B657320612062696E617279206F70657261746F72206F7665726C6F6164206D6574686F64207769746820607369676E617475726560206F6E2074686520696E7374616E63652F636C61737320616E64206F706572616E64206F6E2074686520737461636B2E
+		Private Sub InvokeBinaryOperator(signature As String)
+		  /// Invokes a binary operator overload method with `signature` on the instance/class and operand on the stack.
+		  ///
+		  /// Raises a VM runtime error if the value doesn't implement the operator overload.
+		  /// operand             <---- top of the stack
+		  /// value to invoke on  <---- should be class/instance
+		  
+		  Var value As Variant = Peek(1)
+		  
+		  If value.Type = Variant.TypeDouble Then
+		    InvokeFromClass(NumberClass, signature, 1, False)
+		    
+		  ElseIf value.Type = Variant.TypeString Then
+		    InvokeFromClass(StringClass, signature, 1, False)
+		    
+		  ElseIf value.Type = Variant.TypeBoolean Then
+		    InvokeFromClass(BooleanClass, signature, 1, False)
+		    
+		  ElseIf value IsA ObjoScript.Instance Then
+		    InvokeFromClass(ObjoScript.Instance(value).Klass, signature, 1, False)
+		    
+		  ElseIf value IsA ObjoScript.Klass Then
+		    InvokeFromClass(ObjoScript.Klass(value), signature, 1, True)
+		    
+		  Else
+		    Error(ValueToString(value) + " does not implement `" + signature + "`.")
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 4469726563746C7920696E766F6B65732061206D6574686F64207769746820607369676E617475726560206F6E20606B6C617373602E20417373756D65732065697468657220606B6C61737360206F7220616E20696E7374616E6365206F6620606B6C6173736020616E642074686520726571756972656420617267756D656E74732061726520616C7265616479206F6E2074686520737461636B2E
 		Private Sub InvokeFromClass(klass As ObjoScript.Klass, signature As String, argCount As Integer, isStatic As Boolean)
 		  /// Directly invokes a method with `signature` on `klass`. Assumes either `klass` or an instance 
@@ -954,38 +986,6 @@ Protected Class VM
 		  End If
 		  
 		  Run
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21, Description = 496E766F6B657320616E206F70657261746F72206F7665726C6F6164206D6574686F64207769746820607369676E617475726560206F6E2074686520696E7374616E63652F636C61737320616E64206F706572616E64206F6E2074686520737461636B2E
-		Private Sub InvokeOperator(signature As String)
-		  /// Invokes an operator overload method with `signature` on the instance/class and operand on the stack.
-		  ///
-		  /// Raises a VM runtime error if the value doesn't implement the operator overload.
-		  /// operand             <---- top of the stack
-		  /// value to invoke on  <---- should be class/instance
-		  
-		  Var value As Variant = Peek(1)
-		  
-		  If value.Type = Variant.TypeDouble Then
-		    InvokeFromClass(NumberClass, signature, 1, False)
-		    
-		  ElseIf value.Type = Variant.TypeString Then
-		    InvokeFromClass(StringClass, signature, 1, False)
-		    
-		  ElseIf value.Type = Variant.TypeBoolean Then
-		    InvokeFromClass(BooleanClass, signature, 1, False)
-		    
-		  ElseIf value IsA ObjoScript.Instance Then
-		    InvokeFromClass(ObjoScript.Instance(value).Klass, signature, 1, False)
-		    
-		  ElseIf value IsA ObjoScript.Klass Then
-		    InvokeFromClass(ObjoScript.Klass(value), signature, 1, True)
-		    
-		  Else
-		    Error(ValueToString(value) + " does not implement `" + signature + "`.")
-		  End If
 		  
 		End Sub
 	#tag EndMethod
@@ -1329,35 +1329,35 @@ Protected Class VM
 		      If TopOfStackAreNumbers Then
 		        PopAndReplaceTop(Peek(1).DoubleValue + Peek(0).DoubleValue)
 		      Else
-		        InvokeOperator("+(_)")
+		        InvokeBinaryOperator("+(_)")
 		      End If
 		      
 		    Case OP_SUBTRACT
 		      If TopOfStackAreNumbers Then
 		        PopAndReplaceTop(Peek(1).DoubleValue - Peek(0).DoubleValue)
 		      Else
-		        InvokeOperator("-(_)")
+		        InvokeBinaryOperator("-(_)")
 		      End If
 		      
 		    Case OP_DIVIDE
 		      If TopOfStackAreNumbers Then
 		        PopAndReplaceTop(Peek(1).DoubleValue / Peek(0).DoubleValue)
 		      Else
-		        InvokeOperator("/(_)")
+		        InvokeBinaryOperator("/(_)")
 		      End If
 		      
 		    Case OP_MULTIPLY
 		      If TopOfStackAreNumbers Then
 		        PopAndReplaceTop(Peek(1).DoubleValue * Peek(0).DoubleValue)
 		      Else
-		        InvokeOperator("*(_)")
+		        InvokeBinaryOperator("*(_)")
 		      End If
 		      
 		    Case OP_MODULO
 		      If TopOfStackAreNumbers Then
 		        PopAndReplaceTop(Peek(1).DoubleValue Mod Peek(0).DoubleValue)
 		      Else
-		        InvokeOperator("%(_)")
+		        InvokeBinaryOperator("%(_)")
 		      End If
 		      
 		    Case OP_NOT
@@ -1424,14 +1424,14 @@ Protected Class VM
 		      If TopOfStackAreNumbers Then
 		        PopAndReplaceTop(Ctype(Bitwise.ShiftLeft(Peek(1).IntegerValue, Peek(0).IntegerValue), Double))
 		      Else
-		        InvokeOperator("<<(_)")
+		        InvokeBinaryOperator("<<(_)")
 		      End If
 		      
 		    Case OP_SHIFT_RIGHT
 		      If TopOfStackAreNumbers Then
 		        PopAndReplaceTop(Ctype(Bitwise.ShiftRight(Peek(1).IntegerValue, Peek(0).IntegerValue), Double))
 		      Else
-		        InvokeOperator(">>(_)")
+		        InvokeBinaryOperator(">>(_)")
 		      End If
 		      
 		    Case OP_BITWISE_AND
@@ -1439,7 +1439,7 @@ Protected Class VM
 		        // Bitwise operators work on 32-bit unsigned integers.
 		        PopAndReplaceTop(Ctype(Peek(1).UInt32Value And Peek(0).UInt32Value, Double))
 		      Else
-		        InvokeOperator("&(_)")
+		        InvokeBinaryOperator("&(_)")
 		      End If
 		      
 		    Case OP_BITWISE_OR
@@ -1447,7 +1447,7 @@ Protected Class VM
 		        // Bitwise operators work on 32-bit unsigned integers.
 		        PopAndReplaceTop(Ctype(Peek(1).UInt32Value Or Peek(0).UInt32Value, Double))
 		      Else
-		        InvokeOperator("|(_)")
+		        InvokeBinaryOperator("|(_)")
 		      End If
 		      
 		    Case OP_BITWISE_XOR
@@ -1455,7 +1455,7 @@ Protected Class VM
 		        // Bitwise operators work on 32-bit unsigned integers.
 		        PopAndReplaceTop(Ctype(Peek(1).UInt32Value Xor Peek(0).UInt32Value, Double))
 		      Else
-		        InvokeOperator("^(_)")
+		        InvokeBinaryOperator("^(_)")
 		      End If
 		      
 		    Case OP_BITWISE_NOT
