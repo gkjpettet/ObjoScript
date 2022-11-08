@@ -79,6 +79,24 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub StaticMethodNotFoundTest()
+		  AssertRuntimeError("language.method.static_method_not_found")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub StaticOperatorsTest()
+		  AssertOutputsEqual("language.method.static_operators")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub StaticTest()
+		  AssertOutputsEqual("language.method.static")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

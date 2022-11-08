@@ -1,9 +1,11 @@
 class Foo {
-  constructor() {}
+constructor() {}
 
-  static callFoo() {
-	System.print(this.foo())
-  }
+static foo() { return "ok"}
+
+static callFoo() {
+System.print(this.foo())
+}
 }
 
-Foo.callFoo() // `this` cannot be used within a static method.
+Foo.callFoo() // expect: ok

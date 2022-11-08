@@ -1,0 +1,5 @@
+class Foo {}
+
+// Expect runtime error:
+// There is no static method with signature `bar()` on `Foo`.
+Foo.bar

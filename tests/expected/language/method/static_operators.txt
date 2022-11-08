@@ -1,0 +1,23 @@
+infix Foo + a
+infix Foo - a
+infix Foo * a
+infix Foo / a
+infix Foo % a
+infix Foo < a
+infix Foo > a
+infix Foo <= a
+infix Foo >= a
+infix Foo == a
+infix Foo <> a
+infix Foo & a
+infix Foo | a
+infix Foo is a
+prefix not Foo
+prefix ~Foo
+prefix -Foo
+Foo 1-subscript a
+Foo 2-subscript a b
+Foo 3-subscript a b c
+Foo 1-subscript setter a = value
+Foo 2-subscript setter a b = value
+Foo 3-subscript setter a b c = value

@@ -4,5 +4,5 @@ static methodOnFoo() { System.print("foo") }
 
 class Bar is Foo {}
 
-// Expect runtime error: There is no static method with signature `methodOnFoo()` on `Bar class`.
+// Expect runtime error: There is no static method with signature `methodOnFoo()` on `Bar`.
 Bar.methodOnFoo

@@ -24,7 +24,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub ThisInStaticMethodTest()
-		  AssertCompilerError("language.class.this_in_static_method")
+		  AssertOutputsEqual("language.class.this_in_static_method")
 		  
 		End Sub
 	#tag EndMethod

@@ -1,0 +1,53 @@
+class Foo {
+static +(other)  { return "infix " + this + " + "  + other }
+static -(other)  { return "infix " + this + " - "  + other }
+static *(other)  { return "infix " + this + " * "  + other }
+static /(other)  { return "infix " + this + " / "  + other }
+static %(other)  { return "infix " + this + " % "  + other}
+static <(other)  { return "infix " + this + " < "  + other }
+static >(other)  { return "infix " + this + " > "  + other }
+static <=(other) { return "infix " + this + " <= " + other }
+static >=(other) { return "infix " + this + " >= " + other }
+static ==(other) { return "infix " + this + " == " + other }
+static <>(other) { return "infix " + this + " <> " + other }
+static &(other)  { return "infix " + this + " & "  + other }
+static |(other)  { return "infix " + this + " | "  + other }
+static is(other) { return "infix " + this + " is " + other }
+
+static not() { return "prefix not " + this }
+static ~()   { return "prefix ~"   + this }
+static -()   { return "prefix -"   + this }
+
+static [a] { return "Foo 1-subscript " + a }
+static [a, b] { return "Foo 2-subscript " + a + " " + b }
+static [a, b, c] { return "Foo 3-subscript " + a + " " + b + " " + c }
+static [a]=(value) { return "Foo 1-subscript setter " + a + " = " + value }
+static [a, b]=(value) { return "Foo 2-subscript setter " + a + " " + b  + " = " + value }
+static [a, b, c]=(value) { return "Foo 3-subscript setter " + a + " " + b + " " + c + " = " + value }
+
+ }
+
+System.print(Foo + "a")  // expect: infix Foo + a
+System.print(Foo - "a")  // expect: infix Foo - a
+System.print(Foo * "a")  // expect: infix Foo * a
+System.print(Foo / "a")  // expect: infix Foo / a
+System.print(Foo % "a")  // expect: infix Foo % a
+System.print(Foo < "a")  // expect: infix Foo < a
+System.print(Foo > "a")  // expect: infix Foo > a
+System.print(Foo <= "a") // expect: infix Foo <= a
+System.print(Foo >= "a") // expect: infix Foo >= a
+System.print(Foo == "a") // expect: infix Foo == a
+System.print(Foo <> "a") // expect: infix Foo <> a
+System.print(Foo & "a")  // expect: infix Foo & a
+System.print(Foo | "a")  // expect: infix Foo | a
+System.print(Foo is "a") // expect: infix Foo is a
+System.print(not Foo)    // expect: prefix not Foo
+System.print(~Foo)       // expect: prefix ~Foo
+System.print(-Foo)       // expect: prefix -Foo
+
+System.print(Foo["a"]) // expect: Foo 1-subscript a
+System.print(Foo["a", "b"]) // expect: Foo 2-subscript a b
+System.print(Foo["a", "b", "c"]) // expect: Foo 3-subscript a b c
+System.print(Foo["a"] = "value") // expect: Foo 1-subscript setter a = value
+System.print(Foo["a", "b"] = "value") // expect: Foo 2-subscript setter a b = value
+System.print(Foo["a", "b", "c"] = "value") // expect: Foo 3-subscript setter a b c = value

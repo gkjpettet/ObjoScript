@@ -7,7 +7,6 @@ Implements ObjoScript.Value
 		  Self.Methods = ParseJSON("{}") // HACK: Case sensitive.
 		  Self.StaticMethods = ParseJSON("{}") // HACK: Case sensitive.
 		  Self.StaticFields = ParseJSON("{}") // HACK: Case sensitive.
-		  mToString = Name + " class"
 		  Self.IsForeign = isForeign
 		  Self.FieldCount = fieldCount
 		  Self.FirstFieldIndex = firstFieldIndex
@@ -21,7 +20,7 @@ Implements ObjoScript.Value
 		  ///
 		  /// Part of the ObjoScript.Value interface.
 		  
-		  Return mToString
+		  Return Name
 		  
 		End Function
 	#tag EndMethod
@@ -64,10 +63,6 @@ Implements ObjoScript.Value
 
 	#tag Property, Flags = &h0, Description = 54686520726567756C617220286E6F6E2D7365747465722920636C61737320696E7374616E6365206D6574686F647320284B6579203D207369676E61747572652C2056616C7565203D206046756E6360206F722060466F726569676E4D6574686F6460292E
 		Methods As Dictionary
-	#tag EndProperty
-
-	#tag Property, Flags = &h21, Description = 507265636F6D70757465642076616C756520746F2072657475726E2066726F6D2060546F537472696E672829602E
-		Private mToString As String
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 546865206E616D65206F662074686520636C6173732E
@@ -142,6 +137,22 @@ Implements ObjoScript.Value
 			Group="Behavior"
 			InitialValue="False"
 			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="FieldCount"
+			Visible=false
+			Group="Behavior"
+			InitialValue="0"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="FirstFieldIndex"
+			Visible=false
+			Group="Behavior"
+			InitialValue="0"
+			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

@@ -1,0 +1,12 @@
+class Foo {
+bar() { return "on instance" }
+static bar() { return "on metaclass" }
+
+bar(arg) { return "on instance " + arg }
+static bar(arg) { return "on metaclass " + arg }
+}
+
+System.print(Foo().bar)        // expect: on instance
+System.print(Foo.bar)              // expect: on metaclass
+System.print(Foo().bar("arg")) // expect: on instance arg
+System.print(Foo.bar("arg"))       // expect: on metaclass arg

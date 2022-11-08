@@ -1,0 +1,4 @@
+on instance
+on metaclass
+on instance arg
+on metaclass arg

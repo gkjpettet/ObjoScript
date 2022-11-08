@@ -2584,12 +2584,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  mLocation = this.Location
 		  
 		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
-		    Error("`this` can only be used within an instance method or constructor.")
+		    Error("`this` can only be used within a method or constructor.")
 		  End If
 		  
-		  If Self.IsStaticMethod Then
-		    Error("`this` cannot be used within a static method.")
-		  End If
+		  ' If Self.IsStaticMethod Then
+		  ' Error("`this` cannot be used within a static method.")
+		  ' End If
 		  
 		  // `this` is always at slot 0 of the call frame.
 		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
