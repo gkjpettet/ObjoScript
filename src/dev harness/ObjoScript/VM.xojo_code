@@ -1421,11 +1421,12 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_BITWISE_XOR
-		      Var b As Variant  = Pop
-		      Var a As Variant  = Pop
-		      AssertNumbers(a, b)
-		      // Bitwise operators always work on 32-bit unsigned integers.
-		      Push(Ctype(a.UInt32Value Xor b.UInt32Value, Double))
+		      If TopOfStackAreNumbers Then
+		        // Bitwise operators work on 32-bit unsigned integers.
+		        PopAndReplaceTop(Ctype(Peek(1).UInt32Value Xor Peek(0).UInt32Value, Double))
+		      Else
+		        InvokeOperator("^(_)")
+		      End If
 		      
 		    Case OP_BITWISE_NOT
 		      // Bitwise operators always work on 32-bit unsigned integers.
