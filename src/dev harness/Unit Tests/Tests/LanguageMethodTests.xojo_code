@@ -68,6 +68,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub OperatorsTest()
+		  AssertOutputsEqual("language.method.operators")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub PermittedDuplicateMethodsTest()
 		  AssertOutputsEqual("language.method.permitted_duplicate_methods")
 		End Sub

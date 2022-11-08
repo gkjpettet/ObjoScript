@@ -1,0 +1,17 @@
+infix + a
+infix - a
+infix * a
+infix / a
+infix % a
+infix < a
+infix > a
+infix <= a
+infix >= a
+infix == a
+infix <> a
+infix & a
+infix | a
+prefix not
+prefix ~
+prefix -
+infix is a

@@ -3,18 +3,18 @@ class Foo {
   -(other) { return "infix - " + other }
   *(other) { return "infix * " + other }
   /(other) { return "infix / " + other }
-  %(other) { return "infix \ " + other }
+  %(other) { return "infix % " + other }
   <(other) { return "infix < " + other }
   >(other) { return "infix > " + other }
   <=(other) { return "infix <= " + other }
   >=(other) { return "infix >= " + other }
   ==(other) { return "infix == " + other }
-  <>(other) { return "infix != " + other }
+  <>(other) { return "infix <> " + other }
   &(other) { return "infix & " + other }
   |(other) { return "infix | " + other }
   is(other) { return "infix is " + other }
 
-  not() { return "prefix !" }
+  not() { return "prefix not" }
   ~() { return "prefix ~" }
   -() { return "prefix -" }
 }
@@ -33,7 +33,7 @@ System.print(foo == "a") // expect: infix == a
 System.print(foo <> "a") // expect: infix <> a
 System.print(foo & "a") // expect: infix & a
 System.print(foo | "a") // expect: infix | a
-System.print(not foo) // expect: prefix `not`
+System.print(not foo) // expect: prefix not
 System.print(~foo) // expect: prefix ~
 System.print(-foo) // expect: prefix -
-System.print(foo is a) // expect: infix is a
+System.print(foo is "a") // expect: infix is a
