@@ -1361,8 +1361,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///                 a
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
-		  #Pragma Warning "TODO: Figure out a way to handle overloaded operators (not subscripts, they're already done)"
-		  
 		  mLocation = expr.Location
 		  
 		  // Compile the left and right operands - this will leave them on the stack.

@@ -44,11 +44,83 @@ Protected Module Number
 		    If signature = "+(_)" Then
 		      Return AddressOf Add
 		      
+		    ElseIf signature = "<(_)" Then
+		      Return AddressOf Less
+		      
+		    ElseIf signature = "<=(_)" Then
+		      Return AddressOf LessEqual
+		      
+		    ElseIf signature = ">(_)" Then
+		      Return AddressOf Greater
+		      
+		    ElseIf signature = ">=(_)" Then
+		      Return AddressOf GreaterEqual
+		      
 		    ElseIf signature.CompareCase("sqrt()") Then
 		      Return AddressOf Sqrt_
 		    End If
 		  End If
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73206074727565602069662074686973206973203E20606F74686572602E
+		Protected Sub Greater(vm As ObjoScript.VM)
+		  /// Returns `true` if this is > `other`.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double.
+		  /// Note: Number < Number is handled within the VM for performance reasons.
+		  /// Number.>(other) -> boolean
+		  
+		  // Since this is handled in the VM, we'll just raise a runtime error. If we don't do this, 
+		  // The VM will spit out an error saying that `Number` doesn't implement `>(_)`. It obviously
+		  // does so this is cleaner.
+		  vm.Error("Both operands must be numbers.")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73206074727565602069662074686973206973203E3D20606F74686572602E
+		Protected Sub GreaterEqual(vm As ObjoScript.VM)
+		  /// Returns `true` if this is >= `other`.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double.
+		  /// Note: Number < Number is handled within the VM for performance reasons.
+		  /// Number.>=(other) -> boolean
+		  
+		  // Since this is handled in the VM, we'll just raise a runtime error. If we don't do this, 
+		  // The VM will spit out an error saying that `Number` doesn't implement `>=(_)`. It obviously
+		  // does so this is cleaner.
+		  vm.Error("Both operands must be numbers.")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73206074727565602069662074686973206973203C20606F74686572602E
+		Protected Sub Less(vm As ObjoScript.VM)
+		  /// Returns `true` if this is < `other`.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double.
+		  /// Note: Number < Number is handled within the VM for performance reasons.
+		  /// Number.<(other) -> boolean
+		  
+		  // Since this is handled in the VM, we'll just raise a runtime error. If we don't do this, 
+		  // The VM will spit out an error saying that `Number` doesn't implement `<(_)`. It obviously
+		  // does so this is cleaner.
+		  vm.Error("Both operands must be numbers.")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73206074727565602069662074686973206973203C3D20606F74686572602E
+		Protected Sub LessEqual(vm As ObjoScript.VM)
+		  /// Returns `true` if this is <= `other`.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double.
+		  /// Note: Number < Number is handled within the VM for performance reasons.
+		  /// Number.<=(other) -> boolean
+		  
+		  // Since this is handled in the VM, we'll just raise a runtime error. If we don't do this, 
+		  // The VM will spit out an error saying that `Number` doesn't implement `<=(_)`. It obviously
+		  // does so this is cleaner.
+		  vm.Error("Both operands must be numbers.")
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h1, Description = 52657475726E73207468652073717561726520726F6F74206F6620746865206E756D6265722E

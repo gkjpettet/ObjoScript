@@ -1375,28 +1375,32 @@ Protected Class VM
 		      InvokeBinaryOperator("<>(_)")
 		      
 		    Case OP_GREATER
-		      Var b As Variant  = Pop
-		      Var a As Variant  = Pop
-		      AssertNumbers(a, b)
-		      Push(a > b)
+		      If TopOfStackAreNumbers Then
+		        PopAndReplaceTop(Peek(1).DoubleValue > Peek(0).DoubleValue)
+		      Else
+		        InvokeBinaryOperator(">(_)")
+		      End If
 		      
 		    Case OP_GREATER_EQUAL
-		      Var b As Variant  = Pop
-		      Var a As Variant  = Pop
-		      AssertNumbers(a, b)
-		      Push(a >= b)
+		      If TopOfStackAreNumbers Then
+		        PopAndReplaceTop(Peek(1).DoubleValue >= Peek(0).DoubleValue)
+		      Else
+		        InvokeBinaryOperator(">=(_)")
+		      End If
 		      
 		    Case OP_LESS
-		      Var b As Variant  = Pop
-		      Var a As Variant  = Pop
-		      AssertNumbers(a, b)
-		      Push(a < b)
+		      If TopOfStackAreNumbers Then
+		        PopAndReplaceTop(Peek(1).DoubleValue < Peek(0).DoubleValue)
+		      Else
+		        InvokeBinaryOperator("<(_)")
+		      End If
 		      
 		    Case OP_LESS_EQUAL
-		      Var b As Variant  = Pop
-		      Var a As Variant  = Pop
-		      AssertNumbers(a, b)
-		      Push(a <= b)
+		      If TopOfStackAreNumbers Then
+		        PopAndReplaceTop(Peek(1).DoubleValue <= Peek(0).DoubleValue)
+		      Else
+		        InvokeBinaryOperator("<=(_)")
+		      End If
 		      
 		    Case OP_TRUE
 		      Push(True)

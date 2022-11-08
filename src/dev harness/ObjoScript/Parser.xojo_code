@@ -906,7 +906,11 @@ Protected Class Parser
 		  ObjoScript.TokenTypes.Ampersand, _
 		  ObjoScript.TokenTypes.EqualEqual, _
 		  ObjoScript.TokenTypes.ForwardSlash, _
+		  ObjoScript.TokenTypes.Greater, _
+		  ObjoScript.TokenTypes.GreaterEqual, _
 		  ObjoScript.TokenTypes.GreaterGreater, _
+		  ObjoScript.TokenTypes.Less, _
+		  ObjoScript.TokenTypes.LessEqual, _
 		  ObjoScript.TokenTypes.LessLess, _
 		  ObjoScript.TokenTypes.LSquare, _
 		  ObjoScript.TokenTypes.Minus, _
