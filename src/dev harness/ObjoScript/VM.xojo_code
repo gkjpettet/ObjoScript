@@ -1233,10 +1233,6 @@ Protected Class VM
 		  // Make sure we don't try to step in with an out of bounds instruction pointer.
 		  If CurrentFrame.IP > CurrentChunk.Code.LastIndex Then Return
 		  
-		  // Some temporary variables.
-		  #Pragma Warning "TODO: Remove these when finished implemented overloaded operators"
-		  Var a, b As Variant
-		  
 		  While True
 		    
 		    If Self.DebugMode And CurrentChunk.IsDebug Then
@@ -1344,37 +1340,37 @@ Protected Class VM
 		      
 		    Case OP_EQUAL
 		      #Pragma Warning "TODO: Make this a method call to `==()`"
-		      b = Pop
-		      a = Pop
+		      Var b As Variant = Pop
+		      Var a As Variant  = Pop
 		      Push(ValuesEqual(a, b))
 		      
 		    Case OP_NOT_EQUAL
 		      #Pragma Warning "TODO: Make this an inverse method call to `==()`"
-		      b = Pop
-		      a = Pop
+		      Var b As Variant  = Pop
+		      Var a As Variant  = Pop
 		      Push(Not ValuesEqual(a, b))
 		      
 		    Case OP_GREATER
-		      b = Pop
-		      a = Pop
+		      Var b As Variant  = Pop
+		      Var a As Variant  = Pop
 		      AssertNumbers(a, b)
 		      Push(a > b)
 		      
 		    Case OP_GREATER_EQUAL
-		      b = Pop
-		      a = Pop
+		      Var b As Variant  = Pop
+		      Var a As Variant  = Pop
 		      AssertNumbers(a, b)
 		      Push(a >= b)
 		      
 		    Case OP_LESS
-		      b = Pop
-		      a = Pop
+		      Var b As Variant  = Pop
+		      Var a As Variant  = Pop
 		      AssertNumbers(a, b)
 		      Push(a < b)
 		      
 		    Case OP_LESS_EQUAL
-		      b = Pop
-		      a = Pop
+		      Var b As Variant  = Pop
+		      Var a As Variant  = Pop
 		      AssertNumbers(a, b)
 		      Push(a <= b)
 		      
@@ -1409,22 +1405,22 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_BITWISE_AND
-		      b = Pop
-		      a = Pop
+		      Var b As Variant  = Pop
+		      Var a As Variant  = Pop
 		      AssertNumbers(a, b)
 		      // Bitwise operators always work on 32-bit unsigned integers.
 		      Push(Ctype(a.UInt32Value And b.UInt32Value, Double))
 		      
 		    Case OP_BITWISE_OR
-		      b = Pop
-		      a = Pop
+		      Var b As Variant  = Pop
+		      Var a As Variant  = Pop
 		      AssertNumbers(a, b)
 		      // Bitwise operators always work on 32-bit unsigned integers.
 		      Push(Ctype(a.UInt32Value Or b.UInt32Value, Double))
 		      
 		    Case OP_BITWISE_XOR
-		      b = Pop
-		      a = Pop
+		      Var b As Variant  = Pop
+		      Var a As Variant  = Pop
 		      AssertNumbers(a, b)
 		      // Bitwise operators always work on 32-bit unsigned integers.
 		      Push(Ctype(a.UInt32Value Xor b.UInt32Value, Double))
@@ -1545,8 +1541,8 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_LOGICAL_XOR
-		      b = Pop
-		      a = Pop
+		      Var b As Variant  = Pop
+		      Var a As Variant  = Pop
 		      Push(IsTruthy(a) Xor IsTruthy(b))
 		      
 		    Case OP_LOOP
@@ -1635,7 +1631,7 @@ Protected Class VM
 		      // Do this in-place to avoid Push/Pop calls.
 		      ' b        a
 		      ' a   -->  b
-		      b = Stack(StackTop - 1)
+		      Var b As Variant  = Stack(StackTop - 1)
 		      Stack(StackTop - 1) = Stack(StackTop - 2)
 		      Stack(StackTop - 2) = b
 		      
