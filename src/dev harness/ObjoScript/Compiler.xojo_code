@@ -2117,6 +2117,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = m.Location
 		  
+		  // Assert the parameter count is <= 255 (since that's the maximum that can be called).
+		  If m.Parameters.Count > 255 Then
+		    Error("The maximum number of parameters is 255.")
+		  End If
+		  
 		  // Add the signature of the method to the function's constants pool.
 		  Var index As Integer = AddConstant(m.Signature)
 		  
@@ -2152,6 +2157,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Load the method's signature into the constant pool.
 		  Var index As Integer = AddConstant(m.Signature)
+		  
+		  // Assert that the argument count is <= 255.
+		  If m.Arguments.Count > 255 Then
+		    Error("The maximum number of arguments is 255.")
+		  End If
 		  
 		  // Compile the arguments.
 		  For Each arg As ObjoScript.Expr In m.Arguments
