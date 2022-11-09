@@ -959,6 +959,7 @@ End
 		  
 		  Editor.Formatter = New XUICEObjoScriptFormatter
 		  
+		  #Pragma Warning "TODO: Tweak theme for autocomplete popup in dark mode"
 		  Editor.Theme = XUICETheme.FromFile(SpecialFolder.Resource("EditorTheme.toml"))
 		  
 		  // Increase the default font a little.
@@ -1302,6 +1303,7 @@ End
 		  
 		  AutocompleteEngine = New BasicAutocompleteEngine(True)
 		  
+		  // Keywords.
 		  AutocompleteEngine.AddOption("and")
 		  AutocompleteEngine.AddOption("as")
 		  AutocompleteEngine.AddOption("assert")
@@ -1323,7 +1325,6 @@ End
 		  AutocompleteEngine.AddOption("not")
 		  AutocompleteEngine.AddOption("nothing")
 		  AutocompleteEngine.AddOption("or")
-		  AutocompleteEngine.AddOption("print")
 		  AutocompleteEngine.AddOption("return")
 		  AutocompleteEngine.AddOption("static")
 		  AutocompleteEngine.AddOption("super")
@@ -1334,12 +1335,18 @@ End
 		  AutocompleteEngine.AddOption("while")
 		  AutocompleteEngine.AddOption("xor")
 		  
+		  // Core classes.
 		  AutocompleteEngine.AddOption("Boolean")
-		  AutocompleteEngine.AddOption("Number")
 		  AutocompleteEngine.AddOption("Function")
+		  AutocompleteEngine.AddOption("List")
+		  AutocompleteEngine.AddOption("Number")
+		  AutocompleteEngine.AddOption("Object")
 		  AutocompleteEngine.AddOption("Range")
 		  AutocompleteEngine.AddOption("String")
+		  AutocompleteEngine.AddOption("System")
 		  
+		  // Common methods.
+		  AutocompleteEngine.AddOption("System.print")
 		End Sub
 	#tag EndMethod
 
