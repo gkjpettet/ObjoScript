@@ -103,6 +103,24 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub SubscriptSetterTooManyArgsTest()
+		  AssertRuntimeError("language.method.subscript_setter_too_many_arguments")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub SubscriptTooManyArgsTest()
+		  AssertRuntimeError("language.method.subscript_too_many_arguments")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub TooManyArgsTest()
+		  AssertRuntimeError("language.method.too_many_arguments")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
