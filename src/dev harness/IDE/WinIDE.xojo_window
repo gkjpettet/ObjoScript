@@ -957,9 +957,10 @@ End
 		  // after the editor's Opening event.
 		  Editor.UndoManager = Self.UndoManager
 		  
+		  // Obviously the editor needs to format Objo code.
 		  Editor.Formatter = New XUICEObjoScriptFormatter
 		  
-		  #Pragma Warning "TODO: Tweak theme for autocomplete popup in dark mode"
+		  // Set the theme.
 		  Editor.Theme = XUICETheme.FromFile(SpecialFolder.Resource("EditorTheme.toml"))
 		  
 		  // Increase the default font a little.
