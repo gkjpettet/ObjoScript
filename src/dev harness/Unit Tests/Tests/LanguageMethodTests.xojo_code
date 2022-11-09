@@ -121,6 +121,12 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub TooManyParamsTest()
+		  AssertCompilerError("language.method.too_many_parameters")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
