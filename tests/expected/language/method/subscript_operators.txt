@@ -1,0 +1,6 @@
+1-subscript a
+2-subscript a b
+3-subscript a b c
+1-subscript setter a = value
+2-subscript setter a b = value
+3-subscript setter a b c = value
