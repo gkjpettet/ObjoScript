@@ -1858,7 +1858,7 @@ Protected Class VM
 		    If v.DoubleValue.IsInteger Then
 		      Return CType(v, Integer).ToString
 		    Else
-		      Return v.DoubleValue.ToString(Locale.Current, "#.##")
+		      Return v.DoubleValue.ToString(Locale.Current, "#.#########")
 		    End If
 		    
 		  Else

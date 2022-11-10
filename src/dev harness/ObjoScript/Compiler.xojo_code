@@ -423,10 +423,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // The VM has dedicated instructions for producing certain numeric constants that are commonly used.
 		  If value.Type = Variant.TypeDouble Then
 		    Select Case value
-		    Case 0
+		    Case 0.0
 		      EmitByte(ObjoScript.VM.OP_LOAD_0, location)
 		      Return -1
-		    Case 1
+		    Case 1.0
 		      EmitByte(ObjoScript.VM.OP_LOAD_1, location)
 		      Return -1
 		    End Select
@@ -434,16 +434,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  Var index As Integer = AddConstant(value)
 		  
-		  If index <= 255 Then
-		    // We only need a single byte operand to specify the index of the constant.
-		    EmitBytes(ObjoScript.VM.OP_CONSTANT, index, location)
-		  Else
-		    // We need two bytes for the operand.
-		    EmitByte(ObjoScript.VM.OP_CONSTANT_LONG, location)
-		    EmitUInt16(index, location)
-		  End If
+		  EmitIndexedOpcode(ObjoScript.VM.OP_CONSTANT, ObjoScript.VM.OP_CONSTANT_LONG, index, location)
 		  
 		  Return index
+		  
 		End Function
 	#tag EndMethod
 

@@ -15,7 +15,7 @@ Protected Module Number
 		  If d.DoubleValue.IsInteger Then
 		    s = d.IntegerValue.ToString
 		  Else
-		    s = d.DoubleValue.ToString(Locale.Current, "#.##")
+		    s = d.DoubleValue.ToString(Locale.Current, "#.#########")
 		  End If
 		  
 		  vm.SetReturn(s + vm.GetSlotAsString(1))
