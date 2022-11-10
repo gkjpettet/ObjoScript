@@ -1,0 +1,8 @@
+var nonlocal = "outer"
+
+{
+var nonlocal = "inner"
+System.print(nonlocal) // expect: inner
+}
+
+System.print(nonlocal) // expect: outer

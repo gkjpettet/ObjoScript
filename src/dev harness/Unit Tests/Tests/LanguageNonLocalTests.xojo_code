@@ -1,38 +1,33 @@
 #tag Class
-Protected Class LanguageForTests
+Protected Class LanguageNonLocalTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
-		Sub CompleteTest()
-		  AssertOutputsEqual("language.for.complete")
-		  
+		Sub AssignmentTest()
+		  AssertOutputsEqual("language.non_local.assignment")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub GlobalLoopCounterTest()
-		  AssertOutputsEqual("language.for.global_loop_counter")
-		  
+		Sub DuplicateNonLocalTest()
+		  AssertCompilerError("language.non_local.duplicate_nonlocal")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub NewlineAfterForTest()
-		  AssertCompilerError("language.for.newline_after_for")
-		  
+		Sub InBlockScopeTest()
+		  AssertOutputsEqual("language.non_local.in_block_scope")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub UndefinedLoopCounterTest()
-		  AssertCompilerError("language.for.undefined_loop_counter")
-		  
+		Sub LocalNameForwardDeclareTest()
+		  AssertCompilerError("language.non_local.localname_forward_declare")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub UsingLoopCounterOutsideBodyTest()
-		  AssertCompilerError("language.for.using_loop_counter_outside_body")
-		  
+		Sub MutualRecursionTest()
+		  AssertOutputsEqual("language.non_local.mutual_recursion")
 		End Sub
 	#tag EndMethod
 

@@ -1,0 +1,17 @@
+var nonlocal = "before"
+System.print(nonlocal) // expect: before
+nonlocal = "after"
+System.print(nonlocal) // expect: after
+
+class Foo {
+static method() {
+nonlocal = "method"
+}
+}
+
+Foo.method
+System.print(nonlocal) // expect: method
+
+function test() { nonlocal = "function" }
+test()
+System.print(nonlocal) // expect: function
