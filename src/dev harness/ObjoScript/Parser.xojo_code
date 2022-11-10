@@ -834,14 +834,17 @@ Protected Class Parser
 		  // Setter?
 		  Var isSetter As Boolean = Match(ObjoScript.TokenTypes.Equal)
 		  
-		  Consume(ObjoScript.TokenTypes.LParen, "Expected an opening parenthesis after the method's name.")
-		  
 		  // Optional parameters.
 		  Var params() As ObjoScript.Token
-		  If Not Check(ObjoScript.TokenTypes.RParen) Then
-		    Do
-		      params.Add(Consume(ObjoScript.TokenTypes.Identifier, "Expected parameter name."))
-		    Loop Until Not Match(ObjoScript.TokenTypes.Comma)
+		  Var hasParens As Boolean = False
+		  If Match(ObjoScript.TokenTypes.LParen) Then
+		    hasParens = True
+		    
+		    If Not Check(ObjoScript.TokenTypes.RParen) Then
+		      Do
+		        params.Add(Consume(ObjoScript.TokenTypes.Identifier, "Expected parameter name."))
+		      Loop Until Not Match(ObjoScript.TokenTypes.Comma)
+		    End If
 		  End If
 		  
 		  // Setters must have exactly one parameter.
@@ -849,7 +852,9 @@ Protected Class Parser
 		    Error("Setters must have exactly one parameter.", identifier)
 		  End If
 		  
-		  Consume(ObjoScript.TokenTypes.RParen, "Expected a closing parenthesis after method parameters.")
+		  If hasParens Then
+		    Consume(ObjoScript.TokenTypes.RParen, "Expected a closing parenthesis after method parameters.")
+		  End If
 		  
 		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after method parameters.")
 		  
