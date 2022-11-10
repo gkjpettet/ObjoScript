@@ -180,6 +180,7 @@ Protected Class Lexer
 		  
 		  // Is there an exponent?
 		  If Peek = "e" Then
+		    Var seenExponentDigit As Boolean = False
 		    Var nextChar As String = Peek(1)
 		    If nextChar = "-" Or nextChar = "+" Then
 		      If nextChar = "-" Then isInteger = False
@@ -188,6 +189,7 @@ Protected Class Lexer
 		      lexeme.Add(Advance)
 		      While Peek.IsDigit
 		        lexeme.Add(Advance)
+		        seenExponentDigit = True
 		      Wend
 		      
 		    ElseIf nextChar.IsDigit Then
@@ -196,7 +198,12 @@ Protected Class Lexer
 		      
 		      While Peek.IsDigit
 		        lexeme.Add(Advance)
+		        seenExponentDigit = True
 		      Wend
+		    End If
+		    
+		    If Not seenExponentDigit Then
+		      Error("Unterminated scientific notation.")
 		    End If
 		  End If
 		  

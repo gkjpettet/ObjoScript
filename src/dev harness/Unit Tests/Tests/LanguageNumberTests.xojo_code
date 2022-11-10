@@ -13,6 +13,12 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub ScientificDoubleMissingExponentTest()
+		  AssertCompilerError("language.number.scientific_double_missing_exponent")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
