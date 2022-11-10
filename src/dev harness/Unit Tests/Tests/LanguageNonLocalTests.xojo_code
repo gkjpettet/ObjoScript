@@ -21,7 +21,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub LocalNameForwardDeclareTest()
-		  AssertCompilerError("language.non_local.localname_forward_declare")
+		  AssertRuntimeError("language.non_local.localname_forward_declare")
 		End Sub
 	#tag EndMethod
 
@@ -33,7 +33,43 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub NonLocalInInitialiserTest()
-		  AssertCompilerError("language.non_local.nonlocal_in_initialiser")
+		  AssertRuntimeError("language.non_local.nonlocal_in_initialiser")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub NonLocalWithoutInitialiserTest()
+		  AssertOutputsEqual("language.non_local.nonlocal_without_initialiser")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub NotDefinedTest()
+		  AssertRuntimeError("language.non_local.not_defined")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub UseInFunctionBeforeDefinitionTest()
+		  AssertOutputsEqual("language.non_local.use_in_function_before_definition")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub UseInFunctionTest()
+		  AssertOutputsEqual("language.non_local.use_in_function")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub UseInMethodBeforeDeclarationTest()
+		  AssertOutputsEqual("language.non_local.use_in_method_before_declaration")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub UseInMethodTest()
+		  AssertOutputsEqual("language.non_local.use_in_method")
 		End Sub
 	#tag EndMethod
 

@@ -1,0 +1,1 @@
+System.print(foo) // Expect error: Undefined variable `foo`.

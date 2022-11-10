@@ -24,14 +24,14 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub UndefinedLoopCounterTest()
-		  AssertCompilerError("language.for.undefined_loop_counter")
+		  AssertRuntimeError("language.for.undefined_loop_counter")
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub UsingLoopCounterOutsideBodyTest()
-		  AssertCompilerError("language.for.using_loop_counter_outside_body")
+		  AssertRuntimeError("language.for.using_loop_counter_outside_body")
 		  
 		End Sub
 	#tag EndMethod

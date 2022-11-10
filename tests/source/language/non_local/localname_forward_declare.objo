@@ -1,6 +1,6 @@
-if false {
+// Runtime error.
+if true {
 System.print(a)
 }
 
-// Expect error: Undefined variable `a`.
 var a = 123

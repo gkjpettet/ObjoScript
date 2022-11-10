@@ -321,16 +321,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// `identifier` is the token representing the variable's name in the original source code.
 		  /// If `initialised` then marks the local as initialised immediately (relevant for functions).
 		  
-		  // Global variable?
+		  // Global variable? These are late bound so the compiler doesn't keep track of
+		  // which declarations for them it has seen. We're done.
 		  If ScopeDepth = 0 Then
-		    // Keep track of all known global variables.
-		    If IsKnownGlobalVariable(identifier.Lexeme) Then
-		      Error("Redefined global variable `" + identifier.Lexeme + "`.")
-		    Else
-		      TrackGlobalVariable(identifier.Lexeme)
-		    End If
-		    // Global variables are late bound so the compiler doesn't keep track of
-		    // which declarations for them it has seen. We're done.
 		    Return
 		  End If
 		  
@@ -843,14 +836,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52657475726E732054727565206966207468657265206973206120676C6F62616C207661726961626C65207468617420686173206265656E20646566696E6564206E616D656420606E616D65602E
-		Private Function IsKnownGlobalVariable(name As String) As Boolean
-		  /// Returns True if there is a global variable that has been defined named `name`.
-		  
-		  Return OutermostCompiler.KnownGlobals.HasKey(name)
-		End Function
-	#tag EndMethod
-
 	#tag Method, Flags = &h21, Description = 436F6D70696C65732061206C6F676963616C2060616E64602065787072657373696F6E2E
 		Private Sub LogicalAnd(logical As ObjoScript.LogicalExpr)
 		  /// Compiles a logical `and` expression.
@@ -971,11 +956,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    
 		  Else
 		    // Not a local variable or a getter method - assume we're retrieving a global variable.
-		    If Not IsKnownGlobalVariable(name) Then
-		      Error("Undefined variable `" + name + "`.")
-		    Else
-		      GlobalVariable(name)
-		    End If
+		    GlobalVariable(name)
 		  End If
 		  
 		  If isGetter Then
@@ -1111,7 +1092,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  KnownClasses = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  Enclosing = Nil
 		  
-		  KnownGlobals = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		End Sub
 	#tag EndMethod
 
@@ -1268,17 +1248,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  Return mTokens
 		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h1, Description = 547261636B7320746865206578697374656E6365206F66206120676C6F62616C207661726961626C65206E616D656420606E616D65602E
-		Protected Sub TrackGlobalVariable(name As String)
-		  /// Tracks the existence of a global variable named `name`.
-		  
-		  // Get the outermost compiler - the one compiling the main function.
-		  // This is this compiler that tracks all globals.
-		  OutermostCompiler.KnownGlobals.Value(name) = Nil
-		  
-		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320616E2060617373657274602073746174656D656E742E
@@ -2793,10 +2762,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 
 	#tag Property, Flags = &h0, Description = 54686520636C617373657320616C726561647920636F6D70696C65642062792074686520636F6D70696C65722E204B6579203D20436C617373206E616D652C2056616C7565203D204F626A6F5363726970742E436C61737344617461
 		KnownClasses As Dictionary
-	#tag EndProperty
-
-	#tag Property, Flags = &h1, Description = 546865206E616D6573206F6620616C6C206B6E6F776E20676C6F62616C207661726961626C65732E204B6579203D206E616D652028537472696E67292C2056616C7565203D204E696C2E204F6E6C792076616C696420666F7220746865206F757465726D6F737420636F6D70696C65722028746865206F6E6520636F6D70696C696E6720746865206D61696E2066756E6374696F6E292E
-		Protected KnownGlobals As Dictionary
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 54686520636F6D70696C65722773206C657865722E205573656420746F20746F6B656E69736520736F7572636520636F64652E

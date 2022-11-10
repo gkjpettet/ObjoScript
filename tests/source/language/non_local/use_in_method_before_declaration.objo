@@ -1,0 +1,14 @@
+class Foo {
+method() {
+System.print(global)
+}
+
+static classMethod() {
+System.print(global)
+}
+}
+
+var global = "global"
+
+Foo().method // Expect: global.
+Foo.classMethod // Expect: global.
