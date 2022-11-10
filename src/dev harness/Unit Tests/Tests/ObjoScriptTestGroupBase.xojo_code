@@ -21,14 +21,14 @@ Inherits TestGroup
 		  Catch pe As ObjoScript.ParserException
 		    Var errors() As ObjoScript.ParserException = Compiler.ParserErrors
 		    If errors(0).Message = expected Then
-		      Assert.Pass("", source)
+		      Assert.Pass("Output:" + EndOfLine + EndOfLine + expected, source)
 		    Else
 		      Assert.Fail("A parser error occurred but the message did not match. Got """ + errors(0).Message + """ but expected """ + expected + """", "", source)
 		    End If
 		    
 		  Catch e As ObjoScript.CompilerException
 		    If e.Message = expected Then
-		      Assert.Pass("", source)
+		      Assert.Pass("Output:" + EndOfLine + EndOfLine + expected, source)
 		    Else
 		      Assert.Fail("A compiler error occurred but the message did not match. Got """ + e.Message + """ but expected """ + expected + """", "", source)
 		    End If
@@ -47,7 +47,7 @@ Inherits TestGroup
 		  Var func As ObjoScript.Func = CompileTest(source)
 		  Var expected As String = GetExpectedResult(testName)
 		  Var result As String = RunFunc(func)
-		  Assert.AreSame(expected, result, "", source)
+		  Assert.AreSame(expected, result, "Output:" + EndOfLine + EndOfLine + result, source)
 		  
 		End Sub
 	#tag EndMethod
@@ -73,7 +73,7 @@ Inherits TestGroup
 		    
 		  Catch e As ObjoScript.VMException
 		    If e.Message = expected Then
-		      Assert.Pass("", source)
+		      Assert.Pass("Output:" + EndOfLine + EndOfLine + expected, source)
 		    Else
 		      Assert.Fail("A runtime error occurred but the message did not match. Got """ + e.Message + """ but expected """ + expected + """", "", source)
 		    End If

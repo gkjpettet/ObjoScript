@@ -366,14 +366,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Return
 		  End If
 		  
-		  If index <= 255 Then
-		    // We only need a single byte operand to specify the index of the variable's name in the constant pool.
-		    EmitBytes(ObjoScript.VM.OP_DEFINE_GLOBAL, index)
-		  Else
-		    // We need two bytes for the operand.
-		    EmitByte(ObjoScript.VM.OP_DEFINE_GLOBAL_LONG)
-		    EmitUInt16(index)
-		  End If
+		  EmitIndexedOpcode(ObjoScript.VM.OP_DEFINE_GLOBAL, ObjoScript.VM.OP_DEFINE_GLOBAL_LONG, index)
 		  
 		End Sub
 	#tag EndMethod

@@ -1,0 +1,3 @@
+// It's an error to reference a variable within its own initiliaser.
+var a = a == nothing
+System.print(a) // Expect error: Undefined variable `a`.

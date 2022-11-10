@@ -31,6 +31,12 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub NonLocalInInitialiserTest()
+		  AssertCompilerError("language.non_local.nonlocal_in_initialiser")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
