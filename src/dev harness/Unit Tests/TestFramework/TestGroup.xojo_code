@@ -386,7 +386,6 @@ Protected Class TestGroup
 		      // Process it below
 		      //
 		      err = e
-		      
 		    End Try
 		    
 		    IsTestRunning = False // Again, just in case

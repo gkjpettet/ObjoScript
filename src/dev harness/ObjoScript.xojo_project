@@ -147,6 +147,7 @@ Class=LanguageListTests;Unit Tests/Tests/LanguageListTests.xojo_code;&h000000006
 Class=LanguageMethodTests;Unit Tests/Tests/LanguageMethodTests.xojo_code;&h000000006D21D7FF;&h000000000BB987FF;false
 Class=LanguageNonLocalTests;Unit Tests/Tests/LanguageNonLocalTests.xojo_code;&h000000005DCCAFFF;&h000000000BB987FF;false
 Class=LanguageNothingTests;Unit Tests/Tests/LanguageNothingTests.xojo_code;&h000000002939A7FF;&h000000000BB987FF;false
+Class=LanguageNumberTests;Unit Tests/Tests/LanguageNumberTests.xojo_code;&h000000000B778FFF;&h000000000BB987FF;false
 Class=LanguageLogicalOperatorTests;Unit Tests/Tests/LanguageLogicalOperatorTests.xojo_code;&h000000001453A7FF;&h000000000BB987FF;false
 Class=ObjoScriptTestGroupBase;Unit Tests/Tests/ObjoScriptTestGroupBase.xojo_code;&h0000000044FAAFFF;&h000000000BB987FF;false
 Folder=UI;Unit Tests/UI;&h0000000003D06FFF;&h000000002516B04D;false

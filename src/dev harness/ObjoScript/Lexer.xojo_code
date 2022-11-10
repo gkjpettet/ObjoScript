@@ -58,8 +58,8 @@ Protected Class Lexer
 		    Call Advance
 		  Wend
 		  
-		  // The next character can't alphanumeric or the end of a line.
-		  If IsAlpha(Peek) And Not AtEnd Then
+		  // The next character can't be alphanumeric.
+		  If IsAlpha(Peek) Then
 		    // Rewind to the character after the token start position.
 		    mCurrent = mTokenStart + 1
 		    Return False
@@ -67,7 +67,7 @@ Protected Class Lexer
 		  
 		  // Compute the value. +2 accounts for the "0x" prefix.
 		  Var lexeme As String = _
-		  mSource.Middle(mTokenStart + 2, mCurrent - mTokenStart - 1)
+		  mSource.Middle(mTokenStart + 2, mCurrent - mTokenStart - 2)
 		  
 		  // Create and add this number token.
 		  mTokens.Add(ObjoScript.Token.CreateNumber(mTokenStart, _
@@ -535,7 +535,7 @@ Protected Class Lexer
 		  // Numbers.
 		  // ====================================================================
 		  If c.IsDigit Then
-		    If c = "0" And Peek(1) = "x" Then
+		    If c = "0" And Peek = "x" Then
 		      // Hexadecimal literal (e.g. 0xFF)?
 		      If AddHexLiteralToken Then Return
 		    Else

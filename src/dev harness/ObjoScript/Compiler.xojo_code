@@ -214,7 +214,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  If Parser.HasError Then
 		    Var message As String
 		    If Parser.Errors.Count = 1 Then
-		      message = "A parsing error occurred."
+		      message = Parser.Errors(0).Message
 		    Else
 		      message = Parser.Errors.Count.ToString + " parsing errors occurred."
 		    End If
