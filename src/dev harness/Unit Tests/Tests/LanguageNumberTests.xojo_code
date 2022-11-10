@@ -7,12 +7,6 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0
-		Sub HexTooLargeTest()
-		  AssertCompilerError("language.number.hex_too_large")
-		End Sub
-	#tag EndMethod
-
 
 	#tag ViewBehavior
 		#tag ViewProperty

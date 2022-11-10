@@ -69,13 +69,8 @@ Protected Class Lexer
 		  Var lexeme As String = _
 		  mSource.Middle(mTokenStart + 2, mCurrent - mTokenStart - 2)
 		  
-		  // Compute the value as an integer.
+		  // Compute the value as an integer. Note we make no attempt to prevent overflow from too large a literal.
 		  Var value As Integer = Integer.FromHex(lexeme)
-		  
-		  // Basic check for too large a literal (overflow to negative).
-		  If value < 0 Then
-		    Error("Number literal is too large.")
-		  End If
 		  
 		  // Create and add this number token.
 		  mTokens.Add(ObjoScript.Token.CreateNumber(mTokenStart, mLineNumber, value, True, mScriptID))
