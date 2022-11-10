@@ -18,6 +18,13 @@ Inherits TestGroup
 		    Call CompileTest(source)
 		    Assert.Fail("Expected an error.", "", source)
 		    
+		  Catch le As ObjoScript.LexerException
+		    If le.Message = expected Then
+		      Assert.Pass("Output:" + EndOfLine + EndOfLine + expected, source)
+		    Else
+		      Assert.Fail("A lexer error occurred but the message did not match. Got """ + le.Message + """ but expected """ + expected + """", "", source)
+		    End If
+		    
 		  Catch pe As ObjoScript.ParserException
 		    Var errors() As ObjoScript.ParserException = Compiler.ParserErrors
 		    If errors(0).Message = expected Then
