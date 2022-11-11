@@ -1,0 +1,1 @@
+Static fields can only be accessed from within a method or constructor.
