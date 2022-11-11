@@ -31,6 +31,8 @@ Inherits TestController
 		  group = New LanguageReturnTests(Self, "Language - Return")
 		  group = New LanguageSetterTests(Self, "Language - Setter")
 		  group = New LanguageStaticFieldTests(Self, "Language - Static Field")
+		  group = New LanguageStringTests(Self, "Language - String")
+		  
 		End Sub
 	#tag EndEvent
 

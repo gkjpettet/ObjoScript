@@ -227,6 +227,8 @@ Protected Class Lexer
 		  ///  ^
 		  /// ```
 		  
+		  #Pragma Warning "TODO: Support unicode literals"
+		  
 		  Var lexeme() As String
 		  
 		  // Keep consuming characters until we hit a `"`.
@@ -543,6 +545,7 @@ Protected Class Lexer
 		  // ====================================================================
 		  // Numbers.
 		  // ====================================================================
+		  #Pragma Warning "TODO: Support binary literals"
 		  If c.IsDigit Then
 		    If c = "0" And Peek = "x" Then
 		      // Hexadecimal literal (e.g. 0xFF)?
