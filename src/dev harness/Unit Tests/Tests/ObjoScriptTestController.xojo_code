@@ -28,6 +28,7 @@ Inherits TestController
 		  group = New LanguageNonLocalTests(Self, "Language - Non Local")
 		  group = New LanguageNothingTests(Self, "Language - Nothing")
 		  group = New LanguageNumberTests(Self, "Language - Numbers")
+		  group = New LanguageReturnTests(Self, "Language - Return")
 		End Sub
 	#tag EndEvent
 

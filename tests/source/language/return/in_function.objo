@@ -1,0 +1,6 @@
+function test() {
+return "ok"
+System.print("bad")
+}
+
+System.print(test()) // Expect: ok

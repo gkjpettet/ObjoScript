@@ -43,9 +43,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 
 	#tag Method, Flags = &h0
 		Function VisitBareInvocationExpr(bi As ObjoScript.BareInvocationExpr) As Variant
-		  Var node As New TreeViewNode("Method invocation on `this`")
+		  Var node As New TreeViewNode("Bare invocation")
 		  
-		  node.AppendNode(New TreeViewNode("Method name: " + bi.MethodName))
+		  node.AppendNode(New TreeViewNode("Callee name: " + bi.MethodName))
 		  
 		  // Optional arguments.
 		  If bi.Arguments.Count = 0 Then

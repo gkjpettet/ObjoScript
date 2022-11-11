@@ -1,0 +1,5 @@
+function test() {
+if true then return "ok"
+}
+
+System.print(test()) // Expect: ok

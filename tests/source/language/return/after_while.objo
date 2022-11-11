@@ -1,0 +1,5 @@
+function test() {
+while true { return "ok" }
+}
+
+System.print(test()) // Expect: ok

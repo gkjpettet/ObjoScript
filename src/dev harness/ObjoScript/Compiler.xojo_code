@@ -2032,9 +2032,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Compile the type to put it on the stack.
 		  Call expr.Type.Accept(Self)
 		  
-		  ' // Add the type name to the constants pool and load it onto the stack.
-		  ' Call EmitConstant(expr.Type.Lexeme, expr.Type)
-		  
 		  // Emit the instruction.
 		  EmitByte(VM.OP_IS, expr.Location)
 		  
@@ -2587,11 +2584,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Error("`this` can only be used within a method or constructor.")
 		  End If
 		  
-		  ' If Self.IsStaticMethod Then
-		  ' Error("`this` cannot be used within a static method.")
-		  ' End If
-		  
 		  // `this` is always at slot 0 of the call frame.
+		  // `this` can be an instance or a class.
 		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
 		  
 		End Function
