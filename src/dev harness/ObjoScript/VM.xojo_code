@@ -872,7 +872,7 @@ Protected Class VM
 		  Else
 		    method = klass.Methods.Lookup(signature, Nil)
 		    If method = Nil Then
-		      Error("There is no instance method with signature `" + signature + "` on `" + klass.ToString + "`.")
+		      Error("`" + klass.ToString + "` instance does not implement `" + signature + "`.")
 		    End If
 		  End If
 		  

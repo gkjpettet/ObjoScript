@@ -1,1 +1,1 @@
-There is no instance method with signature `someUnknownMethod(_,_,_,_,_,_,_,_,_,_,_)` on `Foo`.
+`Foo` instance does not implement `someUnknownMethod(_,_,_,_,_,_,_,_,_,_,_)`.

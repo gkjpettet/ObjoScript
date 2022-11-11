@@ -1,0 +1,1 @@
+Expected a method name after the dot.

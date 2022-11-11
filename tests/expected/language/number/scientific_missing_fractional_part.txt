@@ -1,0 +1,1 @@
+`Number` instance does not implement `e()`.

@@ -14,8 +14,32 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub ScientificDoubleExponentTest()
+		  AssertCompilerError("language.number.scientific_double_exponent")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub ScientificDoubleMissingExponentTest()
 		  AssertCompilerError("language.number.scientific_double_missing_exponent")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ScientificMissingFractionalPartTest()
+		  AssertRuntimeError("language.number.scientific_missing_fractional_part")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ScientificMultipleExponentSignsTest()
+		  AssertCompilerError("language.number.scientific_multiple_exponent_signs")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ScientificMultipleExponentsTest()
+		  AssertCompilerError("language.number.scientific_multiple_exponents")
 		End Sub
 	#tag EndMethod
 
