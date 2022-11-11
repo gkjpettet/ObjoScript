@@ -1,0 +1,20 @@
+class Foo {
+constructor(value) { _value = value }
+
+toString { return _value }
+
+bar=(value) {
+_value = value
+return value
+}
+}
+
+var a = Foo("a")
+var b = Foo("b")
+var c = Foo("c")
+
+// Assignment is right-associative.
+a.bar = b.bar = c.bar = "d"
+System.print(a.toString) // Expect: d
+System.print(b.toString) // Expect: d
+System.print(c.toString) // Expect: d

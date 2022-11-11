@@ -1,39 +1,57 @@
 #tag Class
-Protected Class LanguageReturnTests
+Protected Class LanguageSetterTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
-		Sub AfterElseTest()
-		  AssertOutputsEqual("language.return.after_else")
+		Sub AssociativityTest()
+		  AssertOutputsEqual("language.setter.associativity")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub AfterIfTest()
-		  AssertOutputsEqual("language.return.after_if")
+		Sub GroupingTest()
+		  AssertCompilerError("language.setter.grouping")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub AfterWhileTest()
-		  AssertOutputsEqual("language.return.after_while")
+		Sub InfixOperatorTest()
+		  AssertCompilerError("language.setter.infix_operator")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub InFunctionTest()
-		  AssertOutputsEqual("language.return.in_function")
+		Sub InstanceTest()
+		  AssertOutputsEqual("language.setter.instance")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub InMethodTest()
-		  AssertOutputsEqual("language.return.in_method")
+		Sub IsTest()
+		  AssertCompilerError("language.setter.is")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub ReturnNothingIfNewlineTest()
-		  AssertOutputsEqual("language.return.return_nothing_if_newline")
+		Sub PrefixOperatorTest()
+		  AssertCompilerError("language.setter.prefix_operator")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ResultTest()
+		  AssertOutputsEqual("language.setter.result")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub SameNameAsMethodTest()
+		  AssertOutputsEqual("language.setter.same_name_as_method")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub StaticTest()
+		  AssertOutputsEqual("language.setter.static")
 		End Sub
 	#tag EndMethod
 

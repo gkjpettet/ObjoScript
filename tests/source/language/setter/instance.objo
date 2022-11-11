@@ -1,0 +1,8 @@
+class Foo {
+bar=(value) {
+System.print(value)
+}
+}
+
+var foo = Foo()
+foo.bar = "value" // Expect: value

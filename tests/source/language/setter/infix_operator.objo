@@ -1,0 +1,6 @@
+class Foo {
+bar=(value) { return value }
+}
+
+var foo = Foo()
+"a" + foo.bar = "value" // Expect error.
