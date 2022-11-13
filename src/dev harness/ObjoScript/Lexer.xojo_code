@@ -277,8 +277,19 @@ Protected Class Lexer
 		  /// "Hello"
 		  ///  ^
 		  /// ```
-		  
-		  #Pragma Warning "TODO: Support unicode literals"
+		  ///
+		  /// Objo strings can also contain Unicode characters which are represented in two ways:
+		  /// 1. A `\u` followed by four hex digits can be used to specify a Unicode code point:
+		  ///
+		  /// ```objo
+		  /// "\u0041\u0b83\u00DE" // AஃÞ
+		  /// ```
+		  ///
+		  /// 2. A capital `\U` followed by eight hex digits allows Unicode code points outside of the basic multilingual plane:
+		  ///
+		  /// ```objo
+		  /// "\U0001F64A\U0001F680" // 🙊🚀
+		  /// ```
 		  
 		  Var lexeme() As String
 		  
@@ -296,10 +307,51 @@ Protected Class Lexer
 		        terminated = True
 		        Exit
 		      End If
+		      
+		    ElseIf c = "\" And Peek.CompareCase("u") Then
+		      // Move past `u`.
+		      Call Advance
+		      // Need to see 4 hex digits.
+		      Var unicodeHex As String
+		      For i As Integer = 1 to 4
+		        If Not Peek.IsHexDigit Then
+		          Error("Incomplete Unicode escape sequence. Expected 4 hex digits after `\u`.")
+		        Else
+		          unicodeHex = unicodeHex + Advance
+		        End If
+		      Next i
+		      Try
+		        Var unicode As String = Text.FromUnicodeCodepoint(Integer.FromHex(unicodeHex))
+		        lexeme.Add(unicode)
+		      Catch e As RuntimeException
+		        Error("Invalid Unicode escape sequence.")
+		      End Try
+		      
+		    ElseIf c = "\" And Peek.CompareCase("U") Then
+		      // Move past `u`.
+		      Call Advance
+		      // Need to see 8 hex digits.
+		      Var unicodeHex As String
+		      For i As Integer = 1 to 8
+		        If Not Peek.IsHexDigit Then
+		          Error("Incomplete Unicode escape sequence. Expected 8 hex digits after `\u`.")
+		        Else
+		          unicodeHex = unicodeHex + Advance
+		        End If
+		      Next i
+		      Try
+		        Var unicode As String = Text.FromUnicodeCodepoint(Integer.FromHex(unicodeHex))
+		        lexeme.Add(unicode)
+		      Catch e As RuntimeException
+		        Error("Invalid Unicode escape sequence.")
+		      End Try
+		      
 		    ElseIf c = EndOfLine.UNIX Then
 		      Exit
+		      
+		    Else
+		      lexeme.Add(c)
 		    End If
-		    lexeme.Add(c)
 		  Wend
 		  
 		  // Make sure the literal was terminated.
