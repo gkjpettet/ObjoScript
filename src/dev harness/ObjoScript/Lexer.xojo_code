@@ -1,5 +1,56 @@
 #tag Class
 Protected Class Lexer
+	#tag Method, Flags = &h21, Description = 417474656D70747320746F2061646420612062696E617279206C69746572616C20746F6B656E20626567696E6E696E67206174207468652063757272656E7420706F736974696F6E2E2052657475726E7320605472756560206966207375636365737366756C2E
+		Private Function AddBinaryLiteralToken() As Boolean
+		  /// Attempts to add a binary literal token beginning at the current position.
+		  /// Returns `True` if successful.
+		  ///
+		  /// Assumes that `mCurrent` points to the "0" character illustrated below **and** 
+		  /// that the next character is definitely a "b":
+		  /// ```
+		  /// 0b1100
+		  ///  ^
+		  /// ```
+		  
+		  // Move past the "b" character.
+		  Call Advance
+		  
+		  // We need to see at least one binary digit.
+		  If Not Peek.IsBinaryDigit Then
+		    // Rewind a character (since we advanced past the "b").
+		    mCurrent = mCurrent - 1
+		    Return False
+		  Else
+		    Call Advance
+		  End If
+		  
+		  // Consume all contiguous binary digits.
+		  While Peek.IsBinaryDigit
+		    Call Advance
+		  Wend
+		  
+		  // The next character can't be alphanumeric.
+		  If IsAlpha(Peek) Then
+		    // Rewind to the character after the token start position.
+		    mCurrent = mTokenStart + 1
+		    Return False
+		  End If
+		  
+		  // Compute the value. +2 accounts for the "0b" prefix.
+		  Var lexeme As String = _
+		  mSource.Middle(mTokenStart + 2, mCurrent - mTokenStart - 2)
+		  
+		  // Compute the value as an integer.
+		  Var value As Integer = Integer.FromBinary(lexeme)
+		  
+		  // Create and add this number token.
+		  mTokens.Add(ObjoScript.Token.CreateNumber(mTokenStart, mLineNumber, value, True, mScriptID))
+		  
+		  Return True
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 4372656174657320616E642072657475726E73206120746F6B656E20726570726573656E74696E6720656974686572206120737461746963206F7220696E7374616E6365206669656C64206964656E7469666965722E
 		Private Sub AddFieldIdentifier(isStatic As Boolean)
 		  /// Creates and adds a token representing either a static or instance field identifier.
@@ -545,11 +596,15 @@ Protected Class Lexer
 		  // ====================================================================
 		  // Numbers.
 		  // ====================================================================
-		  #Pragma Warning "TODO: Support binary literals"
 		  If c.IsDigit Then
 		    If c = "0" And Peek = "x" Then
 		      // Hexadecimal literal (e.g. 0xFF)?
 		      If AddHexLiteralToken Then Return
+		      
+		    ElseIf c = "0" And Peek = "b" Then
+		      // Binary literal (e.g. 0b1100)?
+		      If AddBinaryLiteralToken Then Return
+		      
 		    Else
 		      AddNumberToken
 		      Return
