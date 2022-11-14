@@ -295,20 +295,21 @@ Protected Class Lexer
 		  
 		  // Keep consuming characters until we hit a `"`.
 		  Var terminated As Boolean = False
-		  Var c As String
+		  Var c, lastChar As String
 		  While Not AtEnd
 		    c = Advance
 		    If c = """" Then
 		      // If the next character is a `"` then this is an escaped quote.
 		      If Match("""") Then
 		        lexeme.Add(c)
+		        lastChar = Previous
 		        Continue
 		      Else
 		        terminated = True
 		        Exit
 		      End If
 		      
-		    ElseIf c = "\" And Peek.CompareCase("u") Then
+		    ElseIf c = "\" And lastChar <> "\" And Peek.CompareCase("u") Then
 		      // Move past `u`.
 		      Call Advance
 		      // Need to see 4 hex digits.
@@ -327,14 +328,14 @@ Protected Class Lexer
 		        Error("Invalid Unicode escape sequence.")
 		      End Try
 		      
-		    ElseIf c = "\" And Peek.CompareCase("U") Then
+		    ElseIf c = "\" And lastChar <> "\" And Peek.CompareCase("U") Then
 		      // Move past `u`.
 		      Call Advance
 		      // Need to see 8 hex digits.
 		      Var unicodeHex As String
 		      For i As Integer = 1 to 8
 		        If Not Peek.IsHexDigit Then
-		          Error("Incomplete Unicode escape sequence. Expected 8 hex digits after `\u`.")
+		          Error("Incomplete Unicode escape sequence. Expected 8 hex digits after `\U`.")
 		        Else
 		          unicodeHex = unicodeHex + Advance
 		        End If
@@ -346,12 +347,27 @@ Protected Class Lexer
 		        Error("Invalid Unicode escape sequence.")
 		      End Try
 		      
+		    ElseIf c = "\" And lastChar <> "\" And Peek.CompareCase("x") Then
+		      // Move past `x`.
+		      Call Advance
+		      // Need to see 2 hex digits.
+		      Var bytesHex As String
+		      For i As Integer = 1 to 2
+		        If Not Peek.IsHexDigit Then
+		          Error("Incomplete byte escape sequence. Expected 2 hex digits after `\x`.")
+		        Else
+		          bytesHex = bytesHex + Advance
+		        End If
+		      Next i
+		      lexeme.Add(Chr(Integer.FromHex(bytesHex)))
+		      
 		    ElseIf c = EndOfLine.UNIX Then
 		      Exit
 		      
 		    Else
 		      lexeme.Add(c)
 		    End If
+		    lastChar = Previous
 		  Wend
 		  
 		  // Make sure the literal was terminated.
