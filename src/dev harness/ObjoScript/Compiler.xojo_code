@@ -192,7 +192,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Reset
 		  
 		  // Import and tokenise the standard libraries first.
-		  Var standardLibraryTokens() As ObjoScript.Token = TokeniseStandardLibraries
+		  Var coreTokens() As ObjoScript.Token = TokeniseCore
 		  
 		  // Tokenise the user's source code. This may raise a LexerException, therefore aborting compilation.
 		  mStopWatch.Start
@@ -200,9 +200,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  mStopWatch.Stop
 		  mTokeniseTime = mStopWatch.ElapsedMilliseconds
 		  
-		  // Prepend the standard library tokens to the source code tokens.
-		  For i As Integer = standardLibraryTokens.LastIndex DownTo 0
-		    mTokens.AddAt(0, standardLibraryTokens(i))
+		  // Prepend the core tokens to the source code tokens.
+		  For i As Integer = coreTokens.LastIndex DownTo 0
+		    mTokens.AddAt(0, coreTokens(i))
 		  Next i
 		  
 		  // Parse.
@@ -1188,9 +1188,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 546F6B656E6973657320746865207374616E64617264206C69627261727920736F7572636520636F64652E2054686573652077696C6C2062652070726570656E64656420746F207468652075736572277320736F7572636520636F646520746F6B656E732E
-		Private Function TokeniseStandardLibraries() As ObjoScript.Token()
-		  /// Tokenises the standard library source code.
+	#tag Method, Flags = &h21, Description = 546F6B656E697365732074686520636F726520736F7572636520636F64652E2054686573652077696C6C2062652070726570656E64656420746F207468652075736572277320736F7572636520636F646520746F6B656E732E
+		Private Function TokeniseCore() As ObjoScript.Token()
+		  /// Tokenises the core source code.
 		  /// These will be prepended to the user's source code tokens.
 		  ///
 		  /// We use a scriptID of -1.
