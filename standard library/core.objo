@@ -58,10 +58,49 @@ foreign +(other)
 }
 
 /// ----------------------------------------------------
+/// SEQUENCE
+/// ----------------------------------------------------
+/// An abstract class for any iterable object.
+/// Any class that implements the `iterator protocol` can 
+/// extend this class to get a number of helpful methods.
+class Sequence {
+/// Tests whether any element in the sequence passed the `predicate`.
+///
+/// Iterates over the sequence, passing each element to the function `predicate(_)`.
+/// If the function returns true then the sequence stops iterating and returns true. 
+/// Otherwise it returns false.
+any(predicate) {
+var result = true
+foreach element in this {
+result = predicate(element)
+if result then return true
+}
+return false
+}
+
+/// Returns true if the sequence contains `element`.
+contains(element) {
+foreach item in this {
+if element == item then return true
+}
+return false
+}
+
+/// Returns the number of elements in the sequence.
+count {
+var result = 0
+foreach item in this {
+result = result + 1
+}
+return result
+}
+}
+
+/// ----------------------------------------------------
 /// LIST
 /// ----------------------------------------------------
 // The List class represents a single dimension array.
-foreign class List {
+foreign class List is Sequence {
 foreign add(item)
 foreign count()
 foreign removeAt(index)

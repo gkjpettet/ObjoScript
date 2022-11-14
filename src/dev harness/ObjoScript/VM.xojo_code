@@ -1257,35 +1257,35 @@ Protected Class VM
 		      
 		    Case OP_ADD
 		      If TopOfStackAreNumbers Then
-		        PopAndReplaceTop(Peek(1).DoubleValue + Peek(0).DoubleValue)
+		        PopAndReplaceTop(CType(Peek(1) + Peek(0), Double))
 		      Else
 		        InvokeBinaryOperator("+(_)")
 		      End If
 		      
 		    Case OP_SUBTRACT
 		      If TopOfStackAreNumbers Then
-		        PopAndReplaceTop(Peek(1).DoubleValue - Peek(0).DoubleValue)
+		        PopAndReplaceTop(CType(Peek(1) - Peek(0), Double))
 		      Else
 		        InvokeBinaryOperator("-(_)")
 		      End If
 		      
 		    Case OP_DIVIDE
 		      If TopOfStackAreNumbers Then
-		        PopAndReplaceTop(Peek(1).DoubleValue / Peek(0).DoubleValue)
+		        PopAndReplaceTop(CType(Peek(1) / Peek(0), Double))
 		      Else
 		        InvokeBinaryOperator("/(_)")
 		      End If
 		      
 		    Case OP_MULTIPLY
 		      If TopOfStackAreNumbers Then
-		        PopAndReplaceTop(Peek(1).DoubleValue * Peek(0).DoubleValue)
+		        PopAndReplaceTop(CType(Peek(1) * Peek(0), Double))
 		      Else
 		        InvokeBinaryOperator("*(_)")
 		      End If
 		      
 		    Case OP_MODULO
 		      If TopOfStackAreNumbers Then
-		        PopAndReplaceTop(Peek(1).DoubleValue Mod Peek(0).DoubleValue)
+		        PopAndReplaceTop(CType(Peek(1) Mod Peek(0), Double))
 		      Else
 		        InvokeBinaryOperator("%(_)")
 		      End If

@@ -142,6 +142,31 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 436F6D70696C657320612063616C6C20746F2061206C6F63616C207661726961626C652E
+		Private Sub CallLocalVariable(slot As Integer, arguments() As ObjoScript.Expr, location As ObjoScript.Token)
+		  /// Compiles a call to a local variable.
+		  
+		  mLocation = location
+		  
+		  // Tell the VM to push the local variable at `slot` on to the top of the stack.
+		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, slot)
+		  
+		  // Check the argument count is within the limit.
+		  If arguments.Count > 255 Then
+		    Error("A call cannot have more than 255 arguments.")
+		  End If
+		  
+		  // Compile the arguments.
+		  For Each arg As ObjoScript.Expr In arguments
+		    Call arg.Accept(Self)
+		  Next arg
+		  
+		  // Emit the call instruction with the number of arguments as its operand.
+		  EmitBytes(ObjoScript.VM.OP_CALL, arguments.Count)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060737562636C617373602068617320286F722068617320696E686572697465642920616E20696E7374616E6365206D6574686F64207769746820607369676E6174757265602E
 		Private Function ClassHierarchyHasInstanceMethodWithSignature(subclass As ObjoScript.ClassData, signature As String) As Boolean
 		  /// Returns True if `subclass` has (or has inherited) an instance method with `signature`.
@@ -1267,6 +1292,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// E.g: `someIdentifier()`
 		  
 		  mLocation = bi.Location
+		  
+		  // Are we invoking a local variable?
+		  Var localSlot As Integer = ResolveLocal(bi.MethodName)
+		  If localSlot <> -1 Then
+		    CallLocalVariable(localSlot, bi.Arguments, bi.Location)
+		    Return Nil
+		  End If
 		  
 		  // Could be a method invocation called from within a class method/constructor or
 		  // a global function call.
