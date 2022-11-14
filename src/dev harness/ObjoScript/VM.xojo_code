@@ -54,9 +54,6 @@ Protected Class VM
 		    
 		  ElseIf className.CompareCase("String") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.String_.Allocate, Nil)
-		    
-		  ElseIf className.CompareCase("StringByteSequence") Then
-		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.StringByteSequence.Allocate, Nil)
 		  End If
 		  
 		End Function
@@ -93,9 +90,6 @@ Protected Class VM
 		    
 		  ElseIf className.CompareCase("String") Then
 		    Return Core.String_.BindForeignMethod(signature, isStatic)
-		    
-		  ElseIf className.CompareCase("StringByteSequence") Then
-		    Return Core.StringByteSequence.BindForeignMethod(signature, isStatic)
 		    
 		  ElseIf className.CompareCase("System") Then
 		    Return Core.System_.BindForeignMethod(signature, isStatic)
@@ -664,8 +658,21 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 52657475726E73207570206120746F702D6C6576656C207661726961626C65206E616D656420606E616D65602E2052657475726E73204E696C206966206E6F7420666F756E642E
+		Function GetVariable(name As String) As Variant
+		  /// Returns up a top-level variable named `name`.
+		  /// Returns Nil if not found.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
+		  Return Globals.Lookup(name, Nil)
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 4C6F6F6B73207570206120746F702D6C6576656C207661726961626C65206E616D656420606E616D656020616E64207075747320697420696E207468652041504920736C6F742060736C6F74602E2052657475726E73205472756520696620666F756E64206F722046616C736520696620746865207661726961626C6520646F6573206E6F742065786973742E
-		Function GetVariable(name As String, slot As Integer) As Boolean
+		Function GetVariableInSlot(name As String, slot As Integer) As Boolean
 		  /// Looks up a top-level variable named `name` and puts it in the API slot `slot`.
 		  /// Returns True if found or False if the variable does not exist.
 		  
@@ -1031,6 +1038,8 @@ Protected Class VM
 		  /// | arg1
 		  /// | klass
 		  
+		  #Pragma Warning "TODO: Test this thoroughly!"
+		  
 		  // Classes are always global.
 		  Var v As Variant = Globals.Lookup(APISlots(0), Nil)
 		  If v = Nil Then
@@ -1227,7 +1236,6 @@ Protected Class VM
 		  LastInstructionFrame = Nil
 		  
 		  Self.Debugger = New ObjoScript.Debugger
-		  
 		  
 		End Sub
 	#tag EndMethod
