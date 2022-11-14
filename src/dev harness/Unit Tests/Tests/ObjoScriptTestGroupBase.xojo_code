@@ -207,7 +207,9 @@ Inherits TestGroup
 		  
 		  RemoveHandler vm.Print, AddressOf VMPrintDelegate
 		  
-		  Return mPrintBuffer.TrimRight
+		  // Make sure we trim any superfluous end of line character added 
+		  // by `VMPrintDelegate`.
+		  Return mPrintBuffer.TrimRight(EndOfLine.UNIX)
 		End Function
 	#tag EndMethod
 

@@ -62,9 +62,29 @@ Protected Module String_
 		      
 		    ElseIf signature.CompareCase("codePoints()") Then
 		      Return AddressOf CodePoints
+		      
+		    ElseIf signature.CompareCase("characterCount()") Then
+		      Return AddressOf CharacterCount
 		    End If
 		  End If
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320746865206E756D626572206F66206368617261637465727320696E2074686520737472696E672E
+		Protected Sub CharacterCount(vm As ObjoScript.VM)
+		  /// Returns the number of characters in the string.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  ///
+		  /// String.characterCount() -> number
+		  
+		  /// Since this is a built-in type, slot 0 will be a string (not an instance object).
+		  Var s As String = vm.GetSlotValue(0)
+		  
+		  vm.SetReturn(CType(s.CharacterCount, Double))
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h1, Description = 52657475726E732061204C69737420636F6E7461696E696E67207468697320737472696E67277320627974652076616C7565732E

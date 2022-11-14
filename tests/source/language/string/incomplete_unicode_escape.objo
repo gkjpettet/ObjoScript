@@ -1,0 +1,2 @@
+// Expect error: Incomplete Unicode escape sequence.
+"\u00"

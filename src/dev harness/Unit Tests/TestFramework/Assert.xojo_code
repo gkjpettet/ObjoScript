@@ -653,6 +653,8 @@ Protected Class Assert
 
 	#tag Method, Flags = &h0
 		Sub Fail(failMessage As String, message As String = "", data As String = "")
+		  #Pragma Unused message
+		  
 		  If Group Is Nil Or Group.CurrentTestResult Is Nil Then
 		    //
 		    // Don't do anything
@@ -664,7 +666,8 @@ Protected Class Assert
 		  Group.CurrentTestResult.Result = TestResult.Failed
 		  FailCount = FailCount + 1
 		  
-		  Message(message + If(message <> "", ": ", "") + failMessage)
+		  ' Message(message + If(message <> "", ": ", "") + failMessage)
+		  Message(failMessage)
 		  
 		  Group.CurrentTestResult.Data = data
 		  

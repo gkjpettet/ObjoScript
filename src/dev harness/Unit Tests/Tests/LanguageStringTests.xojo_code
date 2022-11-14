@@ -7,6 +7,24 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub IncompleteLongUnicodeEscapeTest()
+		  AssertCompilerError("language.string.incomplete_long_unicode_escape")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub IncompleteUnicodeEscapeTest()
+		  AssertCompilerError("language.string.incomplete_unicode_escape")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub LiteralsTest()
+		  AssertOutputsEqual("language.string.literals")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

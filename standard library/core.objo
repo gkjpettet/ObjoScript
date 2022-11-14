@@ -129,9 +129,10 @@ return this.iterate(nothing) ? false : true
 /// STRING
 /// ----------------------------------------------------
 foreign class String {
-foreign beginsWith(prefix)
 foreign +(other)
 
+foreign beginsWith(prefix)
+foreign characterCount()
 foreign codePoints()
 }
 
