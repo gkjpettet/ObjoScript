@@ -7,9 +7,6 @@ Protected Module Range
 		  /// constructor()
 		  /// constructor(lower, upper)
 		  
-		  // We need three fields: _lower, _upper and _next.
-		  instance.Fields.ResizeTo(2)
-		  
 		  If args.Count = 0 Then
 		    instance.ForeignData = New RangeData(0, 0)
 		    

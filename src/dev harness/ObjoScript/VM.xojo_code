@@ -43,7 +43,6 @@ Protected Class VM
 		  ElseIf className.CompareCase("Nothing") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Nothing.Allocate, Nil)
 		    
-		    
 		  ElseIf className.CompareCase("Number") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Number.Allocate, Nil)
 		    
@@ -55,6 +54,9 @@ Protected Class VM
 		    
 		  ElseIf className.CompareCase("String") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.String_.Allocate, Nil)
+		    
+		  ElseIf className.CompareCase("StringByteSequence") Then
+		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.StringByteSequence.Allocate, Nil)
 		  End If
 		  
 		End Function
@@ -91,6 +93,9 @@ Protected Class VM
 		    
 		  ElseIf className.CompareCase("String") Then
 		    Return Core.String_.BindForeignMethod(signature, isStatic)
+		    
+		  ElseIf className.CompareCase("StringByteSequence") Then
+		    Return Core.StringByteSequence.BindForeignMethod(signature, isStatic)
 		    
 		  ElseIf className.CompareCase("System") Then
 		    Return Core.System_.BindForeignMethod(signature, isStatic)
@@ -1008,6 +1013,52 @@ Protected Class VM
 		  Return Not IsFalsey(v)
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 437265617465732061206E657720696E7374616E63652C20706C6163696E672074686520726573756C7420696E2041504920736C6F7420302E
+		Sub NewInstance(arity As Integer)
+		  /// Creates a new instance, placing the result in API slot 0.
+		  ///
+		  /// Assumes:
+		  /// - Slot 0: The name of the class.
+		  /// - Subsequent slots contain the required parameters to pass to the constructor.
+		  ///
+		  /// The number of slots to use for parameters after slot 0 is specified by `arity`.
+		  
+		  /// At the moment this method is called, the stack looks like this:
+		  /// |           <--- StackTop
+		  /// | argN      
+		  /// | arg1
+		  /// | klass
+		  
+		  // Classes are always global.
+		  Var v As Variant = Globals.Lookup(APISlots(0), Nil)
+		  If v = Nil Then
+		    Error("Cannot create a new instance as there is no class named `" + ValueToString(APISlots(0)) + "`.")
+		  ElseIf v IsA ObjoScript.Klass = False Then
+		    Error("Expected a class but got `" + ValueToString(v) + "`.")
+		  End If
+		  
+		  // We'll need to reset the stack when we're done so track the top.
+		  Var oldStackTop As Integer = StackTop
+		  
+		  // Push the class on to the stack.
+		  Push(v)
+		  
+		  // Push the arguments (if any) on to the stack. They will be in slot 1 onwards.
+		  For i As Integer = 1 to arity
+		    Push(APISlots(i))
+		  Next i
+		  
+		  // Call the class. This will leave the instance where the class was previously.
+		  CallClass(v, arity)
+		  
+		  // Put the instance into API slot 0.
+		  APISlots(0) = Stack(StackTop - arity - 1)
+		  
+		  // Reset the stack.
+		  StackTop = oldStackTop
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 52657475726E73207468652076616C7565206064697374616E6365602066726F6D2074686520746F70206F662074686520737461636B2E204C6561766573207468652076616C7565206F6E2074686520737461636B2E20412076616C7565206F662060306020776F756C642072657475726E2074686520746F70206974656D2E

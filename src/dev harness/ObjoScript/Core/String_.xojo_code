@@ -59,9 +59,44 @@ Protected Module String_
 		      
 		    ElseIf signature.CompareCase("beginsWith(_)") Then
 		      Return AddressOf BeginsWith
+		      
+		    ElseIf signature.CompareCase("bytes()") Then
+		      Return AddressOf Bytes
 		    End If
 		  End If
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320547275652069662074686520737472696E6720626567696E7320776974682060707265666978602E
+		Protected Sub Bytes(vm As ObjoScript.VM)
+		  /// Returns a sequence that can be used to access the raw bytes of this string.
+		  ///
+		  /// Ignores encoding.
+		  /// In addition to the methods provided by the `Sequence` class, the returned 
+		  /// object also has a subscript operator that can be used to directly index bytes.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  ///
+		  /// String.bytes() -> StringByteSequence
+		  
+		  // Get the string.
+		  Var s As String = vm.GetSlotValue(0)
+		  
+		  // Put the class name in slot 0.
+		  vm.SetSlot(0, "StringByteSequence")
+		  
+		  // Put the single parameter in slot 1.
+		  vm.SetSlot(1, s)
+		  
+		  // Create the instance. It will be placed in slot 0.
+		  vm.NewInstance(1)
+		  
+		  // Return the instance.
+		  vm.SetReturn(vm.GetSlotValue(0))
+		  
+		  
+		End Sub
 	#tag EndMethod
 
 

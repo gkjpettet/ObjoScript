@@ -50,14 +50,6 @@ foreign sqrt()
 }
 
 /// ----------------------------------------------------
-/// STRING
-/// ----------------------------------------------------
-foreign class String {
-foreign beginsWith(prefix)
-foreign +(other)
-}
-
-/// ----------------------------------------------------
 /// SEQUENCE
 /// ----------------------------------------------------
 /// An abstract class for any iterable object.
@@ -132,6 +124,28 @@ isEmpty {
 return this.iterate(nothing) ? false : true
 }
 }
+
+/// ----------------------------------------------------
+/// STRING
+/// ----------------------------------------------------
+foreign class String {
+foreign beginsWith(prefix)
+foreign +(other)
+
+bytes() { return StringByteSequence(this) }
+}
+
+/// ----------------------------------------------------
+/// STRING BYTE SEQUENCE
+/// ----------------------------------------------------
+class StringByteSequence is Sequence {
+constructor(string) {}
+foreign [index]
+foreign count()
+foreign iterate(iter)
+foreign iteratorValue(iter)
+}
+
 
 /// ----------------------------------------------------
 /// LIST
