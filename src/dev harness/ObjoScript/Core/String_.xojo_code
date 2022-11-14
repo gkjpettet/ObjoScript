@@ -60,42 +60,41 @@ Protected Module String_
 		    ElseIf signature.CompareCase("beginsWith(_)") Then
 		      Return AddressOf BeginsWith
 		      
-		    ElseIf signature.CompareCase("bytes()") Then
-		      Return AddressOf Bytes
+		    ElseIf signature.CompareCase("codePoints()") Then
+		      Return AddressOf CodePoints
 		    End If
 		  End If
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h1, Description = 52657475726E732061204C69737420636F6E7461696E696E67207468697320737472696E67277320627974652076616C7565732E
-		Protected Sub Bytes(vm As ObjoScript.VM)
-		  /// Returns a List containing this string's byte values.
+		Protected Sub CodePoints(vm As ObjoScript.VM)
+		  /// Returns a List containing this string's UTF-8 codepoints.
 		  ///
-		  /// Ignores encoding.
+		  /// Assumes the string is UTF-8 encoded.
 		  ///
 		  /// Assumes: 
 		  /// - Slot 0 is a string
 		  ///
-		  /// String.bytes() -> List
+		  /// String.codePoints() -> List
 		  
-		  // Get the string as a memory block as it's faster to manipulate.
-		  Var mb As MemoryBlock = vm.GetSlotValue(0).StringValue
+		  // Get the string.
+		  Var s As String = vm.GetSlotValue(0)
 		  
 		  // Create a new instance of the List class.
 		  // Note that we are bypassing any constructor's defined by the List class since we're
-		  // instantiating one directly. That's OK since I know there is no special setup required
+		  // instantiating one directly. That's OK since I know there's no special setup required
 		  // in the constructor.
 		  Var list As New ObjoScript.Instance(vm, vm.GetVariable("List"))
 		  list.ForeignData = New ObjoScript.Core.List.ListData
 		  
-		  // Set the List instance's foreign data to an array of bytes.
-		  // Since Objo works with doubles we need to do the same (even though bytes are integers).
-		  Var byteArray() As Variant
-		  Var iLimit As Integer = mb.Size - 1
-		  For i As Integer = 0 To iLimit
-		    byteArray.Add(CType(mb.UInt8Value(i), Double))
-		  Next i
-		  ObjoScript.Core.List.ListData(list.ForeignData).Items = byteArray
+		  // Set the List instance's foreign data to an array of codepoints.
+		  // Since Objo works with doubles we need to do the same (even though codepoints are integers).
+		  Var values() As Variant
+		  For Each cp As Double In s.Codepoints
+		    values.Add(cp)
+		  Next cp
+		  ObjoScript.Core.List.ListData(list.ForeignData).Items = values
 		  
 		  // Return the list.
 		  vm.SetReturn(list)

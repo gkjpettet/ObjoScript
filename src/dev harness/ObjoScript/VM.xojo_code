@@ -1022,54 +1022,6 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 437265617465732061206E657720696E7374616E63652C20706C6163696E672074686520726573756C7420696E2041504920736C6F7420302E
-		Sub NewInstance(arity As Integer)
-		  /// Creates a new instance, placing the result in API slot 0.
-		  ///
-		  /// Assumes:
-		  /// - Slot 0: The name of the class.
-		  /// - Subsequent slots contain the required parameters to pass to the constructor.
-		  ///
-		  /// The number of slots to use for parameters after slot 0 is specified by `arity`.
-		  
-		  /// At the moment this method is called, the stack looks like this:
-		  /// |           <--- StackTop
-		  /// | argN      
-		  /// | arg1
-		  /// | klass
-		  
-		  #Pragma Warning "TODO: Test this thoroughly!"
-		  
-		  // Classes are always global.
-		  Var v As Variant = Globals.Lookup(APISlots(0), Nil)
-		  If v = Nil Then
-		    Error("Cannot create a new instance as there is no class named `" + ValueToString(APISlots(0)) + "`.")
-		  ElseIf v IsA ObjoScript.Klass = False Then
-		    Error("Expected a class but got `" + ValueToString(v) + "`.")
-		  End If
-		  
-		  // We'll need to reset the stack when we're done so track the top.
-		  Var oldStackTop As Integer = StackTop
-		  
-		  // Push the class on to the stack.
-		  Push(v)
-		  
-		  // Push the arguments (if any) on to the stack. They will be in slot 1 onwards.
-		  For i As Integer = 1 to arity
-		    Push(APISlots(i))
-		  Next i
-		  
-		  // Call the class. This will leave the instance where the class was previously.
-		  CallClass(v, arity)
-		  
-		  // Put the instance into API slot 0.
-		  APISlots(0) = Stack(StackTop - arity - 1)
-		  
-		  // Reset the stack.
-		  StackTop = oldStackTop
-		End Sub
-	#tag EndMethod
-
 	#tag Method, Flags = &h21, Description = 52657475726E73207468652076616C7565206064697374616E6365602066726F6D2074686520746F70206F662074686520737461636B2E204C6561766573207468652076616C7565206F6E2074686520737461636B2E20412076616C7565206F662060306020776F756C642072657475726E2074686520746F70206974656D2E
 		Private Function Peek(distance As Integer) As Variant
 		  /// Returns the value `distance` from the top of the stack. Leaves the value on the stack. A value of `0` would return the top item.

@@ -132,7 +132,7 @@ foreign class String {
 foreign beginsWith(prefix)
 foreign +(other)
 
-foreign bytes()
+foreign codePoints()
 }
 
 /// ----------------------------------------------------

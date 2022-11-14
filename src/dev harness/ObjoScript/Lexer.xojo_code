@@ -290,8 +290,6 @@ Protected Class Lexer
 		  /// ```objo
 		  /// "\U0001F64A\U0001F680" // 🙊🚀
 		  /// ```
-		  ///
-		  /// 3. A `\x` followed by two hex digits is used to specify a raw byte.
 		  
 		  Var lexeme() As String
 		  
@@ -350,20 +348,6 @@ Protected Class Lexer
 		        Catch e As RuntimeException
 		          Error("Invalid Unicode escape sequence.")
 		        End Try
-		        
-		      ElseIf peekChar.CompareCase("x") Then
-		        // Move past `x`.
-		        Call Advance
-		        // Need to see 2 hex digits.
-		        Var bytesHex As String
-		        For i As Integer = 1 to 2
-		          If Not Peek.IsHexDigit Then
-		            Error("Incomplete byte escape sequence. Expected 2 hex digits after `\x`.")
-		          Else
-		            bytesHex = bytesHex + Advance
-		          End If
-		        Next i
-		        lexeme.Add(Chr(Integer.FromHex(bytesHex)))
 		      End If
 		      
 		    ElseIf c = EndOfLine.UNIX Then

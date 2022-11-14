@@ -2,11 +2,8 @@
 Protected Class LanguageStringTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
-		Sub ByteEscapesTest()
-		  #Pragma Warning "TODO: Enable test when Sequences and `String.bytes()` method implemented."
-		  Assert.Pass("Skipped", GetTestSourceCode("language.string.byte_escapes"))
-		  
-		  'AssertOutputsEqual("language.string.byte_escapes")
+		Sub CodepointsTest()
+		  AssertOutputsEqual("language.string.codepoints")
 		End Sub
 	#tag EndMethod
 
