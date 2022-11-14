@@ -290,6 +290,8 @@ Protected Class Lexer
 		  /// ```objo
 		  /// "\U0001F64A\U0001F680" // 🙊🚀
 		  /// ```
+		  ///
+		  /// 3. A `\x` followed by two hex digits is used to specify a raw byte.
 		  
 		  Var lexeme() As String
 		  
@@ -309,57 +311,60 @@ Protected Class Lexer
 		        Exit
 		      End If
 		      
-		    ElseIf c = "\" And lastChar <> "\" And Peek.CompareCase("u") Then
-		      // Move past `u`.
-		      Call Advance
-		      // Need to see 4 hex digits.
-		      Var unicodeHex As String
-		      For i As Integer = 1 to 4
-		        If Not Peek.IsHexDigit Then
-		          Error("Incomplete Unicode escape sequence. Expected 4 hex digits after `\u`.")
-		        Else
-		          unicodeHex = unicodeHex + Advance
-		        End If
-		      Next i
-		      Try
-		        Var unicode As String = Text.FromUnicodeCodepoint(Integer.FromHex(unicodeHex))
-		        lexeme.Add(unicode)
-		      Catch e As RuntimeException
-		        Error("Invalid Unicode escape sequence.")
-		      End Try
-		      
-		    ElseIf c = "\" And lastChar <> "\" And Peek.CompareCase("U") Then
-		      // Move past `u`.
-		      Call Advance
-		      // Need to see 8 hex digits.
-		      Var unicodeHex As String
-		      For i As Integer = 1 to 8
-		        If Not Peek.IsHexDigit Then
-		          Error("Incomplete Unicode escape sequence. Expected 8 hex digits after `\U`.")
-		        Else
-		          unicodeHex = unicodeHex + Advance
-		        End If
-		      Next i
-		      Try
-		        Var unicode As String = Text.FromUnicodeCodepoint(Integer.FromHex(unicodeHex))
-		        lexeme.Add(unicode)
-		      Catch e As RuntimeException
-		        Error("Invalid Unicode escape sequence.")
-		      End Try
-		      
-		    ElseIf c = "\" And lastChar <> "\" And Peek.CompareCase("x") Then
-		      // Move past `x`.
-		      Call Advance
-		      // Need to see 2 hex digits.
-		      Var bytesHex As String
-		      For i As Integer = 1 to 2
-		        If Not Peek.IsHexDigit Then
-		          Error("Incomplete byte escape sequence. Expected 2 hex digits after `\x`.")
-		        Else
-		          bytesHex = bytesHex + Advance
-		        End If
-		      Next i
-		      lexeme.Add(Chr(Integer.FromHex(bytesHex)))
+		    ElseIf c = "\" And lastChar <> "\" Then
+		      Var peekChar As String = Peek
+		      If peekChar.CompareCase("u") Then
+		        // Move past `u`.
+		        Call Advance
+		        // Need to see 4 hex digits.
+		        Var unicodeHex As String
+		        For i As Integer = 1 to 4
+		          If Not Peek.IsHexDigit Then
+		            Error("Incomplete Unicode escape sequence. Expected 4 hex digits after `\u`.")
+		          Else
+		            unicodeHex = unicodeHex + Advance
+		          End If
+		        Next i
+		        Try
+		          Var unicode As String = Text.FromUnicodeCodepoint(Integer.FromHex(unicodeHex))
+		          lexeme.Add(unicode)
+		        Catch e As RuntimeException
+		          Error("Invalid Unicode escape sequence.")
+		        End Try
+		        
+		      ElseIf peekChar.CompareCase("U") Then
+		        // Move past `U`.
+		        Call Advance
+		        // Need to see 8 hex digits.
+		        Var unicodeHex As String
+		        For i As Integer = 1 to 8
+		          If Not Peek.IsHexDigit Then
+		            Error("Incomplete Unicode escape sequence. Expected 8 hex digits after `\U`.")
+		          Else
+		            unicodeHex = unicodeHex + Advance
+		          End If
+		        Next i
+		        Try
+		          Var unicode As String = Text.FromUnicodeCodepoint(Integer.FromHex(unicodeHex))
+		          lexeme.Add(unicode)
+		        Catch e As RuntimeException
+		          Error("Invalid Unicode escape sequence.")
+		        End Try
+		        
+		      ElseIf peekChar.CompareCase("x") Then
+		        // Move past `x`.
+		        Call Advance
+		        // Need to see 2 hex digits.
+		        Var bytesHex As String
+		        For i As Integer = 1 to 2
+		          If Not Peek.IsHexDigit Then
+		            Error("Incomplete byte escape sequence. Expected 2 hex digits after `\x`.")
+		          Else
+		            bytesHex = bytesHex + Advance
+		          End If
+		        Next i
+		        lexeme.Add(Chr(Integer.FromHex(bytesHex)))
+		      End If
 		      
 		    ElseIf c = EndOfLine.UNIX Then
 		      Exit
