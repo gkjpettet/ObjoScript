@@ -1,0 +1,4 @@
+Derived.bar
+Base.foo
+Derived.baz=Hello
+Base.baz=Hello

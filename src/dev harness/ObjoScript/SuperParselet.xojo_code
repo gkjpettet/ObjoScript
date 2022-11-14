@@ -13,10 +13,14 @@ Implements ObjoScript.PrefixParselet
 		  If parser.Match(ObjoScript.TokenTypes.LParen) Then
 		    // Must be a call to the super's constructor (e.g: `super(argN)`).
 		    Return ParseSuperConstructor(parser, superKeyword)
-		  Else
+		    
+		  ElseIf parser.Match(ObjoScript.TokenTypes.Dot) Then
 		    // Must be a super method call (e.g: `super.something()` or `super.setter = something`).
-		    parser.Consume(ObjoScript.TokenTypes.Dot, "Expected a `.` after the `super` keyword.")
 		    Return ParseSuperMethodCall(parser, superKeyword, canAssign)
+		    
+		  Else
+		    // `super` on its own.
+		    parser.Error("Expected an opening parenthesis or a dot after `super`.")
 		  End If
 		  
 		End Function
@@ -62,14 +66,18 @@ Implements ObjoScript.PrefixParselet
 		    valueToAssign = parser.Expression
 		    
 		  ElseIf parser.Match(ObjoScript.TokenTypes.LParen) Then
-		    isMethodInvocation = True
 		    // This is an immediate method invocation on `super` since we're seeing: "super.identifier("
+		    isMethodInvocation = True
 		    If Not parser.Check(ObjoScript.TokenTypes.RParen) Then
 		      Do
 		        arguments.Add(parser.Expression)
 		      Loop Until Not parser.Match(ObjoScript.TokenTypes.Comma)
 		    End If
 		    parser.Consume(ObjoScript.TokenTypes.RParen, "Expected a `)` after the method call's arguments.")
+		    
+		  Else
+		    // This is an immediate method invocation on `super` with zero arguments: "super.identifier"
+		    isMethodInvocation = True
 		  End If
 		  
 		  If isMethodInvocation Then

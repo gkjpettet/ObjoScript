@@ -2,6 +2,18 @@
 Protected Class LanguageSuperTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
+		Sub CallDifferentArityTest()
+		  AssertOutputsEqual("language.super.call_different_arity")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub CallOtherMethodTest()
+		  AssertOutputsEqual("language.super.call_other_method")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub NestedInvocationTest()
 		  AssertOutputsEqual("language.super.nested_invocation")
 		  

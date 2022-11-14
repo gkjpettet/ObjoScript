@@ -25,6 +25,18 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub UnicodeEscapesTest()
+		  AssertOutputsEqual("language.string.unicode_escapes")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub UnterminatedTest()
+		  AssertCompilerError("language.string.unterminated")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

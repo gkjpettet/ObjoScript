@@ -666,7 +666,6 @@ Protected Class Assert
 		  Group.CurrentTestResult.Result = TestResult.Failed
 		  FailCount = FailCount + 1
 		  
-		  ' Message(message + If(message <> "", ": ", "") + failMessage)
 		  Message(failMessage)
 		  
 		  Group.CurrentTestResult.Data = data

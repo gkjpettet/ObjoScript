@@ -1,0 +1,29 @@
+class Base {
+foo {
+System.print("Base.foo")
+}
+
+baz=(value) {
+System.print("Base.baz=" + value)
+}
+}
+
+class Derived is Base {
+bar {
+System.print("Derived.bar")
+super.foo
+}
+
+baz=(value) {
+System.print("Derived.baz=" + value)
+super.baz = value
+}
+}
+
+Derived().bar
+// Expect: Derived.bar
+// Expect: Base.foo
+
+Derived().baz = "Hello"
+// Expect: Derived.baz=Hello
+// Expect: Base.baz=Hello

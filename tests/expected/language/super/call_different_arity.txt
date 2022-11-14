@@ -1,0 +1,4 @@
+Derived.bar(a)
+Base.foo
+Base.foo(a)
+Base.foo(a, b)

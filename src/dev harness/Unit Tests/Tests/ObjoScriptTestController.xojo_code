@@ -13,7 +13,6 @@ Inherits TestController
 		  group = New LanguageCommentTests(Self, "Language - Comments")
 		  group = New LanguageConditionalTests(Self, "Language - Conditional")
 		  group = New LanguageConstructorTests(Self, "Language - Constructor")
-		  group = New LanguageSuperTests(Self, "Language - Super")
 		  group = New LanguageFieldTests(Self, "Language - Field")
 		  group = New LanguageForTests(Self, "Language - For")
 		  group = New LanguageForEachTests(Self, "Language - ForEach")
@@ -32,6 +31,7 @@ Inherits TestController
 		  group = New LanguageSetterTests(Self, "Language - Setter")
 		  group = New LanguageStaticFieldTests(Self, "Language - Static Field")
 		  group = New LanguageStringTests(Self, "Language - String")
+		  group = New LanguageSuperTests(Self, "Language - Super")
 		  
 		End Sub
 	#tag EndEvent

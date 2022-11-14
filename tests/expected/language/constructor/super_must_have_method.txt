@@ -1,1 +1,1 @@
-Expected a `.` after the `super` keyword.
+Expected an opening parenthesis or a dot after `super`.
