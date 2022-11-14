@@ -107,6 +107,30 @@ result = result + 1
 }
 return result
 }
+
+/// Returns the number of elements in the sequence that pass the predicate.
+/// Iterates over the sequence, passing each element to the function `predicate(_)` and 
+/// counting the number of times the returned value evaluates to true.
+count(predicate) {
+var result = 0
+foreach element in this {
+if predicate(element) then result = result + 1
+}
+return result
+}
+
+/// Iterates over the sequence, passing each element to the given `action(_)` function.
+each(action) {
+foreach element in this { action(element) }
+}
+
+/// Returns true if the sequence has no elements.
+/// More efficient than `count == 0` as it's doesn't iterate over the entire sequence.
+/// Relies on the fact that calling `iterate(nothing)` on an object that implements
+/// the `iterator protocol` returns the first item or `false` if there are no items.
+isEmpty {
+return this.iterate(nothing) ? false : true
+}
 }
 
 /// ----------------------------------------------------
