@@ -1,8 +1,0 @@
-class System {
-    // Returns the number of microseconds since the VM launched.
-    foreign static clock()
-    
-    // Converts `object` to a string and sends it to
-    // the VM's Print event.
-    foreign static print(object)   
-}

@@ -2,13 +2,13 @@
 			Begin BuildStepList Linux
 				Begin BuildProjectStep Build
 				End
-				Begin CopyFilesBuildStep CopyStandardLibraryLinux
+				Begin CopyFilesBuildStep CopyCoreLinux
 					AppliesTo = 0
 					Architecture = 0
 					Target = 0
 					Destination = 1
 					Subdirectory = 
-					FolderItem = Li4vLi4vLi4vc3RhbmRhcmQlMjBsaWJyYXJ5Lw==
+					FolderItem = Li4vLi4vLi4vc3RhbmRhcmQlMjBsaWJyYXJ5L2NvcmUub2Jqbw==
 				End
 				Begin CopyFilesBuildStep CopyTestsLinux
 					AppliesTo = 0
@@ -30,13 +30,13 @@
 			Begin BuildStepList Mac OS X
 				Begin BuildProjectStep Build
 				End
-				Begin CopyFilesBuildStep CopyStandardLibraryMac
+				Begin CopyFilesBuildStep CopyCore
 					AppliesTo = 0
 					Architecture = 0
 					Target = 0
 					Destination = 1
 					Subdirectory = 
-					FolderItem = Li4vLi4vLi4vc3RhbmRhcmQlMjBsaWJyYXJ5Lw==
+					FolderItem = Li4vLi4vLi4vc3RhbmRhcmQlMjBsaWJyYXJ5L2NvcmUub2Jqbw==
 				End
 				Begin CopyFilesBuildStep CopyTestsMac
 					AppliesTo = 0
@@ -61,13 +61,13 @@
 			Begin BuildStepList Windows
 				Begin BuildProjectStep Build
 				End
-				Begin CopyFilesBuildStep CopyStandardLibraryWindows
+				Begin CopyFilesBuildStep CopyCoreWin
 					AppliesTo = 0
 					Architecture = 0
 					Target = 0
 					Destination = 1
 					Subdirectory = 
-					FolderItem = Li4vLi4vLi4vc3RhbmRhcmQlMjBsaWJyYXJ5Lw==
+					FolderItem = Li4vLi4vLi4vc3RhbmRhcmQlMjBsaWJyYXJ5L2NvcmUub2Jqbw==
 				End
 				Begin CopyFilesBuildStep CopyTestsWindows
 					AppliesTo = 0

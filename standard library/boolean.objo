@@ -1,4 +1,0 @@
-foreign class Boolean {
-foreign not()
-foreign toString()
-}

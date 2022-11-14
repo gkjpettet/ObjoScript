@@ -1,0 +1,105 @@
+/// The order that classes are instantiated in the runtime core
+/// is critical.
+
+/// ----------------------------------------------------
+/// OBJECT
+/// ----------------------------------------------------
+/// This must be the first class defined in the runtime.
+foreign class Object {
+// Overloaded operators.
+foreign ==(other)
+foreign <>(other)
+foreign is(other)
+
+not() {
+// Returns false since most objects are considered true.
+return true
+}
+
+foreign toString()
+foreign type()
+}
+
+/// ----------------------------------------------------
+/// NOTHING
+/// ----------------------------------------------------
+/// This must be the second class defined in the runtime.
+foreign class Nothing {
+foreign not()
+foreign toString()
+}
+
+/// ----------------------------------------------------
+/// BOOLEAN
+/// ----------------------------------------------------
+foreign class Boolean {
+foreign not()
+foreign toString()
+}
+
+/// ----------------------------------------------------
+/// NUMBER
+/// ----------------------------------------------------
+foreign class Number {
+foreign +(other)
+foreign <(other)
+foreign <=(other)
+foreign >(other)
+foreign >=(other)
+foreign sqrt()
+}
+
+/// ----------------------------------------------------
+/// STRING
+/// ----------------------------------------------------
+foreign class String {
+foreign beginsWith(prefix)
+foreign +(other)
+}
+
+/// ----------------------------------------------------
+/// LIST
+/// ----------------------------------------------------
+// The List class represents a single dimension array.
+foreign class List {
+foreign add(item)
+foreign count()
+foreign removeAt(index)
+foreign toString()
+
+// Iterator protocol.
+foreign iterate(iter)
+foreign iteratorValue(iter)
+
+// Operator overloads.
+foreign [index]
+foreign [index]=(value)
+}
+
+/// ----------------------------------------------------
+/// RANGE
+/// ----------------------------------------------------
+// The Range class represents an iterable range of numbers 
+// with an upper and lower bounds.
+foreign class Range {
+constructor(lower, upper) {}
+
+foreign iterate(iter)
+foreign iteratorValue(iter)
+
+toString() { return _lower + ":" + _upper }
+}
+
+/// ----------------------------------------------------
+/// SYSTEM
+/// ----------------------------------------------------
+/// The System class contains useful functionality for 
+/// the VM.
+class System {
+// Returns the number of microseconds since the VM launched.
+foreign static clock()
+
+// Converts `object` to a string and sends it to
+// the VM's Print event.
+foreign static print(object)   
+}

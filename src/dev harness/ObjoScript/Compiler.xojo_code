@@ -1196,41 +1196,24 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// We use a scriptID of -1.
 		  
 		  Var lex As New ObjoScript.Lexer
-		  Var standardLib As String
+		  Var coreLib As String
 		  Var tin As TextInputStream
 		  
-		  // All of the standard library files are bundled with the application.
-		  Var librarySourceFolder As FolderItem = SpecialFolder.Resource("standard library")
+		  // The core library should be bundled with the VM.
+		  Var coreLibraryFile As FolderItem = SpecialFolder.Resource("core.objo")
+		  If coreLibraryFile = Nil Or Not coreLibraryFile.Exists Then
+		    Error("Unable to load the core library. `core.objo` is missing from the application.")
+		  End If
 		  
-		  // The order of class loading in the standard library is important.
-		  // The first file we need to include is `object.objo` as the `Object` class
-		  // is the base of all other classes.
-		  Var objectFile As FolderItem = librarySourceFolder.Child("object.objo")
-		  tin = TextInputStream.Open(objectFile)
-		  standardLib = standardLib + tin.ReadAll + EndOfLine
-		  tin.Close
+		  Try
+		    tin = TextInputStream.Open(coreLibraryFile)
+		    coreLib = tin.ReadAll
+		    tin.Close
+		  Catch e As RuntimeException
+		    Error("Unable to read the contents of `core.objo`.")
+		  End Try
 		  
-		  // Now define `Nothing`.
-		  Var nothingFile As FolderItem = librarySourceFolder.Child("nothing.objo")
-		  tin = TextInputStream.Open(nothingFile)
-		  standardLib = standardLib + tin.ReadAll + EndOfLine
-		  tin.Close
-		  
-		  // Get the contents of all the other standard library source code files and concatenate them.
-		  For Each sourceFile As FolderItem In librarySourceFolder.Children
-		    If Not sourceFile.IsFolder And sourceFile.Name.EndsWith("objo") Then
-		      
-		      // Don't re-add the object and nothing class files.
-		      If sourceFile.NativePath = objectFile.NativePath Then Continue
-		      If sourceFile.NativePath = nothingFile.NativePath Then Continue
-		      
-		      tin = TextInputStream.Open(sourceFile)
-		      standardLib = standardLib + tin.ReadAll + EndOfLine
-		      tin.Close
-		    End If
-		  Next sourceFile
-		  
-		  Return lex.Tokenise(standardLib, False, -1)
+		  Return lex.Tokenise(coreLib, False, -1)
 		  
 		End Function
 	#tag EndMethod

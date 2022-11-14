@@ -1,4 +1,0 @@
-foreign class Nothing {
-foreign not()
-foreign toString()
-}
