@@ -64,6 +64,19 @@ foreign +(other)
 /// Any class that implements the `iterator protocol` can 
 /// extend this class to get a number of helpful methods.
 class Sequence {
+/// Tests whether all the elements in the sequence pass the predicate.
+/// Iterates over the sequence, passing each element to the function `predicate()`. 
+/// If the function returns something false, it stops iterating and returns false. 
+/// Otherwise, returns true.
+all(predicate) {
+var result = true
+foreach element in this {
+result = predicate(element)
+if result == false then return false
+}
+return true
+}
+
 /// Tests whether any element in the sequence passed the `predicate`.
 ///
 /// Iterates over the sequence, passing each element to the function `predicate(_)`.
