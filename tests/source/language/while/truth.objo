@@ -1,0 +1,26 @@
+// False and nothing are false.
+while false {
+System.print("bad")
+exit
+}
+
+while nothing {
+System.print("bad")
+exit
+}
+
+// Everything else is true.
+while true {
+System.print("true") // expect: true
+exit
+}
+
+while 0 {
+System.print(0) // expect: 0
+exit
+}
+
+while "" {
+System.print("string") // expect: string
+exit
+}
