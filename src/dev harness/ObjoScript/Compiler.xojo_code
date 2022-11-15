@@ -20,7 +20,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Private Sub AddLocal(identifier As ObjoScript.Token, initialised As Boolean = False)
 		  /// Tracks a local variable in the current scope.
 		  
-		  If locals.Count > MAX_LOCALS Then
+		  If Locals.Count >= MAX_LOCALS Then
 		    Error("Too many local variables in scope.")
 		  End If
 		  

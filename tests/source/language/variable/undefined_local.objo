@@ -1,0 +1,5 @@
+function test() {
+System.print(notDefined)  // expect error
+}
+
+test()

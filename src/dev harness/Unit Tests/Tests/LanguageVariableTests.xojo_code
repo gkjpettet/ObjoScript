@@ -109,6 +109,84 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub ShadowAndLocalTest()
+		  AssertOutputsEqual("language.variable.shadow_and_local")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ShadowGlobalTest()
+		  AssertOutputsEqual("language.variable.shadow_global")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ShadowInInitialiserTest()
+		  AssertOutputsEqual("language.variable.shadow_in_initialiser")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ShadowLocalTest()
+		  AssertOutputsEqual("language.variable.shadow_local")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub TooManyLocalsNestedTest()
+		  AssertCompilerError("language.variable.too_many_locals_nested")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub TooManyLocalsTest()
+		  AssertCompilerError("language.variable.too_many_locals")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub UndefinedGlobalTest()
+		  AssertRuntimeError("language.variable.undefined_global")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub UndefinedLocalTest()
+		  AssertRuntimeError("language.variable.undefined_local")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub UseFalseAsVarTest()
+		  AssertCompilerError("language.variable.use_false_as_var")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub UseFieldAsVarTest()
+		  AssertCompilerError("language.variable.use_field_as_var")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub UseNothingAsVarTest()
+		  AssertCompilerError("language.variable.use_nothing_as_var")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub UseThisAsVarTest()
+		  AssertCompilerError("language.variable.use_this_as_var")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub UseTrueAsVarTest()
+		  AssertCompilerError("language.variable.use_true_as_var")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
