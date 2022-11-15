@@ -1,0 +1,9 @@
+class A {
+callSuperToString { return super.toString }
+
+toString { "A.toString" }
+}
+
+class B is A {}
+
+System.print(B().callSuperToString) // Expect: B instance

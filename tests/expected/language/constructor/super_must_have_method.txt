@@ -1,1 +1,1 @@
-Expected an opening parenthesis or a dot after `super`.
+A superclass constructor must have an argument list, even if empty.

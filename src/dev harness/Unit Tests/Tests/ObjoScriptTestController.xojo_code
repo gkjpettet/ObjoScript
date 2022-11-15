@@ -32,7 +32,7 @@ Inherits TestController
 		  group = New LanguageStaticFieldTests(Self, "Language - Static Field")
 		  group = New LanguageStringTests(Self, "Language - String")
 		  group = New LanguageSuperTests(Self, "Language - Super")
-		  
+		  group = New LanguageThisTests(Self, "Language - This")
 		End Sub
 	#tag EndEvent
 

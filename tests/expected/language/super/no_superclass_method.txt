@@ -1,0 +1,1 @@
+The superclass (`Base`) of `Derived` does not define `doesNotExist(_)`.

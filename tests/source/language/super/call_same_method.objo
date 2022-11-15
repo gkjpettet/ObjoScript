@@ -1,0 +1,16 @@
+class Base {
+foo {
+System.print("Base.foo")
+}
+}
+
+class Derived is Base {
+foo {
+System.print("Derived.foo")
+super.foo
+}
+}
+
+Derived().foo
+// Expect: Derived.foo
+// Expect: Base.foo

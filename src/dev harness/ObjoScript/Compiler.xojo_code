@@ -333,6 +333,105 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 436F6D70696C657320612063616C6C20746F2061207375706572636C61737320636F6E7374727563746F722E
+		Private Sub CompileSuperConstructorInvocation(arguments() As ObjoScript.Expr, where As ObjoScript.Token)
+		  /// Compiles a call to a superclass constructor.
+		  ///
+		  /// E.g: `super` or `super(argN)`.
+		  
+		  mLocation = where
+		  
+		  // Super can only be used in classes.
+		  If Self.Type <> ObjoScript.FunctionTypes.Constructor Or CurrentClass = Nil Then
+		    Error("You can only call a superclass constructor from within a constructor.")
+		  End If
+		  
+		  // Check this class actually has a superclass.
+		  If CurrentClass.Superclass = Nil Then
+		    Error("Class `" + CurrentClass.Name + "` does not have a superclass.")
+		  End If
+		  
+		  // Check the superclass has a constructor with this many arguments.
+		  If arguments.Count > 0 Then
+		    Var superHasMatchingConstructor As Boolean = False
+		    For Each constructor As ObjoScript.ConstructorDeclStmt In CurrentClass.Superclass.Declaration.Constructors
+		      If constructor.Arity = arguments.Count Then
+		        superHasMatchingConstructor = True
+		        Exit
+		      End If
+		    Next constructor
+		    If Not superHasMatchingConstructor Then
+		      Error("The superclass (`" + CurrentClass.Superclass.Name + "`) of `" + CurrentClass.Name + "` does not define a constructor with " + arguments.Count.ToString + " arguments.")
+		    End If
+		  End If
+		  
+		  // Load the superclass' name into the constant pool.
+		  Var superNameIndex As Integer = AddConstant(CurrentClass.Superclass.Name)
+		  
+		  // Push `this` onto the stack. It's always at slot 0 of the call frame.
+		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		  
+		  // Compile the arguments.
+		  For Each arg As ObjoScript.Expr In arguments
+		    Call arg.Accept(Self)
+		  Next arg
+		  
+		  // Emit the OP_SUPER_CONSTRUCTOR instruction, the index of the superclass' name
+		  // and the argument count.
+		  EmitByte(ObjoScript.VM.OP_SUPER_CONSTRUCTOR, where)
+		  EmitUInt16(superNameIndex, where)
+		  EmitByte(arguments.Count, where)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 436F6D70696C65732061206D6574686F6420696E766F636174696F6E206F6E20607375706572602E
+		Private Sub CompileSuperMethodInvocation(signature As String, arguments() As ObjoScript.Expr, where As ObjoScript.Token)
+		  /// Compiles a method invocation on `super`.
+		  ///
+		  /// E.g: super.method(arg1, arg2).
+		  
+		  mLocation = where
+		  
+		  // Super can only be used in classes.
+		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		    Error("`super` can only be used within a method or constructor.")
+		  End If
+		  
+		  // Check this class actually has a superclass.
+		  If CurrentClass.Superclass = Nil Then
+		    Error("Class `" + CurrentClass.Name + "` does not have a superclass.")
+		  End If
+		  
+		  // Check the superclass has a matching method.
+		  If Not ClassHierarchyHasInstanceMethodWithSignature(CurrentClass.Superclass, signature) Then
+		    Error("The superclass (`" + CurrentClass.Superclass.Name + "`) of `" + CurrentClass.Name + "` does not define `" + signature + "`.")
+		  End If
+		  
+		  // Load the superclass' name into the constant pool.
+		  Var superNameIndex As Integer = AddConstant(CurrentClass.Superclass.Name)
+		  
+		  // Push `this` onto the stack. It's always at slot 0 of the call frame.
+		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		  
+		  // Load the method's signature into the constant pool.
+		  Var index As Integer = AddConstant(signature)
+		  
+		  // Compile the arguments.
+		  For Each arg As ObjoScript.Expr In arguments
+		    Call arg.Accept(Self)
+		  Next arg
+		  
+		  // Emit the OP_SUPER_INVOKE instruction, the superclass name, the index of the 
+		  // method's signature in the constant pool and the argument count.
+		  EmitByte(ObjoScript.VM.OP_SUPER_INVOKE, where)
+		  EmitUInt16(superNameIndex, where)
+		  EmitUInt16(index, where)
+		  EmitByte(arguments.Count, where)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Sub Constructor()
 		  Reset
@@ -1353,6 +1452,44 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Emit the argument count.
 		  EmitByte(bi.Arguments.Count, bi.Location)
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732061206261726520737570657220696E766F636174696F6E2E20452E672E2060737570657260206F7220607375706572286172674E29602E
+		Function VisitBareSuperInvocation(s As ObjoScript.BareSuperInvocationExpr) As Variant
+		  /// Compiles a bare super invocation. E.g. `super` or `super(argN)`.
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  mLocation = s.Location
+		  
+		  // Super can only be used in classes.
+		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		    Error("`super` can only be used within a method or constructor.")
+		  End If
+		  
+		  // Check this class actually has a superclass.
+		  If CurrentClass.Superclass = Nil Then
+		    Error("Class `" + CurrentClass.Name + "` does not have a superclass.")
+		  End If
+		  
+		  If Self.Type = ObjoScript.FunctionTypes.Constructor Then
+		    // This is a call to a superclass' constructor.
+		    // Objo enforces that calls to constructors require parentheses (even when there are no arguments).
+		    If Not s.HasParentheses Then
+		      Error("A superclass constructor must have an argument list, even if empty.")
+		    Else
+		      CompileSuperConstructorInvocation(s.Arguments, s.Location)
+		    End If
+		    
+		  ElseIf Self.Type = ObjoScript.FunctionTypes.Method Then
+		    // This is a call to a method on the superclass with the same name as the one we are currently compiling.
+		    CompileSuperMethodInvocation(Self.Func.Signature, s.Arguments, s.Location)
+		    
+		  Else
+		    Error("`super` can only be used within a method or constructor.")
+		  End If
+		  
 		End Function
 	#tag EndMethod
 
@@ -2386,58 +2523,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C657320612063616C6C20746F20746865207375706572636C6173732720636F6E7374727563746F722E
-		Function VisitSuperConstructor(s As ObjoScript.SuperConstructorExpr) As Variant
-		  /// Compiles a call to the superclass' constructor.
-		  /// E.g: `super(argN)`.
-		  ///
-		  /// Part of the ObjoScript.ExprVisitor interface.
-		  
-		  mLocation = s.Location
-		  
-		  If Self.Type <> ObjoScript.FunctionTypes.Constructor Or CurrentClass = Nil Then
-		    Error("You can only call a superclass constructor from within a constructor.")
-		  End If
-		  
-		  // Check this class actually has a superclass.
-		  If CurrentClass.Superclass = Nil Then
-		    Error("Class `" + CurrentClass.Name + "` does not have a superclass.")
-		  End If
-		  
-		  // Check the superclass has a constructor with this many arguments.
-		  If s.Arguments.Count > 0 Then
-		    Var superHasMatchingConstructor As Boolean = False
-		    For Each constructor As ObjoScript.ConstructorDeclStmt In CurrentClass.Superclass.Declaration.Constructors
-		      If constructor.Arity = s.Arguments.Count Then
-		        superHasMatchingConstructor = True
-		        Exit
-		      End If
-		    Next constructor
-		    If Not superHasMatchingConstructor Then
-		      Error("The superclass (`" + CurrentClass.Superclass.Name + "`) of `" + CurrentClass.Name + "` does not define a constructor with " + s.Arguments.Count.ToString + " arguments.")
-		    End If
-		  End If
-		  
-		  // Load the superclass' name into the constant pool.
-		  Var superNameIndex As Integer = AddConstant(CurrentClass.Superclass.Name)
-		  
-		  // Push `this` onto the stack. It's always at slot 0 of the call frame.
-		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
-		  
-		  // Compile the arguments.
-		  For Each arg As ObjoScript.Expr In s.Arguments
-		    Call arg.Accept(Self)
-		  Next arg
-		  
-		  // Emit the OP_SUPER_CONSTRUCTOR instruction, the index of the superclass' name
-		  // and the argument count.
-		  EmitByte(ObjoScript.VM.OP_SUPER_CONSTRUCTOR, s.Location)
-		  EmitUInt16(superNameIndex, s.Location)
-		  EmitByte(s.Arguments.Count, s.Location)
-		  
-		End Function
-	#tag EndMethod
-
 	#tag Method, Flags = &h0, Description = 436F6D70696C65732061206D6574686F6420696E766F636174696F6E206F6E20607375706572602E
 		Function VisitSuperMethodInvocation(s As ObjoScript.SuperMethodInvocationExpr) As Variant
 		  /// Compiles a method invocation on `super`.
@@ -2446,50 +2531,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
-		  mLocation = s.Location
-		  
-		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
-		    Error("`super` can only be used within a method or constructor.")
-		  End If
-		  
-		  // Check this class actually has a superclass.
-		  If CurrentClass.Superclass = Nil Then
-		    Error("Class `" + CurrentClass.Name + "` does not have a superclass.")
-		  End If
-		  
-		  // Check the superclass has a matching method.
-		  Var superHasMatchingMethod As Boolean = False
-		  For Each entry As DictionaryEntry In CurrentClass.Superclass.Declaration.Methods
-		    Var method As ObjoScript.MethodDeclStmt = entry.Value
-		    If method.Signature.CompareCase(s.Signature) Then
-		      superHasMatchingMethod = True
-		      Exit
-		    End If
-		  Next entry
-		  If Not superHasMatchingMethod Then
-		    Error("The superclass (`" + CurrentClass.Superclass.Name + "`) of `" + CurrentClass.Name + "` does not define `" + s.Signature + "`.")
-		  End If
-		  
-		  // Load the superclass' name into the constant pool.
-		  Var superNameIndex As Integer = AddConstant(CurrentClass.Superclass.Name)
-		  
-		  // Push `this` onto the stack. It's always at slot 0 of the call frame.
-		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
-		  
-		  // Load the method's signature into the constant pool.
-		  Var index As Integer = AddConstant(s.Signature)
-		  
-		  // Compile the arguments.
-		  For Each arg As ObjoScript.Expr In s.Arguments
-		    Call arg.Accept(Self)
-		  Next arg
-		  
-		  // Emit the OP_SUPER_INVOKE instruction, the superclass name, the index of the 
-		  // method's signature in the constant pool and the argument count.
-		  EmitByte(ObjoScript.VM.OP_SUPER_INVOKE, s.Location)
-		  EmitUInt16(superNameIndex, s.Location)
-		  EmitUInt16(index, s.Location)
-		  EmitByte(s.Arguments.Count, s.Location)
+		  CompileSuperMethodInvocation(s.Signature, s.Arguments, s.Location)
 		  
 		End Function
 	#tag EndMethod

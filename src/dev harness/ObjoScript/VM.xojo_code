@@ -747,8 +747,13 @@ Protected Class VM
 		  // At this point, no methods have been defined on the subclass (since this
 		  // opcode should only occur within a class declaration). Therefore, copy all the 
 		  // superclass' methods to the class on the stack.
-		  // NB: We **don't** inherit static methods or constructors.
+		  // NB: We don't inherit static methods or constructors **unless** the immediate
+		  // superclass is `Object`. In this case, we inherit the static methods.
+		  // This allows `Object` to provide static operator overloads.
 		  subclass.Methods = superclass.Methods.Clone
+		  If superclass.Name.CompareCase("Object") Then
+		    subclass.StaticMethods = superclass.StaticMethods.Clone
+		  End If
 		  
 		  // This class should keep a reference to its superclass. Do this and pop it off the stack.
 		  subclass.Superclass = Pop

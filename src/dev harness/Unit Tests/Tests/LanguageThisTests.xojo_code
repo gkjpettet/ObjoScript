@@ -1,71 +1,27 @@
 #tag Class
-Protected Class LanguageSuperTests
+Protected Class LanguageThisTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
-		Sub CallDifferentArityTest()
-		  AssertOutputsEqual("language.super.call_different_arity")
+		Sub ThisAtTopLevelTest()
+		  AssertCompilerError("language.this.this_at_top_level")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub CallOtherMethodTest()
-		  AssertOutputsEqual("language.super.call_other_method")
+		Sub ThisInMethodTest()
+		  AssertOutputsEqual("language.this.this_in_method")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub ImplicitNameTest()
-		  AssertOutputsEqual("language.super.implicit_name")
+		Sub ThisInStaticMethodTest()
+		  AssertOutputsEqual("language.this.this_in_static_method")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub IndirectlyInheritedTest()
-		  AssertOutputsEqual("language.super.indirectly_inherited")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub NestedInvocationTest()
-		  AssertOutputsEqual("language.super.nested_invocation")
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub NestedSettersTest()
-		  AssertOutputsEqual("language.super.nested_setters")
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub NoSuperclassMethodTest()
-		  AssertCompilerError("language.super.no_superclass_method")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub SuperAtTopLevelTest()
-		  AssertCompilerError("language.super.super_at_top_level")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub SuperInInheritedMethodTest()
-		  AssertOutputsEqual("language.super.super_in_inherited_method")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub SuperInStaticMethodTest()
-		  AssertOutputsEqual("language.super.super_in_static_method")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub SuperInTopLevelFunctionTest()
-		  AssertCompilerError("language.super.super_in_top_level_function")
+		Sub ThisIsTopLevelFunctionTest()
+		  AssertCompilerError("language.this.this_in_top_level_function")
 		End Sub
 	#tag EndMethod
 

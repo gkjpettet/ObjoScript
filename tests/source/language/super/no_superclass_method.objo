@@ -1,0 +1,10 @@
+class Base {}
+
+class Derived is Base {
+foo {
+// Expect error: Base does not implement 'doesNotExist(_)'.
+super.doesNotExist(1)
+}
+}
+
+Derived().foo

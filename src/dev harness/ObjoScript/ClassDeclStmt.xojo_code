@@ -28,8 +28,17 @@ Implements ObjoScript.Stmt
 		Function HasInstanceMethodWithSignature(signature As String) As Boolean
 		  /// Returns True if this class has an instance method with `signature`.
 		  
+		  // Check Objo methods.
 		  For Each entry As DictionaryEntry In Self.Methods
 		    Var m As ObjoScript.MethodDeclStmt = entry.Value
+		    If m.Signature.CompareCase(signature) Then
+		      Return True
+		    End If
+		  Next entry
+		  
+		  // Check foreign methods.
+		  For Each entry As DictionaryEntry In Self.ForeignInstanceMethods
+		    Var m As ObjoScript.ForeignMethodDeclStmt = entry.Value
 		    If m.Signature.CompareCase(signature) Then
 		      Return True
 		    End If
@@ -44,8 +53,17 @@ Implements ObjoScript.Stmt
 		Function HasStaticMethodWithSignature(signature As String) As Boolean
 		  /// Returns True if this class has a static method with `signature`.
 		  
+		  // Check static Objo methods.
 		  For Each entry As DictionaryEntry In Self.StaticMethods
 		    Var m As ObjoScript.MethodDeclStmt = entry.Value
+		    If m.Signature.CompareCase(signature) Then
+		      Return True
+		    End If
+		  Next entry
+		  
+		  // Check static foreign methods.
+		  For Each entry As DictionaryEntry In Self.ForeignStaticMethods
+		    Var m As ObjoScript.ForeignMethodDeclStmt = entry.Value
 		    If m.Signature.CompareCase(signature) Then
 		      Return True
 		    End If

@@ -64,6 +64,26 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitBareSuperInvocation(s As ObjoScript.BareSuperInvocationExpr) As Variant
+		  Var node As New TreeViewNode("Bare super invocation")
+		  
+		  // Optional arguments.
+		  If s.Arguments.Count = 0 Then
+		    node.AppendNode(New TreeViewNode("No arguments"))
+		  Else
+		    Var argNode As New TreeViewNode("Arguments")
+		    For Each arg As ObjoScript.Expr In s.Arguments
+		      argNode.AppendNode(arg.Accept(Self))
+		    Next arg
+		    node.AppendNode(argNode)
+		  End If
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitBinary(expr As ObjoScript.BinaryExpr) As Variant
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
@@ -679,26 +699,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var valueNode As New TreeViewNode("Value to assign")
 		  valueNode.AppendNode(s.ValueToAssign.Accept(Self))
 		  node.AppendNode(valueNode)
-		  
-		  Return node
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Function VisitSuperConstructor(s As ObjoScript.SuperConstructorExpr) As Variant
-		  Var node As New TreeViewNode("Super constructor")
-		  
-		  // Optional arguments.
-		  If s.Arguments.Count = 0 Then
-		    node.AppendNode(New TreeViewNode("No arguments"))
-		  Else
-		    Var argNode As New TreeViewNode("Arguments")
-		    For Each arg As ObjoScript.Expr In s.Arguments
-		      argNode.AppendNode(arg.Accept(Self))
-		    Next arg
-		    node.AppendNode(argNode)
-		  End If
 		  
 		  Return node
 		  

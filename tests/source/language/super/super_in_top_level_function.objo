@@ -1,0 +1,3 @@
+function test() {
+super.foo // Expect error.
+}

@@ -10,6 +10,9 @@ foreign class Object {
 foreign ==(other)
 foreign <>(other)
 foreign is(other)
+foreign static ==(other)
+foreign static <>(other)
+foreign static is(other)
 
 not() {
 // Returns false since most objects are considered true.
@@ -18,6 +21,23 @@ return true
 
 foreign toString()
 foreign type()
+foreign superType()
+}
+
+/// ----------------------------------------------------
+/// CLASS
+/// ----------------------------------------------------
+class Class {
+constructor(name, superclass) {
+_name = name
+_superclass = superclass
+}
+
+// The name of the class.
+name { return _name }
+
+// The name of the superclass. Will be nothing for `Object`.
+superclass { return _superclass }
 }
 
 /// ----------------------------------------------------

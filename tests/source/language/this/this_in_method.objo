@@ -1,0 +1,6 @@
+class Foo {
+bar { return this }
+baz { return "baz" }
+}
+
+System.print(Foo().bar.baz) // Expect: baz

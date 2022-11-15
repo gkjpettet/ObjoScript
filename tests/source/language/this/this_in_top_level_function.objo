@@ -1,0 +1,3 @@
+function test() {
+this // Expect error.
+}

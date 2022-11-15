@@ -11,8 +11,8 @@ Implements ObjoScript.PrefixParselet
 		  Var superKeyword As ObjoScript.Token = parser.Previous
 		  
 		  If parser.Match(ObjoScript.TokenTypes.LParen) Then
-		    // Must be a call to the super's constructor (e.g: `super(argN)`).
-		    Return ParseSuperConstructor(parser, superKeyword)
+		    // A bare invocation on `super` (e.g: `super(argN)`).
+		    Return ParseBareSuper(parser, superKeyword, True)
 		    
 		  ElseIf parser.Match(ObjoScript.TokenTypes.Dot) Then
 		    // Must be a super method call (e.g: `super.something()` or `super.setter = something`).
@@ -20,29 +20,30 @@ Implements ObjoScript.PrefixParselet
 		    
 		  Else
 		    // `super` on its own.
-		    parser.Error("Expected an opening parenthesis or a dot after `super`.")
+		    Return ParseBareSuper(parser, superKeyword, False)
 		  End If
 		  
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 50617273657320612063616C6C20746F2061207375706572636C6173736020636F6E7374727563746F722E20417373756D65732074686520602860206166746572206073757065726020686173206A757374206265656E20636F6E73756D65642E
-		Private Function ParseSuperConstructor(parser As ObjoScript.Parser, superKeyword As ObjoScript.Token) As ObjoScript.Expr
-		  /// Parses a call to a superclass` constructor.
-		  /// Assumes the `(` after `super` has just been consumed.
+	#tag Method, Flags = &h21, Description = 5061727365732061206261726520696E766F636174696F6E206F6E20607375706572602E
+		Private Function ParseBareSuper(parser As ObjoScript.Parser, superKeyword As ObjoScript.Token, consumedLParen As Boolean) As ObjoScript.Expr
+		  /// Parses a bare invocation on `super`.
 		  ///
-		  /// E.g: super(argN)
+		  /// E.g: super(argN) or `super`
 		  
 		  // Optional arguments.
 		  Var arguments() As ObjoScript.Expr
-		  If Not parser.Check(ObjoScript.TokenTypes.RParen) Then
-		    Do
-		      arguments.Add(parser.Expression)
-		    Loop Until Not parser.Match(ObjoScript.TokenTypes.Comma)
+		  If consumedLParen Then
+		    If Not parser.Check(ObjoScript.TokenTypes.RParen) Then
+		      Do
+		        arguments.Add(parser.Expression)
+		      Loop Until Not parser.Match(ObjoScript.TokenTypes.Comma)
+		    End If
+		    parser.Consume(ObjoScript.TokenTypes.RParen, "Expected a `)` after the super constructor's arguments.")
 		  End If
-		  parser.Consume(ObjoScript.TokenTypes.RParen, "Expected a `)` after the super constructor's arguments.")
 		  
-		  Return New ObjoScript.SuperConstructorExpr(superKeyword, arguments)
+		  Return New ObjoScript.BareSuperInvocationExpr(superKeyword, arguments, consumedLParen)
 		  
 		End Function
 	#tag EndMethod

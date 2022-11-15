@@ -12,6 +12,12 @@ Protected Interface ExprVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E67206120626172652063616C6C20746F20607375706572602028652E673A20607375706572286172674E2960206F722060737570657260292E
+		Function VisitBareSuperInvocation(s As ObjoScript.BareSuperInvocationExpr) As Variant
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E6720612062696E6172792065787072657373696F6E2E
 		Function VisitBinary(expr As ObjoScript.BinaryExpr) As Variant
 		  
@@ -122,12 +128,6 @@ Protected Interface ExprVisitor
 
 	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E67206120737562736372697074207365747465722C20652E673A20615B315D203D2076616C75652E
 		Function VisitSubscriptSetter(s As ObjoScript.SubscriptSetter) As Variant
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E67206120737570657220636F6E7374727563746F722065787072657373696F6E2028652E673A20607375706572286172674E2960292E
-		Function VisitSuperConstructor(s As ObjoScript.SuperConstructorExpr) As Variant
 		  
 		End Function
 	#tag EndMethod
