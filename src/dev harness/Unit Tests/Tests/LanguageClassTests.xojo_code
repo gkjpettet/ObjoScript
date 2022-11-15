@@ -9,6 +9,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub NestedClassTest()
+		  AssertCompilerError("language.class.nested_class")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub NewLineAfterClassTest()
 		  AssertCompilerError("language.class.newline_after_class")
 		  
@@ -19,6 +25,12 @@ Inherits ObjoScriptTestGroupBase
 		Sub NewlineAfterStaticTest()
 		  AssertCompilerError("language.class.newline_after_static")
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub StaticInstanceNameResolutionTest()
+		  AssertOutputsEqual("language.class.static_instance_name_resolution")
 		End Sub
 	#tag EndMethod
 

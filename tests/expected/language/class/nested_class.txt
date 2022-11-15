@@ -1,0 +1,1 @@
+Nested classes are not permitted. Classes may only be declared globally.

@@ -13,6 +13,102 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub GlobalInInitialiserTest()
+		  AssertRuntimeError("language.variable.global_in_initialiser")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub GlobalWithoutInitialiserTest()
+		  AssertOutputsEqual("language.variable.global_without_initialiser")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub LocalCollideWithFunctionParameterTest()
+		  AssertCompilerError("language.variable.local_collide_with_function_parameter")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub LocalCollideWithMethodParameterTest()
+		  AssertCompilerError("language.variable.local_collide_with_method_parameter")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub LocalInInitialiserTest()
+		  AssertRuntimeError("language.variable.local_in_initialiser")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub LocalInMiddleOfBlockTest()
+		  AssertOutputsEqual("language.variable.local_in_middle_of_block")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub LocalInNestedBlockTest()
+		  AssertOutputsEqual("language.variable.local_in_nested_block")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub LocalWithoutInitialiserTest()
+		  AssertOutputsEqual("language.variable.local_without_initialiser")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ManyLocalsTest()
+		  AssertOutputsEqual("language.variable.many_locals")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ManyNonSimultaneousLocalsTest()
+		  AssertOutputsEqual("language.variable.many_nonsimultaneous_locals")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub NewLineAfterEqualsTest()
+		  AssertCompilerError("language.variable.newline_after_equals")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub NewlineAfterVarTest()
+		  AssertCompilerError("language.variable.newline_after_var")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub OutsideMethodTest()
+		  AssertOutputsEqual("language.variable.outside_method")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ScopeIfTest()
+		  AssertOutputsEqual("language.variable.scope_if")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ScopeReuseInDifferentBlocksTest()
+		  AssertOutputsEqual("language.variable.scope_reuse_in_different_blocks")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ScopeWhileTest()
+		  AssertOutputsEqual("language.variable.scope_while")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

@@ -462,7 +462,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    End If
 		    
 		    If name = local.Name Then
-		      Error("There is already a variable with this name (" + name + ") in this scope.")
+		      Error("Redefined variable `" + name + "`.")
 		    End If
 		  Next i
 		  
@@ -1049,30 +1049,47 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    // Tell the VM to push the value at slot `arg` on to the top of the stack.
 		    EmitBytes(ObjoScript.VM.OP_GET_LOCAL, arg)
 		    
-		  ElseIf (Self.Type = ObjoScript.FunctionTypes.Method Or Self.Type = ObjoScript.FunctionTypes.Constructor) And _
-		    ClassHierarchyHasInstanceMethodWithSignature(CurrentClass, signature) Then
-		    // This is a call to an instance getter method.
-		    If Self.IsStaticMethod Then
-		      Error("Cannot call an instance getter method from within a static method.")
-		    Else
-		      // Slot 0 of the call frame will be the instance. Push it onto the stack.
-		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		  ElseIf Self.Type = ObjoScript.FunctionTypes.Method Or Self.Type = ObjoScript.FunctionTypes.Constructor Then
+		    // We're within a method or constructor.
+		    Var hasStatic, hasInstance As Boolean = False
+		    If ClassHierarchyHasInstanceMethodWithSignature(CurrentClass, signature) Then
+		      // There is a matching instance method.
+		      hasInstance = True
 		    End If
-		    isGetter = True
+		    If ClassHierarchyHasStaticMethodWithSignature(CurrentClass, signature) Then
+		      // There is a matching static method.
+		      hasStatic = True
+		    End If
 		    
-		  ElseIf (Self.Type = ObjoScript.FunctionTypes.Method Or Self.Type = ObjoScript.FunctionTypes.Constructor) And _
-		    ClassHierarchyHasStaticMethodWithSignature(CurrentClass, signature) Then
-		    // This is a call to a static getter method.
 		    If Self.IsStaticMethod Then
-		      // We're calling a static method from within a static method. Therefore, slot 0 of the call frame 
-		      // will be the class. Push it onto the stack.
-		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		      // Within a static method, we can only call other static methods on this class.
+		      If hasInstance And Not hasStatic Then
+		        Error("Cannot call an instance method from within a static method.")
+		      ElseIf hasStatic Then
+		        // We're calling a static method from within a static method. Therefore, slot 0 of the call frame 
+		        // will be the class. Push it onto the stack.
+		        EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		        isGetter = True
+		      Else
+		        // Not a local variable or a static getter method - assume we're retrieving a global variable.
+		        GlobalVariable(name)
+		      End If
 		    Else
-		      // We're calling a static method from within an instance method. Therefore, slot 0 of the 
-		      // call frame will be the instance. Push its class onto the stack.
-		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL_CLASS, 0)
+		      // Within an instance method, we can call instance or static methods.
+		      If hasInstance Then
+		        // Slot 0 of the call frame will be the instance. Push it onto the stack.
+		        EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
+		        isGetter = True
+		      ElseIf hasStatic Then
+		        // We're calling a static method from within an instance method. Therefore, slot 0 of the 
+		        // call frame will be the instance. Push its class onto the stack.
+		        EmitBytes(ObjoScript.VM.OP_GET_LOCAL_CLASS, 0)
+		        isGetter = True
+		      Else
+		        // Not a local variable or a getter method - assume we're retrieving a global variable.
+		        GlobalVariable(name)
+		      End If
 		    End If
-		    isGetter = True
 		    
 		  Else
 		    // Not a local variable or a getter method - assume we're retrieving a global variable.
@@ -1404,10 +1421,14 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Could be a method invocation called from within a class method/constructor or
 		  // a global function call.
 		  Var isMethod, isStatic As Boolean = False
+		  
+		  if bi.MethodName = "foo" then Break
+		  
 		  If CurrentClass <> Nil Then
 		    If ClassHierarchyHasInstanceMethodWithSignature(CurrentClass, bi.Signature) Then
 		      isMethod = True
-		    ElseIf ClassHierarchyHasStaticMethodWithSignature(CurrentClass, bi.Signature) Then
+		    End If
+		    If ClassHierarchyHasStaticMethodWithSignature(CurrentClass, bi.Signature) Then
 		      isMethod = True
 		      isStatic = True
 		    End If
@@ -1650,6 +1671,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Part of the ObjoScript.StmtVisitor interface.
 		  
 		  mLocation = c.Location
+		  
+		  // Assert that this class is being declared in the outermost scope (we don't allow nested classes).
+		  If ScopeDepth > 0 Then
+		    Error("Nested classes are not permitted. Classes may only be declared globally.")
+		  End If
 		  
 		  // Make sure this class is unique.
 		  If FindClass(c.Name) <> Nil Then

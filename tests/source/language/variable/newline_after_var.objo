@@ -1,0 +1,2 @@
+var // Expect error
+foo = 123

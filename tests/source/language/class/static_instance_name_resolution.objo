@@ -1,0 +1,16 @@
+class Foo {
+foo { return "method" }
+
+method {
+System.print(foo)
+}
+
+static foo { return "class method" }
+
+static classMethod {
+System.print(foo)
+}
+}
+
+Foo().method // expect: method
+Foo.classMethod  // expect: class method
