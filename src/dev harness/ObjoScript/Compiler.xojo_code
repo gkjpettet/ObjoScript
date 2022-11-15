@@ -445,6 +445,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// `identifier` is the token representing the variable's name in the original source code.
 		  /// If `initialised` then marks the local as initialised immediately (relevant for functions).
 		  
+		  mLocation = identifier
+		  
 		  // Global variable? These are late bound so the compiler doesn't keep track of
 		  // which declarations for them it has seen. We're done.
 		  If ScopeDepth = 0 Then
@@ -1968,6 +1970,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// If anything else is returned, that means that we have advanced to a new valid element. To get that, 
 		  /// The VM then calls `iteratorValue()` on `seq*` and passes in the iterator value that it just got from calling `iterate()`. 
 		  /// The sequence uses that to look up and return the appropriate element.
+		  
+		  mLocation = stmt.Location
 		  
 		  // For performance reasons, we will handle ranges differently.
 		  If stmt.Range IsA ObjoScript.RangeExpr Then

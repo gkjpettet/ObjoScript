@@ -7,6 +7,12 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub DuplicateParameterTest()
+		  AssertCompilerError("language.variable.duplicate_parameter")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
