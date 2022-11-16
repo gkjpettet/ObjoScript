@@ -730,7 +730,7 @@ Protected Class Parser
 		  TokenTypes.Import               : Unused, _
 		  TokenTypes.In_                  : Unused, _
 		  TokenTypes.Is_                  : NewRule(Nil, New IsParselet, Precedences.Is_), _
-		  TokenTypes.LCurly               : Unused, _
+		  TokenTypes.LCurly               : Prefix(New MapParselet), _
 		  TokenTypes.Less                 : BinaryOperator(Precedences.Comparison), _
 		  TokenTypes.LessEqual            : BinaryOperator(Precedences.Comparison), _
 		  TokenTypes.LessLess             : BinaryOperator(Precedences.BitwiseShift), _

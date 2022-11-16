@@ -2274,6 +2274,46 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732061204D6170206C69746572616C2E
+		Function VisitMapLiteral(map As ObjoScript.MapLiteral) As Variant
+		  /// Compiles a Map literal.
+		  ///
+		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  mLocation = map.Location
+		  
+		  // Retrieve the Map class. It should have been defined globally in the standard library.
+		  GlobalVariable("Map")
+		  
+		  // Make sure no more than 255 initial key-value pairs are defined.
+		  If map.KeyValues.Count > 255 Then
+		    Error("The maximum number of initial key-value pairs for a map is 255.")
+		  End If
+		  
+		  // Compile the key-value pairs.
+		  // We compile in reverse order compared to how they were parsed which means the first key-value 
+		  // popped off the stack by the VM will be the first one in the literal. 
+		  // For each key-value we compile the key first, then the value.
+		  // E.g: {a : b, c : d} compiles to:
+		  // a          <-- stack top
+		  // b
+		  // c
+		  // d
+		  // Map class
+		  For i As Integer = map.KeyValues.LastIndex DownTo 0
+		    Var kv As Pair = map.KeyValues(i)
+		    // Value.
+		    Call ObjoScript.Expr(kv.Right).Accept(Self)
+		    // Key.
+		    Call ObjoScript.Expr(kv.Left).Accept(Self)
+		  Next i
+		  
+		  // Tell the VM to create a Map instance with the optional initial key-values.
+		  EmitBytes(VM.OP_MAP, map.KeyValues.Count, map.Location)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120636C617373206D6574686F64206465636C61726174696F6E2E
 		Function VisitMethodDeclaration(m As ObjoScript.MethodDeclStmt) As Variant
 		  /// Compiles a class method declaration.

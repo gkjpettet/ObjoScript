@@ -176,6 +176,15 @@ foreign [index]=(value)
 }
 
 /// ----------------------------------------------------
+/// MAP
+/// ----------------------------------------------------
+// The Map class represents a key-value dictionary.
+foreign class Map is Sequence {
+foreign count()
+foreign toString()
+}
+
+/// ----------------------------------------------------
 /// RANGE
 /// ----------------------------------------------------
 // The Range class represents an iterable range of numbers 

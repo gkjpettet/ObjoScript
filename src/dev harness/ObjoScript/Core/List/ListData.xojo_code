@@ -1,8 +1,8 @@
 #tag Class
 Protected Class ListData
-	#tag Method, Flags = &h0, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F662074686520617272617920696E2074686520666F726D61743A20225B6974656D312C206974656D4E5D222E
+	#tag Method, Flags = &h0, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F6620746865206C69737420696E2074686520666F726D61743A20225B6974656D312C206974656D4E5D222E
 		Function ToString() As String
-		  /// Returns a string representation of the array in the format: "[item1, itemN]".
+		  /// Returns a string representation of the list in the format: "[item1, itemN]".
 		  
 		  Var s() As String = Array("[")
 		  

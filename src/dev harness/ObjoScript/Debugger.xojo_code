@@ -456,6 +456,9 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_DEFINE_NOTHING
 		    Return SimpleInstruction("DEFINE_NOTHING", offset)
 		    
+		  Case ObjoScript.VM.OP_MAP
+		    Return Instruction8BitOperand("MAP", chunk, offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select

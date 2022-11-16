@@ -490,6 +490,35 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitMapLiteral(map As ObjoScript.MapLiteral) As Variant
+		  Var node As TreeViewNode
+		  If map.KeyValues.Count = 0 Then
+		    node = New TreeViewNode("Empty Map")
+		  Else
+		    node = New TreeViewNode("Map (" + map.KeyValues.Count.ToString + If(map.KeyValues.Count = 1, " entry)", " entries)"))
+		    Var keyValuesNode As New TreeViewNode("Key-Values")
+		    For Each kv As Pair In map.KeyValues
+		      Var kvNode As New TreeViewNode("Key-Value")
+		      
+		      Var keyNode As New TreeViewNode("Key:")
+		      keyNode.AppendNode(ObjoScript.Expr(kv.Left).Accept(Self))
+		      kvNode.AppendNode(keyNode)
+		      
+		      Var valueNode As New TreeViewNode("Value:")
+		      valueNode.AppendNode(ObjoScript.Expr(kv.Right).Accept(Self))
+		      kvNode.AppendNode(valueNode)
+		      
+		      keyValuesNode.AppendNode(kvNode)
+		    Next kv
+		    node.AppendNode(keyValuesNode)
+		  End If
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitMethodDeclaration(m As ObjoScript.MethodDeclStmt) As Variant
 		  Var node As New TreeViewNode("Method declaration")
 		  

@@ -32,13 +32,14 @@ Protected Class VM
 		  #Pragma NilObjectChecking False
 		  #Pragma StackOverflowChecking False
 		  
-		  #Pragma Warning "TODO: Implement the `Map` class"
-		  
 		  If className.CompareCase("Boolean") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Boolean_.Allocate, Nil)
 		    
 		  ElseIf className.CompareCase("List") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.List.Allocate, Nil)
+		    
+		  ElseIf className.CompareCase("Map") Then
+		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Map.Allocate, Nil)
 		    
 		  ElseIf className.CompareCase("Nothing") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Nothing.Allocate, Nil)
@@ -75,6 +76,9 @@ Protected Class VM
 		    
 		  ElseIf className.CompareCase("List") Then
 		    Return Core.List.BindForeignMethod(signature, isStatic)
+		    
+		  ElseIf className.CompareCase("Map") Then
+		    Return Core.Map.BindForeignMethod(signature, isStatic)
 		    
 		  ElseIf className.CompareCase("Nothing") Then
 		    Return Core.Nothing.BindForeignMethod(signature, isStatic)
@@ -359,6 +363,33 @@ Protected Class VM
 		  // Add the initial elements to it's foreign data.
 		  Var list As ObjoScript.Instance = Stack(StackTop - 1)
 		  ObjoScript.Core.List.ListData(list.ForeignData).Items = items
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 4372656174652061206E6577206D6170206C69746572616C2E2054686520636F6D70696C65722077696C6C206861766520706C6163656420746865204D617020636C617373206F6E2074686520737461636B20616E6420616E7920696E697469616C206B65792D76616C75652070616972732061626F766520746869732E
+		Private Sub CreateMapLiteral(keyValueCount As Integer)
+		  /// Create a new map literal. The compiler will have placed the Map class on the stack
+		  /// and any initial key-value pairs above this.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
+		  // Pop and store any optional initial key-values.
+		  // These are compiled so the key is above the value on the stack.
+		  Var keyValues As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
+		  For i As Integer = 1 To keyValueCount
+		    keyValues.Value(Pop) = Pop
+		  Next i
+		  
+		  // Call the default list constructor.
+		  Call CallClass(Peek(0), 0)
+		  
+		  // The top of the stack will now be a Map instance.
+		  // It's foreign data contains a dictionary that we will set to the key-values we popped off the stack.
+		  Var map As ObjoScript.Instance = Stack(StackTop - 1)
+		  ObjoScript.Core.Map.MapData(map.ForeignData).Dict = keyValues
 		  
 		End Sub
 	#tag EndMethod
@@ -1598,6 +1629,9 @@ Protected Class VM
 		    Case OP_LIST
 		      CreateListLiteral(ReadByte)
 		      
+		    Case OP_MAP
+		      CreateMapLiteral(ReadByte)
+		      
 		    Case OP_SWAP
 		      // Swap the two values on the top of the stack.
 		      // Do this in-place to avoid Push/Pop calls.
@@ -1968,7 +2002,7 @@ Protected Class VM
 		52: OP_SWAP (0)
 		53: OP_DEBUG_FIELD_NAME (3)
 		54: OP_DEFINE_NOTHING (0)
-		55: *Unused*
+		55: OP_MAP (1)
 		56: OP_GET_FIELD (1)
 		57: *Unused*
 		58: OP_SET_FIELD (1)
@@ -2139,7 +2173,8 @@ Protected Class VM
 			  OP_LIST                   : 1, _
 			  OP_SWAP                   : 0, _
 			  OP_DEBUG_FIELD_NAME       : 3, _
-			  OP_DEFINE_NOTHING         : 0 _
+			  OP_DEFINE_NOTHING         : 0, _
+			  OP_MAP                    : 1 _
 			  )
 			  
 			  Return d
@@ -2317,6 +2352,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_LOOP, Type = Double, Dynamic = False, Default = \"43", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_MAP, Type = Double, Dynamic = False, Default = \"55", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_METHOD, Type = Double, Dynamic = False, Default = \"50", Scope = Public
