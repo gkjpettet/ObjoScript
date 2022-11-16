@@ -152,8 +152,8 @@ foreign class String {
 foreign +(other)
 
 foreign beginsWith(prefix)
-foreign characterCount()
 foreign codePoints()
+foreign count()
 }
 
 /// ----------------------------------------------------

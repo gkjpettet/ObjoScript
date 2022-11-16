@@ -1,4 +1,4 @@
-System.print("".characterCount)   // expect: 0
+System.print("".count)   // expect: 0
 System.print("a string") // expect: a string
 
 // Non-ASCII.

@@ -13,6 +13,48 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub EmptyBlockTest()
+		  AssertOutputsEqual("language.misc.empty_block")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub EmptyFileTest()
+		  AssertOutputsEqual("language.misc.empty_file")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub NoTrailingNewlineTest()
+		  AssertOutputsEqual("language.misc.no_trailing_newline")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub PrecedenceTest()
+		  AssertOutputsEqual("language.misc.precedence")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub SemicolonTest()
+		  AssertCompilerError("language.misc.semicolon")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub UnexpectedCharacterTest()
+		  AssertCompilerError("language.misc.unexpected_character")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub WhitespaceTest()
+		  AssertOutputsEqual("language.misc.whitespace")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
