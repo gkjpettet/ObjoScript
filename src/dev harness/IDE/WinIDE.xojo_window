@@ -1333,7 +1333,7 @@ End
 		  If VM <> Nil Then
 		    RemoveHandler VM.Print, AddressOf VMPrintDelegate
 		    RemoveHandler VM.DebugPrint, AddressOf VMDebugPrintDelegate
-		    RemoveHandler VM.WillStop, AddressOf VMWIllStopDelegate
+		    RemoveHandler VM.WillStop, AddressOf VMWillStopDelegate
 		    RemoveHandler VM.Finished, AddressOf VMFinishedDelegate
 		  End If
 		  
