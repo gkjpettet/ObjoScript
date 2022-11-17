@@ -195,6 +195,7 @@ foreign [index]=(value)
 // The Map class represents a key-value dictionary.
 foreign class Map is Sequence {
 foreign clear()
+foreign containsKey(key)
 foreign count()
 foreign toString()
 

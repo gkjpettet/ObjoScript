@@ -26,6 +26,9 @@ Protected Module Map
 		  If signature.CompareCase("clear()") Then
 		    Return AddressOf Clear
 		    
+		  ElseIf signature.CompareCase("containsKey(_)") Then
+		    Return AddressOf ContainsKey
+		    
 		  ElseIf signature.CompareCase("count()") Then
 		    Return AddressOf Count
 		    
@@ -57,6 +60,26 @@ Protected Module Map
 		  
 		  Var map As ObjoScript.Instance = vm.GetSlotValue(0)
 		  map.ForeignData = New ObjoScript.Core.Map.MapData
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207472756520696620746865206D617020636F6E7461696E7320606B657960206F722066616C736520696620697420646F65736E27742E
+		Protected Sub ContainsKey(vm As ObjoScript.VM)
+		  /// Returns true if the map contains `key` or false if it doesn't.
+		  ///
+		  /// Assumes:
+		  /// - Slot 0 contains a Map instance.
+		  /// - Slot 1 is the key.
+		  /// Map.containsKey(key) -> boolean
+		  
+		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
+		  
+		  Var key As Variant = vm.GetSlotValue(1)
+		  
+		  Var data As ObjoScript.Core.Map.MapData = instance.ForeignData
+		  
+		  vm.SetReturn(data.Dict.HasKey(key))
 		  
 		End Sub
 	#tag EndMethod

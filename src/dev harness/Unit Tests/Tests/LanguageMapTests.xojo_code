@@ -8,6 +8,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub ContainsKeyTest()
+		  AssertOutputsEqual("language.map.containsKey")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub ForEachTest()
 		  AssertOutputsEqual("language.map.foreach")
 		End Sub
