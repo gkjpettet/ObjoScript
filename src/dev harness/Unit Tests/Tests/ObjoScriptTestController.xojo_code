@@ -36,6 +36,7 @@ Inherits TestController
 		  group = New LanguageVariableTests(Self, "Language - Variable")
 		  group = New LanguageWhileTests(Self, "Language - While")
 		  group = New LanguageMiscTests(Self, "Language - Misc")
+		  group = New LanguageMapTests(Self, "Language - Map")
 		End Sub
 	#tag EndEvent
 

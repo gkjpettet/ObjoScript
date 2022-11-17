@@ -140,6 +140,9 @@ Protected Class Debugger
 		  ElseIf constant.Type = Variant.TypeBoolean Then
 		    Return New TreeViewNode(indexCol + " Boolean: " + If(constant.BooleanValue, "true", "false"))
 		    
+		  ElseIf constant IsA Pair Then
+		    Return New TreeViewNode(indexCol + " KeyValue: " + ObjoScript.VM.ValueToString(Pair(constant).Left) + " : " + ObjoScript.VM.ValueToString(Pair(constant).Right))
+		    
 		  ElseIf constant IsA ObjoScript.Nothing Then
 		    Return New TreeViewNode(indexCol + " nothing")
 		    
@@ -458,6 +461,9 @@ Protected Class Debugger
 		    
 		  Case ObjoScript.VM.OP_MAP
 		    Return Instruction8BitOperand("MAP", chunk, offset)
+		    
+		  Case ObjoScript.VM.OP_KEYVALUE
+		    Return SimpleInstruction("KEYVALUE", offset)
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")

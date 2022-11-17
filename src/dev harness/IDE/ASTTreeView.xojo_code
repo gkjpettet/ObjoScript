@@ -451,6 +451,23 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitKeyValue(kv As ObjoScript.KeyValueExpr) As Variant
+		  Var node As New TreeViewNode("KeyValue:")
+		  
+		  Var keyNode As New TreeViewNode("Key:")
+		  keyNode.AppendNode(kv.Key.Accept(Self))
+		  node.AppendNode(keyNode)
+		  
+		  Var valueNode As New TreeViewNode("Value:")
+		  keyNode.AppendNode(kv.Value.Accept(Self))
+		  node.AppendNode(valueNode)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitListLiteral(expr As ObjoScript.ListLiteral) As Variant
 		  Var node As TreeViewNode
 		  If expr.Elements.Count = 0 Then
@@ -497,18 +514,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Else
 		    node = New TreeViewNode("Map (" + map.KeyValues.Count.ToString + If(map.KeyValues.Count = 1, " entry)", " entries)"))
 		    Var keyValuesNode As New TreeViewNode("Key-Values")
-		    For Each kv As Pair In map.KeyValues
-		      Var kvNode As New TreeViewNode("Key-Value")
-		      
-		      Var keyNode As New TreeViewNode("Key:")
-		      keyNode.AppendNode(ObjoScript.Expr(kv.Left).Accept(Self))
-		      kvNode.AppendNode(keyNode)
-		      
-		      Var valueNode As New TreeViewNode("Value:")
-		      valueNode.AppendNode(ObjoScript.Expr(kv.Right).Accept(Self))
-		      kvNode.AppendNode(valueNode)
-		      
-		      keyValuesNode.AppendNode(kvNode)
+		    For Each kv As ObjoScript.KeyValueExpr In map.KeyValues
+		      keyValuesNode.AppendNode(kv.Accept(Self))
 		    Next kv
 		    node.AppendNode(keyValuesNode)
 		  End If

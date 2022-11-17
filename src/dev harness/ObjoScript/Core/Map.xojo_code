@@ -21,14 +21,23 @@ Protected Module Map
 		  
 		  #Pragma Unused isStatic
 		  
-		  #Pragma Warning "TODO: Implement the iterator protocol"
-		  
 		  If signature.CompareCase("count()") Then
 		    Return AddressOf Count
+		    
+		  ElseIf signature.CompareCase("iterate(_)") Then
+		    Return AddressOf Iterate
+		    
+		  ElseIf signature.CompareCase("iteratorValue(_)") Then
+		    Return AddressOf IteratorValue
 		    
 		  ElseIf signature.CompareCase("toString()") Then
 		    Return AddressOf ToString
 		    
+		  ElseIf signature = "[_]=(_)" Then
+		    Return AddressOf SubscriptSetter
+		    
+		  ElseIf signature = "[_]" Then
+		    Return AddressOf Subscript
 		  End If
 		  
 		End Function
@@ -44,6 +53,105 @@ Protected Module Map
 		  Var data As ObjoScript.Core.Map.MapData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
 		  
 		  vm.SetReturn(CType(data.Count, Double))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E732066616C736520696620746865726520617265206E6F206D6F726520656E747269657320746F2069746572617465206F722072657475726E7320746865206E6578742076616C756520696E207468652073657175656E63652E
+		Protected Sub Iterate(vm As ObjoScript.VM)
+		  /// Returns false if there are no more entries to iterate or returns the next value in the sequence.
+		  ///
+		  /// if `iter` is nothing then we should return the first entry.
+		  /// Assumes slot 0 contains a Map instance.
+		  /// Map.iterate(iter) -> value or false
+		  
+		  #Pragma Warning "TODO: Return a key-value pair, not just the value"
+		  
+		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
+		  Var iter As Variant = vm.GetSlotValue(1)
+		  
+		  Var data As ObjoScript.Core.Map.MapData = instance.ForeignData
+		  
+		  If iter IsA ObjoScript.Nothing Then // Return the first entry.
+		    If data.Dict.KeyCount = 0 Then
+		      // This is an empty map.
+		      data.NextValue = False
+		    Else
+		      data.Index = 0
+		      data.NextValue = data.Dict.Value(data.Dict.Key(0))
+		    End If
+		    
+		  Else // Return the next entry.
+		    data.Index = data.Index + 1
+		    If data.Index <= data.Dict.KeyCount - 1 Then
+		      data.NextValue = data.Dict.Value(data.Dict.Key(data.Index))
+		    Else
+		      data.Index = -1
+		      data.NextValue = False
+		    End If
+		  End If
+		  
+		  vm.SetReturn(data.NextValue)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320746865206E657874206974657261746F722076616C75652E
+		Protected Sub IteratorValue(vm As ObjoScript.VM)
+		  /// Returns the next iterator value.
+		  ///
+		  /// Assumes slot 0 contains a Map instance.
+		  /// We are ignoring `iter` here.
+		  /// Map.iterator(iter) -> value
+		  
+		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
+		  
+		  vm.SetReturn(ObjoScript.Core.Map.MapData(instance.ForeignData).NextValue)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207468652076616C756520666F722074686520737065636966696564206B65792E
+		Protected Sub Subscript(vm As ObjoScript.VM)
+		  /// Returns the value for the specified key.
+		  ///
+		  /// Assumes:
+		  /// - Slot 0 contains a Map instance.
+		  /// - Slot 1 is the key.
+		  /// Map.[key]
+		  
+		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
+		  
+		  Var key As Variant = vm.GetSlotValue(1)
+		  
+		  Var data As ObjoScript.Core.Map.MapData = instance.ForeignData
+		  
+		  Var value As Variant = data.Dict.Lookup(key, vm.Nothing)
+		  
+		  vm.SetReturn(value)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 41737369676E7320612076616C756520746F206120737065636966696564206B65792E
+		Protected Sub SubscriptSetter(vm As ObjoScript.VM)
+		  /// Assigns a value to a specified key.
+		  ///
+		  /// Assumes:
+		  /// - Slot 0 contains a Map instance.
+		  /// - Slot 1 is the key.
+		  /// - Slot 2 is the value to assign.
+		  /// Map.[key]=(value)
+		  
+		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
+		  
+		  Var key As Variant = vm.GetSlotValue(1)
+		  
+		  Var value As Variant = vm.GetSlotValue(2)
+		  
+		  Var data As ObjoScript.Core.Map.MapData = instance.ForeignData
+		  
+		  data.Dict.Value(key) = value
 		  
 		End Sub
 	#tag EndMethod

@@ -2220,6 +2220,29 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732061206B65792D76616C7565206C69746572616C2E
+		Function VisitKeyValue(kv As ObjoScript.KeyValueExpr) As Variant
+		  /// Compiles a key-value literal.
+		  ///
+		  /// Part of the ObjScript.ExprVisitor interface.
+		  
+		  mLocation = kv.Location
+		  
+		  // Retrieve the KeyValue class. It should have been defined globally in the standard library.
+		  GlobalVariable("KeyValue")
+		  
+		  // Compile the value.
+		  Call kv.Value.Accept(Self)
+		  
+		  // Compile the key.
+		  Call kv.Key.Accept(Self)
+		  
+		  // Tell the VM to create a new KeyValue instance.
+		  EmitByte(ObjoScript.VM.OP_KEYVALUE, kv.Location)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D70696C65732061206C697374206C69746572616C2E
 		Function VisitListLiteral(expr As ObjoScript.ListLiteral) As Variant
 		  /// Compiles a list literal.
@@ -2293,19 +2316,18 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Compile the key-value pairs.
 		  // We compile in reverse order compared to how they were parsed which means the first key-value 
 		  // popped off the stack by the VM will be the first one in the literal. 
-		  // For each key-value we compile the key first, then the value.
 		  // E.g: {a : b, c : d} compiles to:
-		  // a          <-- stack top
+		  // a         <-- stack top
 		  // b
 		  // c
 		  // d
 		  // Map class
 		  For i As Integer = map.KeyValues.LastIndex DownTo 0
-		    Var kv As Pair = map.KeyValues(i)
-		    // Value.
-		    Call ObjoScript.Expr(kv.Right).Accept(Self)
-		    // Key.
-		    Call ObjoScript.Expr(kv.Left).Accept(Self)
+		    Var kv As ObjoScript.KeyValueExpr = map.KeyValues(i)
+		    // Compile the value.
+		    Call kv.Value.Accept(Self)
+		    // Compile the key.
+		    Call kv.Key.Accept(Self)
 		  Next i
 		  
 		  // Tell the VM to create a Map instance with the optional initial key-values.

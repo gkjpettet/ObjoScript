@@ -1,0 +1,10 @@
+var kv = KeyValue("name", "garry")
+
+System.print(kv.key) // expect name
+System.print(kv.value) // expect garry
+
+kv.key = "forename"
+System.print(kv.key) // expect forename
+
+kv.value = "fi"
+System.print(kv.value) // expect fi

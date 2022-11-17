@@ -70,6 +70,19 @@ foreign sqrt()
 }
 
 /// ----------------------------------------------------
+/// KEYVALUE
+/// ----------------------------------------------------
+foreign class KeyValue {
+constructor() {}
+constructor(key, value) {}
+
+foreign key()
+foreign key=(k)
+foreign value()
+foreign value=(v)
+}
+
+/// ----------------------------------------------------
 /// SEQUENCE
 /// ----------------------------------------------------
 /// An abstract class for any iterable object.
@@ -182,6 +195,15 @@ foreign [index]=(value)
 foreign class Map is Sequence {
 foreign count()
 foreign toString()
+
+// Iterator protocol.
+foreign iterate(iter)
+foreign iteratorValue(iter)
+
+// Operator overloads.
+foreign [index]
+foreign [index]=(value)
+
 }
 
 /// ----------------------------------------------------

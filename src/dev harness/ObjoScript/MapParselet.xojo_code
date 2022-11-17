@@ -13,7 +13,7 @@ Implements ObjoScript.PrefixParselet
 		  Var lcurly As ObjoScript.Token = parser.Previous
 		  
 		  // Parse the optional values.
-		  Var keyValues() As Pair
+		  Var keyValues() As ObjoScript.KeyValueExpr
 		  If Not parser.Check(ObjoScript.TokenTypes.RCurly) Then
 		    Do
 		      keyValues.Add(ParseKeyValue(parser))
@@ -27,17 +27,17 @@ Implements ObjoScript.PrefixParselet
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 5061727365732061204D6170206C69746572616C206B65792D76616C756520706169722E204C6566743A204E756D6265722F537472696E672F426F6F6C65616E2F4E6F7468696E672C2052696768743A20604F626A6F5363726970742E45787072602E
-		Private Function ParseKeyValue(parser As ObjoScript.Parser) As Pair
+		Private Function ParseKeyValue(parser As ObjoScript.Parser) As ObjoScript.KeyValueExpr
 		  /// Parses a Map literal key-value pair.
 		  /// Left: `ObjoScript.Expr`, Right: `ObjoScript.Expr`.
 		  
 		  Var key As ObjoScript.Expr = parser.Expression
 		  
-		  parser.Consume(ObjoScript.TokenTypes.Colon, "Expected a `:` after the key.")
+		  Var colon As ObjoScript.Token = parser.Consume(ObjoScript.TokenTypes.Colon, "Expected a `:` after the key.")
 		  
 		  Var value As ObjoScript.Expr = parser.Expression
 		  
-		  Return key : value
+		  Return New KeyValueExpr(colon, key, value)
 		  
 		End Function
 	#tag EndMethod

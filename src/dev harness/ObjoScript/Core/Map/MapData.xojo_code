@@ -32,6 +32,14 @@ Protected Class MapData
 		Dict As Dictionary
 	#tag EndProperty
 
+	#tag Property, Flags = &h0, Description = 5468652063757272656E74206B657920696E6465782E2055736564207768656E20697465726174696E672E
+		Index As Integer = -1
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 546865206E6578742076616C756520746F2072657475726E2E2055736564207768656E20697465726174696E672E
+		NextValue As Variant = False
+	#tag EndProperty
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

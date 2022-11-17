@@ -35,6 +35,9 @@ Protected Class VM
 		  If className.CompareCase("Boolean") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Boolean_.Allocate, Nil)
 		    
+		  ElseIf className.CompareCase("KeyValue") Then
+		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.KeyValue.Allocate, Nil)
+		    
 		  ElseIf className.CompareCase("List") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.List.Allocate, Nil)
 		    
@@ -73,6 +76,9 @@ Protected Class VM
 		  
 		  If className.CompareCase("Boolean") Then
 		    Return Core.Boolean_.BindForeignMethod(signature, isStatic)
+		    
+		  ElseIf className.CompareCase("KeyValue") Then
+		    Return Core.KeyValue.BindForeignMethod(signature, isStatic)
 		    
 		  ElseIf className.CompareCase("List") Then
 		    Return Core.List.BindForeignMethod(signature, isStatic)
@@ -128,7 +134,7 @@ Protected Class VM
 		  
 		  // We allow a class to omit providing a default (zero parameter) constructor.
 		  If constructor = Nil And argCount <> 0 Then
-		    Error("There is no `" + klass.Name + "` constructor that expects " + argCount.ToString + If(argCount = 1, " argument.", "arguments."))
+		    Error("There is no `" + klass.Name + "` constructor that expects " + argCount.ToString + If(argCount = 1, " argument.", " arguments."))
 		  End If
 		  
 		  // If this is a foreign class, call the allocate delegate so the host can do any additional setup needed.
@@ -341,6 +347,33 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 437265617465732061206E6577206B65792076616C756520696E7374616E63652E2054686520636F6D70696C65722077696C6C206861766520706C6163656420746865206B657920616E642076616C7565206F6E2074686520737461636B207769746820746865204B657956616C756520636C6173732062656E65617468207468656D2E
+		Private Sub CreateKeyValue()
+		  /// Creates a new key value instance. The compiler will have placed the key and value on the stack
+		  /// with the KeyValue class beneath them.
+		  ///
+		  /// key             <-- top of stack
+		  /// value
+		  /// KeyValue class
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
+		  // Pop the key and value.
+		  Var data As Pair = Pop : Pop
+		  
+		  // Call the default list constructor.
+		  Call CallClass(Peek(0), 0)
+		  
+		  // The top of the stack will now be a KeyValue instance.
+		  // Set it's foreign data.
+		  Var kv As ObjoScript.Instance = Stack(StackTop - 1)
+		  kv.ForeignData = data
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 4372656174652061206E6577206C697374206C69746572616C2E2054686520636F6D70696C65722077696C6C206861766520706C6163656420746865204C69737420636C617373206F6E2074686520737461636B20616E6420616E7920696E697469616C20656C656D656E74732061626F766520746869732E
 		Private Sub CreateListLiteral(itemCount As Integer)
 		  /// Create a new list literal. The compiler will have placed the List class on the stack
@@ -461,6 +494,9 @@ Protected Class VM
 		  // All the built-in types are foreign classes.
 		  If klass.Name.CompareCase("Boolean") Then
 		    BooleanClass = klass
+		    
+		  ElseIf klass.Name.CompareCase("KeyValue") Then
+		    KeyValueClass = klass
 		    
 		  ElseIf klass.Name.CompareCase("Nothing") Then
 		    NothingClass = klass
@@ -849,6 +885,9 @@ Protected Class VM
 		  ElseIf receiver.Type = Variant.TypeBoolean Then
 		    klass = BooleanClass
 		    
+		  ElseIf receiver IsA Pair Then
+		    klass = KeyValueClass
+		    
 		  Else
 		    Error("Only classes and instances have methods.")
 		  End If
@@ -883,6 +922,9 @@ Protected Class VM
 		    
 		  ElseIf value.Type = Variant.TypeBoolean Then
 		    InvokeFromClass(BooleanClass, signature, 1, False)
+		    
+		  ElseIf value IsA Pair Then
+		    InvokeFromClass(KeyValueClass, signature, 1, False)
 		    
 		  ElseIf value IsA ObjoScript.Instance Then
 		    InvokeFromClass(ObjoScript.Instance(value).Klass, signature, 1, False)
@@ -983,6 +1025,9 @@ Protected Class VM
 		    
 		  ElseIf value.Type = Variant.TypeBoolean Then
 		    InvokeFromClass(BooleanClass, signature, 0, False)
+		    
+		  ElseIf value IsA Pair Then
+		    InvokeFromClass(KeyValueClass, signature, 0, False)
 		    
 		  ElseIf value IsA ObjoScript.Instance Then
 		    InvokeFromClass(ObjoScript.Instance(value).Klass, signature, 0, False)
@@ -1224,6 +1269,12 @@ Protected Class VM
 		  LastInstructionFrame = Nil
 		  
 		  Self.Debugger = New ObjoScript.Debugger
+		  
+		  BooleanClass = Nil
+		  KeyValueClass = Nil
+		  NumberClass = Nil
+		  StringClass = Nil
+		  NothingClass = Nil
 		  
 		End Sub
 	#tag EndMethod
@@ -1647,6 +1698,9 @@ Protected Class VM
 		    Case OP_DEFINE_NOTHING
 		      DefineNothing
 		      
+		    Case OP_KEYVALUE
+		      CreateKeyValue
+		      
 		    End Select
 		  Wend
 		  
@@ -1918,6 +1972,10 @@ Protected Class VM
 		    ElseIf v IsA ObjoScript.Value Then
 		      Return ObjoScript.Value(v).ToString
 		      
+		    ElseIf v IsA Pair Then
+		      #Pragma Warning "TODO: Improve this"
+		      Return "KeyValue instance"
+		      
 		    Else
 		      // This shouldn't happen.
 		      Raise New UnsupportedOperationException("Unable to create a string representation of the value.")
@@ -2004,7 +2062,7 @@ Protected Class VM
 		54: OP_DEFINE_NOTHING (0)
 		55: OP_MAP (1)
 		56: OP_GET_FIELD (1)
-		57: *Unused*
+		57: OP_KEYVALUE (0)
 		58: OP_SET_FIELD (1)
 		59: *Unused*
 		60: OP_CONSTRUCTOR (1)
@@ -2061,6 +2119,10 @@ Protected Class VM
 
 	#tag Property, Flags = &h21, Description = 53746F7265732074686520564D277320676C6F62616C207661726961626C65732E204B6579203D207661726961626C65206E616D652028537472696E67292C2056616C7565203D207661726961626C652076616C7565202856617269616E74292E
 		Private Globals As Dictionary
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E204B657956616C7565206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
+		Private KeyValueClass As ObjoScript.Klass
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 5468652063616C6C206672616D6520647572696E67207468652070726576696F757320696E737472756374696F6E2E
@@ -2174,7 +2236,8 @@ Protected Class VM
 			  OP_SWAP                   : 0, _
 			  OP_DEBUG_FIELD_NAME       : 3, _
 			  OP_DEFINE_NOTHING         : 0, _
-			  OP_MAP                    : 1 _
+			  OP_MAP                    : 1, _
+			  OP_KEYVALUE               : 0 _
 			  )
 			  
 			  Return d
@@ -2325,6 +2388,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_JUMP_IF_TRUE, Type = Double, Dynamic = False, Default = \"41", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_KEYVALUE, Type = Double, Dynamic = False, Default = \"57", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_LESS, Type = Double, Dynamic = False, Default = \"12", Scope = Public

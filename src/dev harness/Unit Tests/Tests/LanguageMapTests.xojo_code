@@ -1,63 +1,9 @@
 #tag Class
-Protected Class LanguageMiscTests
+Protected Class LanguageMapTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
-		Sub BitwisePrecedenceTest()
-		  AssertOutputsEqual("language.misc.bitwise_precedence")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub ChainedTest()
-		  AssertOutputsEqual("language.misc.chained")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub EmptyBlockTest()
-		  AssertOutputsEqual("language.misc.empty_block")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub EmptyFileTest()
-		  AssertOutputsEqual("language.misc.empty_file")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub KeyValueConstructorTest()
-		  AssertOutputsEqual("language.misc.keyvalue_constructor")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub NoTrailingNewlineTest()
-		  AssertOutputsEqual("language.misc.no_trailing_newline")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub PrecedenceTest()
-		  AssertOutputsEqual("language.misc.precedence")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub SemicolonTest()
-		  AssertCompilerError("language.misc.semicolon")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub UnexpectedCharacterTest()
-		  AssertCompilerError("language.misc.unexpected_character")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub WhitespaceTest()
-		  AssertOutputsEqual("language.misc.whitespace")
+		Sub SetGetTest()
+		  AssertOutputsEqual("language.map.set_get")
 		End Sub
 	#tag EndMethod
 

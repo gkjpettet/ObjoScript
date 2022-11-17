@@ -62,6 +62,9 @@ Protected Module Object_
 		  ElseIf obj.Type = Variant.TypeString Then
 		    Return type.CompareCase("String")
 		    
+		  ElseIf obj IsA Pair Then
+		    Return type.CompareCase("KeyValue")
+		    
 		  ElseIf obj IsA ObjoScript.Instance Then
 		    Return ObjoScript.Instance(obj).Klass.Name.CompareCase(type)
 		    
@@ -147,8 +150,8 @@ Protected Module Object_
 		  /// Returns True if this object's class or one of its superclasses is `other`.
 		  ///
 		  /// Assumes: 
-		  /// - Slot 0 is a Xojo double/string/boolean, an instance or a class.
-		  /// - Slot 1 is a Xojo double/string/boolean, an instance or a class.
+		  /// - Slot 0 is a Xojo double/string/boolean/pair, an instance or a class.
+		  /// - Slot 1 is a Xojo double/string/boolean/pair, an instance or a class.
 		  ///
 		  /// Object.is(other) -> boolean
 		  
@@ -193,7 +196,16 @@ Protected Module Object_
 		    End If
 		  End Select
 		  
-		  If this IsA ObjoScript.Instance Then
+		  If this IsA Pair Then
+		    If other IsA Pair Then
+		      vm.SetReturn(InstanceIsOfType(ObjoScript.Instance(this), other))
+		      Return
+		    Else
+		      vm.SetReturn(InstanceIsOfType(ObjoScript.Instance(this), TypeFromVariant(other)))
+		      Return
+		    End If
+		    
+		  ElseIf this IsA ObjoScript.Instance Then
 		    If other.Type = Variant.TypeString Then
 		      vm.SetReturn(InstanceIsOfType(ObjoScript.Instance(this), other))
 		      Return
@@ -284,6 +296,9 @@ Protected Module Object_
 		  ElseIf value.Type = Variant.TypeString Then
 		    type = "Object"
 		    
+		  ElseIf value IsA Pair Then
+		    type = "Object"
+		    
 		  ElseIf value IsA ObjoScript.Instance Then
 		    If ObjoScript.Instance(value).Klass = Nil Then
 		      type = "Nothing"
@@ -340,6 +355,9 @@ Protected Module Object_
 		  ElseIf value.Type = Variant.TypeString Then
 		    type = "String"
 		    
+		  ElseIf value IsA Pair Then
+		    type = "KeyValue"
+		    
 		  ElseIf value IsA ObjoScript.Instance Then
 		    type = ObjoScript.Instance(value).Klass.Name
 		    
@@ -369,6 +387,9 @@ Protected Module Object_
 		    
 		  ElseIf value.Type = Variant.TypeString Then
 		    Return "String"
+		    
+		  ElseIf value IsA Pair Then
+		    Return "KeyValue"
 		    
 		  ElseIf value IsA ObjoScript.Instance Then
 		    Return ObjoScript.Instance(value).Klass.Name
@@ -414,6 +435,15 @@ Protected Module Object_
 		    // ===================
 		    If a IsA ObjoScript.Nothing And b IsA ObjoScript.Nothing Then
 		      Return True
+		    End If
+		    
+		    // ===================
+		    // KeyValues (Pairs).
+		    // ===================
+		    If a IsA Pair And b IsA Pair Then
+		      Return ValuesEqual(Pair(a).Left, Pair(b).Left) And ValuesEqual(Pair(a).Right, Pair(b).Right)
+		    Else
+		      Return False
 		    End If
 		    
 		    // ===================
