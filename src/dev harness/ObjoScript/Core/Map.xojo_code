@@ -19,6 +19,8 @@ Protected Module Map
 		Protected Function BindForeignMethod(signature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
 		  /// Returns the method to invoke for a foreign method with `signature` on the `Map` class or Nil if there is no such method.
 		  
+		  #Pragma Warning "TODO: Add more methods"
+		  
 		  #Pragma Unused isStatic
 		  
 		  If signature.CompareCase("count()") Then
