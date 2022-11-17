@@ -1061,7 +1061,7 @@ Protected Class VM
 		    Case OP_ASSERT, OP_SET_LOCAL, OP_SET_GLOBAL, OP_SET_GLOBAL_LONG, _
 		      OP_DEFINE_GLOBAL, OP_DEFINE_GLOBAL_LONG, OP_SET_FIELD, _
 		      OP_SET_STATIC_FIELD, OP_SET_STATIC_FIELD_LONG, OP_RETURN, OP_LOOP, OP_CALL, _
-		      OP_INVOKE, OP_INVOKE_LONG
+		      OP_INVOKE, OP_INVOKE_LONG, OP_BREAKPOINT
 		      Return True
 		      
 		    Else
@@ -1069,7 +1069,7 @@ Protected Class VM
 		    End Select
 		    
 		  Case VM.StepModes.StepOver
-		    Raise New UnsupportedOperationException("Stepping into not yet implemented.")
+		    Raise New UnsupportedOperationException("Stepping over is not yet implemented.")
 		    
 		  Else
 		    Return False
@@ -1283,8 +1283,14 @@ Protected Class VM
 		  While True
 		    
 		    If Self.DebugMode And CurrentChunk.IsDebug Then
-		      If mShouldStop Then Return
-		      If HandleStepping(stepMode) Then Return
+		      If mShouldStop Then
+		        RaiseEvent WillStop(Self.LastStoppedScriptID, Self.LastStoppedLine)
+		        Return
+		      End If
+		      If HandleStepping(stepMode) Then
+		        RaiseEvent WillStop(Self.LastStoppedScriptID, Self.LastStoppedLine)
+		        Return
+		      End If
 		    End If
 		    
 		    Select Case ReadByte
@@ -1301,6 +1307,7 @@ Protected Class VM
 		        // Exit the VM.
 		        Call Pop
 		        StackTop = 0
+		        RaiseEvent Finished
 		        Return
 		      End If
 		      
@@ -1691,6 +1698,14 @@ Protected Class VM
 		    Case OP_KEYVALUE
 		      CreateKeyValue
 		      
+		    Case OP_BREAKPOINT
+		      // Exists to allow the VM to pause at a manually set break point.
+		      mLastStoppedLine = CurrentChunk.LineForOffset(CurrentFrame.IP - 1)
+		      LastStoppedScriptID = CurrentChunk.ScriptIDForOffset(CurrentFrame.IP - 1)
+		      LastInstructionFrame = CurrentFrame
+		      RaiseEvent WillStop(Self.LastStoppedScriptID, mLastStoppedLine)
+		      Return
+		      
 		    End Select
 		  Wend
 		  
@@ -1983,8 +1998,16 @@ Protected Class VM
 		Event DebugPrint(s As String)
 	#tag EndHook
 
+	#tag Hook, Flags = &h0, Description = 54686520564D206861732066696E697368656420657865637574696E672E
+		Event Finished()
+	#tag EndHook
+
 	#tag Hook, Flags = &h0, Description = 6073602069732074686520726573756C74206F66206576616C756174696E67206120607072696E74602065787072657373696F6E2E
 		Event Print(s As String)
+	#tag EndHook
+
+	#tag Hook, Flags = &h0, Description = 54686520564D2069732061626F757420746F2073746F702062656361757365206974206861732068697420612060627265616B706F696E74602073746174656D656E74206F7220686173207265616368656420746865206E657874206C696E65207768696C737420737465702D646562756767696E672E
+		Event WillStop(scriptID As Integer, lineNumber As Integer)
 	#tag EndHook
 
 
@@ -2050,7 +2073,7 @@ Protected Class VM
 		56: OP_GET_FIELD (1)
 		57: OP_KEYVALUE (0)
 		58: OP_SET_FIELD (1)
-		59: *Unused*
+		59: OP_BREAKPOINT (0)
 		60: OP_CONSTRUCTOR (1)
 		61: OP_INVOKE (2)
 		62: OP_INVOKE_LONG (3)
@@ -2232,7 +2255,8 @@ Protected Class VM
 			  OP_DEBUG_FIELD_NAME       : 3, _
 			  OP_DEFINE_NOTHING         : 0, _
 			  OP_MAP                    : 1, _
-			  OP_KEYVALUE               : 0 _
+			  OP_KEYVALUE               : 0, _
+			  OP_BREAKPOINT             : 0 _
 			  )
 			  
 			  Return d
@@ -2293,6 +2317,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_BITWISE_XOR, Type = Double, Dynamic = False, Default = \"24", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_BREAKPOINT, Type = Double, Dynamic = False, Default = \"59", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_CALL, Type = Double, Dynamic = False, Default = \"47", Scope = Public

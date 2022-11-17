@@ -1623,6 +1623,24 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitBreakpointStmt(b As ObjoScript.BreakpointStmt) As Variant
+		  /// Compiles a breakpoint.
+		  ///
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  
+		  mLocation = b.Location
+		  
+		  If Not Self.DebugMode Then
+		    // Break points have no effect in production builds.
+		    Return Nil
+		  Else
+		    EmitByte(ObjoScript.VM.OP_BREAKPOINT)
+		  End If
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitCall(expr As ObjoScript.CallExpr) As Variant
 		  /// Compiles a call expression.
 		  ///

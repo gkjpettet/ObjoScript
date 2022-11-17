@@ -128,6 +128,14 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitBreakpointStmt(b As ObjoScript.BreakpointStmt) As Variant
+		  #Pragma Unused b
+		  
+		  Return New TreeViewNode("Breakpoint")
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitCall(expr As ObjoScript.CallExpr) As Variant
 		  Var node As New TreeViewNode("Call")
 		  

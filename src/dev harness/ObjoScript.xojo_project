@@ -87,6 +87,7 @@ Class=ForStmt;ObjoScript/ForStmt.xojo_code;&h000000007F48EFFF;&h000000004D1497FF
 Class=ForEachStmt;ObjoScript/ForEachStmt.xojo_code;&h00000000448B97FF;&h000000004D1497FF;false
 Class=LoopData;ObjoScript/LoopData.xojo_code;&h0000000006FFFFFF;&h000000004D1497FF;false
 Class=ExitStmt;ObjoScript/ExitStmt.xojo_code;&h000000006C8EB7FF;&h000000004D1497FF;false
+Class=BreakpointStmt;ObjoScript/BreakpointStmt.xojo_code;&h0000000055F51FFF;&h000000004D1497FF;false
 Class=ContinueStmt;ObjoScript/ContinueStmt.xojo_code;&h0000000007846FFF;&h000000004D1497FF;false
 Class=Func;ObjoScript/Func.xojo_code;&h00000000191E37FF;&h000000004D1497FF;false
 Class=CallFrame;ObjoScript/CallFrame.xojo_code;&h0000000074E92FFF;&h000000004D1497FF;false

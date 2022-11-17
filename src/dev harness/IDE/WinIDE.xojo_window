@@ -637,42 +637,6 @@ Begin DesktopWindow WinIDE
       Visible         =   True
       Width           =   650
    End
-   Begin XUIImageButton ButtonStepOver
-      AllowAutoDeactivate=   True
-      AllowFocus      =   False
-      AllowFocusRing  =   True
-      AllowTabs       =   False
-      Backdrop        =   0
-      BorderColor     =   &c00000000
-      DefaultImage    =   539498495
-      DisabledImage   =   1357662207
-      Enabled         =   True
-      HasBottomBorder =   False
-      HasLeftBorder   =   False
-      HasRightBorder  =   False
-      HasTopBorder    =   False
-      Height          =   22
-      HoverImage      =   539498495
-      Index           =   -2147483648
-      IsPressed       =   False
-      Left            =   741
-      LockBottom      =   False
-      LockedInPosition=   False
-      LockLeft        =   False
-      LockRight       =   True
-      LockTop         =   True
-      PressedImage    =   1357662207
-      Scope           =   2
-      TabIndex        =   8
-      TabPanelIndex   =   0
-      TabStop         =   True
-      Tooltip         =   ""
-      Top             =   20
-      Transparent     =   True
-      Type            =   ""
-      Visible         =   True
-      Width           =   22
-   End
    Begin XUIImageButton ButtonStepIn
       AllowAutoDeactivate=   True
       AllowFocus      =   False
@@ -691,7 +655,7 @@ Begin DesktopWindow WinIDE
       HoverImage      =   990324735
       Index           =   -2147483648
       IsPressed       =   False
-      Left            =   770
+      Left            =   743
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   False
@@ -753,7 +717,7 @@ Begin DesktopWindow WinIDE
       Backdrop        =   0
       BorderColor     =   &c00000000
       DefaultImage    =   285988863
-      DisabledImage   =   285988863
+      DisabledImage   =   1880049663
       Enabled         =   False
       HasBottomBorder =   False
       HasLeftBorder   =   False
@@ -839,7 +803,7 @@ Begin DesktopWindow WinIDE
       Height          =   20
       Index           =   -2147483648
       Italic          =   False
-      Left            =   804
+      Left            =   777
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   False
@@ -1153,9 +1117,10 @@ End
 		    DisplayVMError(e)
 		  End Try
 		  
-		  ButtonStepOver.Enabled = True
 		  ButtonStepIn.Enabled = True
+		  ButtonStop.Enabled = True
 		  
+		  FirstRun = False
 		End Sub
 	#tag EndMethod
 
@@ -1368,6 +1333,8 @@ End
 		  If VM <> Nil Then
 		    RemoveHandler VM.Print, AddressOf VMPrintDelegate
 		    RemoveHandler VM.DebugPrint, AddressOf VMDebugPrintDelegate
+		    RemoveHandler VM.WillStop, AddressOf VMWIllStopDelegate
+		    RemoveHandler VM.Finished, AddressOf VMFinishedDelegate
 		  End If
 		  
 		  // Create a new VM and add the required event handlers.
@@ -1376,11 +1343,16 @@ End
 		  VM.TraceExecution = CheckBoxDebugMode.Value
 		  AddHandler VM.Print, AddressOf VMPrintDelegate
 		  AddHandler VM.DebugPrint, AddressOf VMDebugPrintDelegate
+		  AddHandler VM.WillStop, AddressOf VMWIllStopDelegate
+		  AddHandler VM.Finished, AddressOf VMFinishedDelegate
 		  
-		  ButtonStepOver.Enabled = False
 		  ButtonStepIn.Enabled = False
+		  ButtonStop.Enabled = False
 		  
 		  FirstRun = True
+		  
+		  // Highlight the first line.
+		  Editor.CaretLineNumber = 1
 		End Sub
 	#tag EndMethod
 
@@ -1553,11 +1525,36 @@ End
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21
+		Private Sub VMFinishedDelegate(sender As ObjoScript.VM)
+		  /// The VM has just finished executing the script.
+		  
+		  #Pragma Unused sender
+		  
+		  vm.Reset
+		  FirstRun = True
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Sub VMPrintDelegate(sender As ObjoScript.VM, s As String)
 		  #Pragma Unused sender
 		  
 		  Output.Text = Output.Text + s + EndOfLine
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 54686520564D2069732061626F757420746F2073746F7020626563617573652069742068617320686974206120627265616B20706F696E742E
+		Private Sub VMWIllStopDelegate(sender As ObjoScript.VM, scriptID As Integer, lineNumber As Integer)
+		  /// The VM is about to stop because it has hit a break point.
+		  
+		  #Pragma Unused sender
+		  #Pragma Unused scriptID
+		  
+		  // Highlight the currently stopped on line.
+		  If lineNumber > 0 And lineNumber <= Editor.LineManager.LineCount Then
+		    Editor.CaretLineNumber = lineNumber
+		  End If
 		End Sub
 	#tag EndMethod
 
@@ -1720,10 +1717,10 @@ End
 		  // Update the debugger.
 		  DebuggerTree.Display(VM, VM.GetCurrentFrame)
 		  
-		  // Highlight the currently stopped on line.
-		  If VM.LastStoppedLine > 0 And VM.LastStoppedLine <= Editor.LineManager.LineCount Then
-		    Editor.CaretLineNumber = VM.LastStoppedLine
-		  End If
+		  ' // Highlight the currently stopped on line.
+		  ' If VM.LastStoppedLine > 0 And VM.LastStoppedLine <= Editor.LineManager.LineCount Then
+		  ' Editor.CaretLineNumber = VM.LastStoppedLine
+		  ' End If
 		End Sub
 	#tag EndEvent
 #tag EndEvents
@@ -1744,8 +1741,9 @@ End
 		  
 		  If VM <> Nil Then
 		    VM.Stop
-		    VM.Reset
 		  End If
+		  
+		  Reset
 		  
 		  Me.Enabled = False
 		End Sub
@@ -1771,7 +1769,7 @@ End
 		  End If
 		  
 		  ButtonStepIn.Enabled = Me.Value
-		  ButtonStepOver.Enabled = Me.Value
+		  
 		  
 		End Sub
 	#tag EndEvent

@@ -104,6 +104,20 @@ Protected Class Parser
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 50617273657320612060627265616B706F696E74602073746174656D656E742E20417373756D6573207468652070617273657220686173206A75737420636F6E73756D6564207468652060627265616B706F696E7460206B6579776F72642E
+		Private Function BreakpointStatement() As ObjoScript.Stmt
+		  /// Parses a `breakpoint` statement.
+		  /// Assumes the parser has just consumed the `breakpoint` keyword.
+		  
+		  Var keyword As ObjoScript.Token = Previous
+		  
+		  ConsumeNewLine("Expected a newline after the `breakpoint` statement.")
+		  
+		  Return New BreakpointStmt(keyword)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 52657475726E732074727565206966207468652063757272656E7420746F6B656E206D61746368657320616E79206F6620746865207370656369666965642074797065732E2053696D696C617220746F20604D617463682829602062757420646F6573204E4F5420636F6E73756D65207468652063757272656E7420746F6B656E2069662074686572652069732061206D617463682E
 		Function Check(types() As ObjoScript.TokenTypes) As Boolean
 		  /// Returns true if the current token matches any of the specified types.
@@ -1200,6 +1214,9 @@ Protected Class Parser
 		    
 		  ElseIf Match(ObjoScript.TokenTypes.Return_) Then
 		    Return ReturnStatement
+		    
+		  ElseIf Match(ObjoScript.TokenTypes.Breakpoint) Then
+		    Return BreakpointStatement
 		    
 		  Else
 		    Return ExpressionStatement

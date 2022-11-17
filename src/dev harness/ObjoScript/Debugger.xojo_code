@@ -462,6 +462,9 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_KEYVALUE
 		    Return SimpleInstruction("KEYVALUE", offset)
 		    
+		  CASE ObjoScript.VM.OP_BREAKPOINT
+		    Return SimpleInstruction("BREAKPOINT", offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
