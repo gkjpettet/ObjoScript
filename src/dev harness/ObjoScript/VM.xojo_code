@@ -495,9 +495,6 @@ Protected Class VM
 		  If klass.Name.CompareCase("Boolean") Then
 		    BooleanClass = klass
 		    
-		  ElseIf klass.Name.CompareCase("KeyValue") Then
-		    KeyValueClass = klass
-		    
 		  ElseIf klass.Name.CompareCase("Nothing") Then
 		    NothingClass = klass
 		    
@@ -885,9 +882,6 @@ Protected Class VM
 		  ElseIf receiver.Type = Variant.TypeBoolean Then
 		    klass = BooleanClass
 		    
-		  ElseIf receiver IsA Pair Then
-		    klass = KeyValueClass
-		    
 		  Else
 		    Error("Only classes and instances have methods.")
 		  End If
@@ -922,9 +916,6 @@ Protected Class VM
 		    
 		  ElseIf value.Type = Variant.TypeBoolean Then
 		    InvokeFromClass(BooleanClass, signature, 1, False)
-		    
-		  ElseIf value IsA Pair Then
-		    InvokeFromClass(KeyValueClass, signature, 1, False)
 		    
 		  ElseIf value IsA ObjoScript.Instance Then
 		    InvokeFromClass(ObjoScript.Instance(value).Klass, signature, 1, False)
@@ -1025,9 +1016,6 @@ Protected Class VM
 		    
 		  ElseIf value.Type = Variant.TypeBoolean Then
 		    InvokeFromClass(BooleanClass, signature, 0, False)
-		    
-		  ElseIf value IsA Pair Then
-		    InvokeFromClass(KeyValueClass, signature, 0, False)
 		    
 		  ElseIf value IsA ObjoScript.Instance Then
 		    InvokeFromClass(ObjoScript.Instance(value).Klass, signature, 0, False)
@@ -1271,7 +1259,6 @@ Protected Class VM
 		  Self.Debugger = New ObjoScript.Debugger
 		  
 		  BooleanClass = Nil
-		  KeyValueClass = Nil
 		  NumberClass = Nil
 		  StringClass = Nil
 		  NothingClass = Nil
@@ -1972,10 +1959,6 @@ Protected Class VM
 		    ElseIf v IsA ObjoScript.Value Then
 		      Return ObjoScript.Value(v).ToString
 		      
-		    ElseIf v IsA Pair Then
-		      #Pragma Warning "TODO: Improve this"
-		      Return "KeyValue instance"
-		      
 		    Else
 		      // This shouldn't happen.
 		      Raise New UnsupportedOperationException("Unable to create a string representation of the value.")
@@ -2119,10 +2102,6 @@ Protected Class VM
 
 	#tag Property, Flags = &h21, Description = 53746F7265732074686520564D277320676C6F62616C207661726961626C65732E204B6579203D207661726961626C65206E616D652028537472696E67292C2056616C7565203D207661726961626C652076616C7565202856617269616E74292E
 		Private Globals As Dictionary
-	#tag EndProperty
-
-	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E204B657956616C7565206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
-		Private KeyValueClass As ObjoScript.Klass
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 5468652063616C6C206672616D6520647572696E67207468652070726576696F757320696E737472756374696F6E2E

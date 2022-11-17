@@ -140,9 +140,6 @@ Protected Class Debugger
 		  ElseIf constant.Type = Variant.TypeBoolean Then
 		    Return New TreeViewNode(indexCol + " Boolean: " + If(constant.BooleanValue, "true", "false"))
 		    
-		  ElseIf constant IsA Pair Then
-		    Return New TreeViewNode(indexCol + " KeyValue: " + ObjoScript.VM.ValueToString(Pair(constant).Left) + " : " + ObjoScript.VM.ValueToString(Pair(constant).Right))
-		    
 		  ElseIf constant IsA ObjoScript.Nothing Then
 		    Return New TreeViewNode(indexCol + " nothing")
 		    

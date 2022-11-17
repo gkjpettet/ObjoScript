@@ -58,9 +58,6 @@ Inherits DesktopTreeView
 		    ElseIf value IsA ObjoScript.Nothing Then
 		      node = New TreeViewNode(name + ": nothing")
 		      
-		    ElseIf value IsA Pair Then
-		      node = New TreeViewNode(name + ": " + ObjoScript.VM.ValueToString(value))
-		      
 		    Else
 		      Raise New InvalidArgumentException("Unknown value type.")
 		    End If
