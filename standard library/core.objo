@@ -78,6 +78,7 @@ constructor(key, value) {}
 
 foreign key()
 foreign key=(k)
+foreign toString()
 foreign value()
 foreign value=(v)
 }

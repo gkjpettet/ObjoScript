@@ -1,0 +1,5 @@
+var people = {"garry" : 41, "aoife" : 10, "maebh" : 8}
+
+foreach person in people {
+System.print(person.toString)
+}

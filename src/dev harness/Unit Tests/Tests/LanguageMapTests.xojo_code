@@ -2,6 +2,12 @@
 Protected Class LanguageMapTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
+		Sub ForEachTest()
+		  AssertOutputsEqual("language.map.foreach")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub SetGetTest()
 		  AssertOutputsEqual("language.map.set_get")
 		End Sub

@@ -420,7 +420,14 @@ Protected Module Object_
 		    // Instances.
 		    // ===================
 		    If a IsA ObjoScript.Instance And b IsA ObjoScript.Instance Then
-		      Return a = b
+		      If ObjoScript.Instance(a).Klass.Name.CompareCase("KeyValue") And ObjoScript.Instance(b).Klass.Name.CompareCase("KeyValue") Then
+		        // KeyValues.
+		        Var aPair As Pair = ObjoScript.Instance(a).ForeignData
+		        Var bPair As Pair = ObjoScript.Instance(b).ForeignData
+		        Return (aPair.Left = bPair.Left) And (aPair.Right = bPair.Right)
+		      Else
+		        Return a = b
+		      End If
 		    End If
 		    
 		    // ===================

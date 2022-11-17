@@ -32,6 +32,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub KeyValueEqualityTest()
+		  AssertOutputsEqual("language.misc.keyvalue_equality")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub NoTrailingNewlineTest()
 		  AssertOutputsEqual("language.misc.no_trailing_newline")
 		End Sub

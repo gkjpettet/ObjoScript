@@ -495,6 +495,9 @@ Protected Class VM
 		  If klass.Name.CompareCase("Boolean") Then
 		    BooleanClass = klass
 		    
+		  ElseIf klass.Name.CompareCase("KeyValue") Then
+		    mKeyValueClass = klass
+		    
 		  ElseIf klass.Name.CompareCase("Nothing") Then
 		    NothingClass = klass
 		    
@@ -1262,7 +1265,7 @@ Protected Class VM
 		  NumberClass = Nil
 		  StringClass = Nil
 		  NothingClass = Nil
-		  
+		  mKeyValueClass = Nil
 		End Sub
 	#tag EndMethod
 
@@ -2104,6 +2107,15 @@ Protected Class VM
 		Private Globals As Dictionary
 	#tag EndProperty
 
+	#tag ComputedProperty, Flags = &h0, Description = 41207265666572656E636520746F20746865206275696C742D696E204B657956616C7565206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
+		#tag Getter
+			Get
+			  Return mKeyValueClass
+			End Get
+		#tag EndGetter
+		KeyValueClass As ObjoScript.Klass
+	#tag EndComputedProperty
+
 	#tag Property, Flags = &h21, Description = 5468652063616C6C206672616D6520647572696E67207468652070726576696F757320696E737472756374696F6E2E
 		Private LastInstructionFrame As ObjoScript.CallFrame
 	#tag EndProperty
@@ -2119,6 +2131,10 @@ Protected Class VM
 
 	#tag Property, Flags = &h21, Description = 546865204944206F6620746865207363726970742074686520564D206C6173742073746F7070656420696E2E20602D316020666F7220746865207374616E64617264206C6962726172792E205479706963616C6C792060306020666F72206D6F737420736372697074732E
 		Private LastStoppedScriptID As Integer = -1
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E204B657956616C7565206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
+		Private mKeyValueClass As ObjoScript.Klass
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 546865206C696E65206F6620636F64652074686520564D206C6173742073746F70706564206F6E2E

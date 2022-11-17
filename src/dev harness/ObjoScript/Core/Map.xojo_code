@@ -65,8 +65,6 @@ Protected Module Map
 		  /// Assumes slot 0 contains a Map instance.
 		  /// Map.iterate(iter) -> value or false
 		  
-		  #Pragma Warning "TODO: Return a key-value pair, not just the value"
-		  
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
 		  Var iter As Variant = vm.GetSlotValue(1)
 		  
@@ -78,13 +76,19 @@ Protected Module Map
 		      data.NextValue = False
 		    Else
 		      data.Index = 0
-		      data.NextValue = data.Dict.Value(data.Dict.Key(0))
+		      Var kv As New ObjoScript.Instance(vm, vm.KeyValueClass)
+		      Var key As Variant = data.Dict.Key(data.Index)
+		      kv.ForeignData = key : data.Dict.Value(key)
+		      data.NextValue = kv
 		    End If
 		    
 		  Else // Return the next entry.
 		    data.Index = data.Index + 1
 		    If data.Index <= data.Dict.KeyCount - 1 Then
-		      data.NextValue = data.Dict.Value(data.Dict.Key(data.Index))
+		      Var kv As New ObjoScript.Instance(vm, vm.KeyValueClass)
+		      Var key As Variant = data.Dict.Key(data.Index)
+		      kv.ForeignData = key : data.Dict.Value(key)
+		      data.NextValue = kv
 		    Else
 		      data.Index = -1
 		      data.NextValue = False

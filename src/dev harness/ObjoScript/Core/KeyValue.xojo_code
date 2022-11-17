@@ -109,11 +109,12 @@ Protected Module KeyValue
 		  /// Returns this key-value as a string ("key : value").
 		  ///
 		  /// Assumes: 
-		  /// - Slot 0 is a Pair
+		  /// - Slot 0 is a KeyValue instance.
 		  ///
 		  /// KeyValue.toString() -> string
 		  
-		  vm.SetReturn(vm.GetSlotAsString(0))
+		  Var kv As Pair = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
+		  vm.SetReturn(vm.ValueToString(kv.Left) + " : " + vm.ValueToString(kv.Right))
 		  
 		End Sub
 	#tag EndMethod
