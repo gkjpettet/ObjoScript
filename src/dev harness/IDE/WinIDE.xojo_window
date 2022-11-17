@@ -1101,33 +1101,37 @@ End
 		Private Sub BeginVM(stepMode As ObjoScript.VM.StepModes)
 		  /// Compiles the contents of the editor (and the standard library) and then runs the VM with the compiled function.
 		  
-		  Reset
-		  
+		  // Compile the source code in the editor to an executable function.
 		  Var func As ObjoScript.Func = Compile
 		  If func = Nil Then Return
 		  
+		  // Show the debugger panel by default.
 		  SwitchToPanel(PANEL_DEBUGGER)
 		  
 		  // Run the VM in debugging mode if specified.
 		  Vm.DebugMode = CheckBoxDebugMode.Value
 		  
+		  // Enable the stop and step-in debugging buttons.
+		  ButtonStepIn.Enabled = True
+		  ButtonStop.Enabled = True
+		  
+		  // Since the VM is about to run, set this flag to false.
+		  FirstRun = False
+		  
+		  // Run the function.
 		  Try
 		    VM.Interpret(func, stepMode)
 		  Catch e As ObjoScript.VMException
 		    DisplayVMError(e)
 		  End Try
 		  
-		  ButtonStepIn.Enabled = True
-		  ButtonStop.Enabled = True
-		  
-		  FirstRun = False
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 436F6D70696C65732074686520736F7572636520636F646520696E2074686520656469746F722C20616C6F6E67207769746820746865207374616E64617264206C6962726172792C20696E746F20612066756E6374696F6E2077686963682069732072657475726E65642E2052657475726E73204E696C20696620636F6D70696C6174696F6E206661696C732E
+	#tag Method, Flags = &h21, Description = 436F6D70696C65732074686520736F7572636520636F646520696E2074686520656469746F722C20616C6F6E67207769746820746865207374616E64617264206C6962726172792C20696E746F20612066756E6374696F6E2077686963682069732072657475726E65642E2052657475726E73204E696C20696620636F6D70696C6174696F6E206661696C732E2052657365747320746865204944452E
 		Private Function Compile() As ObjoScript.Func
 		  /// Compiles the source code in the editor, along with the standard library, into a function which is returned.
-		  /// Returns Nil if compilation fails.
+		  /// Returns Nil if compilation fails. Resets the IDE.
 		  
 		  #Pragma BreakOnExceptions False
 		  
@@ -1205,6 +1209,19 @@ End
 		    Return "DejaVu Sans Mono"
 		  #EndIf
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52656D6F76657320616E792068616E646C65727320776527766520616464656420746F2074686520564D2E
+		Private Sub DIsmantleVM()
+		  /// Removes any handlers we've added to the VM.
+		  
+		  If VM <> Nil Then
+		    RemoveHandler VM.Print, AddressOf VMPrintDelegate
+		    RemoveHandler VM.DebugPrint, AddressOf VMDebugPrintDelegate
+		    RemoveHandler VM.WillStop, AddressOf VMWillStopDelegate
+		    RemoveHandler VM.Finished, AddressOf VMFinishedDelegate
+		  End If
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 446973706C6179732064657461696C732061626F7574206120636F6D70696C6572206572726F7220696E20746865204F75747075742054657874417265612E
@@ -1316,8 +1333,11 @@ End
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0
+	#tag Method, Flags = &h0, Description = 526573657473207468652049444520776974682061206E657720564D2E
 		Sub Reset()
+		  /// Resets the IDE with a new VM.
+		  
+		  // Clear out the various controls on the window.
 		  ASTView.RemoveAllNodes
 		  DisassemblyOutput.RemoveAllNodes
 		  ErrorsListbox.RemoveAllRows
@@ -1330,28 +1350,19 @@ End
 		  Compiler.DebugMode = CheckBoxDebugMode.Value
 		  
 		  // If the VM has been instantiated, remove any handlers we added.
-		  If VM <> Nil Then
-		    RemoveHandler VM.Print, AddressOf VMPrintDelegate
-		    RemoveHandler VM.DebugPrint, AddressOf VMDebugPrintDelegate
-		    RemoveHandler VM.WillStop, AddressOf VMWillStopDelegate
-		    RemoveHandler VM.Finished, AddressOf VMFinishedDelegate
-		  End If
+		  DismantleVM
 		  
 		  // Create a new VM and add the required event handlers.
-		  VM = New ObjoScript.VM
-		  VM.DebugMode = CheckBoxDebugMode.Value
-		  VM.TraceExecution = CheckBoxDebugMode.Value
-		  AddHandler VM.Print, AddressOf VMPrintDelegate
-		  AddHandler VM.DebugPrint, AddressOf VMDebugPrintDelegate
-		  AddHandler VM.WillStop, AddressOf VMWIllStopDelegate
-		  AddHandler VM.Finished, AddressOf VMFinishedDelegate
+		  SetupVM
 		  
+		  //Since no script is currenty running, disable the stop and step-in buttons.
 		  ButtonStepIn.Enabled = False
 		  ButtonStop.Enabled = False
 		  
+		  // Flag this is the first run of this new VM.
 		  FirstRun = True
 		  
-		  // Highlight the first line.
+		  // Highlight the first line in the code editor.
 		  Editor.CaretLineNumber = 1
 		End Sub
 	#tag EndMethod
@@ -1410,8 +1421,24 @@ End
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
+	#tag Method, Flags = &h21, Description = 536574732075702061206E657720564D20746F207573652E
+		Private Sub SetupVM()
+		  /// Sets up a new VM to use.
+		  
+		  VM = New ObjoScript.VM
+		  VM.DebugMode = CheckBoxDebugMode.Value
+		  VM.TraceExecution = CheckBoxDebugMode.Value
+		  AddHandler VM.Print, AddressOf VMPrintDelegate
+		  AddHandler VM.DebugPrint, AddressOf VMDebugPrintDelegate
+		  AddHandler VM.WillStop, AddressOf VMWIllStopDelegate
+		  AddHandler VM.Finished, AddressOf VMFinishedDelegate
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 53686F777320746865207370656369666965642070616E656C20696E20746865204944452E
 		Private Sub SwitchToPanel(id As Integer)
+		  /// Shows the specified panel in the IDE.
+		  
 		  Select Case id
 		  Case PANEL_AST
 		    ButtonAST.Value = True
@@ -1516,8 +1543,10 @@ End
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0
+	#tag Method, Flags = &h0, Description = 54686520564D2069732073656E64696E67206120646562756767696E67206D657373616765206073602E
 		Sub VMDebugPrintDelegate(sender As ObjoScript.VM, s As String)
+		  /// The VM is sending a debugging message `s`.
+		  
 		  #Pragma Unused sender
 		  
 		  DebuggerOutput.Text = DebuggerOutput.Text + s + EndOfLine
@@ -1533,11 +1562,14 @@ End
 		  
 		  vm.Reset
 		  FirstRun = True
+		  ButtonStop.Enabled = False
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0
+	#tag Method, Flags = &h0, Description = 54686520736372697074206861732063616C6C6564206053797374656D2E7072696E74287329602E
 		Sub VMPrintDelegate(sender As ObjoScript.VM, s As String)
+		  /// The script has called `System.print(s)`.
+		  
 		  #Pragma Unused sender
 		  
 		  Output.Text = Output.Text + s + EndOfLine
