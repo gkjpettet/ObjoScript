@@ -1,0 +1,7 @@
+var map = {"a" : "b", "c" : "d"}
+
+System.print(map.count)
+
+map.clear()
+
+System.print(map.count)

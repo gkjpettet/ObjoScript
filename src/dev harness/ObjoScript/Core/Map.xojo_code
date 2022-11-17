@@ -23,7 +23,10 @@ Protected Module Map
 		  
 		  #Pragma Unused isStatic
 		  
-		  If signature.CompareCase("count()") Then
+		  If signature.CompareCase("clear()") Then
+		    Return AddressOf Clear
+		    
+		  ElseIf signature.CompareCase("count()") Then
 		    Return AddressOf Count
 		    
 		  ElseIf signature.CompareCase("iterate(_)") Then
@@ -43,6 +46,19 @@ Protected Module Map
 		  End If
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52656D6F76657320616C6C20656E74726965732066726F6D20746865206D61702E
+		Protected Sub Clear(vm As ObjoScript.VM)
+		  /// Removes all entries from the map.
+		  ///
+		  /// Assumes slot 0 contains a Map instance.
+		  /// Map.clear() -> nothing
+		  
+		  Var map As ObjoScript.Instance = vm.GetSlotValue(0)
+		  map.ForeignData = New ObjoScript.Core.Map.MapData
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h1, Description = 52657475726E7320746865206E756D626572206F66206B65797320696E20746865206D61702E
