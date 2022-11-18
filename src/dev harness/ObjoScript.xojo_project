@@ -256,6 +256,7 @@ Class=LanguageStringTests;Unit Tests/Tests/Language/LanguageStringTests.xojo_cod
 Folder=Core;Unit Tests/Tests/Core;&h000000006FA827FF;&h000000000BB987FF;false
 Class=CoreStringTests;Unit Tests/Tests/Core/CoreStringTests.xojo_code;&h0000000028BBDFFF;&h000000006FA827FF;false
 Class=CoreMapTests;Unit Tests/Tests/Core/CoreMapTests.xojo_code;&h0000000068535FFF;&h000000006FA827FF;false
+Class=CoreListTests;Unit Tests/Tests/Core/CoreListTests.xojo_code;&h0000000041BB07FF;&h000000006FA827FF;false
 AppMenuBar=MainMenuBar
 MajorVersion=1
 MinorVersion=0

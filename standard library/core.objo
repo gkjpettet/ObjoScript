@@ -175,6 +175,8 @@ foreign count()
 /// ----------------------------------------------------
 // The List class represents a single dimension array.
 foreign class List is Sequence {
+foreign static filled(size, element)
+
 foreign add(item)
 foreign count()
 foreign removeAt(index)

@@ -40,33 +40,39 @@ Protected Module List
 		  
 		  #Pragma Warning "TODO: Add more methods"
 		  
-		  #Pragma Unused isStatic
-		  
-		  If signature.CompareCase("add(_)") Then
-		    Return AddressOf Add
+		  If isStatic Then
+		    // STATIC METHODS
+		    If signature.CompareCase("filled(_,_)") Then
+		      Return AddressOf Filled
+		    End If
 		    
-		  ElseIf signature.CompareCase("count()") Then
-		    Return AddressOf Count
-		    
-		  ElseIf signature.CompareCase("iterate(_)") Then
-		    Return AddressOf Iterate
-		    
-		  ElseIf signature.CompareCase("iteratorValue(_)") Then
-		    Return AddressOf IteratorValue
-		    
-		  ElseIf signature.CompareCase("removeAt(_)") Then
-		    Return AddressOf RemoveAt
-		    
-		  ElseIf signature.CompareCase("toString()") Then
-		    Return AddressOf ToString
-		    
-		  ElseIf signature = "[_]=(_)" Then
-		    Return AddressOf SubscriptSetter
-		    
-		  ElseIf signature = "[_]" Then
-		    Return AddressOf Subscript
+		  Else
+		    // INSTANCE METHODS
+		    If signature.CompareCase("add(_)") Then
+		      Return AddressOf Add
+		      
+		    ElseIf signature.CompareCase("count()") Then
+		      Return AddressOf Count
+		      
+		    ElseIf signature.CompareCase("iterate(_)") Then
+		      Return AddressOf Iterate
+		      
+		    ElseIf signature.CompareCase("iteratorValue(_)") Then
+		      Return AddressOf IteratorValue
+		      
+		    ElseIf signature.CompareCase("removeAt(_)") Then
+		      Return AddressOf RemoveAt
+		      
+		    ElseIf signature.CompareCase("toString()") Then
+		      Return AddressOf ToString
+		      
+		    ElseIf signature = "[_]=(_)" Then
+		      Return AddressOf SubscriptSetter
+		      
+		    ElseIf signature = "[_]" Then
+		      Return AddressOf Subscript
+		    End If
 		  End If
-		  
 		End Function
 	#tag EndMethod
 
@@ -81,6 +87,41 @@ Protected Module List
 		  
 		  vm.SetReturn(CType(data.Items.Count, Double))
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 437265617465732061206E6577206C6973742077697468206073697A656020656C656D656E74732C20616C6C2073657420746F2060656C656D656E74602E
+		Protected Sub Filled(vm As ObjoScript.VM)
+		  /// Creates a new list with `size` elements, all set to `element`.
+		  ///
+		  /// Setup:
+		  /// - Slot 0 is the List class.
+		  /// - Slot 1 should be a non-negative integer (runtime error otherwise).
+		  /// - Slot 2 is the element to replicate.
+		  /// List.filled(size, element) -> List instance
+		  
+		  #Pragma BreakOnExceptions False
+		  
+		  Var size As Variant = vm.GetSlotValue(1)
+		  Var element As Variant = vm.GetSlotValue(2)
+		  
+		  // Assert index is a non-negative integer.
+		  If Not ObjoScript.VariantIsIntegerDouble(size) Then
+		    vm.Error("Size must be an integer.")
+		    If size < 0 Then
+		      vm.Error("Size cannot be negative.")
+		    End If
+		  End If
+		  
+		  // Create the list.
+		  Var list As New ObjoScript.Instance(vm, vm.ListClass)
+		  list.ForeignData = New ObjoScript.Core.List.ListData
+		  For i As Integer = 1 To size
+		    ObjoScript.Core.List.ListData(list.ForeignData).Items.Add(element)
+		  Next i
+		  
+		  // Return the new list.
+		  vm.SetReturn(list)
 		End Sub
 	#tag EndMethod
 
