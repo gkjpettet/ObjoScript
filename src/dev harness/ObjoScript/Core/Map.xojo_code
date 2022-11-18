@@ -32,6 +32,9 @@ Protected Module Map
 		  ElseIf signature.CompareCase("count()") Then
 		    Return AddressOf Count
 		    
+		  ElseIf signature.CompareCase("keys()") Then
+		    Return AddressOf Keys
+		    
 		  ElseIf signature.CompareCase("iterate(_)") Then
 		    Return AddressOf Iterate
 		    
@@ -152,6 +155,27 @@ Protected Module Map
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
 		  
 		  vm.SetReturn(ObjoScript.Core.Map.MapData(instance.ForeignData).NextValue)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E732061206C69737420636F6E7461696E696E672074686973206D61702773206B6579732E20546865206F72646572206F6620746865206B65797320697320756E646566696E6564206275742069742069732067756172616E74656564207468617420616C6C206B6579732077696C6C2062652072657475726E65642E
+		Protected Sub Keys(vm As ObjoScript.VM)
+		  /// Returns a list containing this map's keys. The order of the keys is undefined but it is 
+		  /// guaranteed that all keys will be returned.
+		  ///
+		  /// Assumes slot 0 contains a Map instance.
+		  /// Map.keys() -> List
+		  
+		  Var map As ObjoScript.Instance = vm.GetSlotValue(0)
+		  Var data As Dictionary = ObjoScript.Core.Map.MapData(map.ForeignData).Dict
+		  
+		  // Create a new list instance containing the map's keys.
+		  Var list As New ObjoScript.Instance(vm, vm.ListClass)
+		  list.ForeignData = New ObjoScript.Core.List.ListData
+		  ObjoScript.Core.List.ListData(list.ForeignData).Items = data.Keys
+		  
+		  vm.SetReturn(list)
 		  
 		End Sub
 	#tag EndMethod

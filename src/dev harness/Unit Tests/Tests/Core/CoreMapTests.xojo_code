@@ -1,27 +1,21 @@
 #tag Class
-Protected Class LanguageMapTests
+Protected Class CoreMapTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub ClearTest()
-		  AssertOutputsEqual("language.map.clear")
+		  AssertOutputsEqual("core.map.clear")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ContainsKeyTest()
-		  AssertOutputsEqual("language.map.containsKey")
+		  AssertOutputsEqual("core.map.containsKey")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub ForEachTest()
-		  AssertOutputsEqual("language.map.foreach")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub SetGetTest()
-		  AssertOutputsEqual("language.map.set_get")
+		Sub KeysTest()
+		  AssertOutputsEqual("core.map.keys")
 		End Sub
 	#tag EndMethod
 

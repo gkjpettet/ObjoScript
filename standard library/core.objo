@@ -197,6 +197,7 @@ foreign class Map is Sequence {
 foreign clear()
 foreign containsKey(key)
 foreign count()
+foreign keys()
 foreign toString()
 
 // Iterator protocol.

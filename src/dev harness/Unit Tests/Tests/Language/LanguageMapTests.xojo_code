@@ -1,39 +1,15 @@
 #tag Class
-Protected Class LanguageStringTests
+Protected Class LanguageMapTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
-		Sub CodepointsTest()
-		  AssertOutputsEqual("language.string.codepoints")
+		Sub ForEachTest()
+		  AssertOutputsEqual("language.map.foreach")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub IncompleteLongUnicodeEscapeTest()
-		  AssertCompilerError("language.string.incomplete_long_unicode_escape")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub IncompleteUnicodeEscapeTest()
-		  AssertCompilerError("language.string.incomplete_unicode_escape")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub LiteralsTest()
-		  AssertOutputsEqual("language.string.literals")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub UnicodeEscapesTest()
-		  AssertOutputsEqual("language.string.unicode_escapes")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub UnterminatedTest()
-		  AssertCompilerError("language.string.unterminated")
+		Sub SetGetTest()
+		  AssertOutputsEqual("language.map.set_get")
 		End Sub
 	#tag EndMethod
 
