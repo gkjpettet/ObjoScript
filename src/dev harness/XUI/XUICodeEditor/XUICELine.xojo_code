@@ -209,8 +209,6 @@ Inherits XUITextLine
 		  ///
 		  /// Assumes that the graphics context has anti-aliasing off in Windows builds.
 		  
-		  #Pragma Warning "TODO: Draw breakpoint line highlight"
-		  
 		  #Pragma Unused containsCaret
 		  #Pragma Unused maxLineNumWidth
 		  
