@@ -127,6 +127,7 @@ Protected Module Map
 		    End If
 		    
 		  Else // Return the next entry.
+		    #Pragma Warning "BUG: Need to consider the value of `iter`"
 		    data.Index = data.Index + 1
 		    If data.Index <= data.Dict.KeyCount - 1 Then
 		      Var kv As New ObjoScript.Instance(vm, vm.KeyValueClass)
@@ -151,6 +152,8 @@ Protected Module Map
 		  /// Assumes slot 0 contains a Map instance.
 		  /// We are ignoring `iter` here.
 		  /// Map.iterator(iter) -> value
+		  
+		  #Pragma Warning "BUG: Need to consider the value of `iter`"
 		  
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
 		  

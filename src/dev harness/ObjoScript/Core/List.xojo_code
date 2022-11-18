@@ -107,6 +107,7 @@ Protected Module List
 		    End If
 		    
 		  Else // Return the next element.
+		    #Pragma Warning "BUG: Need to consider the value of `iter`"
 		    data.Index = data.Index + 1.0
 		    If data.Index <= data.Items.LastIndex Then
 		      data.NextValue = data.Items(data.Index)
@@ -126,7 +127,9 @@ Protected Module List
 		  ///
 		  /// Assumes slot 0 contains a List instance.
 		  /// We are ignoring `iter` here.
-		  /// List.iterator(iter) -> value
+		  /// List.iteratorValue(iter) -> value
+		  
+		  #Pragma Warning "BUG: Need to consider the value of `iter`"
 		  
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
 		  
