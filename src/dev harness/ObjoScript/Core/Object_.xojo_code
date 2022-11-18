@@ -16,36 +16,47 @@ Protected Module Object_
 		  /// Returns the method to invoke for a foreign method with `signature` on the `Object` class or Nil if there is no such method.
 		  
 		  If isStatic Then
+		    // -------------------------
+		    // STATIC METHODS
+		    // -------------------------
 		    If signature = "==(_)" Then
 		      Return AddressOf EqualStatic
 		      
 		    ElseIf signature = "<>(_)" Then
 		      Return AddressOf NotEqualStatic
 		      
+		    ElseIf signature.CompareCase("hasMethod(_)") Then
+		      Return AddressOf HasMethodStatic
+		      
 		    ElseIf signature.CompareCase("is(_)") Then
 		      Return AddressOf Is_
 		    End If
-		    
-		  ElseIf signature = "==(_)" Then
-		    Return AddressOf Equal
-		    
-		  ElseIf signature = "<>(_)" Then
-		    Return AddressOf NotEqual
-		    
-		  ElseIf signature.CompareCase("is(_)") Then
-		    Return AddressOf Is_
-		    
-		  ElseIf signature.CompareCase("toString()") Then
-		    Return AddressOf ToString
-		    
-		  ElseIf signature.CompareCase("type()") Then
-		    Return AddressOf Type
-		    
-		  ElseIf signature.CompareCase("superType()") Then
-		    Return AddressOf SuperType
-		    
+		  Else
+		    // -------------------------
+		    // INSTANCE METHODS
+		    // -------------------------
+		    If signature = "==(_)" Then
+		      Return AddressOf Equal
+		      
+		    ElseIf signature = "<>(_)" Then
+		      Return AddressOf NotEqual
+		      
+		    ElseIf signature.CompareCase("is(_)") Then
+		      Return AddressOf Is_
+		      
+		    ElseIf signature.CompareCase("hasMethod(_)") Then
+		      Return AddressOf HasMethod
+		      
+		    ElseIf signature.CompareCase("superType()") Then
+		      Return AddressOf SuperType
+		      
+		    ElseIf signature.CompareCase("toString()") Then
+		      Return AddressOf ToString
+		      
+		    ElseIf signature.CompareCase("type()") Then
+		      Return AddressOf Type
+		    End If
 		  End If
-		  
 		End Function
 	#tag EndMethod
 
@@ -115,6 +126,80 @@ Protected Module Object_
 		  End If
 		  
 		  vm.SetReturn(ClassesEqual(obj, type))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320747275652069662074686973206F626A65637420286F722061207375706572636C6173732920696D706C656D656E747320616E20696E7374616E6365206D6574686F64207769746820607369676E6174757265602E
+		Protected Sub HasMethod(vm As ObjoScript.VM)
+		  /// Returns true if this object (or a superclass) implements an instance method with `signature`.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a boolean/double/string or instance.
+		  /// - Slot 1 is a string signature.
+		  ///
+		  /// Object.hasMethod(signature) -> boolean
+		  
+		  Var obj As Variant = vm.GetSlotValue(0)
+		  
+		  // The `signature` argument must be a string.
+		  If vm.GetSlotValue(1).Type <> Variant.TypeString Then
+		    vm.Error("`Object.hasMethod(_)` expects a string argument.")
+		  End If
+		  Var signature As String = vm.GetSlotValue(1)
+		  
+		  // Get the object's class so we can query its methods.
+		  Var klass As ObjoScript.Klass
+		  Select Case obj.Type
+		  Case Variant.TypeBoolean
+		    klass = vm.BooleanClass
+		    
+		  Case Variant.TypeDouble
+		    klass = vm.NumberClass
+		    
+		  Case Variant.TypeString
+		    klass = vm.StringClass
+		    
+		  Else
+		    If obj IsA ObjoScript.Nothing Then
+		      klass = vm.NothingClass
+		      
+		    ElseIf obj IsA ObjoScript.Instance Then
+		      klass = ObjoScript.Instance(obj).Klass
+		      
+		    Else
+		      vm.Error("Value `" + vm.ValueToString(obj) + "` has an unknown class.")
+		    End If
+		  End Select
+		  
+		  vm.SetReturn(klass.Methods.HasKey(signature))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320747275652069662074686973206F626A65637420286F722061207375706572636C6173732920696D706C656D656E7473206120737461746963206D6574686F64207769746820607369676E6174757265602E
+		Protected Sub HasMethodStatic(vm As ObjoScript.VM)
+		  /// Returns true if this object (or a superclass) implements a static method with `signature`.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a class.
+		  /// - Slot 1 is a string signature.
+		  ///
+		  /// Object.hasMethod(signature) -> boolean
+		  
+		  Var obj As Variant = vm.GetSlotValue(0)
+		  
+		  If obj IsA ObjoScript.Klass = False Then
+		    vm.Error("Expected a class.")
+		  End If
+		  
+		  // The `signature` argument must be a string.
+		  If vm.GetSlotValue(1).Type <> Variant.TypeString Then
+		    vm.Error("`Object.hasMethod(_)` expects a string argument.")
+		  End If
+		  Var signature As String = vm.GetSlotValue(1)
+		  
+		  vm.SetReturn(ObjoScript.Klass(obj).StaticMethods.HasKey(signature))
 		  
 		End Sub
 	#tag EndMethod

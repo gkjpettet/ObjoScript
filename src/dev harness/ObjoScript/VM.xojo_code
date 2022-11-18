@@ -493,7 +493,7 @@ Protected Class VM
 		  // If this is one of Objo's built-in types we keep a reference to the class for use elsewhere.
 		  // All the built-in types are foreign classes.
 		  If klass.Name.CompareCase("Boolean") Then
-		    BooleanClass = klass
+		    mBooleanClass = klass
 		    
 		  ElseIf klass.Name.CompareCase("KeyValue") Then
 		    mKeyValueClass = klass
@@ -502,13 +502,13 @@ Protected Class VM
 		    mListClass = klass
 		    
 		  ElseIf klass.Name.CompareCase("Nothing") Then
-		    NothingClass = klass
+		    mNothingClass = klass
 		    
 		  ElseIf klass.Name.CompareCase("Number") Then
-		    NumberClass = klass
+		    mNumberClass = klass
 		    
 		  ElseIf klass.Name.CompareCase("String") Then
-		    StringClass = klass
+		    mStringClass = klass
 		  End If
 		  
 		End Sub
@@ -1097,6 +1097,21 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 4372656174657320616E642072657475726E732061206E657720636C6173732E
+		Private Function NewClass(className As String, isForeign As Boolean, fieldCount As Integer, firstFieldIndex As Integer) As ObjoScript.Klass
+		  /// Creates and returns a new class.
+		  
+		  Var klass As New ObjoScript.Klass(className, isForeign, fieldCount, firstFieldIndex)
+		  
+		  // All classes (except `Object`, obviously) always inherit Object's static methods.
+		  If Not klass.Name.CompareCase("Object") Then
+		    klass.StaticMethods = ObjoScript.Klass(Globals.Value("Object")).StaticMethods.Clone
+		  End If
+		  
+		  Return klass
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E73207468652076616C7565206064697374616E6365602066726F6D2074686520746F70206F662074686520737461636B2E204C6561766573207468652076616C7565206F6E2074686520737461636B2E20412076616C7565206F662060306020776F756C642072657475726E2074686520746F70206974656D2E
 		Private Function Peek(distance As Integer) As Variant
 		  /// Returns the value `distance` from the top of the stack. Leaves the value on the stack. A value of `0` would return the top item.
@@ -1264,10 +1279,10 @@ Protected Class VM
 		  
 		  Self.Debugger = New ObjoScript.Debugger
 		  
-		  BooleanClass = Nil
-		  NumberClass = Nil
-		  StringClass = Nil
-		  NothingClass = Nil
+		  mBooleanClass = Nil
+		  mNumberClass = Nil
+		  mStringClass = Nil
+		  mNothingClass = Nil
 		  mKeyValueClass = Nil
 		  mListClass = Nil
 		End Sub
@@ -1625,7 +1640,7 @@ Protected Class VM
 		      Var isForeign As Boolean = ReadByte = 1
 		      Var fieldCount As Integer = ReadByte
 		      Var firstFieldIndex As Integer = ReadByte
-		      Push(New ObjoScript.Klass(className, isForeign, fieldCount, firstFieldIndex))
+		      Push(NewClass(className, isForeign, fieldCount, firstFieldIndex))
 		      If isForeign Then
 		        DefineForeignClass
 		      End If
@@ -2102,9 +2117,14 @@ Protected Class VM
 		Private APISlots(-1) As Variant
 	#tag EndProperty
 
-	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E20426F6F6C65616E206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
-		Private BooleanClass As ObjoScript.Klass
-	#tag EndProperty
+	#tag ComputedProperty, Flags = &h0, Description = 41207265666572656E636520746F20746865206275696C742D696E20426F6F6C65616E206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
+		#tag Getter
+			Get
+			  Return mBooleanClass
+			End Get
+		#tag EndGetter
+		BooleanClass As ObjoScript.Klass
+	#tag EndComputedProperty
 
 	#tag Property, Flags = &h21, Description = 436F6E7461696E7320616C6C20626F756E64206D6574686F647320637265617465642061732043616C6C48616E646C65732062792074686520564D2E
 		Private CallHandles() As ObjoScript.BoundMethod
@@ -2169,6 +2189,10 @@ Protected Class VM
 		ListClass As ObjoScript.Klass
 	#tag EndComputedProperty
 
+	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E20426F6F6C65616E206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
+		Private mBooleanClass As ObjoScript.Klass
+	#tag EndProperty
+
 	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E204B657956616C7565206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
 		Private mKeyValueClass As ObjoScript.Klass
 	#tag EndProperty
@@ -2181,21 +2205,43 @@ Protected Class VM
 		Private mListClass As ObjoScript.Klass
 	#tag EndProperty
 
+	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E204E6F7468696E67206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
+		Private mNothingClass As ObjoScript.Klass
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E204E756D626572206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
+		Private mNumberClass As ObjoScript.Klass
+	#tag EndProperty
+
 	#tag Property, Flags = &h21, Description = 49662054727565207468656E2074686520564D2073686F756C642073746F7020617420746865206E657874206F70706F7274756E69747920287072696F7220746F20746865206E65787420696E737472756374696F6E206665746368292E204F6E6C7920776F726B73207768656E206044656275674D6F64656020697320547275652E
 		Private mShouldStop As Boolean = False
+	#tag EndProperty
+
+	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E20537472696E67206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
+		Private mStringClass As ObjoScript.Klass
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 53696E676C65746F6E20696E7374616E6365206F6620224E6F7468696E67222E
 		Nothing As ObjoScript.Nothing
 	#tag EndProperty
 
-	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E204E6F7468696E67206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
-		Private NothingClass As ObjoScript.Klass
-	#tag EndProperty
+	#tag ComputedProperty, Flags = &h0, Description = 41207265666572656E636520746F20746865206275696C742D696E204E6F7468696E67206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
+		#tag Getter
+			Get
+			  Return mNothingClass
+			End Get
+		#tag EndGetter
+		NothingClass As ObjoScript.Klass
+	#tag EndComputedProperty
 
-	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E204E756D626572206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
-		Private NumberClass As ObjoScript.Klass
-	#tag EndProperty
+	#tag ComputedProperty, Flags = &h0, Description = 41207265666572656E636520746F20746865206275696C742D696E204E756D626572206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
+		#tag Getter
+			Get
+			  Return mNumberClass
+			End Get
+		#tag EndGetter
+		NumberClass As ObjoScript.Klass
+	#tag EndComputedProperty
 
 	#tag ComputedProperty, Flags = &h0, Description = 4B6579203D206F70636F64652028496E7465676572292C2056616C7565203D206E756D626572206F66206279746573207573656420666F72206F706572616E64732E
 		#tag Getter
@@ -2291,9 +2337,14 @@ Protected Class VM
 		Private StackTop As Integer = 0
 	#tag EndProperty
 
-	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E20537472696E67206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
-		Private StringClass As ObjoScript.Klass
-	#tag EndProperty
+	#tag ComputedProperty, Flags = &h0, Description = 41207265666572656E636520746F20746865206275696C742D696E20537472696E67206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
+		#tag Getter
+			Get
+			  Return mStringClass
+			End Get
+		#tag EndGetter
+		StringClass As ObjoScript.Klass
+	#tag EndComputedProperty
 
 	#tag Property, Flags = &h0, Description = 49662054727565207468656E2074686520564D2077696C6C206F75747075742028766961206974732044656275675072696E74206576656E74292074686520737461636B20636F6E74656E747320616E642063757272656E74206F70636F64652061732069742065786563757465732E
 		TraceExecution As Boolean = False

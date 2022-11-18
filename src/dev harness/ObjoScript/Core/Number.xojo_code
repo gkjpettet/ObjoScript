@@ -41,6 +41,7 @@ Protected Module Number
 		  If isStatic Then
 		    
 		  Else
+		    // INSTANCE METHODS
 		    If signature = "+(_)" Then
 		      Return AddressOf Add
 		      

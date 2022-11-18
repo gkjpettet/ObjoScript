@@ -40,6 +40,7 @@ Inherits TestController
 		  group = New LanguageMapTests(Self, "Language - Map")
 		  
 		  // Core.
+		  group = New CoreObjectTests(Self, "Core - Object")
 		  group = New CoreMapTests(Self, "Core - Map")
 		  group = New CoreStringTests(Self, "Core - String")
 		  group = New CoreListTests(Self, "Core - List")

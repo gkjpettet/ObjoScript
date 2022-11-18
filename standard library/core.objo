@@ -14,14 +14,23 @@ foreign static ==(other)
 foreign static <>(other)
 foreign static is(other)
 
+// -----------------
+// Instance methods.
+// -----------------
 not() {
 // Returns false since most objects are considered true.
 return true
 }
 
+foreign hasMethod(signature)
+foreign superType()
 foreign toString()
 foreign type()
-foreign superType()
+
+// -----------------
+// Static methods.
+// -----------------
+foreign static hasMethod(signature)
 }
 
 /// ----------------------------------------------------
