@@ -209,6 +209,8 @@ Inherits XUITextLine
 		  ///
 		  /// Assumes that the graphics context has anti-aliasing off in Windows builds.
 		  
+		  #Pragma Warning "TODO: Draw breakpoint line highlight"
+		  
 		  #Pragma Unused containsCaret
 		  #Pragma Unused maxLineNumWidth
 		  
@@ -234,6 +236,14 @@ Inherits XUITextLine
 		    g.DrawingColor = editor.BackgroundColor
 		  End If
 		  g.FillRectangle(topLeftX, topLeftY, g.Width, lineH)
+		  
+		  // ===================================
+		  // DEBUGGING LINE
+		  // ===================================
+		  If editor.DebuggingLine = Self.Number Then
+		    // Fill the background behind the text of this line with a rounded rectangle.
+		    DrawDebugHighlight(g, topLeftX, topLeftY, lineH, gutterWidth)
+		  End If
 		  
 		  // ===================================
 		  // LINE NUMBER
@@ -406,6 +416,28 @@ Inherits XUITextLine
 		    // Draw a simple vertical line.
 		    g.DrawLine(x, topLeftY, x, topLeftY + lineH)
 		  Next level
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 4472617773206120726F756E64656420726563742061726F756E64207468652074657874206F6E2074686973206C696E652E205573656420746F20686967686C696768742061206C696E652074686174206973206265696E672064656275676765642E
+		Private Sub DrawDebugHighlight(g As Graphics, topLeftX As Double, topLeftY As Double, lineH As Double, gutterWidth As Double)
+		  /// Draws a rounded rect around the text on this line.
+		  /// Used to highlight a line that is being debugged.
+		  
+		  Var editor As XUICodeEditor = LineManager.Owner
+		  
+		  If Self.IsEmpty Then Return
+		  
+		  g.DrawingColor = editor.DebugLineColour
+		  
+		  // Compute the X pos of the first character
+		  Var selStartX As Double
+		  selStartX = topLeftX + gutterWidth + editor.LINE_CONTENTS_LEFT_PADDING + _
+		  WidthToColumn(0, g, False)
+		  
+		  g.FillRoundRectangle(selStartX, topLeftY, g.TextWidth(Self.Contents), lineH, 3, 3)
+		  
 		  
 		End Sub
 	#tag EndMethod

@@ -47,6 +47,7 @@ Begin DesktopWindow WinIDE
       CurrentLineHighlightColor=   &c00000000
       CurrentLineNumberColor=   &c00000000
       CurrentUndoID   =   0
+      DebugLineColour =   &c00000000
       DisplayLineNumbers=   False
       DrawBlockLines  =   True
       Enabled         =   True
@@ -1584,9 +1585,7 @@ End
 		  #Pragma Unused scriptID
 		  
 		  // Highlight the currently stopped on line.
-		  If lineNumber > 0 And lineNumber <= Editor.LineManager.LineCount Then
-		    Editor.CaretLineNumber = lineNumber
-		  End If
+		  Editor.DebuggingLine = lineNumber
 		End Sub
 	#tag EndMethod
 
@@ -1749,10 +1748,6 @@ End
 		  // Update the debugger.
 		  DebuggerTree.Display(VM, VM.GetCurrentFrame)
 		  
-		  ' // Highlight the currently stopped on line.
-		  ' If VM.LastStoppedLine > 0 And VM.LastStoppedLine <= Editor.LineManager.LineCount Then
-		  ' Editor.CaretLineNumber = VM.LastStoppedLine
-		  ' End If
 		End Sub
 	#tag EndEvent
 #tag EndEvents
