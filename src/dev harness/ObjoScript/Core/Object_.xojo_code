@@ -393,13 +393,17 @@ Protected Module Object_
 		  /// Returns a default representation of the object as a string.
 		  ///
 		  /// Assumes: 
-		  /// - Slot 0 is an instance.
+		  /// - Slot 0 is a boolean/double/string or instance.
 		  ///
 		  /// Object.toString() -> string
 		  
-		  Var instance As ObjoScript.Instance = ObjoScript.Instance(vm.GetSlotValue(0))
+		  Var obj As Variant = vm.GetSlotValue(0)
 		  
-		  vm.SetReturn(instance.Klass.Name + " instance")
+		  If obj IsA ObjoScript.Instance Then
+		    vm.SetReturn(ObjoScript.Instance(obj).Klass.Name + " instance")
+		  Else
+		    vm.SetReturn(vm.ValueToString(obj))
+		  End If
 		  
 		End Sub
 	#tag EndMethod

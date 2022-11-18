@@ -187,6 +187,16 @@ foreign class List is Sequence {
 foreign static filled(size, element)
 
 foreign add(item)
+
+/// Appends each element of `other` in the same order to the end of the list. 
+/// `other` must be an iterable.
+addAll(other) {
+foreach element in other {
+add(element)
+}
+return other
+}
+
 foreign count()
 foreign removeAt(index)
 foreign toString()

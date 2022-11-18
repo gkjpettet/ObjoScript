@@ -2,6 +2,12 @@
 Protected Class CoreListTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
+		Sub AddAllTest()
+		  AssertOutputsEqual("core.list.addAll")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub FilledTest()
 		  AssertOutputsEqual("core.list.filled")
 		End Sub
