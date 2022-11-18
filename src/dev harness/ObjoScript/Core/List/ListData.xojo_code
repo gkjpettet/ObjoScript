@@ -32,10 +32,6 @@ Protected Class ListData
 		Count As Integer
 	#tag EndComputedProperty
 
-	#tag Property, Flags = &h0, Description = 5468652063757272656E7420696E6465782E2055736564207768656E20697465726174696E672E
-		Index As Double = -1
-	#tag EndProperty
-
 	#tag Property, Flags = &h0, Description = 5468652061637475616C206974656D7320696E207468652061727261792E
 		Items() As Variant
 	#tag EndProperty
@@ -48,10 +44,6 @@ Protected Class ListData
 		#tag EndGetter
 		LastIndex As Integer
 	#tag EndComputedProperty
-
-	#tag Property, Flags = &h0, Description = 546865206E6578742076616C756520746F2072657475726E2E2055736564207768656E20697465726174696E672E
-		NextValue As Variant = False
-	#tag EndProperty
 
 
 	#tag ViewBehavior

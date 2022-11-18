@@ -84,39 +84,41 @@ Protected Module List
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h1, Description = 52657475726E732066616C736520696620746865726520617265206E6F206D6F7265206974656D7320746F2069746572617465206F722072657475726E7320746865206E6578742076616C756520696E207468652073657175656E63652E
+	#tag Method, Flags = &h1, Description = 52657475726E732066616C736520696620746865726520617265206E6F206D6F7265206974656D7320746F2069746572617465206F722072657475726E732074686520696E64657820696E20746865206172726179206F6620746865206E6578742076616C756520696E20746865206C6973742E
 		Protected Sub Iterate(vm As ObjoScript.VM)
-		  /// Returns false if there are no more items to iterate or returns the next value in the sequence.
+		  /// Returns false if there are no more items to iterate or returns the index in the array 
+		  /// of the next value in the list.
 		  ///
-		  /// if `iter` is nothing then we should return the first item.
+		  /// if `iter` is nothing then we should return the first index.
 		  /// Assumes slot 0 contains a List instance.
 		  /// List.iterate(iter) -> value or false
 		  
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
 		  Var iter As Variant = vm.GetSlotValue(1)
-		  
 		  Var data As ObjoScript.Core.List.ListData = instance.ForeignData
 		  
-		  If iter IsA ObjoScript.Nothing Then // Return the first item.
+		  If iter IsA ObjoScript.Nothing Then
+		    // Return the index of the first item or false if the list is empty.
+		    // Note we return `0.0` not `0` since the VM expects doubles on the stack.
 		    If data.Items.Count = 0 Then
-		      // This is an empty list.
-		      data.NextValue = False
+		      vm.SetReturn(False)
 		    Else
-		      data.Index = 0
-		      data.NextValue = data.Items(0)
+		      vm.SetReturn(0.0)
 		    End If
 		    
-		  Else // Return the next element.
-		    #Pragma Warning "BUG: Need to consider the value of `iter`"
-		    data.Index = data.Index + 1.0
-		    If data.Index <= data.Items.LastIndex Then
-		      data.NextValue = data.Items(data.Index)
+		  Else
+		    // If `iter <> nothing` then assert it's an integer.
+		    If Not ObjoScript.VariantIsIntegerDouble(iter) Then
+		      vm.Error("The iterator must must be an integer.")
+		    End If
+		    
+		    // Return the next index unless we've reached the end of the array when we return false.
+		    If iter.DoubleValue >= data.LastIndex Then
+		      vm.SetReturn(false)
 		    Else
-		      data.NextValue = False
+		      vm.SetReturn(iter.DoubleValue + 1.0)
 		    End If
 		  End If
-		  
-		  vm.SetReturn(data.NextValue)
 		  
 		End Sub
 	#tag EndMethod
@@ -125,15 +127,29 @@ Protected Module List
 		Protected Sub IteratorValue(vm As ObjoScript.VM)
 		  /// Returns the next iterator value.
 		  ///
-		  /// Assumes slot 0 contains a List instance.
-		  /// We are ignoring `iter` here.
+		  /// Assume:
+		  /// - Slot 0 is a List instance.
+		  /// - Slot 1 is false or an integer number.
+		  ///
+		  /// Uses `iter` to determine the next value in the iteration. It should be an index in the array.
 		  /// List.iteratorValue(iter) -> value
 		  
-		  #Pragma Warning "BUG: Need to consider the value of `iter`"
-		  
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
+		  Var iter As Variant = vm.GetSlotValue(1)
 		  
-		  vm.SetReturn(ObjoScript.Core.List.ListData(instance.ForeignData).NextValue)
+		  // `iter` must be an integer.
+		  If Not ObjoScript.VariantIsIntegerDouble(iter) Then
+		    vm.Error("The iterator must must be an integer.")
+		  End If
+		  Var index As Integer = iter
+		  
+		  Var data As ObjoScript.Core.List.ListData = instance.ForeignData
+		  
+		  If index < 0 Or index > data.LastIndex Then
+		    vm.Error("The iterator is out of bounds.")
+		  End If
+		  
+		  vm.SetReturn(ObjoScript.Core.List.ListData(instance.ForeignData).Items(index))
 		  
 		End Sub
 	#tag EndMethod
