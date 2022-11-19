@@ -57,6 +57,9 @@ Protected Module Number
 		    ElseIf signature = ">=(_)" Then
 		      Return AddressOf GreaterEqual
 		      
+		    ElseIf signature.CompareCase("isInteger()") Then
+		      Return AddressOf IsInteger
+		      
 		    ElseIf signature.CompareCase("sqrt()") Then
 		      Return AddressOf Sqrt_
 		    End If
@@ -91,6 +94,18 @@ Protected Module Number
 		  // The VM will spit out an error saying that `Number` doesn't implement `>=(_)`. It obviously
 		  // does so this is cleaner.
 		  vm.Error("Both operands must be numbers.")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73206074727565602069662074686973206E756D62657220697320616E20696E74656765722E
+		Protected Sub IsInteger(vm As ObjoScript.VM)
+		  /// Returns `true` if this number is an integer.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double.
+		  
+		  Var num As Double = vm.GetSlotValue(0)
+		  vm.SetReturn(num = Floor(num))
+		  
 		End Sub
 	#tag EndMethod
 

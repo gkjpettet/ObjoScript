@@ -75,6 +75,7 @@ foreign <(other)
 foreign <=(other)
 foreign >(other)
 foreign >=(other)
+foreign isInteger()
 foreign sqrt()
 }
 
@@ -216,6 +217,20 @@ foreign iteratorValue(iter)
 var result = this.clone
 foreach element in other {
 result.add(element)
+}
+return result
+}
+
+/// Creates a new list by repeating this one count times. 
+/// It is a runtime error if `count` is not a non-negative integer.
+*(count) {
+assert(count is Number, "`count` must be a number.")
+assert(count.isInteger, "`count` must be an integer.")
+assert(count > 0, "`count` must be a non-negative integer.")
+
+var result = []
+foreach i in 0...count {
+result.addAll(this)
 }
 return result
 }

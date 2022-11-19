@@ -1,0 +1,3 @@
+var digits = [1, 2]
+var tripleDigits = digits * 3
+System.print(tripleDigits.toString) // expect [1, 2, 1, 2, 1, 2] 

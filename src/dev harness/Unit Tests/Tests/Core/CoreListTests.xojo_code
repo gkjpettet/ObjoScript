@@ -56,6 +56,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub MultiplyTest()
+		  AssertOutputsEqual("core.list.multiply")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub PlusTest()
 		  AssertOutputsEqual("core.list.plus")
 		End Sub
