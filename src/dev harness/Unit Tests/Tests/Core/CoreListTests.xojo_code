@@ -25,6 +25,30 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub InsertNegativeOutOfBoundsTest()
+		  AssertRuntimeError("core.list.insert_negative_out_of_bounds")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub InsertNonIntegerIndexTest()
+		  AssertRuntimeError("core.list.insert_non_integer_index")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub InsertPositiveOutOfBoundsTest()
+		  AssertRuntimeError("core.list.insert_positive_out_of_bounds")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub InsertTest()
+		  AssertOutputsEqual("core.list.insert")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

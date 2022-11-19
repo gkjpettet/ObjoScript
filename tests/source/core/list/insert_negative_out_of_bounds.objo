@@ -1,0 +1,3 @@
+var list = ["a", "b", "c"]
+
+list.insert(-5, "d") // expect error

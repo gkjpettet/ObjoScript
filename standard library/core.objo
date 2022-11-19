@@ -200,6 +200,7 @@ return other
 foreign clear()
 foreign count()
 foreign indexOf(value)
+foreign insert(index, value)
 foreign removeAt(index)
 foreign toString()
 

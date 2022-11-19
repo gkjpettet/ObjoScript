@@ -136,6 +136,7 @@ Protected Module List
 		  d.Value("clear()")          = AddressOf Clear
 		  d.Value("count()")          = AddressOf Count
 		  d.Value("indexOf(_)")       = AddressOf IndexOf
+		  d.Value("insert(_,_)")      = AddressOf Insert
 		  d.Value("iterate(_)")       = AddressOf Iterate
 		  d.Value("iteratorValue(_)") = AddressOf IteratorValue
 		  d.Value("removeAt(_)")      = AddressOf RemoveAt
@@ -159,6 +160,60 @@ Protected Module List
 		  Return d
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 496E736572747320606974656D602061742060696E6465786020696E20746865206C69737420616E642072657475726E732074686520696E736572746564206974656D2E
+		Protected Sub Insert(vm As ObjoScript.VM)
+		  /// Inserts `item` at `index` in the list and returns the inserted item.
+		  ///
+		  /// Assumes:
+		  /// - Slot 0 is a List instance.
+		  /// - Slot 1 is the index to insert at.
+		  /// - Slot 2 is the item to insert.
+		  ///
+		  /// List.insert(index, item) -> item
+		  ///
+		  /// The index may be one past the last index in the list to append an element.
+		  /// If `index` is < 0 it counts backwards from the end of the list. It bases the
+		  /// computation on the length of the list after inserted the element, so 
+		  /// that -1 will append the element, not insert it before the last element.
+		  ///
+		  /// If `index` is not an integer or is out of bounds, a runtime error occurs.
+		  
+		  Var data As ObjoScript.Core.List.ListData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
+		  
+		  // Get `index` and assert it's an integer.
+		  If Not ObjoScript.VariantIsIntegerDouble(vm.GetSlotValue(1)) Then
+		    vm.Error("Index must be an integer.")
+		  End
+		  Var index As Integer = vm.GetSlotValue(1)
+		  
+		  // Get the value to insert.
+		  Var value As Variant = vm.GetSlotValue(2)
+		  
+		  // Append?
+		  If index = data.LastIndex + 1 Then
+		    data.Items.Add(value)
+		    vm.SetReturn(value)
+		    Return
+		  End If
+		  
+		  // Assert `index` is within bounds and recompute if necessary.
+		  If index > data.LastIndex + 1 Then
+		    vm.Error("Index is out of bounds.")
+		  ElseIf index < 0 Then
+		    If Abs(index) > data.Count + 1 Then
+		      vm.Error("Index is out of bounds.")
+		    Else
+		      index = data.Count + index + 1
+		    End If
+		  End If
+		  
+		  data.Items.AddAt(index, value)
+		  
+		  vm.SetReturn(value)
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h1, Description = 52657475726E732066616C736520696620746865726520617265206E6F206D6F7265206974656D7320746F2069746572617465206F722072657475726E732074686520696E64657820696E20746865206172726179206F6620746865206E6578742076616C756520696E20746865206C6973742E
