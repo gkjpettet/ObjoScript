@@ -1,0 +1,5 @@
+var list = [1, 2, 3]
+System.print(list.count) // expect 3
+
+list.clear()
+System.print(list.count) // expect 0

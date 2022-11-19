@@ -51,6 +51,9 @@ Protected Module List
 		    If signature.CompareCase("add(_)") Then
 		      Return AddressOf Add
 		      
+		    ElseIf signature.CompareCase("clear()") Then
+		      Return AddressOf Clear
+		      
 		    ElseIf signature.CompareCase("count()") Then
 		      Return AddressOf Count
 		      
@@ -74,6 +77,18 @@ Protected Module List
 		    End If
 		  End If
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52656D6F76657320616C6C20656C656D656E74732066726F6D20746865206C6973742E
+		Protected Sub Clear(vm As ObjoScript.VM)
+		  /// Removes all elements from the list.
+		  ///
+		  /// Assumes slot 0 contains a List instance.
+		  /// List.clear() -> nothing
+		  
+		  ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData = New ObjoScript.Core.List.ListData
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h1, Description = 52657475726E7320746865206E756D626572206F66206974656D7320696E20746865206C6973742E

@@ -197,6 +197,7 @@ add(element)
 return other
 }
 
+foreign clear()
 foreign count()
 foreign removeAt(index)
 foreign toString()

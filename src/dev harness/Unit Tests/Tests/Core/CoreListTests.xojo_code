@@ -8,6 +8,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub CountTest()
+		  AssertOutputsEqual("core.list.count")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub FilledTest()
 		  AssertOutputsEqual("core.list.filled")
 		End Sub
