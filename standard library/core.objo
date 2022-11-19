@@ -211,7 +211,15 @@ foreign toString()
 foreign iterate(iter)
 foreign iteratorValue(iter)
 
-// Operator overloads.
+/// Creates a new list by concatenating this list and `other` (an iterable).
++(other) {
+var result = this.clone
+foreach element in other {
+result.add(element)
+}
+return result
+}
+
 foreign [index]
 foreign [index]=(value)
 }

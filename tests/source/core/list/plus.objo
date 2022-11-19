@@ -1,0 +1,4 @@
+var letters = ["a", "b", "c"]
+var other = ["d", "e", "f"]
+var combined = letters + other
+System.print(combined.toString)  // expect [a, b, c, d, e, f]

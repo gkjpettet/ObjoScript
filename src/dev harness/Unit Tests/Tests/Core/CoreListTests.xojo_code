@@ -56,6 +56,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub PlusTest()
+		  AssertOutputsEqual("core.list.plus")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub RemoveAtNegativeOutOfBoundsTest()
 		  AssertRuntimeError("core.list.removeAt_negative_out_of_bounds")
 		End Sub
