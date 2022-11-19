@@ -1379,8 +1379,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  mLocation = stmt.Location
 		  Var assertLocation As ObjoScript.Token = stmt.Location
 		  
-		  // Compile the expression.
-		  Call stmt.Expression.Accept(Self)
+		  // Compile the condition.
+		  Call stmt.Condition.Accept(Self)
+		  
+		  // Compile the message.
+		  Call stmt.Message.Accept(Self)
 		  
 		  EmitByte(ObjoScript.VM.OP_ASSERT, assertLocation)
 		  

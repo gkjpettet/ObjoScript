@@ -22,7 +22,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  Var node As New TreeViewNode("Assert")
 		  
-		  node.AppendNode(stmt.Expression.Accept(Self))
+		  Var condition As New TreeViewNode("Condition:")
+		  condition.AppendNode(stmt.Condition.Accept(Self))
+		  node.AppendNode(condition)
+		  
+		  Var message As New TreeViewNode("Message:")
+		  message.AppendNode(stmt.Message.Accept(Self))
+		  node.AppendNode(message)
 		  
 		  Return node
 		End Function

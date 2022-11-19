@@ -1507,10 +1507,11 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_ASSERT
-		      // Pop the top of the stack. If it's False then raise a runtime error.
-		      If IsFalsey(Pop) Then
-		        Error("Failed assertion.")
-		      End If
+		      // Pop the message.
+		      Var message As String = ValueToString(Pop)
+		      
+		      // Pop the condition off the stack. If it's False then raise a runtime error.
+		      If IsFalsey(Pop) Then Error("Failed assertion: " + message)
 		      
 		    Case OP_DEFINE_GLOBAL
 		      // Define a global variable, the name of which requires a single byte operand to get its index.

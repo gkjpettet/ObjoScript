@@ -10,8 +10,9 @@ Implements ObjoScript.Stmt
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(expression As ObjoScript.Expr, location As ObjoScript.Token)
-		  Self.Expression = Expression
+		Sub Constructor(condition As ObjoScript.Expr, message As ObjoScript.Expr, location As ObjoScript.Token)
+		  Self.Condition = condition
+		  Self.Message = message
 		  mLocation = location
 		End Sub
 	#tag EndMethod
@@ -27,8 +28,12 @@ Implements ObjoScript.Stmt
 	#tag EndMethod
 
 
-	#tag Property, Flags = &h0, Description = 5468652065787072657373696F6E20746F2061737365727420697320547275652E
-		Expression As ObjoScript.Expr
+	#tag Property, Flags = &h0, Description = 54686520636F6E646974696F6E20746F2061737365727420697320547275652E
+		Condition As ObjoScript.Expr
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 546865206D65737361676520746F20646973706C61792069662074686520636F6E646974696F6E2069732066616C73652E
+		Message As ObjoScript.Expr
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 546865206C6F636174696F6E206F6620746865206061737365727460206B6579776F72642E

@@ -37,7 +37,7 @@ Protected Class Parser
 		  ///
 		  /// Format:
 		  /// ```objo
-		  /// assert(EXPRESSION)
+		  /// assert(condition, message)
 		  /// ```
 		  
 		  // Store the location of the assert keyword.
@@ -45,13 +45,17 @@ Protected Class Parser
 		  
 		  Consume(ObjoScript.TokenTypes.LParen, "Expected an opening parenthesis after the `assert` keyword.")
 		  
-		  Var expr As ObjoScript.Expr = Expression
+		  Var condition As ObjoScript.Expr = Expression
 		  
-		  Consume(ObjoScript.TokenTypes.RParen, "Expected a closing parenthesis after the assert expression.")
+		  Consume(ObjoScript.TokenTypes.Comma, "Expected a comma after the condition.")
+		  
+		  Var message As ObjoScript.Expr = Expression
+		  
+		  Consume(ObjoScript.TokenTypes.RParen, "Expected a closing parenthesis after the assert message.")
 		  
 		  ConsumeNewLine("Expected a new line EOL after the assert statement.")
 		  
-		  Return New ObjoScript.AssertStmt(expr, location)
+		  Return New ObjoScript.AssertStmt(condition, message, location)
 		End Function
 	#tag EndMethod
 
