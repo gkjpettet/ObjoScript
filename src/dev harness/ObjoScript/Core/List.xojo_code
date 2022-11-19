@@ -162,8 +162,6 @@ Protected Module List
 		Private Function InitialiseInstanceMethodsDictionary() As Dictionary
 		  /// Returns a case-sensitive dictionary mapping the signatures of foreign instance method signatures to Xojo method addresses.
 		  
-		  #Pragma Warning "TODO: Add more methods"
-		  
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  
 		  d.Value("add(_)")           = AddressOf Add
