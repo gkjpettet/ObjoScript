@@ -59,6 +59,40 @@ Protected Module List
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 52657475726E732061207368616C6C6F7720636C6F6E65206F662074686973206C6973742E
+		Protected Sub Clone(vm As ObjoScript.VM)
+		  /// Returns a shallow clone of this list.
+		  ///
+		  /// Assumes slot 0 contains a List instance.
+		  /// List.clone() -> List
+		  
+		  vm.SetReturn(CloneList(vm.GetSlotValue(0), vm))
+		  
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E732061207368616C6C6F7720636C6F6E65206F662074686973206C6973742E
+		Private Function CloneList(list As ObjoScript.Instance, vm As ObjoScript.VM) As ObjoScript.Instance
+		  /// Returns a shallow clone of `list`.
+		  /// Assumes `list` is a List instance.
+		  
+		  Var data As ObjoScript.Core.List.ListData = list.ForeignData
+		  
+		  Var newList As New ObjoScript.Instance(vm, vm.ListClass)
+		  Var newListData As New ObjoScript.Core.List.ListData
+		  
+		  For Each item As Variant In data.Items
+		    newListData.Items.Add(item)
+		  Next item
+		  
+		  newList.ForeignData = newListData
+		  
+		  Return newList
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 52657475726E7320746865206E756D626572206F66206974656D7320696E20746865206C6973742E
 		Protected Sub Count(vm As ObjoScript.VM)
 		  /// Returns the number of items in the list.
@@ -125,7 +159,7 @@ Protected Module List
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 52657475726E73206120636173652D73656E7369746976652064696374696F6E617279206D617070696E6720746865207369676E617475726573206F6620666F726569676E20696E7374616E6365206D6574686F64207369676E61747572657320746F20586F6A6F206D6574686F64206164647265737365732E
-		Private Function InitiliaseInstanceMethodsDictionary() As Dictionary
+		Private Function InitialiseInstanceMethodsDictionary() As Dictionary
 		  /// Returns a case-sensitive dictionary mapping the signatures of foreign instance method signatures to Xojo method addresses.
 		  
 		  #Pragma Warning "TODO: Add more methods"
@@ -134,6 +168,7 @@ Protected Module List
 		  
 		  d.Value("add(_)")           = AddressOf Add
 		  d.Value("clear()")          = AddressOf Clear
+		  d.Value("clone()")          = AddressOf Clone
 		  d.Value("count()")          = AddressOf Count
 		  d.Value("indexOf(_)")       = AddressOf IndexOf
 		  d.Value("insert(_,_)")      = AddressOf Insert
@@ -152,7 +187,7 @@ Protected Module List
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 52657475726E73206120636173652D73656E7369746976652064696374696F6E617279206D617070696E6720746865207369676E617475726573206F6620666F726569676E20737461746963206D6574686F64207369676E61747572657320746F20586F6A6F206D6574686F64206164647265737365732E
-		Private Function InitiliaseStaticMethodsDictionary() As Dictionary
+		Private Function InitialiseStaticMethodsDictionary() As Dictionary
 		  /// Returns a case-sensitive dictionary mapping the signatures of foreign static method signatures to Xojo method addresses.
 		  
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
@@ -481,7 +516,7 @@ Protected Module List
 	#tag ComputedProperty, Flags = &h1, Description = 436F6E7461696E7320616C6C20666F726569676E20696E7374616E6365206D6574686F647320646566696E6564206F6E20746865204C69737420636C6173732E204B6579203D207369676E61747572652028737472696E67292C2056616C7565203D20416464726573734F6620586F6A6F206D6574686F642E
 		#tag Getter
 			Get
-			  Static d As Dictionary = InitiliaseInstanceMethodsDictionary
+			  Static d As Dictionary = InitialiseInstanceMethodsDictionary
 			  
 			  Return d
 			  
@@ -493,7 +528,7 @@ Protected Module List
 	#tag ComputedProperty, Flags = &h1, Description = 436F6E7461696E7320616C6C20666F726569676E20737461746963206D6574686F647320646566696E6564206F6E20746865204C69737420636C6173732E204B6579203D207369676E61747572652028737472696E67292C2056616C7565203D20416464726573734F6620586F6A6F206D6574686F642E
 		#tag Getter
 			Get
-			  Static d As Dictionary = InitiliaseStaticMethodsDictionary
+			  Static d As Dictionary = InitialiseStaticMethodsDictionary
 			  
 			  Return d
 			  

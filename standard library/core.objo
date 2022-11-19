@@ -198,6 +198,7 @@ return other
 }
 
 foreign clear()
+foreign clone()
 foreign count()
 foreign indexOf(value)
 foreign insert(index, value)
