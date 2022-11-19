@@ -108,6 +108,22 @@ Protected Module List
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 52657475726E732074686520696E646578206F66206076616C75656020696E20746865206C6973742C20696620666F756E642E204966206E6F7420666F756E642069742072657475726E7320602D31602E
+		Protected Sub IndexOf(vm As ObjoScript.VM)
+		  /// Returns the index of `value` in the list, if found. If not found it returns `-1`.
+		  ///
+		  /// Assumes:
+		  /// - Slot 0 is a List instance.
+		  /// - Slot 1 is the value.
+		  /// List.indexOf(value) -> number
+		  
+		  Var data As ObjoScript.Core.List.ListData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
+		  
+		  vm.SetReturn( CType(data.Items.IndexOf(vm.GetSlotValue(1)), Double))
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E73206120636173652D73656E7369746976652064696374696F6E617279206D617070696E6720746865207369676E617475726573206F6620666F726569676E20696E7374616E6365206D6574686F64207369676E61747572657320746F20586F6A6F206D6574686F64206164647265737365732E
 		Private Function InitiliaseInstanceMethodsDictionary() As Dictionary
 		  /// Returns a case-sensitive dictionary mapping the signatures of foreign instance method signatures to Xojo method addresses.
@@ -116,15 +132,16 @@ Protected Module List
 		  
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  
-		  d.Value("add(_)") = AddressOf Add
-		  d.Value("clear()") =  AddressOf Clear
-		  d.Value("count()") = AddressOf Count
-		  d.Value("iterate(_)") = AddressOf Iterate
+		  d.Value("add(_)")           = AddressOf Add
+		  d.Value("clear()")          = AddressOf Clear
+		  d.Value("count()")          = AddressOf Count
+		  d.Value("indexOf(_)")       = AddressOf IndexOf
+		  d.Value("iterate(_)")       = AddressOf Iterate
 		  d.Value("iteratorValue(_)") = AddressOf IteratorValue
-		  d.Value("removeAt(_)") = AddressOf RemoveAt
-		  d.Value("toString()") = AddressOf ToString
-		  d.Value("[_]=(_)") = AddressOf SubscriptSetter
-		  d.Value("[_]") = AddressOf Subscript
+		  d.Value("removeAt(_)")      = AddressOf RemoveAt
+		  d.Value("toString()")       = AddressOf ToString
+		  d.Value("[_]=(_)")          = AddressOf SubscriptSetter
+		  d.Value("[_]")              = AddressOf Subscript
 		  
 		  Return d
 		  

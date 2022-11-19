@@ -1,0 +1,12 @@
+class Person {
+constructor(name) { _name = name }
+}
+
+var garry = Person("Garry")
+
+var list = [1, "a", garry]
+
+System.print(list.indexOf(1)) // expect 0
+System.print(list.indexOf("a")) // expect 1
+System.print(list.indexOf(garry)) // expect 2
+System.print(list.indexOf(5)) // expect -1

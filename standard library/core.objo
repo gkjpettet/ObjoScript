@@ -199,6 +199,7 @@ return other
 
 foreign clear()
 foreign count()
+foreign indexOf(value)
 foreign removeAt(index)
 foreign toString()
 
