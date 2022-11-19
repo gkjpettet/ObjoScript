@@ -139,6 +139,7 @@ Protected Module List
 		  d.Value("insert(_,_)")      = AddressOf Insert
 		  d.Value("iterate(_)")       = AddressOf Iterate
 		  d.Value("iteratorValue(_)") = AddressOf IteratorValue
+		  d.Value("remove(_)")        = AddressOf Remove
 		  d.Value("removeAt(_)")      = AddressOf RemoveAt
 		  d.Value("toString()")       = AddressOf ToString
 		  d.Value("[_]=(_)")          = AddressOf SubscriptSetter
@@ -282,6 +283,32 @@ Protected Module List
 		  End If
 		  
 		  vm.SetReturn(ObjoScript.Core.List.ListData(instance.ForeignData).Items(index))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52656D6F766573207468652066697273742076616C756520666F756E642074686174206D6174636865732074686520676976656E206076616C7565602E20547261696C696E6720656C656D656E747320617265207368696674656420757020746F2066696C6C20696E207768657265207468652072656D6F76656420656C656D656E74207761732E2052657475726E73207468652072656D6F7665642076616C756520696620666F756E64206F72206E6F7468696E67206966206E6F7420666F756E642E
+		Protected Sub Remove(vm As ObjoScript.VM)
+		  /// Removes the first value found that matches the given `value`.
+		  /// Trailing elements are shifted up to fill in where the removed element was.
+		  /// Returns the removed value if found or nothing if not found.
+		  ///
+		  /// Assumes:
+		  /// - Slot 0 is a List instance.
+		  /// - Slot 1 is the value.
+		  /// List.remove(value) -> value or nothing
+		  
+		  Var data As ObjoScript.Core.List.ListData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
+		  
+		  Var value As Variant = vm.GetSlotValue(1)
+		  Var index As Integer = data.Items.IndexOf(value)
+		  
+		  If index = -1 Then
+		    vm.SetReturn(vm.Nothing)
+		  Else
+		    data.Items.RemoveAt(index)
+		    vm.SetReturn(value)
+		  End If
 		  
 		End Sub
 	#tag EndMethod

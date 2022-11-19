@@ -10,7 +10,7 @@ Protected Class ListData
 		  For i As Integer = 0 To iLimit
 		    s.Add(ObjoScript.VM.ValueToString(Items(i)))
 		    If i < iLimit Then
-		      s.Add(",")
+		      s.Add(", ")
 		    End If
 		  Next i
 		  
