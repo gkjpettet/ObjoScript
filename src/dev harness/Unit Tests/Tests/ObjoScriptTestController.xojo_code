@@ -42,8 +42,9 @@ Inherits TestController
 		  // Core.
 		  group = New CoreObjectTests(Self, "Core - Object")
 		  group = New CoreMapTests(Self, "Core - Map")
-		  group = New CoreStringTests(Self, "Core - String")
 		  group = New CoreListTests(Self, "Core - List")
+		  group = New CoreNumberTests(Self, "Core - Number")
+		  group = New CoreStringTests(Self, "Core - String")
 		End Sub
 	#tag EndEvent
 

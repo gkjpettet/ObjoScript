@@ -255,6 +255,7 @@ Class=LanguageStaticFieldTests;Unit Tests/Tests/Language/LanguageStaticFieldTest
 Class=LanguageStringTests;Unit Tests/Tests/Language/LanguageStringTests.xojo_code;&h000000003F3577FF;&h00000000414F7FFF;false
 Folder=Core;Unit Tests/Tests/Core;&h000000006FA827FF;&h000000000BB987FF;false
 Class=CoreStringTests;Unit Tests/Tests/Core/CoreStringTests.xojo_code;&h0000000028BBDFFF;&h000000006FA827FF;false
+Class=CoreNumberTests;Unit Tests/Tests/Core/CoreNumberTests.xojo_code;&h0000000023E317FF;&h000000006FA827FF;false
 Class=CoreMapTests;Unit Tests/Tests/Core/CoreMapTests.xojo_code;&h0000000068535FFF;&h000000006FA827FF;false
 Class=CoreListTests;Unit Tests/Tests/Core/CoreListTests.xojo_code;&h0000000041BB07FF;&h000000006FA827FF;false
 Class=CoreObjectTests;Unit Tests/Tests/Core/CoreObjectTests.xojo_code;&h00000000184627FF;&h000000006FA827FF;false

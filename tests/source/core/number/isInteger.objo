@@ -1,0 +1,5 @@
+System.print(9.isInteger) // expect true
+System.print(1.9.isInteger) // expect false
+System.print(0.isInteger) // expect true
+System.print(0.0.isInteger) // expect true
+System.print(0.isInteger) // expect true
