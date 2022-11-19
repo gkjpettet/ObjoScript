@@ -203,6 +203,7 @@ foreign indexOf(value)
 foreign insert(index, value)
 foreign remove(value)
 foreign removeAt(index)
+foreign swap(index0, index1)
 foreign toString()
 
 // Iterator protocol.

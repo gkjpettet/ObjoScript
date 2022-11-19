@@ -141,6 +141,7 @@ Protected Module List
 		  d.Value("iteratorValue(_)") = AddressOf IteratorValue
 		  d.Value("remove(_)")        = AddressOf Remove
 		  d.Value("removeAt(_)")      = AddressOf RemoveAt
+		  d.Value("swap(_,_)")        = AddressOf Swap
 		  d.Value("toString()")       = AddressOf ToString
 		  d.Value("[_]=(_)")          = AddressOf SubscriptSetter
 		  d.Value("[_]")              = AddressOf Subscript
@@ -418,6 +419,45 @@ Protected Module List
 		  End If
 		  
 		  data.Items(index) = value
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 53776170732076616C75657320696E7369646520746865206C6973742061726F756E642E2050757473207468652076616C75652066726F6D2060696E646578306020696E2060696E646578316020616E64207468652076616C75652066726F6D2060696E64657831602061742060696E646578306020696E20746865206C6973742E
+		Protected Sub Swap(vm As ObjoScript.VM)
+		  /// Swaps values inside the list around. Puts the value from `index0` in `index1`
+		  /// and the value from `index1` at `index0` in the list.
+		  ///
+		  /// Assumes:
+		  /// - Slot 0 is a List instance.
+		  /// - Slot 1 is `index0`
+		  /// - Slot 2 is `index1`
+		  ///
+		  /// List.swap(index0, index1) -> nothing
+		  
+		  Var data As ObjoScript.Core.List.ListData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
+		  
+		  // Get the indexes and assert they are both integers.
+		  If Not ObjoScript.VariantIsIntegerDouble(vm.GetSlotValue(1)) Then
+		    vm.Error("Index0 must be an integer.")
+		  End
+		  Var index0 As Integer = vm.GetSlotValue(1)
+		  If Not ObjoScript.VariantIsIntegerDouble(vm.GetSlotValue(2)) Then
+		    vm.Error("Index1 must be an integer.")
+		  End
+		  Var index1 As Integer = vm.GetSlotValue(2)
+		  
+		  // Bounds check.
+		  If index0 < 0 Or index0 > data.LastIndex Then
+		    vm.Error("Index0 is out of bounds.")
+		  ElseIf index1 < 0 Or index1 > data.LastIndex Then
+		    vm.Error("Index1 is out of bounds.")
+		  End If
+		  
+		  // Swap.
+		  Var tmp As Variant = data.Items(index0)
+		  data.Items(index0) = data.Items(index1)
+		  data.Items(index1) = tmp
 		  
 		End Sub
 	#tag EndMethod
