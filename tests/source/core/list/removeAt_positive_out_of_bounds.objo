@@ -1,0 +1,3 @@
+var list = ["a", "b", "c"]
+
+list.removeAt(4)

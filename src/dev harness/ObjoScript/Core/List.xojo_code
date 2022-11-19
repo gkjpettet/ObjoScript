@@ -302,12 +302,17 @@ Protected Module List
 		  
 		  Var data As ObjoScript.Core.List.ListData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
 		  
-		  // Determine the index, accounting for backwards counting.
+		  // Get `index` and assert it's an integer.
+		  If Not ObjoScript.VariantIsIntegerDouble(vm.GetSlotValue(1)) Then
+		    vm.Error("Index must be an integer.")
+		  End
 		  Var index As Integer = vm.GetSlotValue(1)
+		  
+		  // Adjust `index`, accounting for backwards counting.
 		  index = If(index >= 0, index, data.Count + index)
 		  
 		  // Bounds check.
-		  If index > data.LastIndex Then
+		  If index > data.LastIndex Or index < 0 Then
 		    vm.Error("List index is out of bounds.")
 		  End If
 		  
