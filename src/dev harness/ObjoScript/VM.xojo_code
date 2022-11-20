@@ -44,6 +44,9 @@ Protected Class VM
 		  ElseIf className.CompareCase("Map") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Map.Allocate, Nil)
 		    
+		  ElseIf className.CompareCase("Maths") Then
+		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Maths.Allocate, Nil)
+		    
 		  ElseIf className.CompareCase("Nothing") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Nothing.Allocate, Nil)
 		    
@@ -58,6 +61,9 @@ Protected Class VM
 		    
 		  ElseIf className.CompareCase("String") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.String_.Allocate, Nil)
+		    
+		  ElseIf className.CompareCase("System") Then
+		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.System_.Allocate, Nil)
 		  End If
 		  
 		End Function
@@ -85,6 +91,9 @@ Protected Class VM
 		    
 		  ElseIf className.CompareCase("Map") Then
 		    Return Core.Map.BindForeignMethod(signature, isStatic)
+		    
+		  ElseIf className.CompareCase("Maths") Then
+		    Return Core.Maths.BindForeignMethod(signature, isStatic)
 		    
 		  ElseIf className.CompareCase("Nothing") Then
 		    Return Core.Nothing.BindForeignMethod(signature, isStatic)

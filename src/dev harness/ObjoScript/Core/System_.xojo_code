@@ -1,5 +1,16 @@
 #tag Module
 Protected Module System_
+	#tag Method, Flags = &h1, Description = 54686520757365722069732063616C6C696E67207468652053797374656D20636C61737320636F6E7374727563746F722E
+		Protected Sub Allocate(vm As ObjoScript.VM, instance As ObjoScript.Instance, args() As Variant)
+		  /// The user is calling the System class constructor.
+		  
+		  #Pragma Unused instance
+		  #Pragma Unused args
+		  
+		  vm.Error("You cannot instantiate the System class.")
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 52657475726E7320746865206D6574686F6420746F20696E766F6B6520666F72206120666F726569676E206D6574686F64207769746820607369676E617475726560206F6E20746865206053797374656D6020636C617373206F72204E696C206966207468657265206973206E6F2073756368206D6574686F642E
 		Protected Function BindForeignMethod(signature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
 		  /// Returns the method to invoke for a foreign method with `signature` on the `System` class or Nil if there is no such method.

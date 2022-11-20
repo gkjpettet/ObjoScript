@@ -279,11 +279,16 @@ toString() { return _lower + ":" + _upper }
 /// ----------------------------------------------------
 /// The System class contains useful functionality for 
 /// the VM.
-class System {
-// Returns the number of microseconds since the VM launched.
+foreign class System {
 foreign static clock()
-
-// Converts `object` to a string and sends it to
-// the VM's Print event.
 foreign static print(object)   
+}
+
+/// ----------------------------------------------------
+/// MATHS
+/// ----------------------------------------------------
+/// The Maths class contains useful mathematical 
+/// constants and functions.
+foreign class Maths {
+foreign static pi()
 }
