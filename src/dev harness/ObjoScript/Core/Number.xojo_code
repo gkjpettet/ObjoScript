@@ -39,31 +39,11 @@ Protected Module Number
 		  /// Returns the method to invoke for a foreign method with `signature` on the `Number` class or Nil if there is no such method.
 		  
 		  If isStatic Then
-		    
+		    Return StaticMethods.Lookup(signature, Nil)
 		  Else
-		    // INSTANCE METHODS
-		    If signature = "+(_)" Then
-		      Return AddressOf Add
-		      
-		    ElseIf signature = "<(_)" Then
-		      Return AddressOf Less
-		      
-		    ElseIf signature = "<=(_)" Then
-		      Return AddressOf LessEqual
-		      
-		    ElseIf signature = ">(_)" Then
-		      Return AddressOf Greater
-		      
-		    ElseIf signature = ">=(_)" Then
-		      Return AddressOf GreaterEqual
-		      
-		    ElseIf signature.CompareCase("isInteger()") Then
-		      Return AddressOf IsInteger
-		      
-		    ElseIf signature.CompareCase("sqrt()") Then
-		      Return AddressOf Sqrt_
-		    End If
+		    Return InstanceMethods.Lookup(signature, Nil)
 		  End If
+		  
 		End Function
 	#tag EndMethod
 
@@ -95,6 +75,40 @@ Protected Module Number
 		  // does so this is cleaner.
 		  vm.Error("Both operands must be numbers.")
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E73206120636173652D73656E7369746976652064696374696F6E617279206D617070696E6720746865207369676E617475726573206F6620666F726569676E20696E7374616E6365206D6574686F64207369676E61747572657320746F20586F6A6F206D6574686F64206164647265737365732E
+		Private Function InitialiseInstanceMethodsDictionary() As Dictionary
+		  /// Returns a case-sensitive dictionary mapping the signatures of foreign instance method signatures to Xojo method addresses.
+		  
+		  #Pragma Warning "TODO: Add more methods"
+		  
+		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
+		  
+		  d.Value("+(_)")        = AddressOf Add
+		  d.Value("<(_)")        = AddressOf Less
+		  d.Value("<=(_)")       = AddressOf LessEqual
+		  d.Value(">(_)")        = AddressOf Greater
+		  d.Value(">=(_)")       = AddressOf GreaterEqual
+		  d.Value("isInteger()") = AddressOf IsInteger
+		  d.Value("sqrt()")      = AddressOf Sqrt_
+		  
+		  Return d
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E73206120636173652D73656E7369746976652064696374696F6E617279206D617070696E6720746865207369676E617475726573206F6620666F726569676E20737461746963206D6574686F64207369676E61747572657320746F20586F6A6F206D6574686F64206164647265737365732E
+		Private Function InitialiseStaticMethodsDictionary() As Dictionary
+		  /// Returns a case-sensitive dictionary mapping the signatures of foreign static method signatures to Xojo method addresses.
+		  
+		  #Pragma Warning "TODO: Add more methods"
+		  
+		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
+		  
+		  Return d
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h1, Description = 52657475726E73206074727565602069662074686973206E756D62657220697320616E20696E74656765722E
@@ -150,6 +164,31 @@ Protected Module Number
 		  
 		End Sub
 	#tag EndMethod
+
+
+	#tag ComputedProperty, Flags = &h1, Description = 436F6E7461696E7320616C6C20666F726569676E20696E7374616E6365206D6574686F647320646566696E6564206F6E20746865204E756D62657220636C6173732E204B6579203D207369676E61747572652028737472696E67292C2056616C7565203D20416464726573734F6620586F6A6F206D6574686F642E
+		#tag Getter
+			Get
+			  Static d As Dictionary = InitialiseInstanceMethodsDictionary
+			  
+			  Return d
+			  
+			End Get
+		#tag EndGetter
+		Protected InstanceMethods As Dictionary
+	#tag EndComputedProperty
+
+	#tag ComputedProperty, Flags = &h1, Description = 436F6E7461696E7320616C6C20666F726569676E20737461746963206D6574686F647320646566696E6564206F6E20746865204E756D62657220636C6173732E204B6579203D207369676E61747572652028737472696E67292C2056616C7565203D20416464726573734F6620586F6A6F206D6574686F642E
+		#tag Getter
+			Get
+			  Static d As Dictionary = InitialiseStaticMethodsDictionary
+			  
+			  Return d
+			  
+			End Get
+		#tag EndGetter
+		Protected StaticMethods As Dictionary
+	#tag EndComputedProperty
 
 
 	#tag ViewBehavior
