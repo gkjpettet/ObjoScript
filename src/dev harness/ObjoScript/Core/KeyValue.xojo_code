@@ -18,6 +18,19 @@ Protected Module KeyValue
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F662061204B657956616C756520696E7374616E63652E
+		Protected Function AsString(kv As ObjoScript.Instance) As String
+		  /// Returns a string representation of a KeyValue instance.
+		  ///
+		  /// Assumes `kv` actually is a KeyValue instance.
+		  
+		  Var data As Pair = kv.ForeignData
+		  
+		  Return ObjoScript.VM.ValueToString(data.Left) + " : " + ObjoScript.VM.ValueToString(data.Right)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 52657475726E7320746865206D6574686F6420746F20696E766F6B6520666F72206120666F726569676E206D6574686F64207769746820607369676E617475726560206F6E207468652060426F6F6C65616E6020636C617373206F72204E696C206966207468657265206973206E6F2073756368206D6574686F642E
 		Protected Function BindForeignMethod(signature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
 		  /// Returns the method to invoke for a foreign method with `signature` on the `Boolean` class or Nil if there is no such method.
@@ -113,9 +126,7 @@ Protected Module KeyValue
 		  ///
 		  /// KeyValue.toString() -> string
 		  
-		  Var kv As Pair = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
-		  vm.SetReturn(vm.ValueToString(kv.Left) + " : " + vm.ValueToString(kv.Right))
-		  
+		  vm.SetReturn(AsString(vm.GetSlotValue(0)))
 		End Sub
 	#tag EndMethod
 

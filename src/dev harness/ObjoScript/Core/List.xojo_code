@@ -34,6 +34,24 @@ Protected Module List
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F662074686520606C6973746020696E2074686520666F726D61743A20225B6974656D312C206974656D4E5D222E
+		Protected Function AsString(list As ObjoScript.Instance) As String
+		  /// Returns a string representation of the `list` in the format: "[item1, itemN]".
+		  ///
+		  /// Assumes `list` is a List instance.
+		  
+		  Var items() As Variant = ObjoScript.Core.List.ListData(list.ForeignData).Items
+		  Var s() As String
+		  
+		  For Each item As Variant In items
+		    s.Add(ObjoScript.VM.ValueToString(item))
+		  Next item
+		  
+		  Return "[" + String.FromArray(s, ", ") + "]"
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 52657475726E7320746865206D6574686F6420746F20696E766F6B6520666F72206120666F726569676E206D6574686F64207769746820607369676E617475726560206F6E2074686520604C6973746020636C617373206F72204E696C206966207468657265206973206E6F2073756368206D6574686F642E
 		Protected Function BindForeignMethod(signature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
 		  /// Returns the method to invoke for a foreign method with `signature` on the `List` class or Nil if there is no such method.
@@ -294,9 +312,9 @@ Protected Module List
 		Protected Sub IteratorValue(vm As ObjoScript.VM)
 		  /// Returns the next iterator value.
 		  ///
-		  /// Assume:
+		  /// Assumes:
 		  /// - Slot 0 is a List instance.
-		  /// - Slot 1 is false or an integer number.
+		  /// - Slot 1 is an integer.
 		  ///
 		  /// Uses `iter` to determine the next value in the iteration. It should be an index in the array.
 		  /// List.iteratorValue(iter) -> value
@@ -503,10 +521,7 @@ Protected Module List
 		  /// - Slot 0 contains a List instance.
 		  /// List.toString -> String
 		  
-		  Var data As ObjoScript.Core.List.ListData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
-		  
-		  vm.SetReturn(data.ToString)
-		  
+		  vm.SetReturn(AsString(vm.GetSlotValue(0)))
 		End Sub
 	#tag EndMethod
 

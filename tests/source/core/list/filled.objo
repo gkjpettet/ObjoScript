@@ -1,5 +1,5 @@
 var a1 = List.filled(3, "a")
-System.print(a1.toString) // Expect [a, a, a]
+System.print(a1) // Expect [a, a, a]
 
 var a2 = List.filled(0, "a")
-System.print(a2.toString) // Expect []
+System.print(a2) // Expect []

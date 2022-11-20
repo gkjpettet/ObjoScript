@@ -6,17 +6,6 @@ Protected Class MapData
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F6620746865206D61702E
-		Function ToString() As String
-		  /// Returns a string representation of the map.
-		  
-		  #Pragma Warning "TODO: Implement this properly"
-		  
-		  Return "Map instance (" + Count.ToString + If(Count = 1, " entry", "entries") + ")"
-		  
-		End Function
-	#tag EndMethod
-
 
 	#tag ComputedProperty, Flags = &h0, Description = 546865206E756D626572206F66206B65797320696E207468652064696374696F6E6172792E
 		#tag Getter
@@ -30,14 +19,6 @@ Protected Class MapData
 
 	#tag Property, Flags = &h0, Description = 5468652061637475616C20586F6A6F2064696374696F6E61727920636F6E7461696E696E672074686520646174612E
 		Dict As Dictionary
-	#tag EndProperty
-
-	#tag Property, Flags = &h0, Description = 5468652063757272656E74206B657920696E6465782E2055736564207768656E20697465726174696E672E
-		Index As Integer = -1
-	#tag EndProperty
-
-	#tag Property, Flags = &h0, Description = 546865206E6578742076616C756520746F2072657475726E2E2055736564207768656E20697465726174696E672E
-		NextValue As Variant = False
 	#tag EndProperty
 
 

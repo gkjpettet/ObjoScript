@@ -1994,6 +1994,20 @@ Protected Class VM
 		    If v IsA ObjoScript.Nothing Then
 		      Return "nothing"
 		      
+		    ElseIf v IsA ObjoScript.Instance Then
+		      If ObjoScript.Instance(v).Klass.Name.CompareCase("KeyValue") Then
+		        Return ObjoScript.Core.KeyValue.AsString(v)
+		        
+		      ElseIf ObjoScript.Instance(v).Klass.Name.CompareCase("Map") Then
+		        Return ObjoScript.Core.Map.AsString(v)
+		        
+		      ElseIf ObjoScript.Instance(v).Klass.Name.CompareCase("List") Then
+		        Return ObjoScript.Core.List.AsString(v)
+		        
+		      Else
+		        Return ObjoScript.Instance(v).ToString
+		      End If
+		      
 		    ElseIf v IsA ObjoScript.Value Then
 		      Return ObjoScript.Value(v).ToString
 		      

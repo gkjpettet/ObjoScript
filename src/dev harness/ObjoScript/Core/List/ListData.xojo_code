@@ -1,27 +1,5 @@
 #tag Class
 Protected Class ListData
-	#tag Method, Flags = &h0, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F6620746865206C69737420696E2074686520666F726D61743A20225B6974656D312C206974656D4E5D222E
-		Function ToString() As String
-		  /// Returns a string representation of the list in the format: "[item1, itemN]".
-		  
-		  Var s() As String = Array("[")
-		  
-		  Var iLimit As Integer = Items.LastIndex
-		  For i As Integer = 0 To iLimit
-		    s.Add(ObjoScript.VM.ValueToString(Items(i)))
-		    If i < iLimit Then
-		      s.Add(", ")
-		    End If
-		  Next i
-		  
-		  s.Add("]")
-		  
-		  Return String.FromArray(s, "")
-		  
-		End Function
-	#tag EndMethod
-
-
 	#tag ComputedProperty, Flags = &h0, Description = 546865206E756D626572206F66206974656D7320696E207468652061727261792E
 		#tag Getter
 			Get

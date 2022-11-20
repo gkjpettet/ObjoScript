@@ -15,6 +15,25 @@ Protected Module Map
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F662061204D617020696E7374616E63652E
+		Protected Function AsString(map As ObjoScript.Instance) As String
+		  /// Returns a string representation of a Map instance.
+		  ///
+		  /// Assumes `map` actually is a Map instance.
+		  
+		  Var data As ObjoScript.Core.Map.MapData = map.ForeignData
+		  
+		  Var s() As String
+		  
+		  For Each entry As DictionaryEntry In data.Dict
+		    s.Add(ObjoScript.VM.ValueToString(entry.Key) + " : " + ObjoScript.VM.ValueToString(entry.Value))
+		  Next entry
+		  
+		  Return "{" + String.FromArray(s, ", ") + "}"
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 52657475726E7320746865206D6574686F6420746F20696E766F6B6520666F72206120666F726569676E206D6574686F64207769746820607369676E617475726560206F6E2074686520604D61706020636C617373206F72204E696C206966207468657265206973206E6F2073756368206D6574686F642E
 		Protected Function BindForeignMethod(signature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
 		  /// Returns the method to invoke for a foreign method with `signature` on the `Map` class or Nil if there is no such method.
@@ -101,46 +120,41 @@ Protected Module Map
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h1, Description = 52657475726E732066616C736520696620746865726520617265206E6F206D6F726520656E747269657320746F2069746572617465206F722072657475726E7320746865206E6578742076616C756520696E207468652073657175656E63652E
+	#tag Method, Flags = &h1, Description = 52657475726E732066616C736520696620746865726520617265206E6F206D6F7265206974656D7320746F2069746572617465206F722072657475726E732074686520696E64657820696E207468652064696374696F6E6172792773204B657973206172726179206F6620746865206E6578742076616C756520696E20746865206D61702E
 		Protected Sub Iterate(vm As ObjoScript.VM)
-		  /// Returns false if there are no more entries to iterate or returns the next value in the sequence.
+		  /// Returns false if there are no more items to iterate or returns the index in the 
+		  /// dictionary's Keys array of the next value in the map.
 		  ///
-		  /// if `iter` is nothing then we should return the first entry.
+		  /// if `iter` is nothing then we should return the first index.
 		  /// Assumes slot 0 contains a Map instance.
 		  /// Map.iterate(iter) -> value or false
 		  
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
 		  Var iter As Variant = vm.GetSlotValue(1)
+		  Var keys() As Variant = ObjoScript.Core.Map.MapData(instance.ForeignData).Dict.Keys
 		  
-		  Var data As ObjoScript.Core.Map.MapData = instance.ForeignData
-		  
-		  If iter IsA ObjoScript.Nothing Then // Return the first entry.
-		    If data.Dict.KeyCount = 0 Then
-		      // This is an empty map.
-		      data.NextValue = False
+		  If iter IsA ObjoScript.Nothing Then
+		    // Return the index of the first key or false if the map is empty.
+		    // Note we return `0.0` not `0` since the VM expects doubles on the stack.
+		    If keys.Count = 0 Then
+		      vm.SetReturn(False)
 		    Else
-		      data.Index = 0
-		      Var kv As New ObjoScript.Instance(vm, vm.KeyValueClass)
-		      Var key As Variant = data.Dict.Key(data.Index)
-		      kv.ForeignData = key : data.Dict.Value(key)
-		      data.NextValue = kv
+		      vm.SetReturn(0.0)
 		    End If
 		    
-		  Else // Return the next entry.
-		    #Pragma Warning "BUG: Need to consider the value of `iter`"
-		    data.Index = data.Index + 1
-		    If data.Index <= data.Dict.KeyCount - 1 Then
-		      Var kv As New ObjoScript.Instance(vm, vm.KeyValueClass)
-		      Var key As Variant = data.Dict.Key(data.Index)
-		      kv.ForeignData = key : data.Dict.Value(key)
-		      data.NextValue = kv
+		  Else
+		    // If `iter <> nothing` then assert it's an integer.
+		    If Not ObjoScript.VariantIsIntegerDouble(iter) Then
+		      vm.Error("The iterator must must be an integer.")
+		    End If
+		    
+		    // Return the next index unless we've reached the end of the keys array when we return false.
+		    If iter.DoubleValue >= keys.LastIndex Then
+		      vm.SetReturn(false)
 		    Else
-		      data.Index = -1
-		      data.NextValue = False
+		      vm.SetReturn(iter.DoubleValue + 1.0)
 		    End If
 		  End If
-		  
-		  vm.SetReturn(data.NextValue)
 		  
 		End Sub
 	#tag EndMethod
@@ -149,16 +163,38 @@ Protected Module Map
 		Protected Sub IteratorValue(vm As ObjoScript.VM)
 		  /// Returns the next iterator value.
 		  ///
-		  /// Assumes slot 0 contains a Map instance.
-		  /// We are ignoring `iter` here.
-		  /// Map.iterator(iter) -> value
-		  
-		  #Pragma Warning "BUG: Need to consider the value of `iter`"
+		  /// Assumes:
+		  /// - Slot 0 is a Map instance.
+		  /// - Slot 1 is an integer.
+		  ///
+		  /// Uses `iter` to determine the next value in the iteration. It should be an index in the dictionary's Keys array.
+		  /// Map.iteratorValue(iter) -> value
+		  ///
+		  /// Xojo guarantees that order of the keys in the backing dictionary is stable (at least until the dictionary is modified).
 		  
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
+		  Var iter As Variant = vm.GetSlotValue(1)
 		  
-		  vm.SetReturn(ObjoScript.Core.Map.MapData(instance.ForeignData).NextValue)
+		  // `iter` must be an integer.
+		  If Not ObjoScript.VariantIsIntegerDouble(iter) Then
+		    vm.Error("The iterator must must be an integer.")
+		  End If
+		  Var index As Integer = iter
 		  
+		  // Get the dictionary's keys.
+		  Var keys() As Variant = ObjoScript.Core.Map.MapData(instance.ForeignData).Dict.Keys
+		  
+		  // Bounds check.
+		  If index < 0 Or index > keys.LastIndex Then
+		    vm.Error("The iterator is out of bounds.")
+		  End If
+		  
+		  // Create a new KeyValue instance.
+		  Var kv As New ObjoScript.Instance(vm, vm.KeyValueClass)
+		  kv.ForeignData = keys(index) : ObjoScript.Core.Map.MapData(instance.ForeignData).Dict.Value(keys(index))
+		  
+		  // Return the KeyValue instance.
+		  vm.SetReturn(kv)
 		End Sub
 	#tag EndMethod
 
@@ -236,9 +272,7 @@ Protected Module Map
 		  /// - Slot 0 contains a Map instance.
 		  /// Map.toString -> String
 		  
-		  Var data As ObjoScript.Core.Map.MapData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
-		  
-		  vm.SetReturn(data.ToString)
+		  vm.SetReturn(AsString(vm.GetSlotValue(0)))
 		  
 		End Sub
 	#tag EndMethod

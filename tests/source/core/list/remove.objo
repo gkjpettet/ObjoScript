@@ -1,6 +1,6 @@
 var list = ["a", "b", "c", "d"]
 list.remove("b")
-System.print(list.toString) // expect [a, c, d]
+System.print(list) // expect [a, c, d]
 
 System.print(["a", "b", "c"].remove("b")) // expect b
 System.print(["a", "b", "c"].remove("not found")) // expect nothing

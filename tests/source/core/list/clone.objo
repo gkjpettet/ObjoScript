@@ -1,8 +1,8 @@
 var a = ["a", "b", "c"]
 var b = a.clone
-System.print(a.toString) // expect [a, b, c]
-System.print(b.toString) // expect [a, b, c]
+System.print(a) // expect [a, b, c]
+System.print(b) // expect [a, b, c]
 
 b.removeAt(0)
-System.print(a.toString) // expect [a, b, c]
-System.print(b.toString) // expect [b, c]
+System.print(a) // expect [a, b, c]
+System.print(b) // expect [b, c]
