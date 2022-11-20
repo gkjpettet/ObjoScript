@@ -26,6 +26,15 @@ Protected Module Maths
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 52657475726E73207468652076616C7565206F66206065602C207468652062617365206F66206E61747572616C206C6F6761726974686D732E
+		Protected Sub E_(vm As ObjoScript.VM)
+		  /// Returns the value of `e`, the base of natural logarithms.
+		  
+		  vm.SetReturn(E)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E73206120636173652D73656E7369746976652064696374696F6E617279206D617070696E6720746865207369676E617475726573206F6620666F726569676E20737461746963206D6574686F64207369676E61747572657320746F20586F6A6F206D6574686F64206164647265737365732E
 		Private Function InitialiseStaticMethodsDictionary() As Dictionary
 		  /// Returns a case-sensitive dictionary mapping the signatures of foreign static method signatures to Xojo method addresses.
@@ -34,7 +43,9 @@ Protected Module Maths
 		  
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  
-		  d.Value("pi()") = AddressOf Pi_
+		  d.Value("e()")   = AddressOf E_
+		  d.Value("pi()")  = AddressOf Pi_
+		  d.Value("tau()") = AddressOf Tau_
 		  
 		  Return d
 		  
@@ -46,6 +57,15 @@ Protected Module Maths
 		  /// Returns the value of π.
 		  
 		  vm.SetReturn(PI)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207468652076616C7565206F6620CF842C206571756976616C656E7420746F2032202A20CF802E
+		Protected Sub Tau_(vm As ObjoScript.VM)
+		  /// Returns the value of τ, equivalent to 2 * π.
+		  
+		  vm.SetReturn(TAU)
 		  
 		End Sub
 	#tag EndMethod
@@ -64,7 +84,13 @@ Protected Module Maths
 	#tag EndComputedProperty
 
 
+	#tag Constant, Name = E, Type = Double, Dynamic = False, Default = \"2.718281828459045", Scope = Protected, Description = 5468652076616C7565206F66206065602C207468652062617365206F66206E61747572616C206C6F6761726974686D732E
+	#tag EndConstant
+
 	#tag Constant, Name = PI, Type = Double, Dynamic = False, Default = \"3.14159265359", Scope = Protected, Description = 5468652076616C7565206F662060CF806020746F20313120646563696D616C20706C616365732E
+	#tag EndConstant
+
+	#tag Constant, Name = TAU, Type = Double, Dynamic = False, Default = \"6.2831853071800001", Scope = Protected, Description = 5468652076616C7565206F6620CF842C206571756976616C656E7420746F2032202A20CF802E
 	#tag EndConstant
 
 

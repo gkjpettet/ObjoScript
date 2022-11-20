@@ -290,5 +290,7 @@ foreign static print(object)
 /// The Maths class contains useful mathematical 
 /// constants and functions.
 foreign class Maths {
+foreign static e()
 foreign static pi()
+foreign static tau()
 }

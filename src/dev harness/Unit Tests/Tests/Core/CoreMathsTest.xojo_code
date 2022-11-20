@@ -2,8 +2,8 @@
 Protected Class CoreMathsTest
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
-		Sub PiTest()
-		  AssertOutputsEqual("core.maths.pi")
+		Sub ConstantsTest()
+		  AssertOutputsEqual("core.maths.constants")
 		End Sub
 	#tag EndMethod
 
