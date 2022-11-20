@@ -38,36 +38,10 @@ Protected Module Map
 		Protected Function BindForeignMethod(signature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
 		  /// Returns the method to invoke for a foreign method with `signature` on the `Map` class or Nil if there is no such method.
 		  
-		  #Pragma Warning "TODO: Add more methods"
-		  
-		  #Pragma Unused isStatic
-		  
-		  If signature.CompareCase("clear()") Then
-		    Return AddressOf Clear
-		    
-		  ElseIf signature.CompareCase("containsKey(_)") Then
-		    Return AddressOf ContainsKey
-		    
-		  ElseIf signature.CompareCase("count()") Then
-		    Return AddressOf Count
-		    
-		  ElseIf signature.CompareCase("keys()") Then
-		    Return AddressOf Keys
-		    
-		  ElseIf signature.CompareCase("iterate(_)") Then
-		    Return AddressOf Iterate
-		    
-		  ElseIf signature.CompareCase("iteratorValue(_)") Then
-		    Return AddressOf IteratorValue
-		    
-		  ElseIf signature.CompareCase("toString()") Then
-		    Return AddressOf ToString
-		    
-		  ElseIf signature = "[_]=(_)" Then
-		    Return AddressOf SubscriptSetter
-		    
-		  ElseIf signature = "[_]" Then
-		    Return AddressOf Subscript
+		  If isStatic Then
+		    Return StaticMethods.Lookup(signature, Nil)
+		  Else
+		    Return InstanceMethods.Lookup(signature, Nil)
 		  End If
 		  
 		End Function
@@ -118,6 +92,38 @@ Protected Module Map
 		  vm.SetReturn(CType(data.Count, Double))
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E73206120636173652D73656E7369746976652064696374696F6E617279206D617070696E6720746865207369676E617475726573206F6620666F726569676E20696E7374616E6365206D6574686F64207369676E61747572657320746F20586F6A6F206D6574686F64206164647265737365732E
+		Private Function InitialiseInstanceMethodsDictionary() As Dictionary
+		  /// Returns a case-sensitive dictionary mapping the signatures of foreign instance method signatures to Xojo method addresses.
+		  
+		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
+		  
+		  d.Value("clear()")          = AddressOf Clear
+		  d.Value("containsKey(_)")   = AddressOf ContainsKey
+		  d.Value("count()")          = AddressOf Count
+		  d.Value("iterate(_)")       = AddressOf Iterate
+		  d.Value("iteratorValue(_)") = AddressOf IteratorValue
+		  d.Value("keys()")           = AddressOf Keys
+		  d.Value("[_]=(_)")          = AddressOf SubscriptSetter
+		  d.Value("[_]")              = AddressOf Subscript
+		  d.Value("toString()")       = AddressOf ToString
+		  
+		  Return d
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E73206120636173652D73656E7369746976652064696374696F6E617279206D617070696E6720746865207369676E617475726573206F6620666F726569676E20737461746963206D6574686F64207369676E61747572657320746F20586F6A6F206D6574686F64206164647265737365732E
+		Private Function InitialiseStaticMethodsDictionary() As Dictionary
+		  /// Returns a case-sensitive dictionary mapping the signatures of foreign static method signatures to Xojo method addresses.
+		  
+		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
+		  
+		  Return d
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h1, Description = 52657475726E732066616C736520696620746865726520617265206E6F206D6F7265206974656D7320746F2069746572617465206F722072657475726E732074686520696E64657820696E207468652064696374696F6E6172792773204B657973206172726179206F6620746865206E6578742076616C756520696E20746865206D61702E
@@ -276,6 +282,31 @@ Protected Module Map
 		  
 		End Sub
 	#tag EndMethod
+
+
+	#tag ComputedProperty, Flags = &h1, Description = 436F6E7461696E7320616C6C20666F726569676E20696E7374616E6365206D6574686F647320646566696E6564206F6E20746865204D617020636C6173732E204B6579203D207369676E61747572652028737472696E67292C2056616C7565203D20416464726573734F6620586F6A6F206D6574686F642E
+		#tag Getter
+			Get
+			  Static d As Dictionary = InitialiseInstanceMethodsDictionary
+			  
+			  Return d
+			  
+			End Get
+		#tag EndGetter
+		Protected InstanceMethods As Dictionary
+	#tag EndComputedProperty
+
+	#tag ComputedProperty, Flags = &h1, Description = 436F6E7461696E7320616C6C20666F726569676E20737461746963206D6574686F647320646566696E6564206F6E20746865204D617020636C6173732E204B6579203D207369676E61747572652028737472696E67292C2056616C7565203D20416464726573734F6620586F6A6F206D6574686F642E
+		#tag Getter
+			Get
+			  Static d As Dictionary = InitialiseStaticMethodsDictionary
+			  
+			  Return d
+			  
+			End Get
+		#tag EndGetter
+		Protected StaticMethods As Dictionary
+	#tag EndComputedProperty
 
 
 	#tag ViewBehavior
