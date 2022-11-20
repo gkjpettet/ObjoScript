@@ -14,6 +14,8 @@ Inherits XUITextLine
 		  
 		  Return mContents.MiddleCharacters(col, count)
 		  
+		  Exception OutOfBoundsException // HACK: Need to pin down why this occurs sometimes.
+		    Return ""
 		End Function
 	#tag EndMethod
 

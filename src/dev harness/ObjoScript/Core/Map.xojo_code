@@ -106,9 +106,10 @@ Protected Module Map
 		  d.Value("iterate(_)")       = AddressOf Iterate
 		  d.Value("iteratorValue(_)") = AddressOf IteratorValue
 		  d.Value("keys()")           = AddressOf Keys
+		  d.Value("remove(_)")        = AddressOf Remove
+		  d.Value("toString()")       = AddressOf ToString
 		  d.Value("[_]=(_)")          = AddressOf SubscriptSetter
 		  d.Value("[_]")              = AddressOf Subscript
-		  d.Value("toString()")       = AddressOf ToString
 		  
 		  Return d
 		  
@@ -221,6 +222,28 @@ Protected Module Map
 		  ObjoScript.Core.List.ListData(list.ForeignData).Items = data.Keys
 		  
 		  vm.SetReturn(list)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52656D6F76657320606B65796020616E64207468652076616C7565206173736F63696174656420776974682069742066726F6D20746865206D61702E2052657475726E73207468652076616C75652E20496620606B65796020776173206E6F742070726573656E742C2072657475726E73206E6F7468696E672E
+		Protected Sub Remove(vm As ObjoScript.VM)
+		  /// Removes `key` and the value associated with it from the map. Returns the value.
+		  /// If `key` was not present, returns nothing.
+		  ///
+		  /// Assumes slot 0 contains a Map instance.
+		  /// Map.remove(key) -> value or nothing
+		  
+		  Var data As ObjoScript.Core.Map.MapData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
+		  Var key As Variant = vm.GetSlotValue(1)
+		  
+		  If data.Dict.HasKey(key) Then
+		    Var value As Variant = data.Dict.Value(key)
+		    data.Dict.Remove(key)
+		    vm.SetReturn(value)
+		  Else
+		    vm.SetReturn(vm.Nothing)
+		  End If
 		  
 		End Sub
 	#tag EndMethod
