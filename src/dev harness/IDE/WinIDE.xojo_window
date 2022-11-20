@@ -47,6 +47,7 @@ Begin DesktopWindow WinIDE
       CurrentLineHighlightColor=   &c00000000
       CurrentLineNumberColor=   &c00000000
       CurrentUndoID   =   0
+      DebuggingLine   =   0
       DebugLineColour =   &c00000000
       DisplayLineNumbers=   False
       DrawBlockLines  =   True
@@ -1081,7 +1082,9 @@ End
 
 	#tag MenuHandler
 		Function FileSave() As Boolean Handles FileSave.Action
-		  Call SaveFile(Self.File)
+		  If SaveFile(Self.File) Then
+		    Self.Changed = False
+		  End If
 		  
 		  Return True
 		  
@@ -1090,7 +1093,9 @@ End
 
 	#tag MenuHandler
 		Function FileSaveAs() As Boolean Handles FileSaveAs.Action
-		  Call SaveFile(Nil)
+		  If SaveFile(Nil) Then
+		    Self.Changed = False
+		  End If
 		  
 		  Return True
 		  

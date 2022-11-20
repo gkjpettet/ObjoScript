@@ -252,10 +252,11 @@ foreign iteratorValue(iter)
 foreign keys()
 foreign remove(value)
 foreign toString()
+foreign values()
 
 // Operator overloads.
-foreign [index]
-foreign [index]=(value)
+foreign [key]
+foreign [key]=(value)
 
 }
 

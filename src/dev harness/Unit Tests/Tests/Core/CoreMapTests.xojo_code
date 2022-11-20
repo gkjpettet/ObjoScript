@@ -25,6 +25,24 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub ValueIterateIteratorNotIntegerTest()
+		  AssertRuntimeError("core.map.value_iterate_iterator_not_integer")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ValueIterateIteratorNotNumberTest()
+		  AssertRuntimeError("core.map.value_iterate_iterator_not_number")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ValueIterateTest()
+		  AssertOutputsEqual("core.map.value_iterate")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

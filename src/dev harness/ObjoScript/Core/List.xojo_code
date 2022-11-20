@@ -298,7 +298,7 @@ Protected Module List
 		    End If
 		    
 		    // Return the next index unless we've reached the end of the array when we return false.
-		    If iter.DoubleValue >= data.LastIndex Then
+		    If iter < 0 Or iter >= data.LastIndex Then
 		      vm.SetReturn(false)
 		    Else
 		      vm.SetReturn(iter.DoubleValue + 1.0)

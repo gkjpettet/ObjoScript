@@ -108,6 +108,7 @@ Protected Module Map
 		  d.Value("keys()")           = AddressOf Keys
 		  d.Value("remove(_)")        = AddressOf Remove
 		  d.Value("toString()")       = AddressOf ToString
+		  d.Value("values()")          = AddressOf Values
 		  d.Value("[_]=(_)")          = AddressOf SubscriptSetter
 		  d.Value("[_]")              = AddressOf Subscript
 		  
@@ -156,7 +157,7 @@ Protected Module Map
 		    End If
 		    
 		    // Return the next index unless we've reached the end of the keys array when we return false.
-		    If iter.DoubleValue >= keys.LastIndex Then
+		    If iter < 0 Or iter >= keys.LastIndex Then
 		      vm.SetReturn(false)
 		    Else
 		      vm.SetReturn(iter.DoubleValue + 1.0)
@@ -302,6 +303,27 @@ Protected Module Map
 		  /// Map.toString -> String
 		  
 		  vm.SetReturn(AsString(vm.GetSlotValue(0)))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E732061206C69737420636F6E7461696E696E672074686973206D61702773206B6579732E20546865206F72646572206F6620746865206B65797320697320756E646566696E6564206275742069742069732067756172616E74656564207468617420616C6C206B6579732077696C6C2062652072657475726E65642E
+		Protected Sub Values(vm As ObjoScript.VM)
+		  /// Returns a list containing this map's values. The order of the values is undefined but it is 
+		  /// guaranteed that all values will be returned.
+		  ///
+		  /// Assumes slot 0 contains a Map instance.
+		  /// Map.values() -> List
+		  
+		  Var map As ObjoScript.Instance = vm.GetSlotValue(0)
+		  Var data As Dictionary = ObjoScript.Core.Map.MapData(map.ForeignData).Dict
+		  
+		  // Create a new list instance containing the map's values.
+		  Var list As New ObjoScript.Instance(vm, vm.ListClass)
+		  list.ForeignData = New ObjoScript.Core.List.ListData
+		  ObjoScript.Core.List.ListData(list.ForeignData).Items = data.Values
+		  
+		  vm.SetReturn(list)
 		  
 		End Sub
 	#tag EndMethod
