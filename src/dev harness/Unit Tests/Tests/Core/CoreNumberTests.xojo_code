@@ -44,8 +44,32 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub FloorTest()
+		  AssertOutputsEqual("core.number.floor")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub IsIntegerTest()
 		  AssertOutputsEqual("core.number.isInteger")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub LogTest()
+		  AssertOutputsEqual("core.number.log")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub MaxTest()
+		  AssertOutputsEqual("core.number.max")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub MinTest()
+		  AssertOutputsEqual("core.number.min")
 		End Sub
 	#tag EndMethod
 

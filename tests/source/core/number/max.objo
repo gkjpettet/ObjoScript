@@ -1,0 +1,3 @@
+System.print(10.max(11)) // Expect 11
+System.print(10.max(9)) // Expect 10
+System.print(10.5.max(10.51)) // Expect 10.51

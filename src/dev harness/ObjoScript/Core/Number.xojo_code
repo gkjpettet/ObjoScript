@@ -131,6 +131,18 @@ Protected Module Number
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 52657475726E73207468652076616C75652073706563696669656420726F756E64656420646F776E20746F20746865206E6561726573742077686F6C65206E756D6265722E
+		Protected Sub Floor_(vm As ObjoScript.VM)
+		  /// Returns the value specified rounded down to the nearest whole number.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Number.floor() -> Number
+		  
+		  vm.SetReturn(CType(Floor(vm.GetSlotValue(0)), Double))
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 52657475726E73206074727565602069662074686973206973203E20606F74686572602E
 		Protected Sub Greater(vm As ObjoScript.VM)
 		  /// Returns `true` if this is > `other`.
@@ -181,7 +193,11 @@ Protected Module Number
 		  d.Value("atan()")      = AddressOf ATan_
 		  d.Value("cos()")       = AddressOf Cos_
 		  d.Value("exp()")       = AddressOf Exp_
+		  d.Value("floor()")     = AddressOf Floor_
+		  d.Value("log()")       = AddressOf Log_
 		  d.Value("isInteger()") = AddressOf IsInteger
+		  d.Value("max(_)")      = AddressOf Max_
+		  d.Value("min(_)")      = AddressOf Min_
 		  d.Value("sqrt()")      = AddressOf Sqrt_
 		  
 		  Return d
@@ -241,6 +257,52 @@ Protected Module Number
 		  // The VM will spit out an error saying that `Number` doesn't implement `<=(_)`. It obviously
 		  // does so this is cleaner.
 		  vm.Error("Both operands must be numbers.")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207468652076616C75652073706563696669656420726F756E64656420646F776E20746F20746865206E6561726573742077686F6C65206E756D6265722E
+		Protected Sub Log_(vm As ObjoScript.VM)
+		  /// Returns the natural logarithm of the value specified.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Number.log() -> Number
+		  
+		  vm.SetReturn(CType(Log(vm.GetSlotValue(0)), Double))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320746865206D6178696D756D2076616C7565207768656E20636F6D706172696E672074686973206E756D62657220616E6420606F74686572602E
+		Protected Sub Max_(vm As ObjoScript.VM)
+		  /// Returns the maximum value when comparing this number and `other`.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Slot 1 should be a number.
+		  /// Number.max(other) -> Number
+		  
+		  If Not vm.GetSlotValue(1).Type = Variant.TypeDouble Then
+		    vm.Error("The argument to `max(_)` should be a Number.")
+		  End If
+		  
+		  vm.SetReturn(CType(Max(vm.GetSlotValue(0), vm.GetSlotValue(1)), Double))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320746865206D696E696D756D2076616C7565207768656E20636F6D706172696E672074686973206E756D62657220616E6420606F74686572602E
+		Protected Sub Min_(vm As ObjoScript.VM)
+		  /// Returns the minimum value when comparing this number and `other`.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Slot 1 should be a number.
+		  /// Number.min(other) -> Number
+		  
+		  If Not vm.GetSlotValue(1).Type = Variant.TypeDouble Then
+		    vm.Error("The argument to `min(_)` should be a Number.")
+		  End If
+		  
+		  vm.SetReturn(CType(Min(vm.GetSlotValue(0), vm.GetSlotValue(1)), Double))
+		  
 		End Sub
 	#tag EndMethod
 

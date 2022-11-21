@@ -82,7 +82,11 @@ foreign atan()
 foreign ceil()
 foreign cos()
 foreign exp()
+foreign floor()
+foreign log()
 foreign isInteger()
+foreign max(other)
+foreign min(other)
 foreign sqrt()
 }
 
