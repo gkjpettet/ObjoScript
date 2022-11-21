@@ -20,6 +20,24 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub ATanTest()
+		  AssertOutputsEqual("core.number.atan")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub CeilTest()
+		  AssertOutputsEqual("core.number.ceil")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub CosTest()
+		  AssertOutputsEqual("core.number.cos")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub IsIntegerTest()
 		  AssertOutputsEqual("core.number.isInteger")
 		End Sub

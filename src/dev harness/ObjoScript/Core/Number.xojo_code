@@ -70,6 +70,18 @@ Protected Module Number
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 52657475726E7320746865206172632074616E67656E74206F6620746865206E756D6265722E
+		Protected Sub ATan_(vm As ObjoScript.VM)
+		  /// Returns the arc tangent of the number.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Number.atan() -> Number
+		  
+		  vm.SetReturn(CType(ATan(vm.GetSlotValue(0)), Double))
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 52657475726E7320746865206D6574686F6420746F20696E766F6B6520666F72206120666F726569676E206D6574686F64207769746820607369676E617475726560206F6E2074686520604E756D6265726020636C617373206F72204E696C206966207468657265206973206E6F2073756368206D6574686F642E
 		Protected Function BindForeignMethod(signature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
 		  /// Returns the method to invoke for a foreign method with `signature` on the `Number` class or Nil if there is no such method.
@@ -81,6 +93,30 @@ Protected Module Number
 		  End If
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207468652061726320636F73696E65206F6620746865206E756D6265722E
+		Protected Sub Ceil_(vm As ObjoScript.VM)
+		  /// Returns the value specified rounded up to the nearest whole number.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Number.ceil() -> Number
+		  
+		  vm.SetReturn(CType(Ceil(vm.GetSlotValue(0)), Double))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E732074686520636F73696E65206F6620746865206E756D6265722E
+		Protected Sub Cos_(vm As ObjoScript.VM)
+		  /// Returns the cosine of the number.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Number.cos() -> Number
+		  
+		  vm.SetReturn(CType(Cos(vm.GetSlotValue(0)), Double))
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h1, Description = 52657475726E73206074727565602069662074686973206973203E20606F74686572602E
@@ -122,6 +158,7 @@ Protected Module Number
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  
 		  d.Value("+(_)")        = AddressOf Add
+		  d.Value("ceil()")      = AddressOf Ceil_
 		  d.Value("<(_)")        = AddressOf Less
 		  d.Value("<=(_)")       = AddressOf LessEqual
 		  d.Value(">(_)")        = AddressOf Greater
@@ -129,6 +166,8 @@ Protected Module Number
 		  d.Value("abs()")       = AddressOf Abs_
 		  d.Value("acos()")      = AddressOf ACos_
 		  d.Value("asin()")      = AddressOf ASin_
+		  d.Value("atan()")      = AddressOf ATan_
+		  d.Value("cos()")       = AddressOf Cos_
 		  d.Value("isInteger()") = AddressOf IsInteger
 		  d.Value("sqrt()")      = AddressOf Sqrt_
 		  

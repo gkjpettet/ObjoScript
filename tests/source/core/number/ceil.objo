@@ -1,0 +1,4 @@
+System.print(10.55.ceil) // Expect 11
+System.print(0.ceil) // Expect 0
+System.print(0.5.ceil) // Expect 1 
+System.print((-1).ceil) // Expect -1

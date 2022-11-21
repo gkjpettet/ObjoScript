@@ -1,0 +1,3 @@
+System.print(0.atan) // Expect 
+System.print(1.atan) // Expect 
+System.print(0.5.atan) // Expect 
