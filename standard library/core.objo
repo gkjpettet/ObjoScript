@@ -87,6 +87,8 @@ foreign log()
 foreign isInteger()
 foreign max(other)
 foreign min(other)
+foreign pow(power)
+foreign round()
 foreign sqrt()
 }
 

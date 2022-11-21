@@ -198,6 +198,8 @@ Protected Module Number
 		  d.Value("isInteger()") = AddressOf IsInteger
 		  d.Value("max(_)")      = AddressOf Max_
 		  d.Value("min(_)")      = AddressOf Min_
+		  d.Value("pow(_)")      = AddressOf Pow_
+		  d.Value("round()")     = AddressOf Round_
 		  d.Value("sqrt()")      = AddressOf Sqrt_
 		  
 		  Return d
@@ -302,6 +304,35 @@ Protected Module Number
 		  End If
 		  
 		  vm.SetReturn(CType(Min(vm.GetSlotValue(0), vm.GetSlotValue(1)), Double))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 5261697365732074686973206E756D626572202874686520626173652920746F2060706F776572602E2052657475726E73206E616E206966207468652062617365206973206E656761746976652E
+		Protected Sub Pow_(vm As ObjoScript.VM)
+		  /// Raises this number (the base) to `power`. Returns nan if the base is negative.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Slot 1 should be a number.
+		  /// Number.pow(power) -> Number
+		  
+		  If Not vm.GetSlotValue(1).Type = Variant.TypeDouble Then
+		    vm.Error("The argument to `pow(_)` should be a Number.")
+		  End If
+		  
+		  vm.SetReturn(CType(Pow(vm.GetSlotValue(0), vm.GetSlotValue(1)), Double))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207468652076616C756520726F756E64656420746F20746865206E65617265737420696E74656765722E
+		Protected Sub Round_(vm As ObjoScript.VM)
+		  /// Returns the value rounded to the nearest integer.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Number.round() -> Number
+		  
+		  vm.SetReturn(CType(Round(vm.GetSlotValue(0)), Double))
 		  
 		End Sub
 	#tag EndMethod

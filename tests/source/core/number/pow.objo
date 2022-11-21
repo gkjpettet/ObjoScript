@@ -1,0 +1,4 @@
+System.print(2.pow(2)) // Expect 4
+System.print(0.pow(2)) // Expect 0
+System.print(3.pow(2.5)) // Expect 15.588457268
+System.print(2.pow(-3)) // Expect 0.125

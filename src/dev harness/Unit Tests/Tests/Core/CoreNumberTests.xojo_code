@@ -73,6 +73,18 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub PowTest()
+		  AssertOutputsEqual("core.number.pow")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub RoundTest()
+		  AssertOutputsEqual("core.number.round")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
