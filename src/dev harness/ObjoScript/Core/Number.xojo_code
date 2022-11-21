@@ -200,6 +200,7 @@ Protected Module Number
 		  d.Value("min(_)")      = AddressOf Min_
 		  d.Value("pow(_)")      = AddressOf Pow_
 		  d.Value("round()")     = AddressOf Round_
+		  d.Value("sign()")      = AddressOf Sign_
 		  d.Value("sqrt()")      = AddressOf Sqrt_
 		  
 		  Return d
@@ -338,13 +339,27 @@ Protected Module Number
 	#tag EndMethod
 
 	#tag Method, Flags = &h1, Description = 52657475726E73207468652073717561726520726F6F74206F6620746865206E756D6265722E
+		Protected Sub Sign_(vm As ObjoScript.VM)
+		  /// Returns the sign of the number, expressed as a -1, 1 or 0, for negative/positive numbers, and zero.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Number.sign() -> double
+		  
+		  vm.SetReturn(CType(Sign(vm.GetSlotValue(0)), Double))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207468652073717561726520726F6F74206F6620746865206E756D6265722E
 		Protected Sub Sqrt_(vm As ObjoScript.VM)
 		  /// Returns the square root of the number.
 		  ///
 		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
 		  /// Number.sqrt() -> double
 		  
-		  vm.SetReturn(Sqrt(vm.GetSlotValue(0)))
+		  #Pragma Warning "TODO: Add sqrt() test"
+		  
+		  vm.SetReturn(CType(Sqrt(vm.GetSlotValue(0)), Double))
 		  
 		End Sub
 	#tag EndMethod

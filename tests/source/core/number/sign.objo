@@ -1,0 +1,5 @@
+var neg = -2
+
+System.print(neg.sign) // Expect -1
+System.print(0.sign) // Expect 0
+System.print(2.sign) // Expect 1

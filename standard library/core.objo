@@ -89,6 +89,7 @@ foreign max(other)
 foreign min(other)
 foreign pow(power)
 foreign round()
+foreign sign()
 foreign sqrt()
 }
 
