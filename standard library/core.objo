@@ -91,6 +91,8 @@ foreign pow(power)
 foreign round()
 foreign sign()
 foreign sqrt()
+foreign sin()
+foreign tan()
 }
 
 /// ----------------------------------------------------

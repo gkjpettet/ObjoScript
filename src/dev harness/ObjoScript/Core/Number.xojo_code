@@ -202,6 +202,8 @@ Protected Module Number
 		  d.Value("round()")     = AddressOf Round_
 		  d.Value("sign()")      = AddressOf Sign_
 		  d.Value("sqrt()")      = AddressOf Sqrt_
+		  d.Value("sin()")       = AddressOf Sin_
+		  d.Value("tan()")       = AddressOf Tan_
 		  
 		  Return d
 		  
@@ -350,6 +352,18 @@ Protected Module Number
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 52657475726E73207468652073696E65206F6620746865206E756D6265722E
+		Protected Sub Sin_(vm As ObjoScript.VM)
+		  /// Returns the sine of the number.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Number.sin() -> Number
+		  
+		  vm.SetReturn(CType(Sin(vm.GetSlotValue(0)), Double))
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 52657475726E73207468652073717561726520726F6F74206F6620746865206E756D6265722E
 		Protected Sub Sqrt_(vm As ObjoScript.VM)
 		  /// Returns the square root of the number.
@@ -357,9 +371,19 @@ Protected Module Number
 		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
 		  /// Number.sqrt() -> double
 		  
-		  #Pragma Warning "TODO: Add sqrt() test"
-		  
 		  vm.SetReturn(CType(Sqrt(vm.GetSlotValue(0)), Double))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207468652073696E65206F6620746865206E756D6265722E
+		Protected Sub Tan_(vm As ObjoScript.VM)
+		  /// Returns the tangent of this number, where this number is in radians.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Number.tan() -> Number
+		  
+		  vm.SetReturn(CType(Tan(vm.GetSlotValue(0)), Double))
 		  
 		End Sub
 	#tag EndMethod

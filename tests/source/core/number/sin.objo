@@ -1,0 +1,3 @@
+System.print(0.sin) // Expect 0
+System.print(1.sin) // Expect 0.841470985
+System.print(0.5.sin) // Expect 0.479425539

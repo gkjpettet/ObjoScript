@@ -91,6 +91,24 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub SinTest()
+		  AssertOutputsEqual("core.number.sin")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub SqrtTest()
+		  AssertOutputsEqual("core.number.sqrt")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub TanTest()
+		  AssertOutputsEqual("core.number.tan")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
