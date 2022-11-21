@@ -2,6 +2,24 @@
 Protected Class CoreNumberTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
+		Sub AbsTest()
+		  AssertOutputsEqual("core.number.abs")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ACosTest()
+		  AssertOutputsEqual("core.number.acos")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ASinTest()
+		  AssertOutputsEqual("core.number.asin")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub IsIntegerTest()
 		  AssertOutputsEqual("core.number.isInteger")
 		End Sub

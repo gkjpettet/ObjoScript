@@ -1,5 +1,29 @@
 #tag Module
 Protected Module Number
+	#tag Method, Flags = &h1, Description = 52657475726E7320746865206162736F6C7574652076616C7565206F6620746865206E756D6265722E
+		Protected Sub Abs_(vm As ObjoScript.VM)
+		  /// Returns the absolute value of the number.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Number.abs() -> Number
+		  
+		  vm.SetReturn(CType(Abs(vm.GetSlotValue(0)), Double))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207468652061726320636F73696E65206F6620746865206E756D6265722E
+		Protected Sub ACos_(vm As ObjoScript.VM)
+		  /// Returns the arc cosine of the number.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Number.acos() -> Number
+		  
+		  vm.SetReturn(CType(ACos(vm.GetSlotValue(0)), Double))
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 52657475726E73207468652073717561726520726F6F74206F6620746865206E756D6265722E
 		Protected Sub Add(vm As ObjoScript.VM)
 		  /// Converts this number to a string and adds a value to it.
@@ -31,6 +55,18 @@ Protected Module Number
 		  #Pragma Unused args
 		  
 		  vm.Error("The Number class does not have a constructor.")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207468652061726373696E65206F6620746865206E756D6265722E
+		Protected Sub ASin_(vm As ObjoScript.VM)
+		  /// Returns the arc sine of the number.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Number.asin() -> Number
+		  
+		  vm.SetReturn(CType(ASin(vm.GetSlotValue(0)), Double))
+		  
 		End Sub
 	#tag EndMethod
 
@@ -90,6 +126,9 @@ Protected Module Number
 		  d.Value("<=(_)")       = AddressOf LessEqual
 		  d.Value(">(_)")        = AddressOf Greater
 		  d.Value(">=(_)")       = AddressOf GreaterEqual
+		  d.Value("abs()")       = AddressOf Abs_
+		  d.Value("acos()")      = AddressOf ACos_
+		  d.Value("asin()")      = AddressOf ASin_
 		  d.Value("isInteger()") = AddressOf IsInteger
 		  d.Value("sqrt()")      = AddressOf Sqrt_
 		  
