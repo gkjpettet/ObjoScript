@@ -81,6 +81,7 @@ foreign asin()
 foreign atan()
 foreign ceil()
 foreign cos()
+foreign exp()
 foreign isInteger()
 foreign sqrt()
 }

@@ -119,6 +119,18 @@ Protected Module Number
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 52657475726E73207468652061726320636F73696E65206F6620746865206E756D6265722E
+		Protected Sub Exp_(vm As ObjoScript.VM)
+		  /// Returns the exponential e (Euler’s number) raised to the number. 
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Number.exp() -> Number
+		  
+		  vm.SetReturn(CType(Exp(vm.GetSlotValue(0)), Double))
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 52657475726E73206074727565602069662074686973206973203E20606F74686572602E
 		Protected Sub Greater(vm As ObjoScript.VM)
 		  /// Returns `true` if this is > `other`.
@@ -168,6 +180,7 @@ Protected Module Number
 		  d.Value("asin()")      = AddressOf ASin_
 		  d.Value("atan()")      = AddressOf ATan_
 		  d.Value("cos()")       = AddressOf Cos_
+		  d.Value("exp()")       = AddressOf Exp_
 		  d.Value("isInteger()") = AddressOf IsInteger
 		  d.Value("sqrt()")      = AddressOf Sqrt_
 		  

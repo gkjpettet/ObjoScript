@@ -38,6 +38,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub ExpTest()
+		  AssertOutputsEqual("core.number.exp")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub IsIntegerTest()
 		  AssertOutputsEqual("core.number.isInteger")
 		End Sub
