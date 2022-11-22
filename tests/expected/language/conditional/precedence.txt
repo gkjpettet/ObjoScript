@@ -15,7 +15,7 @@
 1
 1
 1
-Range instance
+[3, 4]
 12
 7
 1
@@ -28,7 +28,7 @@ Foo instance
 2
 2
 1
-Range instance
+[3, 4]
 12
 7
 2

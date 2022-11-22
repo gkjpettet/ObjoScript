@@ -378,8 +378,8 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_LOOP
 		    Return JumpInstruction("LOOP", True, chunk, offset)
 		    
-		  Case ObjoScript.VM.OP_RANGE
-		    Return SimpleInstruction("RANGE", offset)
+		  Case ObjoScript.VM.OP_RANGE_INCLUSIVE
+		    Return SimpleInstruction("RANGE_INCLUSIVE", offset)
 		    
 		  Case ObjoScript.VM.OP_EXIT
 		    Return SimpleInstruction("EXIT", offset)
@@ -462,8 +462,11 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_KEYVALUE
 		    Return SimpleInstruction("KEYVALUE", offset)
 		    
-		  CASE ObjoScript.VM.OP_BREAKPOINT
+		  Case ObjoScript.VM.OP_BREAKPOINT
 		    Return SimpleInstruction("BREAKPOINT", offset)
+		    
+		  Case ObjoScript.VM.OP_RANGE_EXCLUSIVE
+		    Return SimpleInstruction("RANGE_EXCLUSIVE", offset)
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")

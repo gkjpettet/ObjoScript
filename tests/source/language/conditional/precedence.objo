@@ -1,7 +1,7 @@
 class Foo {
-  constructor() {}
-  static bar() { return true }
-  static baz() { return 1 }
+constructor() {}
+static bar() { return true }
+static baz() { return 1 }
 }
 
 var boolList = [true, false]
@@ -29,7 +29,7 @@ System.print(a) // expect: 1
 System.print(true ? (1) : 2) // expect: 1
 System.print(true ? [1][0] : 2) // expect: 1
 System.print(true ? Foo.baz() : 2) // expect: 1
-System.print(true ? 3..4 : 2) // expect: 3..4
+System.print(true ? 3..4 : 2) // expect: [3, 4]
 System.print(true ? 3 * 4 : 2) // expect: 12
 System.print(true ? 3 + 4 : 2) // expect: 7
 System.print(true ? 1 or false : 2) // expect: 1
@@ -45,7 +45,7 @@ System.print(a) // expect: 5
 System.print(false ? 1 : (2)) // expect: 2
 System.print(false ? 1 : [2][0]) // expect: 2
 System.print(false ? 2 : Foo.baz()) // expect: 1
-System.print(false ? 1 : 3..4) // expect: 3..4
+System.print(false ? 1 : 3..4) // expect: [3, 4]
 System.print(false ? 1 : 3 * 4) // expect: 12
 System.print(false ? 1 : 3 + 4) // expect: 7
 System.print(false ? 1 : 2 or false) // expect: 2

@@ -1523,7 +1523,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Function VisitBinary(expr As ObjoScript.BinaryExpr) As Variant
 		  /// Compiles a binary expression.
 		  ///
-		  ///
 		  /// a OP b becomes: OP  
 		  ///                 b   ← top of the stack
 		  ///                 a
@@ -2020,12 +2019,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = stmt.Location
 		  
-		  // For performance reasons, we will handle ranges differently.
-		  If stmt.Range IsA ObjoScript.RangeExpr Then
-		    ForEachRange(stmt.Location, stmt.LoopCounter, ObjoScript.RangeExpr(stmt.Range), stmt.Body)
-		    Return Nil
-		  End If
-		  
 		  BeginScope
 		  
 		  // Track the current location.
@@ -2476,27 +2469,23 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Function VisitRange(r As ObjoScript.RangeExpr) As Variant
 		  /// Compiles an inclusive (..) or exclusive (...) range expression.
 		  ///
+		  /// a RANGE_OP b becomes: 
+		  ///  RANGE_OP  
+		  ///  b   ← top of the stack
+		  ///  a
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
 		  mLocation = r.Location
 		  
-		  // Retrieve the Range class. It should have been defined globally in the standard library.
-		  GlobalVariable("Range")
+		  // Compile the left and right operands - this will leave them on the stack.
+		  Call r.Lower.Accept(Self) // a
+		  Call r.Upper.Accept(Self) // b
 		  
-		  // The lower and upper bounds need compiling to leave them on the top of the stack.
-		  // The lower bounds is compiled as is.
-		  Call r.Lower.Accept(Self)
-		  
-		  // For exclusive ranges, we need to subtract 1 from the upper bounds at runtime.
 		  If r.Inclusive Then
-		    Call r.Upper.Accept(Self)
+		    EmitByte(ObjoScript.VM.OP_RANGE_INCLUSIVE)
 		  Else
-		    Var subtract As New ObjoScript.BinaryExpr(r.Upper, _
-		    SyntheticOperatorToken(ObjoScript.TokenTypes.Minus), New ObjoScript.NumberLiteral(SyntheticNumberToken(1.0, True)))
-		    Call subtract.Accept(Self)
+		    EmitByte(ObjoScript.VM.OP_RANGE_EXCLUSIVE)
 		  End If
-		  
-		  EmitByte(VM.OP_RANGE, r.Location)
 		  
 		End Function
 	#tag EndMethod

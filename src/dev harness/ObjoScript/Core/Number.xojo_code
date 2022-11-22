@@ -182,15 +182,17 @@ Protected Module Number
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  
 		  d.Value("+(_)")        = AddressOf Add
-		  d.Value("ceil()")      = AddressOf Ceil_
 		  d.Value("<(_)")        = AddressOf Less
 		  d.Value("<=(_)")       = AddressOf LessEqual
 		  d.Value(">(_)")        = AddressOf Greater
 		  d.Value(">=(_)")       = AddressOf GreaterEqual
+		  d.Value("..(_)")       = AddressOf RangeInclusive
+		  d.Value("...(_)")      = AddressOf RangeExclusive
 		  d.Value("abs()")       = AddressOf Abs_
 		  d.Value("acos()")      = AddressOf ACos_
 		  d.Value("asin()")      = AddressOf ASin_
 		  d.Value("atan()")      = AddressOf ATan_
+		  d.Value("ceil()")      = AddressOf Ceil_
 		  d.Value("cos()")       = AddressOf Cos_
 		  d.Value("exp()")       = AddressOf Exp_
 		  d.Value("floor()")     = AddressOf Floor_
@@ -324,6 +326,86 @@ Protected Module Number
 		  End If
 		  
 		  vm.SetReturn(CType(Pow(vm.GetSlotValue(0), vm.GetSlotValue(1)), Double))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E732061206C697374207769746820656C656D656E74732072616E67696E672066726F6D2074686973206E756D62657220746F206075707065726020286578636C7573697665292E
+		Protected Sub RangeExclusive(vm As ObjoScript.VM)
+		  /// Returns a list with elements ranging from this number to `upper` (exclusive).
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double.
+		  /// Number...upper -> List
+		  
+		  Var lower As Double = vm.GetSlotValue(0)
+		  Var upper As Double = vm.GetSlotValue(1)
+		  
+		  Var values() As Variant
+		  
+		  If lower = upper Then
+		    // Empty array.
+		  Else
+		    If upper > lower Then
+		      upper = upper - 1.0
+		      Var value As Double = lower
+		      While value <= upper
+		        values.Add(value)
+		        value = value + 1.0
+		      Wend
+		    Else // lower > upper
+		      upper = upper + 1.0
+		      Var value As Double = lower
+		      While value >= upper
+		        values.Add(value)
+		        value = value - 1.0
+		      Wend
+		    End If
+		  End If
+		  
+		  // Create a new lists with values.
+		  Var list As New ObjoScript.Instance(vm, vm.ListClass)
+		  list.ForeignData = New ObjoScript.Core.List.ListData
+		  ObjoScript.Core.List.ListData(list.ForeignData).Items = values
+		  
+		  vm.SetReturn(list)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E732061206C697374207769746820656C656D656E74732072616E67696E672066726F6D2074686973206E756D62657220746F20607570706572602028696E636C7573697665292E
+		Protected Sub RangeInclusive(vm As ObjoScript.VM)
+		  /// Returns a list with elements ranging from this number to `upper` (inclusive).
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double.
+		  /// Number..upper -> List
+		  
+		  Var lower As Double = vm.GetSlotValue(0)
+		  Var upper As Double = vm.GetSlotValue(1)
+		  
+		  Var values() As Variant
+		  
+		  If lower = upper Then
+		    values.Add(lower)
+		  ElseIf upper > lower Then
+		    Var value As Double = lower
+		    While value <= upper
+		      values.Add(value)
+		      value = value + 1.0
+		    Wend
+		  Else // lower > upper
+		    Var value As Double = lower
+		    While value >= upper
+		      values.Add(value)
+		      value = value - 1.0
+		    Wend
+		  End If
+		  
+		  // Create a new lists with values.
+		  Var list As New ObjoScript.Instance(vm, vm.ListClass)
+		  list.ForeignData = New ObjoScript.Core.List.ListData
+		  ObjoScript.Core.List.ListData(list.ForeignData).Items = values
+		  
+		  vm.SetReturn(list)
 		  
 		End Sub
 	#tag EndMethod

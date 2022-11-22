@@ -21,6 +21,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub RangeTest()
+		  AssertOutputsEqual("language.foreach.range")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub ReturnInsideFunctionTest()
 		  AssertOutputsEqual("language.foreach.return_inside_function")
 		  

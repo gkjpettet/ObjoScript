@@ -56,9 +56,6 @@ Protected Class VM
 		  ElseIf className.CompareCase("Object") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Object_.Allocate, Nil)
 		    
-		  ElseIf className.CompareCase("Range") Then
-		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Range.Allocate, Nil)
-		    
 		  ElseIf className.CompareCase("String") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.String_.Allocate, Nil)
 		    
@@ -103,9 +100,6 @@ Protected Class VM
 		    
 		  ElseIf className.CompareCase("Object") Then
 		    Return Core.Object_.BindForeignMethod(signature, isStatic)
-		    
-		  ElseIf className.CompareCase("Range") Then
-		    Return Core.Range.BindForeignMethod(signature, isStatic)
 		    
 		  ElseIf className.CompareCase("String") Then
 		    Return Core.String_.BindForeignMethod(signature, isStatic)
@@ -1632,10 +1626,11 @@ Protected Class VM
 		      Var offset AS UInt16 = ReadUInt16
 		      CurrentFrame.IP = CurrentFrame.IP - offset
 		      
-		    Case OP_RANGE
-		      // The compiler will have placed the Range class, lower and upper bounds on the stack
-		      // (in that order).
-		      Call CallValue(Peek(2), 2)
+		    Case OP_RANGE_INCLUSIVE
+		      InvokeBinaryOperator("..(_)")
+		      
+		    Case OP_RANGE_EXCLUSIVE
+		      InvokeBinaryOperator("...(_)")
 		      
 		    Case OP_EXIT
 		      Error("Unexpected `exit` placeholder instruction. The chunk is invalid.")
@@ -2101,7 +2096,7 @@ Protected Class VM
 		41: OP_JUMP_IF_TRUE (2)
 		42: OP_LOGICAL_XOR (0)
 		43: OP_LOOP (2)
-		44: OP_RANGE (0)
+		44: OP_RANGE_INCLUSIVE (0)
 		45: OP_BITWISE_NOT (0)
 		46: OP_EXIT (0)
 		47: OP_CALL (1)
@@ -2122,7 +2117,7 @@ Protected Class VM
 		62: OP_INVOKE_LONG (3)
 		63: OP_INHERIT (0)
 		64: OP_LIST (1)
-		65: **Unused**
+		65: OP_RANGE_EXCLUSIVE (0)
 		66: OP_SUPER_SETTER (4)
 		67: **Unused**
 		68: OP_SUPER_INVOKE (4)
@@ -2314,7 +2309,7 @@ Protected Class VM
 			  OP_JUMP_IF_TRUE           : 2, _
 			  OP_LOGICAL_XOR            : 0, _
 			  OP_LOOP                   : 2, _
-			  OP_RANGE                  : 0, _
+			  OP_RANGE_INCLUSIVE        : 0, _
 			  OP_EXIT                   : 0, _
 			  OP_CALL                   : 1, _
 			  OP_CLASS                  : 5, _
@@ -2343,7 +2338,8 @@ Protected Class VM
 			  OP_DEFINE_NOTHING         : 0, _
 			  OP_MAP                    : 1, _
 			  OP_KEYVALUE               : 0, _
-			  OP_BREAKPOINT             : 0 _
+			  OP_BREAKPOINT             : 0, _
+			  OP_RANGE_EXCLUSIVE        : 0 _
 			  )
 			  
 			  Return d
@@ -2564,7 +2560,10 @@ Protected Class VM
 	#tag Constant, Name = OP_POP_N, Type = Double, Dynamic = False, Default = \"36", Scope = Public
 	#tag EndConstant
 
-	#tag Constant, Name = OP_RANGE, Type = Double, Dynamic = False, Default = \"44", Scope = Public
+	#tag Constant, Name = OP_RANGE_EXCLUSIVE, Type = Double, Dynamic = False, Default = \"65", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_RANGE_INCLUSIVE, Type = Double, Dynamic = False, Default = \"44", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_RETURN, Type = Double, Dynamic = False, Default = \"0", Scope = Public, Description = 5468652072657475726E206F70636F64652E

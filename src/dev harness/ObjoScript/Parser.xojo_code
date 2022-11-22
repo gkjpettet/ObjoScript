@@ -902,7 +902,6 @@ Protected Class Parser
 		  "Map", _
 		  "Nothing", _
 		  "Number", _
-		  "Range", _
 		  "String", _
 		  "System" _
 		  )
@@ -927,6 +926,8 @@ Protected Class Parser
 		  
 		  Static operators() As ObjoScript.TokenTypes = Array( _
 		  ObjoScript.TokenTypes.Ampersand, _
+		  ObjoScript.TokenTypes.DotDot, _
+		  ObjoScript.TokenTypes.DotDotDot, _
 		  ObjoScript.TokenTypes.EqualEqual, _
 		  ObjoScript.TokenTypes.ForwardSlash, _
 		  ObjoScript.TokenTypes.Greater, _

@@ -1330,7 +1330,6 @@ End
 		  AutocompleteEngine.AddOption("List")
 		  AutocompleteEngine.AddOption("Number")
 		  AutocompleteEngine.AddOption("Object")
-		  AutocompleteEngine.AddOption("Range")
 		  AutocompleteEngine.AddOption("String")
 		  AutocompleteEngine.AddOption("System")
 		  
