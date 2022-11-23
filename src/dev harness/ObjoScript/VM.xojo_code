@@ -1527,12 +1527,24 @@ Protected Class VM
 		    Case OP_DEFINE_GLOBAL
 		      // Define a global variable, the name of which requires a single byte operand to get its index.
 		      Var name As String = ReadConstant
+		      
+		      // Is there a variable with this name already defined in the global scope?
+		      If globals.HasKey(name) Then
+		        Error("Redefined global variable `" + name + "`.")
+		      End If
+		      
 		      // The value of the variable is on the top of the stack.
 		      globals.Value(name) = Pop
 		      
 		    Case OP_DEFINE_GLOBAL_LONG
 		      // Define a global variable, the name of which requires a two byte operand to get its index.
 		      Var name As String = ReadConstantLong
+		      
+		      // Is there a variable with this name already defined in the global scope?
+		      If globals.HasKey(name) Then
+		        Error("Redefined global variable `" + name + "`.")
+		      End If
+		      
 		      // The value of the variable is on the top of the stack.
 		      globals.Value(name) = Pop
 		      
