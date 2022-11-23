@@ -338,10 +338,14 @@ Protected Module Number
 		  /// Number...upper -> List
 		  
 		  Var lower As Double = vm.GetSlotValue(0)
+		  
+		  // Assert that the upper argument is a number.
+		  If vm.GetSlotValue(1).Type <> Variant.TypeDouble Then
+		    vm.Error("The upper bounds must be a number.")
+		  End If
 		  Var upper As Double = vm.GetSlotValue(1)
 		  
 		  Var values() As Variant
-		  
 		  If lower = upper Then
 		    // Empty array.
 		  Else
@@ -380,10 +384,14 @@ Protected Module Number
 		  /// Number..upper -> List
 		  
 		  Var lower As Double = vm.GetSlotValue(0)
+		  
+		  // Assert that the upper argument is a number.
+		  If vm.GetSlotValue(1).Type <> Variant.TypeDouble Then
+		    vm.Error("The upper bounds must be a number.")
+		  End If
 		  Var upper As Double = vm.GetSlotValue(1)
 		  
 		  Var values() As Variant
-		  
 		  If lower = upper Then
 		    values.Add(lower)
 		  ElseIf upper > lower Then
