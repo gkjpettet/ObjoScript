@@ -196,6 +196,7 @@ foreign static fromCodepoint(codePoint)
 foreign +(other)
 foreign beginsWith(prefix)
 foreign codePoints()
+foreign contains(other)
 foreign count()
 }
 

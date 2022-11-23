@@ -96,6 +96,26 @@ Protected Module String_
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 52657475726E73207472756520696620606F7468657260206973206120737562737472696E67206F66207468697320737472696E672E20436173652D73656E73697469766520636F6D70617269736F6E2E
+		Protected Sub Contains(vm As ObjoScript.VM)
+		  /// Returns true if `other` is a substring of this string. Case-sensitive comparison.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is a string.
+		  /// String.contains(other) -> boolean
+		  
+		  // Assert `other` is a string.
+		  Var other As Variant = vm.GetSlotValue(1)
+		  
+		  If other.Type <> Variant.TypeString Then
+		    vm.Error("The argument must be a string.")
+		  End If
+		  
+		  vm.SetReturn(vm.GetSlotValue(0).StringValue.Contains(other, ComparisonOptions.CaseSensitive))
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 52657475726E7320746865206E756D626572206F66206368617261637465727320696E2074686520737472696E672E
 		Protected Sub Count(vm As ObjoScript.VM)
 		  /// Returns the number of characters in the string.
@@ -154,6 +174,7 @@ Protected Module String_
 		  d.Value("+(_)")          = AddressOf Add
 		  d.Value("beginsWith(_)") = AddressOf BeginsWith
 		  d.Value("codePoints()")  = AddressOf CodePoints
+		  d.Value("contains(_)")   = AddressOf Contains
 		  d.Value("count()")       = AddressOf Count
 		  
 		  Return d
