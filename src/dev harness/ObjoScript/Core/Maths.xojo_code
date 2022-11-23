@@ -43,9 +43,10 @@ Protected Module Maths
 		  
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  
-		  d.Value("e()")   = AddressOf E_
-		  d.Value("pi()")  = AddressOf Pi_
-		  d.Value("tau()") = AddressOf Tau_
+		  d.Value("e()")      = AddressOf E_
+		  d.Value("pi()")     = AddressOf Pi_
+		  d.Value("random()") = AddressOf Random_
+		  d.Value("tau()")    = AddressOf Tau_
 		  
 		  Return d
 		  
@@ -57,6 +58,20 @@ Protected Module Maths
 		  /// Returns the value of π.
 		  
 		  vm.SetReturn(PI)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320746865206052616E646F6D602073696E676C65746F6E20696E7374616E636520666F72207468697320564D2E
+		Protected Sub Random_(vm As ObjoScript.VM)
+		  /// Returns the `Random` singleton instance for this VM.
+		  
+		  // Ensure the VM has a single Random instance.
+		  If vm.RandomInstance = Nil Then
+		    vm.RandomInstance = New ObjoScript.Instance(vm, vm.GetVariable("Random"))
+		  End If
+		  
+		  vm.SetReturn(vm.RandomInstance)
 		  
 		End Sub
 	#tag EndMethod

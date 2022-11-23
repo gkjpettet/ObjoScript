@@ -56,6 +56,9 @@ Protected Class VM
 		  ElseIf className.CompareCase("Object") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Object_.Allocate, Nil)
 		    
+		  ElseIf className.CompareCase("Random") Then
+		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Random_.Allocate, Nil)
+		    
 		  ElseIf className.CompareCase("String") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.String_.Allocate, Nil)
 		    
@@ -100,6 +103,9 @@ Protected Class VM
 		    
 		  ElseIf className.CompareCase("Object") Then
 		    Return Core.Object_.BindForeignMethod(signature, isStatic)
+		    
+		  ElseIf className.CompareCase("Random") Then
+		    Return Core.Random_.BindForeignMethod(signature, isStatic)
 		    
 		  ElseIf className.CompareCase("String") Then
 		    Return Core.String_.BindForeignMethod(signature, isStatic)
@@ -1288,6 +1294,8 @@ Protected Class VM
 		  mNothingClass = Nil
 		  mKeyValueClass = Nil
 		  mListClass = Nil
+		  
+		  RandomInstance = Nil
 		End Sub
 	#tag EndMethod
 
@@ -2348,6 +2356,10 @@ Protected Class VM
 		#tag EndGetter
 		Shared OpcodeOperandMap As Dictionary
 	#tag EndComputedProperty
+
+	#tag Property, Flags = &h0, Description = 5468652073696E676C65746F6E2052616E646F6D20696E7374616E63652E2057696C6C206265204E696C20756E74696C206669727374206163636573736564207468726F75676820604D617468732E72616E646F6D2829602E
+		RandomInstance As ObjoScript.Instance
+	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 54686520564D277320737461636B2E
 		Private Stack(-1) As Variant

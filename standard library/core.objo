@@ -275,7 +275,6 @@ foreign values()
 // Operator overloads.
 foreign [key]
 foreign [key]=(value)
-
 }
 
 /// ----------------------------------------------------
@@ -296,5 +295,17 @@ foreign static print(object)
 foreign class Maths {
 foreign static e()
 foreign static pi()
+foreign static random()
 foreign static tau()
+}
+
+/// ----------------------------------------------------
+/// RANDOM
+/// ----------------------------------------------------
+/// A class used to generate random numbers.
+foreign class Random {
+/// Returns a random integer in the range `min` to `max` inclusive.
+foreign inRange(min, max)
+/// Returns a random integer (`result`) where: `0 <= result < upper`.
+foreign lessThan(upper)
 }
