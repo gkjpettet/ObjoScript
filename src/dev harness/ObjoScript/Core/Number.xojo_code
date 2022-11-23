@@ -177,8 +177,6 @@ Protected Module Number
 		Private Function InitialiseInstanceMethodsDictionary() As Dictionary
 		  /// Returns a case-sensitive dictionary mapping the signatures of foreign instance methods to Xojo method addresses.
 		  
-		  #Pragma Warning "TODO: Add more methods"
-		  
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  
 		  d.Value("+(_)")        = AddressOf Add
@@ -215,8 +213,6 @@ Protected Module Number
 	#tag Method, Flags = &h21, Description = 52657475726E73206120636173652D73656E7369746976652064696374696F6E617279206D617070696E6720746865207369676E617475726573206F6620666F726569676E20737461746963206D6574686F647320746F20586F6A6F206D6574686F64206164647265737365732E
 		Private Function InitialiseStaticMethodsDictionary() As Dictionary
 		  /// Returns a case-sensitive dictionary mapping the signatures of foreign static methods to Xojo method addresses.
-		  
-		  #Pragma Warning "TODO: Add more methods"
 		  
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  

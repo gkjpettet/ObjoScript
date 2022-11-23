@@ -15,8 +15,6 @@ Protected Module Maths
 		Protected Function BindForeignMethod(signature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
 		  /// Returns the method to invoke for a foreign method with `signature` on the `Maths` class or Nil if there is no such method.
 		  
-		  #Pragma Warning "TODO: Add more methods"
-		  
 		  If isStatic Then
 		    Return StaticMethods.Lookup(signature, Nil)
 		  Else
@@ -38,8 +36,6 @@ Protected Module Maths
 	#tag Method, Flags = &h21, Description = 52657475726E73206120636173652D73656E7369746976652064696374696F6E617279206D617070696E6720746865207369676E617475726573206F6620666F726569676E20737461746963206D6574686F6420746F20586F6A6F206D6574686F64206164647265737365732E
 		Private Function InitialiseStaticMethodsDictionary() As Dictionary
 		  /// Returns a case-sensitive dictionary mapping the signatures of foreign static method to Xojo method addresses.
-		  
-		  #Pragma Warning "TODO: Add more methods"
 		  
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  

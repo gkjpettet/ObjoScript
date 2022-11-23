@@ -33,7 +33,8 @@ Protected Module Random_
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  
 		  d.Value("inRange(_,_)") = AddressOf InRange
-		  d.Value("lessThan(_)") =  AddressOf LessThan
+		  d.Value("lessThan(_)")  = AddressOf LessThan
+		  d.Value("number()")     = AddressOf Number
 		  
 		  Return d
 		  
@@ -83,6 +84,19 @@ Protected Module Random_
 		  End If
 		  
 		  vm.SetReturn(CType(System.Random.LessThan(upper), Double))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320612072616E646F6D20646F75626C6520696E207468652072616E67653A2030203C3D20726573756C74203C3D20312E302E
+		Protected Sub Number(vm As ObjoScript.VM)
+		  /// Returns a random double in the range: 0 <= result <= 1.0.
+		  ///
+		  /// Assumes:
+		  /// - Slot 0 contains a Random instance.
+		  /// Random.number() -> number.
+		  
+		  vm.SetReturn(System.Random.Number)
 		  
 		End Sub
 	#tag EndMethod

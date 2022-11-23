@@ -308,4 +308,5 @@ foreign class Random {
 foreign inRange(min, max)
 /// Returns a random integer (`result`) where: `0 <= result < upper`.
 foreign lessThan(upper)
+foreign number()
 }
