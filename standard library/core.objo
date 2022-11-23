@@ -191,8 +191,9 @@ return this.iterate(nothing) ? false : true
 /// STRING
 /// ----------------------------------------------------
 foreign class String {
-foreign +(other)
+foreign static fromCodepoint(codePoint)
 
+foreign +(other)
 foreign beginsWith(prefix)
 foreign codePoints()
 foreign count()

@@ -49,24 +49,15 @@ Protected Module String_
 
 	#tag Method, Flags = &h1, Description = 52657475726E7320746865206D6574686F6420746F20696E766F6B6520666F72206120666F726569676E206D6574686F64207769746820607369676E617475726560206F6E207468652060537472696E676020636C617373206F72204E696C206966207468657265206973206E6F2073756368206D6574686F642E
 		Protected Function BindForeignMethod(signature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
-		  /// Returns the method to invoke for a foreign method with `signature` on the `String` class or Nil if there is no such method.
+		  /// Returns the method to invoke for a foreign method with `signature` on the `String` class or 
+		  /// Nil if there is no such method.
 		  
 		  If isStatic Then
-		    
+		    Return StaticMethods.Lookup(signature, Nil)
 		  Else
-		    If signature = "+(_)" Then
-		      Return AddressOf Add
-		      
-		    ElseIf signature.CompareCase("beginsWith(_)") Then
-		      Return AddressOf BeginsWith
-		      
-		    ElseIf signature.CompareCase("codePoints()") Then
-		      Return AddressOf CodePoints
-		      
-		    ElseIf signature.CompareCase("count()") Then
-		      Return AddressOf Count
-		    End If
+		    Return InstanceMethods.Lookup(signature, Nil)
 		  End If
+		  
 		End Function
 	#tag EndMethod
 
@@ -121,6 +112,92 @@ Protected Module String_
 		  
 		End Sub
 	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E732061206E657720737472696E6720636F6E7461696E696E6720746865205554462D3820656E636F64696E67206F662060636F6465706F696E74602E
+		Protected Sub FromCodePoint(vm As ObjoScript.VM)
+		  /// Returns a new string containing the UTF-8 encoding of `codepoint`.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 1 is an integer number.
+		  ///
+		  /// String.fromCodepoint(codePoint) -> String
+		  
+		  #Pragma BreakOnExceptions False
+		  
+		  // Assert `codePoint` is a positive integer.
+		  If Not ObjoScript.VariantIsIntegerDouble(vm.GetSlotValue(1)) Then
+		    vm.Error("The `codePoint` argument should be a positive integer.")
+		  End If
+		  Var cp As Integer = vm.GetSlotValue(1)
+		  If cp < 0 Then
+		    vm.Error("The `codePoint` argument should be a positive integer.")
+		  End If
+		  
+		  Var s As String
+		  Try
+		    s = Text.FromUnicodeCodepoint(cp)
+		  Catch e As RuntimeException
+		    vm.Error("Invalid code point.")
+		  End Try
+		  
+		  vm.SetReturn(s)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E73206120636173652D73656E7369746976652064696374696F6E617279206D617070696E6720746865207369676E617475726573206F6620666F726569676E20696E7374616E6365206D6574686F647320746F20586F6A6F206D6574686F64206164647265737365732E
+		Private Function InitialiseInstanceMethodsDictionary() As Dictionary
+		  /// Returns a case-sensitive dictionary mapping the signatures of foreign instance methods to Xojo method addresses.
+		  
+		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
+		  
+		  d.Value("+(_)")          = AddressOf Add
+		  d.Value("beginsWith(_)") = AddressOf BeginsWith
+		  d.Value("codePoints()")  = AddressOf CodePoints
+		  d.Value("count()")       = AddressOf Count
+		  
+		  Return d
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 52657475726E73206120636173652D73656E7369746976652064696374696F6E617279206D617070696E6720746865207369676E617475726573206F6620666F726569676E20737461746963206D6574686F647320746F20586F6A6F206D6574686F64206164647265737365732E
+		Private Function InitialiseStaticMethodsDictionary() As Dictionary
+		  /// Returns a case-sensitive dictionary mapping the signatures of foreign static methods to Xojo method addresses.
+		  
+		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
+		  
+		  d.Value("fromCodepoint(_)") = AddressOf FromCodePoint
+		  
+		  Return d
+		  
+		End Function
+	#tag EndMethod
+
+
+	#tag ComputedProperty, Flags = &h1, Description = 436F6E7461696E7320616C6C20666F726569676E20696E7374616E6365206D6574686F647320646566696E6564206F6E2074686520537472696E6720636C6173732E204B6579203D207369676E61747572652028737472696E67292C2056616C7565203D20416464726573734F6620586F6A6F206D6574686F642E
+		#tag Getter
+			Get
+			  Static d As Dictionary = InitialiseInstanceMethodsDictionary
+			  
+			  Return d
+			  
+			End Get
+		#tag EndGetter
+		Protected InstanceMethods As Dictionary
+	#tag EndComputedProperty
+
+	#tag ComputedProperty, Flags = &h1, Description = 436F6E7461696E7320616C6C20666F726569676E20737461746963206D6574686F647320646566696E6564206F6E2074686520537472696E6720636C6173732E204B6579203D207369676E61747572652028737472696E67292C2056616C7565203D20416464726573734F6620586F6A6F206D6574686F642E
+		#tag Getter
+			Get
+			  Static d As Dictionary = InitialiseStaticMethodsDictionary
+			  
+			  Return d
+			  
+			End Get
+		#tag EndGetter
+		Protected StaticMethods As Dictionary
+	#tag EndComputedProperty
 
 
 	#tag ViewBehavior
