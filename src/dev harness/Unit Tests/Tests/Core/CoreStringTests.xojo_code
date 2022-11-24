@@ -8,12 +8,6 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub BeginsWithTest()
-		  AssertOutputsEqual("core.string.beginsWith")
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
 		Sub CodepointsTest()
 		  AssertOutputsEqual("core.string.codepoints")
 		End Sub
@@ -100,6 +94,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub RightTest()
 		  AssertOutputsEqual("core.string.right")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub StartsWithTest()
+		  AssertOutputsEqual("core.string.startsWith")
 		End Sub
 	#tag EndMethod
 

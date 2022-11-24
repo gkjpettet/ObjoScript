@@ -29,52 +29,6 @@ Protected Module String_
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h1, Description = 52657475726E7320547275652069662074686520737472696E6720626567696E7320776974682060707265666978602E20436173652D73656E7369746976652E
-		Protected Sub BeginsWith(vm As ObjoScript.VM)
-		  /// Returns True if the string begins with `prefix`. Case-sensitive.
-		  ///
-		  /// Assumes: 
-		  /// - Slot 0 is a string
-		  /// - Slot 1 is the prefix to check for.
-		  ///
-		  /// String.beginsWith(prefix) -> boolean
-		  
-		  /// Since this is a built-in type, slot 0 will be a string (not an instance object).
-		  Var s As String = vm.GetSlotValue(0)
-		  
-		  vm.SetReturn(s.BeginsWith(vm.GetSlotAsString(1), ComparisonOptions.CaseSensitive))
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h1, Description = 52657475726E7320547275652069662074686520737472696E6720626567696E7320776974682060707265666978602E2054686520606361736553656E7369746976656020617267756D656E742064657465726D696E657320636173652D73656E73697469766974792E
-		Protected Sub BeginsWithCaseSensitivity(vm As ObjoScript.VM)
-		  /// Returns True if the string begins with `prefix`. The `caseSensitive` argument determines case-sensitivity.
-		  ///
-		  /// Assumes: 
-		  /// - Slot 0 is a string
-		  /// - Slot 1 is the prefix to check for.
-		  /// - Slot 2 is the `caseSensitive` argument.
-		  ///
-		  /// String.beginsWith(prefix, caseSensitive) -> boolean
-		  
-		  // Assert `prefix` is a string.
-		  Var prefix As Variant = vm.GetSlotValue(1)
-		  If prefix.Type <> Variant.TypeString Then
-		    vm.Error("The argument must be a string.")
-		  End If
-		  
-		  If vm.IsFalsey(vm.GetSlotValue(2)) Then
-		    // Case-insensitive.
-		    vm.SetReturn(vm.GetSlotValue(0).StringValue.BeginsWith(prefix, ComparisonOptions.CaseInsensitive))
-		  Else
-		    // Case sensitive.
-		    vm.SetReturn(vm.GetSlotValue(0).StringValue.BeginsWith(prefix, ComparisonOptions.CaseSensitive))
-		  End If
-		  
-		End Sub
-	#tag EndMethod
-
 	#tag Method, Flags = &h1, Description = 52657475726E7320746865206D6574686F6420746F20696E766F6B6520666F72206120666F726569676E206D6574686F64207769746820607369676E617475726560206F6E207468652060537472696E676020636C617373206F72204E696C206966207468657265206973206E6F2073756368206D6574686F642E
 		Protected Function BindForeignMethod(signature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
 		  /// Returns the method to invoke for a foreign method with `signature` on the `String` class or 
@@ -337,8 +291,6 @@ Protected Module String_
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  
 		  d.Value("+(_)")             = AddressOf Add
-		  d.Value("beginsWith(_)")    = AddressOf BeginsWith
-		  d.Value("beginsWith(_,_)")  = AddressOf BeginsWithCaseSensitivity
 		  d.Value("codePoints()")     = AddressOf CodePoints
 		  d.Value("contains(_)")      = AddressOf Contains
 		  d.Value("count()")          = AddressOf Count
@@ -356,6 +308,8 @@ Protected Module String_
 		  d.Value("replace(_,_)")     = AddressOf Replace
 		  d.Value("replaceAll(_,_)")  = AddressOf ReplaceAll
 		  d.Value("right(_)")         = AddressOf Right
+		  d.Value("startsWith(_)")    = AddressOf StartsWith
+		  d.Value("startsWith(_,_)")  = AddressOf StartsWithCaseSensitivity
 		  d.Value("titlecase()")      = AddressOf TitleCase
 		  d.Value("trim()")           = AddressOf Trim
 		  d.Value("trim(_)")          = AddressOf TrimChars
@@ -650,6 +604,52 @@ Protected Module String_
 		  Catch e As OutOfBoundsException
 		    vm.Error("The `count` argument is out of bounds (" + count.IntegerValue.ToString + ").")
 		  End Try
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320547275652069662074686520737472696E672073746172747320776974682060707265666978602E20436173652D73656E7369746976652E
+		Protected Sub StartsWith(vm As ObjoScript.VM)
+		  /// Returns True if the string starts with `prefix`. Case-sensitive.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is the prefix to check for.
+		  ///
+		  /// String.startsWith(prefix) -> boolean
+		  
+		  /// Since this is a built-in type, slot 0 will be a string (not an instance object).
+		  Var s As String = vm.GetSlotValue(0)
+		  
+		  vm.SetReturn(s.BeginsWith(vm.GetSlotAsString(1), ComparisonOptions.CaseSensitive))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320547275652069662074686520737472696E672073746172747320776974682060707265666978602E2054686520606361736553656E7369746976656020617267756D656E742064657465726D696E657320636173652D73656E73697469766974792E
+		Protected Sub StartsWithCaseSensitivity(vm As ObjoScript.VM)
+		  /// Returns True if the string starts with `prefix`. The `caseSensitive` argument determines case-sensitivity.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is the prefix to check for.
+		  /// - Slot 2 is the `caseSensitive` argument.
+		  ///
+		  /// String.startsWith(prefix, caseSensitive) -> boolean
+		  
+		  // Assert `prefix` is a string.
+		  Var prefix As Variant = vm.GetSlotValue(1)
+		  If prefix.Type <> Variant.TypeString Then
+		    vm.Error("The argument must be a string.")
+		  End If
+		  
+		  If vm.IsFalsey(vm.GetSlotValue(2)) Then
+		    // Case-insensitive.
+		    vm.SetReturn(vm.GetSlotValue(0).StringValue.BeginsWith(prefix, ComparisonOptions.CaseInsensitive))
+		  Else
+		    // Case sensitive.
+		    vm.SetReturn(vm.GetSlotValue(0).StringValue.BeginsWith(prefix, ComparisonOptions.CaseSensitive))
+		  End If
+		  
 		End Sub
 	#tag EndMethod
 
