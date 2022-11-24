@@ -350,9 +350,12 @@ Protected Module String_
 		  d.Value("iterate(_)")       = AddressOf Iterate
 		  d.Value("iteratorValue(_)") = AddressOf IteratorValue
 		  d.Value("left(_)")          = AddressOf Left
+		  d.Value("lowercase()")      = AddressOf Lowercase
 		  d.Value("middle(_)")        = AddressOf Middle
 		  d.Value("middle(_,_)")      = AddressOf MiddleLength
 		  d.Value("right(_)")         = AddressOf Right
+		  d.Value("titlecase()")      = AddressOf TitleCase
+		  d.Value("uppercase()")      = AddressOf Uppercase
 		  
 		  Return d
 		  
@@ -477,6 +480,21 @@ Protected Module String_
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 52657475726E732061206C6F776572636173652076657273696F6E206F66207468697320737472696E672E
+		Protected Sub Lowercase(vm As ObjoScript.VM)
+		  /// Returns a lowercase version of this string.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  ///
+		  /// String.lowercase() -> string
+		  
+		  Var s As String = vm.GetSlotValue(0)
+		  vm.SetReturn(s.Lowercase)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 52657475726E7320746865206120706F7274696F6E206F66207468697320737472696E6720626567696E6E696E6720617420696E646578206073746172746020756E74696C2074686520656E64206F662074686520737472696E672E
 		Protected Sub Middle(vm As ObjoScript.VM)
 		  /// Returns the a portion of this string beginning at index `start` until the end of the string.
@@ -570,6 +588,36 @@ Protected Module String_
 		  Catch e As OutOfBoundsException
 		    vm.Error("The `count` argument is out of bounds (" + count.IntegerValue.ToString + ").")
 		  End Try
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E732061207469746C65636173652076657273696F6E206F66207468697320737472696E672E
+		Protected Sub Titlecase(vm As ObjoScript.VM)
+		  /// Returns a titlecase version of this string.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  ///
+		  /// String.titlecase() -> string
+		  
+		  Var s As String = vm.GetSlotValue(0)
+		  vm.SetReturn(s.Titlecase)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320616E207570706572636173652076657273696F6E206F66207468697320737472696E672E
+		Protected Sub Uppercase(vm As ObjoScript.VM)
+		  /// Returns an uppercase version of this string.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  ///
+		  /// String.uppercase() -> string
+		  
+		  Var s As String = vm.GetSlotValue(0)
+		  vm.SetReturn(s.Uppercase)
+		  
 		End Sub
 	#tag EndMethod
 

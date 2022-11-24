@@ -1,0 +1,1 @@
+System.print("hello".middle(0, 10)) // Expect error

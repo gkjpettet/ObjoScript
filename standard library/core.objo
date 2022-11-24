@@ -207,9 +207,12 @@ foreign indexOf(other, start, caseSensitive)
 foreign iterate(iter)
 foreign iteratorValue(iter)
 foreign left(count)
+foreign lowercase()
 foreign middle(start)
 foreign middle(start, length)
 foreign right(count)
+foreign titlecase()
+foreign uppercase()
 }
 
 /// ----------------------------------------------------

@@ -62,6 +62,24 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub LowercaseTest()
+		  AssertOutputsEqual("core.string.lowercase")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub MiddleLengthOutOfBoundsTest()
+		  AssertRuntimeError("core.string.middle_length_out_of_bounds")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub MiddleNegativeStartTest()
+		  AssertRuntimeError("core.string.middle_negative_start")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub MiddleTest()
 		  AssertOutputsEqual("core.string.middle")
 		End Sub
@@ -70,6 +88,18 @@ Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub RightTest()
 		  AssertOutputsEqual("core.string.right")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub TitlecaseTest()
+		  AssertOutputsEqual("core.string.titlecase")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub UppercaseTest()
+		  AssertOutputsEqual("core.string.uppercase")
 		End Sub
 	#tag EndMethod
 
