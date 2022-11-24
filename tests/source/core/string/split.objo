@@ -1,0 +1,2 @@
+System.print("one,two,three".split(",")) // [one, two, three]
+System.print("hello".split("")) // [h, e, l, l, o]

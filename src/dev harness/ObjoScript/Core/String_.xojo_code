@@ -308,6 +308,7 @@ Protected Module String_
 		  d.Value("replace(_,_)")     = AddressOf Replace
 		  d.Value("replaceAll(_,_)")  = AddressOf ReplaceAll
 		  d.Value("right(_)")         = AddressOf Right
+		  d.Value("split(_)")         = AddressOf Split
 		  d.Value("startsWith(_)")    = AddressOf StartsWith
 		  d.Value("startsWith(_,_)")  = AddressOf StartsWithCaseSensitivity
 		  d.Value("titlecase()")      = AddressOf TitleCase
@@ -604,6 +605,44 @@ Protected Module String_
 		  Catch e As OutOfBoundsException
 		    vm.Error("The `count` argument is out of bounds (" + count.IntegerValue.ToString + ").")
 		  End Try
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E732061206C697374206F66206F6E65206F72206D6F726520737472696E6773207365706172617465642062792060736570617261746F72602E
+		Protected Sub Split(vm As ObjoScript.VM)
+		  /// Returns a list of one or more strings separated by `separator`.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is a string.
+		  /// String.split(separator) -> list
+		  ///
+		  /// If `separator` is an empty string then a list of this string's characters are returned.
+		  
+		  Var s As String = vm.GetSlotValue(0)
+		  
+		  // Assert `separator` is a string.
+		  If Not vm.GetSlotValue(1).Type = Variant.TypeString Then
+		    vm.Error("The `separator` argument must be a string.")
+		  End If
+		  
+		  // Split the string.
+		  Var columns() As String = s.Split(vm.GetSlotValue(1))
+		  
+		  // Create a new list instance.
+		  Var list As ObjoScript.Instance = New ObjoScript.Instance(vm, vm.ListClass)
+		  list.ForeignData = New ObjoScript.Core.List.ListData
+		  
+		  // The Xojo compiler isn't smart enough to let us assign our array of
+		  // strings the the list's Variant Items array so we need to loop 
+		  // through it.
+		  For Each column As String In columns
+		    ObjoScript.Core.List.ListData(list.ForeignData).Items.Add(column)
+		  Next column
+		  
+		  // Return the list.
+		  vm.SetReturn(list)
+		  
 		End Sub
 	#tag EndMethod
 

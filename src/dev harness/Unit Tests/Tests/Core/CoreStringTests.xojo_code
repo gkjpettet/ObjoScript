@@ -98,6 +98,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub SplitTest()
+		  AssertOutputsEqual("core.string.split")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub StartsWithTest()
 		  AssertOutputsEqual("core.string.startsWith")
 		End Sub
