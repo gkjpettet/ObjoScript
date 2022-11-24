@@ -8,7 +8,7 @@
 					Target = 0
 					Destination = 1
 					Subdirectory = 
-					FolderItem = Li4vLi4vLi4vc3RhbmRhcmQlMjBsaWJyYXJ5L2NvcmUub2Jqbw==
+					FolderItem = Li4vLi4vLi4vY29yZSUyMGxpYnJhcnkvY29yZS5vYmpv
 				End
 				Begin CopyFilesBuildStep CopyTestsLinux
 					AppliesTo = 0
@@ -36,7 +36,7 @@
 					Target = 0
 					Destination = 1
 					Subdirectory = 
-					FolderItem = Li4vLi4vLi4vc3RhbmRhcmQlMjBsaWJyYXJ5L2NvcmUub2Jqbw==
+					FolderItem = Li4vLi4vLi4vY29yZSUyMGxpYnJhcnkvY29yZS5vYmpv
 				End
 				Begin CopyFilesBuildStep CopyTestsMac
 					AppliesTo = 0
@@ -67,7 +67,7 @@
 					Target = 0
 					Destination = 1
 					Subdirectory = 
-					FolderItem = Li4vLi4vLi4vc3RhbmRhcmQlMjBsaWJyYXJ5L2NvcmUub2Jqbw==
+					FolderItem = Li4vLi4vLi4vY29yZSUyMGxpYnJhcnkvY29yZS5vYmpv
 				End
 				Begin CopyFilesBuildStep CopyTestsWindows
 					AppliesTo = 0
