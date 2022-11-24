@@ -353,8 +353,16 @@ Protected Module String_
 		  d.Value("lowercase()")      = AddressOf Lowercase
 		  d.Value("middle(_)")        = AddressOf Middle
 		  d.Value("middle(_,_)")      = AddressOf MiddleLength
+		  d.Value("replace(_,_)")     = AddressOf Replace
+		  d.Value("replaceAll(_,_)")  = AddressOf ReplaceAll
 		  d.Value("right(_)")         = AddressOf Right
 		  d.Value("titlecase()")      = AddressOf TitleCase
+		  d.Value("trim()")           = AddressOf Trim
+		  d.Value("trim(_)")          = AddressOf TrimChars
+		  d.Value("trimEnd()")        = AddressOf TrimEnd
+		  d.Value("trimEnd(_)")       = AddressOf TrimEndChars
+		  d.Value("trimStart()")      = AddressOf TrimStart
+		  d.Value("trimStart(_)")     = AddressOf TrimStartChars
 		  d.Value("uppercase()")      = AddressOf Uppercase
 		  
 		  Return d
@@ -560,6 +568,60 @@ Protected Module String_
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 5265706C6163657320746865206669727374206F6363757272656E6365206F662060776861746020696E207468697320737472696E672077697468206077697468602E20436173652D696E73656E7369746976652E
+		Protected Sub Replace(vm As ObjoScript.VM)
+		  /// Replaces the first occurrence of `what` in this string with `with`.
+		  /// Case-sensitive.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is `what` (the string to search for)
+		  /// - Slot 2 is `with` (the replacement string)
+		  ///
+		  /// String.replace(what, with) -> string
+		  
+		  /// Since this is a built-in type, slot 0 will be a string (not an instance object).
+		  Var s As String = vm.GetSlotValue(0)
+		  
+		  // Assert `what` and `with` are strings.
+		  If Not vm.GetSlotValue(1).Type = Variant.TypeString Then
+		    vm.Error("The `what` argument must be a string.")
+		  ElseIf Not vm.GetSlotValue(2).Type = Variant.TypeString Then
+		    vm.Error("The `with` argument must be a string.")
+		  End If
+		  
+		  vm.SetReturn(s.ReplaceBytes(vm.GetSlotValue(1), vm.GetSlotValue(2)))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 5265706C6163657320616C6C206F6363757272656E636573206F662060776861746020696E207468697320737472696E672077697468206077697468602E20436173652D73656E7369746976652E
+		Protected Sub ReplaceAll(vm As ObjoScript.VM)
+		  /// Replaces all occurrences of `what` in this string with `with`.
+		  /// Case-sensitive.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is `what` (the string to search for)
+		  /// - Slot 2 is `with` (the replacement string)
+		  ///
+		  /// String.replaceAll(what, with) -> string
+		  
+		  /// Since this is a built-in type, slot 0 will be a string (not an instance object).
+		  Var s As String = vm.GetSlotValue(0)
+		  
+		  // Assert `what` and `with` are strings.
+		  If Not vm.GetSlotValue(1).Type = Variant.TypeString Then
+		    vm.Error("The `what` argument must be a string.")
+		  ElseIf Not vm.GetSlotValue(2).Type = Variant.TypeString Then
+		    vm.Error("The `with` argument must be a string.")
+		  End If
+		  
+		  vm.SetReturn(s.ReplaceAllBytes(vm.GetSlotValue(1), vm.GetSlotValue(2)))
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 52657475726E73207468652066697273742060636F756E746020636861726163746572732066726F6D207468697320737472696E672E
 		Protected Sub Right(vm As ObjoScript.VM)
 		  /// Returns the last `count` characters from this string.
@@ -602,6 +664,102 @@ Protected Module String_
 		  
 		  Var s As String = vm.GetSlotValue(0)
 		  vm.SetReturn(s.Titlecase)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207468697320737472696E67207769746820776869746573706163652072656D6F7665642066726F6D2074686520626567696E6E696E6720616E6420656E642E
+		Protected Sub Trim(vm As ObjoScript.VM)
+		  /// Returns this string with whitespace removed from the beginning and end.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  ///
+		  /// String.trim() -> string
+		  /// Whitespace characters are defined here: http://www.unicode.org/Public/UNIDATA/PropList.txt
+		  
+		  Var s As String = vm.GetSlotValue(0)
+		  vm.SetReturn(s.Trim)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207468697320737472696E67207769746820606368617273602072656D6F7665642066726F6D2074686520626567696E6E696E6720616E6420656E642E
+		Protected Sub TrimChars(vm As ObjoScript.VM)
+		  /// Returns this string with `chars` removed from the beginning and end.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is the `chars` argument.
+		  ///
+		  /// String.trim(chars) -> string
+		  
+		  Var s As String = vm.GetSlotValue(0)
+		  vm.SetReturn(s.Trim(vm.GetSlotAsString(1)))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207468697320737472696E67207769746820776869746573706163652072656D6F7665642066726F6D2074686520656E642E
+		Protected Sub TrimEnd(vm As ObjoScript.VM)
+		  /// Returns this string with whitespace removed from the end.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  ///
+		  /// String.trimEnd() -> string
+		  /// Whitespace characters are defined here: http://www.unicode.org/Public/UNIDATA/PropList.txt
+		  
+		  Var s As String = vm.GetSlotValue(0)
+		  vm.SetReturn(s.TrimRight)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207468697320737472696E67207769746820606368617273602072656D6F7665642066726F6D2074686520656E642E
+		Protected Sub TrimEndChars(vm As ObjoScript.VM)
+		  /// Returns this string with `chars` removed from the end.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is the `chars` argument
+		  ///
+		  /// String.trimEnd(chars) -> string
+		  
+		  Var s As String = vm.GetSlotValue(0)
+		  vm.SetReturn(s.TrimRight(vm.GetSlotAsString(1)))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207468697320737472696E67207769746820776869746573706163652072656D6F7665642066726F6D2074686520626567696E6E696E672E
+		Protected Sub TrimStart(vm As ObjoScript.VM)
+		  /// Returns this string with whitespace removed from the beginning.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  ///
+		  /// String.trimStart() -> string
+		  /// Whitespace characters are defined here: http://www.unicode.org/Public/UNIDATA/PropList.txt
+		  
+		  Var s As String = vm.GetSlotValue(0)
+		  vm.SetReturn(s.TrimLeft)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207468697320737472696E67207769746820606368617273602072656D6F7665642066726F6D2074686520626567696E6E696E672E
+		Protected Sub TrimStartChars(vm As ObjoScript.VM)
+		  /// Returns this string with `chars` removed from the beginning.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is the `chars` argument
+		  ///
+		  /// String.trimStart(chars) -> string
+		  
+		  Var s As String = vm.GetSlotValue(0)
+		  vm.SetReturn(s.TrimLeft(vm.GetSlotAsString(1)))
 		  
 		End Sub
 	#tag EndMethod

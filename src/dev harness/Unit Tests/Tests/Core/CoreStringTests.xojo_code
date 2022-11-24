@@ -86,6 +86,18 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub ReplaceAllTest()
+		  AssertOutputsEqual("core.string.replaceAll")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ReplaceTest()
+		  AssertOutputsEqual("core.string.replace")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub RightTest()
 		  AssertOutputsEqual("core.string.right")
 		End Sub
@@ -94,6 +106,24 @@ Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub TitlecaseTest()
 		  AssertOutputsEqual("core.string.titlecase")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub TrimEndTest()
+		  AssertOutputsEqual("core.string.trimEnd")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub TrimStartTest()
+		  AssertOutputsEqual("core.string.trimStart")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub TrimTest()
+		  AssertOutputsEqual("core.string.trim")
 		End Sub
 	#tag EndMethod
 

@@ -1,0 +1,3 @@
+System.print("hello".replace("h", "y")) // yello
+System.print("hello".replace("x", "y")) // hello
+System.print("hello".replace("h", "")) // ello
