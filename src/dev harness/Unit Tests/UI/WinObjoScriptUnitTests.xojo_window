@@ -8,9 +8,9 @@ Begin DesktopWindow WinObjoScriptUnitTests
    HasBackgroundColor=   False
    HasCloseButton  =   True
    HasFullScreenButton=   False
-   HasMaximizeButton=   False
+   HasMaximizeButton=   True
    HasMinimizeButton=   True
-   Height          =   784
+   Height          =   640
    ImplicitInstance=   True
    MacProcID       =   0
    MaximumHeight   =   32000
@@ -23,7 +23,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
    Title           =   "ObjoScript Unit Tests"
    Type            =   0
    Visible         =   True
-   Width           =   1400
+   Width           =   1200
    Begin DesktopGroupBox GroupBoxes
       AllowAutoDeactivate=   True
       Bold            =   False
@@ -51,7 +51,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
       Transparent     =   False
       Underline       =   False
       Visible         =   True
-      Width           =   1061
+      Width           =   861
       Begin DesktopLabel Labels
          AllowAutoDeactivate=   True
          Bold            =   False
@@ -523,7 +523,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
       FontName        =   "System"
       FontSize        =   0.0
       FontUnit        =   0
-      Height          =   550
+      Height          =   406
       Index           =   1
       InitialParent   =   ""
       Italic          =   False
@@ -542,7 +542,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
       Transparent     =   False
       Underline       =   False
       Visible         =   True
-      Width           =   1067
+      Width           =   867
       Begin DesktopLabel TestNameLabel
          AllowAutoDeactivate=   True
          Bold            =   True
@@ -574,7 +574,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Transparent     =   False
          Underline       =   False
          Visible         =   True
-         Width           =   809
+         Width           =   609
       End
       Begin DesktopLabel Labels
          AllowAutoDeactivate=   True
@@ -686,7 +686,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          Index           =   -2147483648
          InitialParent   =   "GroupBoxes$1"
          Italic          =   False
-         Left            =   1267
+         Left            =   1067
          LockBottom      =   False
          LockedInPosition=   True
          LockLeft        =   False
@@ -724,7 +724,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          HasBorder       =   True
          HasHorizontalScrollbar=   False
          HasVerticalScrollbar=   True
-         Height          =   403
+         Height          =   259
          HideSelection   =   True
          Index           =   -2147483648
          InitialParent   =   "GroupBoxes$1"
@@ -754,7 +754,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          UnicodeMode     =   1
          ValidationMask  =   ""
          Visible         =   True
-         Width           =   514
+         Width           =   314
       End
       Begin DesktopLabel LabelMessages
          AllowAutoDeactivate=   True
@@ -825,7 +825,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
          HasLeftBorder   =   False
          HasRightBorder  =   False
          HasTopBorder    =   False
-         Height          =   403
+         Height          =   259
          HighlightCurrentLine=   False
          HighlightDelimitersAroundCaret=   False
          Index           =   -2147483648
@@ -893,7 +893,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
       Height          =   16
       Index           =   -2147483648
       InitialParent   =   ""
-      Left            =   1364
+      Left            =   1164
       LockBottom      =   False
       LockedInPosition=   True
       LockLeft        =   False
@@ -937,7 +937,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
       HasHorizontalScrollbar=   False
       HasVerticalScrollbar=   True
       HeadingIndex    =   -1
-      Height          =   764
+      Height          =   620
       Index           =   -2147483648
       InitialParent   =   ""
       InitialValue    =   ""
@@ -969,8 +969,10 @@ End
 #tag WindowCode
 	#tag Event
 		Sub Opening()
-		  Me.Top = 100
-		  Me.Left = 50
+		  #If TargetMacOS
+		    Me.Top = 100
+		    Me.Left = 50
+		  #EndIf
 		  
 		  // Setup the editor.
 		  TestSourceCodeArea.Formatter = New ObjoScriptFormatter

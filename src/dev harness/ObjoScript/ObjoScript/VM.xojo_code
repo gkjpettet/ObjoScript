@@ -2011,7 +2011,12 @@ Protected Class VM
 		    If v.DoubleValue.IsInteger Then
 		      Return CType(v, Integer).ToString
 		    Else
-		      Return v.DoubleValue.ToString(Locale.Current, "#.#########")
+		      If v.DoubleValue.IsNotANumber Then
+		        // Always return NaN, not -NaN as is returned on some platforms.
+		        Return "NaN"
+		      Else
+		        Return v.DoubleValue.ToString(Locale.Current, "#.#########")
+		      End If
 		    End If
 		    
 		  Else

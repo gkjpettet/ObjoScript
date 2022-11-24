@@ -142,7 +142,7 @@ Inherits TestGroup
 		  Var expected As String = tin.ReadAll
 		  tin.Close
 		  
-		  Return expected
+		  Return expected.ReplaceLineEndings(EndOfLine.UNIX)
 		  
 		End Function
 	#tag EndMethod
@@ -217,7 +217,7 @@ Inherits TestGroup
 		Sub VMPrintDelegate(sender As ObjoScript.VM, s As String)
 		  #Pragma Unused sender
 		  
-		  mPrintBuffer = mPrintBuffer + s + EndOfLine
+		  mPrintBuffer = mPrintBuffer + s + EndOfLine.UNIX
 		  
 		End Sub
 	#tag EndMethod
