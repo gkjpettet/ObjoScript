@@ -812,6 +812,8 @@ Begin DesktopWindow WinObjoScriptUnitTests
          CurrentLineHighlightColor=   &c00000000
          CurrentLineNumberColor=   &c00000000
          CurrentUndoID   =   0
+         DebuggingLine   =   0
+         DebugLineColour =   &c00000000
          DisplayLineNumbers=   True
          DrawBlockLines  =   True
          Enabled         =   True
@@ -967,10 +969,11 @@ End
 #tag WindowCode
 	#tag Event
 		Sub Opening()
-		  Me.Center
+		  Me.Top = 100
+		  Me.Left = 50
 		  
 		  // Setup the editor.
-		  TestSourceCodeArea.Formatter = New XUICEObjoScriptFormatter
+		  TestSourceCodeArea.Formatter = New ObjoScriptFormatter
 		  TestSourceCodeArea.Theme = XUICETheme.FromFile(SpecialFolder.Resource("EditorTheme.toml"))
 		  
 		  Controller.LoadTestGroups
