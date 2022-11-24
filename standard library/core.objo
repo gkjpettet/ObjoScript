@@ -95,6 +95,7 @@ foreign sign()
 foreign sqrt()
 foreign sin()
 foreign tan()
+foreign toString()
 }
 
 /// ----------------------------------------------------

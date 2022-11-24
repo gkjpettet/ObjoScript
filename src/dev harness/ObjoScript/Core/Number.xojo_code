@@ -204,6 +204,7 @@ Protected Module Number
 		  d.Value("sqrt()")      = AddressOf Sqrt_
 		  d.Value("sin()")       = AddressOf Sin_
 		  d.Value("tan()")       = AddressOf Tan_
+		  d.Value("toString()")  = AddressOf ToString
 		  
 		  Return d
 		  
@@ -470,6 +471,18 @@ Protected Module Number
 		  /// Number.tan() -> Number
 		  
 		  vm.SetReturn(CType(Tan(vm.GetSlotValue(0)), Double))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E732074686520636F73696E65206F6620746865206E756D6265722E
+		Protected Sub ToString(vm As ObjoScript.VM)
+		  /// Returns a string representation of this number.
+		  ///
+		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
+		  /// Number.toString() -> string
+		  
+		  vm.SetReturn(vm.GetSlotAsString(0))
 		  
 		End Sub
 	#tag EndMethod
