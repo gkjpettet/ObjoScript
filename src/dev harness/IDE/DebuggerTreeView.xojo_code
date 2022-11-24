@@ -59,7 +59,8 @@ Inherits DesktopTreeView
 		      node = New TreeViewNode(name + ": nothing")
 		      
 		    Else
-		      Raise New InvalidArgumentException("Unknown value type.")
+		      // This shouldn't happen but we'll handle it gracefully instead of crashing.
+		      node = New TreeViewNode(name + ": Nil")
 		    End If
 		  End Select
 		  
