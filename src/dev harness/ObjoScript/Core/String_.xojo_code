@@ -194,6 +194,35 @@ Protected Module String_
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 52657475726E73207472756520696620606F7468657260206973206120737562737472696E67206F66207468697320737472696E672E20436173652D73656E73697469766520636F6D70617269736F6E2E
+		Protected Sub Index(vm As ObjoScript.VM)
+		  /// Returns the character at `index` in this string.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot is `index` - a positive integer.
+		  /// String.[index] -> string
+		  
+		  #Pragma BreakOnExceptions False
+		  
+		  Var s As String = vm.GetSlotValue(0)
+		  
+		  // Assert `index` is a positive integer.
+		  Var arg As Variant = vm.GetSlotValue(1)
+		  If Not ObjoScript.VariantIsPositiveInteger(arg) Then
+		    vm.Error("The `index` argument must be a positive integer.")
+		  End If
+		  Var index As Integer = arg
+		  
+		  Try
+		    vm.SetReturn(s.MiddleCharacters(index, 1))
+		  Catch e As OutOfBoundsException
+		    vm.Error("The index is out of bounds (" + index.ToString + ").")
+		  End Try
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 52657475726E732074686520706F736974696F6E206F6620746865206669727374206F6363757272656E6365206F6620606F746865726020696E73696465207468697320737472696E67206F7220602D3160206966206E6F7420666F756E642E20436173652073656E7369746976652E
 		Protected Sub IndexOf(vm As ObjoScript.VM)
 		  /// Returns the position of the first occurrence of `other` inside this string or `-1` if not found. Case sensitive.
@@ -292,6 +321,7 @@ Protected Module String_
 		  
 		  d.Value("+(_)")             = AddressOf Add
 		  d.Value("*(_)")             = AddressOf Multiply
+		  d.Value("[_]")              = AddressOf Index
 		  d.Value("codePoints()")     = AddressOf CodePoints
 		  d.Value("contains(_)")      = AddressOf Contains
 		  d.Value("count()")          = AddressOf Count

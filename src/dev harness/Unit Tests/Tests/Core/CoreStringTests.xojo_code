@@ -44,8 +44,26 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub IndexNegativeArgumentTest()
+		  AssertRuntimeError("core.string.index_negative_argument")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub IndexOfTest()
 		  AssertOutputsEqual("core.string.indexOf")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub IndexOutOfBoundsTest()
+		  AssertRuntimeError("core.string.index_out_of_bounds")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub IndexTest()
+		  AssertOutputsEqual("core.string.index")
 		End Sub
 	#tag EndMethod
 

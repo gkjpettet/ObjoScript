@@ -195,6 +195,7 @@ foreign static fromCodepoint(codePoint)
 
 foreign +(other)
 foreign *(count)
+foreign [index]
 foreign codePoints()
 foreign contains(other)
 foreign count()
