@@ -336,19 +336,23 @@ Protected Module String_
 		  
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  
-		  d.Value("+(_)")            = AddressOf Add
-		  d.Value("beginsWith(_)")   = AddressOf BeginsWith
-		  d.Value("beginsWith(_,_)") = AddressOf BeginsWithCaseSensitivity
-		  d.Value("codePoints()")    = AddressOf CodePoints
-		  d.Value("contains(_)")     = AddressOf Contains
-		  d.Value("count()")         = AddressOf Count
-		  d.Value("endsWith(_)")     = AddressOf EndsWith
-		  d.Value("endsWith(_,_)")   = AddressOf EndsWithCaseSensitivity
-		  d.Value("indexOf(_)")      = AddressOf IndexOf
-		  d.Value("indexOf(_,_)")    = AddressOf IndexOfStart
-		  d.Value("indexOf(_,_,_)")  = AddressOf IndexOfCaseSensitivity
+		  d.Value("+(_)")             = AddressOf Add
+		  d.Value("beginsWith(_)")    = AddressOf BeginsWith
+		  d.Value("beginsWith(_,_)")  = AddressOf BeginsWithCaseSensitivity
+		  d.Value("codePoints()")     = AddressOf CodePoints
+		  d.Value("contains(_)")      = AddressOf Contains
+		  d.Value("count()")          = AddressOf Count
+		  d.Value("endsWith(_)")      = AddressOf EndsWith
+		  d.Value("endsWith(_,_)")    = AddressOf EndsWithCaseSensitivity
+		  d.Value("indexOf(_)")       = AddressOf IndexOf
+		  d.Value("indexOf(_,_)")     = AddressOf IndexOfStart
+		  d.Value("indexOf(_,_,_)")   = AddressOf IndexOfCaseSensitivity
 		  d.Value("iterate(_)")       = AddressOf Iterate
 		  d.Value("iteratorValue(_)") = AddressOf IteratorValue
+		  d.Value("left(_)")          = AddressOf Left
+		  d.Value("middle(_)")        = AddressOf Middle
+		  d.Value("middle(_,_)")      = AddressOf MiddleLength
+		  d.Value("right(_)")         = AddressOf Right
 		  
 		  Return d
 		  
@@ -438,6 +442,134 @@ Protected Module String_
 		    vm.Error("The iterator is out of bounds (" + index.ToString + ").")
 		  End Try
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207468652066697273742060636F756E746020636861726163746572732066726F6D207468697320737472696E672E
+		Protected Sub Left(vm As ObjoScript.VM)
+		  /// Returns the first `count` characters from this string.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is a number
+		  ///
+		  /// String.left(count) -> string
+		  ///
+		  /// If `count` is greater than the length of the string then a runtime error occurs.
+		  
+		  #Pragma BreakOnExceptions False
+		  
+		  // Since this is a built-in type, slot 0 will be a string (not an instance object).
+		  Var s As String = vm.GetSlotValue(0)
+		  
+		  // Assert `count` is a positive integer.
+		  Var count As Variant = vm.GetSlotValue(1)
+		  If Not ObjoScript.VariantIsPositiveInteger(count) Then
+		    vm.Error("The `count` argument must be a positive integer.")
+		  End If
+		  
+		  Try
+		    vm.SetReturn(s.LeftCharacters(count))
+		  Catch e As OutOfBoundsException
+		    vm.Error("The `count` argument is out of bounds (" + count.IntegerValue.ToString + ").")
+		  End Try
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320746865206120706F7274696F6E206F66207468697320737472696E6720626567696E6E696E6720617420696E646578206073746172746020756E74696C2074686520656E64206F662074686520737472696E672E
+		Protected Sub Middle(vm As ObjoScript.VM)
+		  /// Returns the a portion of this string beginning at index `start` until the end of the string.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is a number
+		  ///
+		  /// String.middle(start) -> string
+		  
+		  #Pragma BreakOnExceptions False
+		  
+		  // Since this is a built-in type, slot 0 will be a string (not an instance object).
+		  Var s As String = vm.GetSlotValue(0)
+		  
+		  // Assert `start` is a positive integer.
+		  Var start As Variant = vm.GetSlotValue(1)
+		  If Not ObjoScript.VariantIsPositiveInteger(start) Then
+		    vm.Error("The `start` argument must be a positive integer.")
+		  End If
+		  
+		  Try
+		    vm.SetReturn(s.MiddleCharacters(start))
+		  Catch e As OutOfBoundsException
+		    vm.Error("The `start` argument is out of bounds (" + start.IntegerValue.ToString + ").")
+		  End Try
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320606C656E67746860206368617261637465727320626567696E6E696E6720617420607374617274602066726F6D207468697320737472696E672E
+		Protected Sub MiddleLength(vm As ObjoScript.VM)
+		  /// Returns `length` characters beginning at `start` from this string.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is a number
+		  /// - Slot 2 is a number
+		  ///
+		  /// String.middle(start< length) -> string
+		  
+		  #Pragma BreakOnExceptions False
+		  
+		  // Since this is a built-in type, slot 0 will be a string (not an instance object).
+		  Var s As String = vm.GetSlotValue(0)
+		  
+		  // Assert `start` and `length` are positive integers.
+		  Var start As Variant = vm.GetSlotValue(1)
+		  If Not ObjoScript.VariantIsPositiveInteger(start) Then
+		    vm.Error("The `start` argument must be a positive integer.")
+		  End If
+		  Var length As Variant = vm.GetSlotValue(2)
+		  If Not ObjoScript.VariantIsPositiveInteger(length) Then
+		    vm.Error("The `start` argument must be a positive integer.")
+		  End If
+		  
+		  Try
+		    vm.SetReturn(s.MiddleCharacters(start, length))
+		  Catch e As OutOfBoundsException
+		    vm.Error("Out of bounds error.")
+		  End Try
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E73207468652066697273742060636F756E746020636861726163746572732066726F6D207468697320737472696E672E
+		Protected Sub Right(vm As ObjoScript.VM)
+		  /// Returns the last `count` characters from this string.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is a number
+		  ///
+		  /// String.right(count) -> string
+		  ///
+		  /// If `count` is greater than the length of the string then a runtime error occurs.
+		  
+		  #Pragma BreakOnExceptions False
+		  
+		  // Since this is a built-in type, slot 0 will be a string (not an instance object).
+		  Var s As String = vm.GetSlotValue(0)
+		  
+		  // Assert `count` is a positive integer.
+		  Var count As Variant = vm.GetSlotValue(1)
+		  If Not ObjoScript.VariantIsPositiveInteger(count) Then
+		    vm.Error("The `count` argument must be a positive integer.")
+		  End If
+		  
+		  Try
+		    vm.SetReturn(s.RightCharacters(count))
+		  Catch e As OutOfBoundsException
+		    vm.Error("The `count` argument is out of bounds (" + count.IntegerValue.ToString + ").")
+		  End Try
 		End Sub
 	#tag EndMethod
 

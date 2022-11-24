@@ -206,6 +206,10 @@ foreign indexOf(other, start)
 foreign indexOf(other, start, caseSensitive)
 foreign iterate(iter)
 foreign iteratorValue(iter)
+foreign left(count)
+foreign middle(start)
+foreign middle(start, length)
+foreign right(count)
 }
 
 /// ----------------------------------------------------

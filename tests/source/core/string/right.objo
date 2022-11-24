@@ -1,0 +1,5 @@
+System.print("hello".right(1)) // o
+System.print("hello".right(3)) // llo
+System.print("hello".right(0)) // ""
+System.print("hello".right(5)) // hello
+System.print("😀+☺️".right(1)) // ☺️

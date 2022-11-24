@@ -55,6 +55,24 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub LeftTest()
+		  AssertOutputsEqual("core.string.left")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub MiddleTest()
+		  AssertOutputsEqual("core.string.middle")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub RightTest()
+		  AssertOutputsEqual("core.string.right")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
