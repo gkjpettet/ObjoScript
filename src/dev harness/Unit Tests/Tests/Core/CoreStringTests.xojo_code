@@ -80,6 +80,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub MultiplyTest()
+		  AssertOutputsEqual("core.string.multiply")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub ReplaceAllTest()
 		  AssertOutputsEqual("core.string.replaceAll")
 		End Sub

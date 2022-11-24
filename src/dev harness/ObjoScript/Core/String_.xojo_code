@@ -291,6 +291,7 @@ Protected Module String_
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  
 		  d.Value("+(_)")             = AddressOf Add
+		  d.Value("*(_)")             = AddressOf Multiply
 		  d.Value("codePoints()")     = AddressOf CodePoints
 		  d.Value("contains(_)")      = AddressOf Contains
 		  d.Value("count()")          = AddressOf Count
@@ -520,6 +521,35 @@ Protected Module String_
 		    vm.Error("Out of bounds error.")
 		  End Try
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 436F6E636174656E61746573207468697320737472696E6720776974682074686520617267756D656E7420696E20736C6F74203120616E642072657475726E732074686520726573756C742E
+		Protected Sub Multiply(vm As ObjoScript.VM)
+		  /// Returns a new string that contains this string repeated `count` times.
+		  ///
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is the `count` argument.
+		  ///
+		  /// String.*(count) -> string
+		  
+		  Var original As String = vm.GetSlotValue(0)
+		  
+		  // It is a runtime error if count is not a positive integer.
+		  Var arg As Variant = vm.GetSlotValue(1)
+		  If Not ObjoScript.VariantIsPositiveInteger(arg) Then
+		    vm.Error("The `String.*(_)` method expects a positive integer argument.")
+		  End If
+		  Var count As Integer = arg
+		  
+		  Var s() As String
+		  For i As Integer = 1 To count
+		    s.Add(original)
+		  Next i
+		  
+		  vm.SetReturn(String.FromArray(s, ""))
 		End Sub
 	#tag EndMethod
 

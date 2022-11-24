@@ -194,6 +194,7 @@ foreign class String is Sequence {
 foreign static fromCodepoint(codePoint)
 
 foreign +(other)
+foreign *(count)
 foreign codePoints()
 foreign contains(other)
 foreign count()
