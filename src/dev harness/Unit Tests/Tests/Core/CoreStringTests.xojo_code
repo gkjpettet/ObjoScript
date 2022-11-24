@@ -2,8 +2,56 @@
 Protected Class CoreStringTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
+		Sub AddTest()
+		  AssertOutputsEqual("core.string.add")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub BeginsWithTest()
+		  AssertOutputsEqual("core.string.beginsWith")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub CodepointsTest()
 		  AssertOutputsEqual("core.string.codepoints")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ContainsTest()
+		  AssertOutputsEqual("core.string.contains")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub CountTest()
+		  AssertOutputsEqual("core.string.count")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub EndsWithTest()
+		  AssertOutputsEqual("core.string.endsWith")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ForEachTest()
+		  AssertOutputsEqual("core.string.foreach")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub FromCodepointTest()
+		  AssertOutputsEqual("core.string.fromCodepoint")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub IndexOfTest()
+		  AssertOutputsEqual("core.string.indexOf")
 		End Sub
 	#tag EndMethod
 

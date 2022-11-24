@@ -1,0 +1,4 @@
+System.print("abCD".contains("ab")) // Expect true
+System.print("abCD".contains("a")) // Expect true
+System.print("abCD".contains("A")) // Expect false
+System.print("abCD".contains("")) // Expect true

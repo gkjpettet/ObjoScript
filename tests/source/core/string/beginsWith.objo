@@ -1,0 +1,7 @@
+System.print("garry".beginsWith("g")) // Expect true
+System.print("garry".beginsWith("g", true)) // Expect true
+System.print("garry".beginsWith("g", false)) // Expect true
+
+System.print("garry".beginsWith("G")) // Expect false
+System.print("garry".beginsWith("G", true)) // Expect false
+System.print("garry".beginsWith("G", false)) // Expect true

@@ -1,0 +1,5 @@
+abc1
+abctrue
+abcd
+abc[1, 2]
+abc{key : value}

@@ -1,0 +1,3 @@
+foreach char in "hello" { System.print(char) }
+foreach char in "" { System.print(char) }
+foreach char in "abc🚀😎" { System.print(char) }

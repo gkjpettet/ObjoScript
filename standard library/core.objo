@@ -190,14 +190,22 @@ return this.iterate(nothing) ? false : true
 /// ----------------------------------------------------
 /// STRING
 /// ----------------------------------------------------
-foreign class String {
+foreign class String is Sequence {
 foreign static fromCodepoint(codePoint)
 
 foreign +(other)
 foreign beginsWith(prefix)
+foreign beginsWith(prefix, caseSensitive)
 foreign codePoints()
 foreign contains(other)
 foreign count()
+foreign endsWith(suffix)
+foreign endsWith(suffix, caseSensitive)
+foreign indexOf(other)
+foreign indexOf(other, start)
+foreign indexOf(other, start, caseSensitive)
+foreign iterate(iter)
+foreign iteratorValue(iter)
 }
 
 /// ----------------------------------------------------
@@ -223,14 +231,12 @@ foreign clone()
 foreign count()
 foreign indexOf(value)
 foreign insert(index, value)
+foreign iterate(iter)
+foreign iteratorValue(iter)
 foreign remove(value)
 foreign removeAt(index)
 foreign swap(index0, index1)
 foreign toString()
-
-// Iterator protocol.
-foreign iterate(iter)
-foreign iteratorValue(iter)
 
 /// Creates a new list by concatenating this list and `other` (an iterable).
 +(other) {

@@ -29,9 +29,9 @@ Protected Module String_
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h1, Description = 52657475726E7320547275652069662074686520737472696E6720626567696E7320776974682060707265666978602E
+	#tag Method, Flags = &h1, Description = 52657475726E7320547275652069662074686520737472696E6720626567696E7320776974682060707265666978602E20436173652D73656E7369746976652E
 		Protected Sub BeginsWith(vm As ObjoScript.VM)
-		  /// Returns True if the string begins with `prefix`.
+		  /// Returns True if the string begins with `prefix`. Case-sensitive.
 		  ///
 		  /// Assumes: 
 		  /// - Slot 0 is a string
@@ -43,6 +43,34 @@ Protected Module String_
 		  Var s As String = vm.GetSlotValue(0)
 		  
 		  vm.SetReturn(s.BeginsWith(vm.GetSlotAsString(1), ComparisonOptions.CaseSensitive))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320547275652069662074686520737472696E6720626567696E7320776974682060707265666978602E2054686520606361736553656E7369746976656020617267756D656E742064657465726D696E657320636173652D73656E73697469766974792E
+		Protected Sub BeginsWithCaseSensitivity(vm As ObjoScript.VM)
+		  /// Returns True if the string begins with `prefix`. The `caseSensitive` argument determines case-sensitivity.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is the prefix to check for.
+		  /// - Slot 2 is the `caseSensitive` argument.
+		  ///
+		  /// String.beginsWith(prefix, caseSensitive) -> boolean
+		  
+		  // Assert `prefix` is a string.
+		  Var prefix As Variant = vm.GetSlotValue(1)
+		  If prefix.Type <> Variant.TypeString Then
+		    vm.Error("The argument must be a string.")
+		  End If
+		  
+		  If vm.IsFalsey(vm.GetSlotValue(2)) Then
+		    // Case-insensitive.
+		    vm.SetReturn(vm.GetSlotValue(0).StringValue.BeginsWith(prefix, ComparisonOptions.CaseInsensitive))
+		  Else
+		    // Case sensitive.
+		    vm.SetReturn(vm.GetSlotValue(0).StringValue.BeginsWith(prefix, ComparisonOptions.CaseSensitive))
+		  End If
 		  
 		End Sub
 	#tag EndMethod
@@ -133,6 +161,53 @@ Protected Module String_
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 52657475726E732074727565206966207468697320737472696E6720656E647320776974682060737566666978602E20436173652D696E73656E7369746976652E
+		Protected Sub EndsWith(vm As ObjoScript.VM)
+		  /// Returns true if this string ends with `suffix`. Case-insensitive.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is a string.
+		  /// String.endsWith(suffix) -> boolean
+		  
+		  // Assert `suffix` is a string.
+		  Var suffix As Variant = vm.GetSlotValue(1)
+		  
+		  If suffix.Type <> Variant.TypeString Then
+		    vm.Error("The argument must be a string.")
+		  End If
+		  
+		  vm.SetReturn(vm.GetSlotValue(0).StringValue.EndsWith(suffix, ComparisonOptions.CaseSensitive))
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E732074727565206966207468697320737472696E6720656E647320776974682060737566666978602E2054686520606361736553656E7369746976656020617267756D656E742064657465726D696E657320636173652D73656E73697469766974792E
+		Protected Sub EndsWithCaseSensitivity(vm As ObjoScript.VM)
+		  /// Returns true if this string ends with `suffix`. The `caseSensitive` argument determines case-sensitivity.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is a string.
+		  /// - Slot 2 is the `caseSensitive` argument
+		  /// String.endsWith(suffix, caseSensitive) -> boolean
+		  
+		  // Assert `suffix` is a string.
+		  Var suffix As Variant = vm.GetSlotValue(1)
+		  If suffix.Type <> Variant.TypeString Then
+		    vm.Error("The argument must be a string.")
+		  End If
+		  
+		  If vm.IsFalsey(vm.GetSlotValue(2)) Then
+		    // Case-insensitive.
+		    vm.SetReturn(vm.GetSlotValue(0).StringValue.EndsWith(suffix, ComparisonOptions.CaseInsensitive))
+		  Else
+		    // Case sensitive.
+		    vm.SetReturn(vm.GetSlotValue(0).StringValue.EndsWith(suffix, ComparisonOptions.CaseSensitive))
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 52657475726E732061206E657720737472696E6720636F6E7461696E696E6720746865205554462D3820656E636F64696E67206F662060636F6465706F696E74602E
 		Protected Sub FromCodePoint(vm As ObjoScript.VM)
 		  /// Returns a new string containing the UTF-8 encoding of `codepoint`.
@@ -165,17 +240,115 @@ Protected Module String_
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 52657475726E732074686520706F736974696F6E206F6620746865206669727374206F6363757272656E6365206F6620606F746865726020696E73696465207468697320737472696E67206F7220602D3160206966206E6F7420666F756E642E20436173652073656E7369746976652E
+		Protected Sub IndexOf(vm As ObjoScript.VM)
+		  /// Returns the position of the first occurrence of `other` inside this string or `-1` if not found. Case sensitive.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is a string.
+		  /// String.indexOf(other) -> number
+		  
+		  // Assert `other` is a string.
+		  Var other As Variant = vm.GetSlotValue(1)
+		  
+		  If other.Type <> Variant.TypeString Then
+		    vm.Error("The argument must be a string.")
+		  End If
+		  
+		  vm.SetReturn(CType(vm.GetSlotValue(0).StringValue.IndexOf(0, other, ComparisonOptions.CaseSensitive), Double))
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E732074686520706F736974696F6E206F6620606F746865726020696E73696465207468697320737472696E67206F7220602D3160206966206E6F7420666F756E642E20426567696E7320617420696E64657820607374617274602E2054686520606361736553656E7369746976656020617267756D656E742064657465726D696E657320636173652073656E73697469766974792E
+		Protected Sub IndexOfCaseSensitivity(vm As ObjoScript.VM)
+		  /// Returns the position of `other` inside this string or `-1` if not found.
+		  /// Begins at index `start`.
+		  /// The `caseSensitive` argument determines case sensitivity.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is a string.
+		  /// - Slot 2 is an integer number.
+		  /// - Slot 3 is the `caseSensitive` argument.
+		  /// String.indexOf(other, start, caseSensitive) -> number
+		  
+		  // Assert `other` is a string.
+		  Var other As Variant = vm.GetSlotValue(1)
+		  If other.Type <> Variant.TypeString Then
+		    vm.Error("The argument must be a string.")
+		  End If
+		  
+		  // Assert `start` is a positive integer.
+		  If Not ObjoScript.VariantIsIntegerDouble(vm.GetSlotValue(2)) Then
+		    vm.Error("The `start` argument should be a positive integer.")
+		  End If
+		  Var start As Integer = vm.GetSlotValue(2)
+		  If start < 0 Then
+		    vm.Error("The `start` argument should be a positive integer.")
+		  End If
+		  
+		  If vm.IsFalsey(vm.GetSlotValue(3)) Then
+		    // Case-insensitive.
+		    vm.SetReturn(CType(vm.GetSlotValue(0).StringValue.IndexOf(start, other, ComparisonOptions.CaseInsensitive), Double))
+		  Else
+		    // Case sensitive.
+		    vm.SetReturn(CType(vm.GetSlotValue(0).StringValue.IndexOf(start, other, ComparisonOptions.CaseSensitive), Double))
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E732074686520706F736974696F6E206F6620746865206669727374206F6363757272656E6365206F6620606F746865726020696E73696465207468697320737472696E67206F7220602D3160206966206E6F7420666F756E642E2054686520606361736553656E7369746976656020617267756D656E742064657465726D696E657320636173652073656E73697469766974792E
+		Protected Sub IndexOfStart(vm As ObjoScript.VM)
+		  /// Returns the position of `other` inside this string or `-1` if not found.
+		  /// Begins at index `start`.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a string
+		  /// - Slot 1 is a string.
+		  /// - Slot 2 is an integer number.
+		  /// String.indexOf(other, start) -> number
+		  
+		  // Assert `other` is a string.
+		  Var other As Variant = vm.GetSlotValue(1)
+		  If other.Type <> Variant.TypeString Then
+		    vm.Error("The argument must be a string.")
+		  End If
+		  
+		  // Assert `start` is a positive integer.
+		  If Not ObjoScript.VariantIsIntegerDouble(vm.GetSlotValue(2)) Then
+		    vm.Error("The `start` argument should be a positive integer.")
+		  End If
+		  Var start As Integer = vm.GetSlotValue(2)
+		  If start < 0 Then
+		    vm.Error("The `start` argument should be a positive integer.")
+		  End If
+		  
+		  vm.SetReturn(CType(vm.GetSlotValue(0).StringValue.IndexOf(start, other, ComparisonOptions.CaseSensitive), Double))
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E73206120636173652D73656E7369746976652064696374696F6E617279206D617070696E6720746865207369676E617475726573206F6620666F726569676E20696E7374616E6365206D6574686F647320746F20586F6A6F206D6574686F64206164647265737365732E
 		Private Function InitialiseInstanceMethodsDictionary() As Dictionary
 		  /// Returns a case-sensitive dictionary mapping the signatures of foreign instance methods to Xojo method addresses.
 		  
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  
-		  d.Value("+(_)")          = AddressOf Add
-		  d.Value("beginsWith(_)") = AddressOf BeginsWith
-		  d.Value("codePoints()")  = AddressOf CodePoints
-		  d.Value("contains(_)")   = AddressOf Contains
-		  d.Value("count()")       = AddressOf Count
+		  d.Value("+(_)")            = AddressOf Add
+		  d.Value("beginsWith(_)")   = AddressOf BeginsWith
+		  d.Value("beginsWith(_,_)") = AddressOf BeginsWithCaseSensitivity
+		  d.Value("codePoints()")    = AddressOf CodePoints
+		  d.Value("contains(_)")     = AddressOf Contains
+		  d.Value("count()")         = AddressOf Count
+		  d.Value("endsWith(_)")     = AddressOf EndsWith
+		  d.Value("endsWith(_,_)")   = AddressOf EndsWithCaseSensitivity
+		  d.Value("indexOf(_)")      = AddressOf IndexOf
+		  d.Value("indexOf(_,_)")    = AddressOf IndexOfStart
+		  d.Value("indexOf(_,_,_)")  = AddressOf IndexOfCaseSensitivity
+		  d.Value("iterate(_)")       = AddressOf Iterate
+		  d.Value("iteratorValue(_)") = AddressOf IteratorValue
 		  
 		  Return d
 		  
@@ -193,6 +366,79 @@ Protected Module String_
 		  Return d
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E732066616C736520696620746865726520617265206E6F206D6F7265206368617261637465727320746F2069746572617465206F722072657475726E732074686520696E64657820696E2074686520737472696E67206F6620746865206E657874206368617261637465722E
+		Protected Sub Iterate(vm As ObjoScript.VM)
+		  /// Returns false if there are no more characters to iterate or returns the index in the string 
+		  /// of the next character.
+		  ///
+		  /// Assumes: 
+		  /// - Slot 0 is a Xojo string.
+		  /// - Slot 1 is the `iter` argument.
+		  ///
+		  /// if `iter` is nothing then we should return 0 or false if an empty string.
+		  /// `iter` should be the index in the string of the previous character.
+		  /// Assumes slot 0 contains a Xojo string.
+		  /// String.iterate(iter) -> number or false
+		  
+		  // Get the string and precompute its last valid index
+		  Var s As String = vm.GetSlotValue(0)
+		  Var sLastIndex As Integer = s.Length - 1
+		  
+		  Var iter As Variant = vm.GetSlotValue(1)
+		  If iter IsA ObjoScript.Nothing Then
+		    If s = "" Then
+		      vm.SetReturn(False)
+		    Else
+		      vm.SetReturn(0.0) // Must be a double as the VM's stack uses doubles internally.
+		    End If
+		    
+		  Else
+		    // Assert that the `iter` index is a positive integer.
+		    If Not ObjoScript.VariantIsPositiveInteger(iter) Then
+		      vm.Error("The iterator must be a positive integer.")
+		    End If
+		    Var index As Double = iter
+		    
+		    // Return the next index or False if there are no more characters.
+		    If index >= sLastIndex Then
+		      vm.SetReturn(False)
+		    Else
+		      vm.SetReturn(index + 1.0)
+		    End If
+		  End If
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320746865206E657874206974657261746F722076616C75652E
+		Protected Sub IteratorValue(vm As ObjoScript.VM)
+		  /// Returns the next iterator value.
+		  ///
+		  /// Assumes:
+		  /// - Slot 0 is a Xojo string.
+		  /// - Slot 1 is an integer.
+		  ///
+		  /// Uses `iter` to determine the next value in the iteration. It should be an index into the string.
+		  /// String.iteratorValue(iter) -> value
+		  
+		  #Pragma BreakOnExceptions False
+		  
+		  Var s As String = vm.GetSlotValue(0)
+		  
+		  // Assert that `iter` is a positive integer.
+		  If Not ObjoScript.VariantIsPositiveInteger(vm.GetSlotValue(1)) Then
+		    vm.Error("The iterator must be a positive integer.")
+		  End If
+		  Var index As Integer = vm.GetSlotValue(1)
+		  
+		  Try
+		    vm.SetReturn(s.Middle(index, 1))
+		  Catch e As OutOfBoundsException
+		    vm.Error("The iterator is out of bounds (" + index.ToString + ").")
+		  End Try
+		  
+		End Sub
 	#tag EndMethod
 
 

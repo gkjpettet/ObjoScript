@@ -1,0 +1,7 @@
+System.print("garry".endsWith("y")) // Expect true
+System.print("garry".endsWith("y", true)) // Expect true
+System.print("garry".endsWith("y", false)) // Expect true
+
+System.print("garry".endsWith("Y")) // Expect false
+System.print("garry".endsWith("Y", true)) // Expect false
+System.print("garry".endsWith("Y", false)) // Expect true

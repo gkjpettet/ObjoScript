@@ -1045,8 +1045,8 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060766020697320636F6E73696465726564202266616C736579222E
-		Private Function IsFalsey(v As Variant) As Boolean
+	#tag Method, Flags = &h0, Description = 52657475726E7320547275652069662060766020697320636F6E73696465726564202266616C736579222E
+		Shared Function IsFalsey(v As Variant) As Boolean
 		  /// Returns True if `v` is considered "falsey".
 		  ///
 		  /// Objo considers the boolean value `false` and the Objo value `nothing` to
@@ -1090,8 +1090,8 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52657475726E73205472756520696620607660206973202A6E6F742A20636F6E73696465726564202266616C736579222E
-		Private Function IsTruthy(v As Variant) As Boolean
+	#tag Method, Flags = &h0, Description = 52657475726E73205472756520696620607660206973202A6E6F742A20636F6E73696465726564202266616C736579222E
+		Shared Function IsTruthy(v As Variant) As Boolean
 		  /// Returns True if `v` is *not* considered "falsey".
 		  ///
 		  /// Objo considers the boolean value `false` and the Objo value `nothing` to
