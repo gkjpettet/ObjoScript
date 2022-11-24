@@ -924,7 +924,7 @@ End
 		  Editor.UndoManager = Self.UndoManager
 		  
 		  // Obviously the editor needs to format Objo code.
-		  Editor.Formatter = New ObjoScriptFormatter
+		  Editor.Formatter = New XUICEObjoScriptFormatter
 		  
 		  // Set the theme.
 		  Editor.Theme = XUICETheme.FromFile(SpecialFolder.Resource("EditorTheme.toml"))
