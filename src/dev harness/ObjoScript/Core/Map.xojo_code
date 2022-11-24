@@ -108,7 +108,7 @@ Protected Module Map
 		  d.Value("keys()")           = AddressOf Keys
 		  d.Value("remove(_)")        = AddressOf Remove
 		  d.Value("toString()")       = AddressOf ToString
-		  d.Value("values()")          = AddressOf Values
+		  d.Value("values()")         = AddressOf Values
 		  d.Value("[_]=(_)")          = AddressOf SubscriptSetter
 		  d.Value("[_]")              = AddressOf Subscript
 		  
