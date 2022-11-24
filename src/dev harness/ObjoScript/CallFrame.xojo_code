@@ -5,7 +5,7 @@ Protected Class CallFrame
 		  Self.Func = Nil
 		  Self.IP = 0
 		  Self.StackBase = 0
-		  Self.Locals = ParseJSON("{}") // Hack: case sensitive dictionary.
+		  Self.Locals = ParseJSON("{}") // HACK: case sensitive dictionary.
 		End Sub
 	#tag EndMethod
 
@@ -14,7 +14,7 @@ Protected Class CallFrame
 		  Self.Func = func
 		  Self.IP = ip
 		  Self.StackBase = stackBase
-		  Self.Locals = ParseJSON("{}") // Hack: case sensitive dictionary.
+		  Self.Locals = ParseJSON("{}") // HACK: case sensitive dictionary.
 		End Sub
 	#tag EndMethod
 
