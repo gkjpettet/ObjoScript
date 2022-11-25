@@ -14,4 +14,6 @@ I needed an embeddable scripting language for an app I'm working on that's writt
 7. Cross platform. The desktop dev harness compiles and runs on macOS, Windows and Linux. The ObjoScript VM compiles without issue on iOS.
 
 ## How to use
-For detailed instructions, see the Wiki.
+For detailed instructions, see the [Wiki].
+
+[Wiki]: https://github.com/gkjpettet/ObjoScript/wiki
