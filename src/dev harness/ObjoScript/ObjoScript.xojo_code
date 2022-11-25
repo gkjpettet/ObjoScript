@@ -74,7 +74,7 @@ Protected Module ObjoScript
 		  If v = Nil Then Return False
 		  
 		  Select Case v.Type
-		  Case Variant.TypeInteger, Variant.TypeDouble
+		  Case Variant.TypeInt32, Variant.TypeInt64, Variant.TypeDouble
 		    Return True
 		  Else
 		    Return False

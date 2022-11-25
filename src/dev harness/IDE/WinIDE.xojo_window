@@ -1378,7 +1378,7 @@ End
 		  
 		  Var d As New MessageDialog
 		  Var b As MessageDialogButton
-		  d.Icon = MessageDialog.GraphicCaution
+		  d.IconType = MessageDialog.IconTypes.Caution
 		  d.ActionButton.Caption = "Save"
 		  d.CancelButton.Visible = True
 		  d.AlternateActionButton.Visible = True // Don't save button.

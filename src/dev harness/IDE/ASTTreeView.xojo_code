@@ -176,7 +176,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  node.AppendNode(New TreeViewNode("Name: " + c.Name))
 		  
 		  // Instance methods
-		  If c.Methods.Count > 0 Then
+		  If c.Methods.KeyCount > 0 Then
 		    Var methods As New TreeViewNode("Instance methods")
 		    For Each entry As DictionaryEntry In c.Methods
 		      Var m As ObjoScript.MethodDeclStmt = entry.Value
@@ -186,7 +186,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  End If
 		  
 		  // Static methods
-		  If c.StaticMethods.Count > 0 Then
+		  If c.StaticMethods.KeyCount > 0 Then
 		    Var staticMethods As New TreeViewNode("Static methods")
 		    For Each entry As DictionaryEntry In c.StaticMethods
 		      Var m As ObjoScript.MethodDeclStmt = entry.Value
@@ -196,7 +196,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  End If
 		  
 		  // Foreign methods.
-		  If c.ForeignInstanceMethods.Count > 0 Then
+		  If c.ForeignInstanceMethods.KeyCount > 0 Then
 		    Var foreignMethods As New TreeViewNode("Foreign instance methods")
 		    For Each entry As DictionaryEntry In c.ForeignInstanceMethods
 		      Var m As ObjoScript.ForeignMethodDeclStmt = entry.Value
@@ -204,7 +204,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Next entry
 		    node.AppendNode(foreignMethods)
 		  End If
-		  If c.ForeignStaticMethods.Count > 0 Then
+		  If c.ForeignStaticMethods.KeyCount > 0 Then
 		    Var foreignMethods As New TreeViewNode("Foreign static methods")
 		    For Each entry As DictionaryEntry In c.ForeignStaticMethods
 		      Var m As ObjoScript.ForeignMethodDeclStmt = entry.Value

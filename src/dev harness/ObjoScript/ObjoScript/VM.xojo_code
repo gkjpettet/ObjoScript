@@ -1264,7 +1264,7 @@ Protected Class VM
 		  Frames.ResizeTo(-1)
 		  Frames.ResizeTo(MAX_FRAMES)
 		  // Allocate new call frames up front so we don't incur object creation overhead at runtime.
-		  For i As Integer = 0 To Frames.LastRowIndex
+		  For i As Integer = 0 To Frames.LastIndex
 		    Frames(i) = New ObjoScript.CallFrame
 		  Next i
 		  

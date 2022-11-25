@@ -63,7 +63,7 @@ Protected Class Parser
 		Private Function AtEnd() As Boolean
 		  /// True if we've reached the end of the token stream.
 		  
-		  Return mCurrentIndex > mTokens.LastRowIndex Or Current.Type = ObjoScript.TokenTypes.EOF
+		  Return mCurrentIndex > mTokens.LastIndex Or Current.Type = ObjoScript.TokenTypes.EOF
 		  
 		End Function
 	#tag EndMethod
@@ -1058,7 +1058,7 @@ Protected Class Parser
 		  /// `e` contains details of the error that triggered panic mode.
 		  
 		  // Add this error to our array of errors.
-		  Errors.AddRow(e)
+		  Errors.Add(e)
 		  
 		  // Try to recover.
 		  Synchronise
