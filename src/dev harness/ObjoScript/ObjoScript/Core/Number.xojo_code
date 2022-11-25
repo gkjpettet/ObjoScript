@@ -102,7 +102,7 @@ Protected Module Number
 		  /// Since this is a built-in type, slot 0 will be a double (not an instance object).
 		  /// Number.ceil() -> Number
 		  
-		  vm.SetReturn(CType(Ceil(vm.GetSlotValue(0)), Double))
+		  vm.SetReturn(CType(Ceiling(vm.GetSlotValue(0)), Double))
 		  
 		End Sub
 	#tag EndMethod

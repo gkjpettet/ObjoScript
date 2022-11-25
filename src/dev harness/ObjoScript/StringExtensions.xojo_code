@@ -189,7 +189,7 @@ Protected Module StringExtensions
 		    "character should be <= &h007F")
 		  End If
 		  
-		  Return CategoryForLatin1(Asc(character))
+		  Return CategoryForLatin1(character.Asc)
 		  
 		End Function
 	#tag EndMethod
@@ -315,7 +315,7 @@ Protected Module StringExtensions
 		  ///
 		  /// Assumes that `character` is one character in length.
 		  
-		  Return Asc(character) <= &h007F
+		  Return character.Asc <= &h007F
 		  
 		End Function
 	#tag EndMethod
@@ -483,7 +483,7 @@ Protected Module StringExtensions
 		  ///
 		  /// Assumes that `character` is one character in length.
 		  
-		  Return Asc(character) <= &h00FF
+		  Return character.Asc <= &h00FF
 		  
 		End Function
 	#tag EndMethod
@@ -534,7 +534,7 @@ Protected Module StringExtensions
 		  
 		  If IsLatin1(character) Then
 		    If character.IsASCII Then
-		      Return Asc(character) >= 97 And Asc(character) <= 122
+		      Return character.Asc >= 97 And character.Asc <= 122
 		    End If
 		    Return GetLatin1UnicodeCharacter(character) = UnicodeCategories.LowercaseLetter
 		  End If
