@@ -12,6 +12,7 @@ I needed an embeddable scripting language for an app I'm working on that's writt
 5. Lovingly crafted. Almost every line of code is commented and there is rich documentation within the source code.
 6. Comprehensive test suite. Several hundred tests have been implemented testing every facet of the language and the core library.
 7. Cross platform. The desktop dev harness compiles and runs on macOS, Windows and Linux. The ObjoScript VM compiles without issue on iOS.
+8. 100% native API 2.0 Xojo code. The only plugins required are for the demo app / bundled code editor. The actual VM is entirely Xojo code.
 
 ## More information
 For detailed instructions on how to use and for further documentation about the language, see the [Wiki].
