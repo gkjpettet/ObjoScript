@@ -13,7 +13,7 @@ I needed an embeddable scripting language for an app I'm working on that's writt
 6. Comprehensive test suite. Several hundred tests have been implemented testing every facet of the language and the core library.
 7. Cross platform. The desktop dev harness compiles and runs on macOS, Windows and Linux. The ObjoScript VM compiles without issue on iOS.
 
-## How to use
-For detailed instructions, see the [Wiki].
+## More information
+For detailed instructions on how to use and for further documentation about the language, see the [Wiki].
 
 [Wiki]: https://github.com/gkjpettet/ObjoScript/wiki
