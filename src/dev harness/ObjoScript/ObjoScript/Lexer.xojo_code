@@ -564,6 +564,9 @@ Protected Class Lexer
 		  /// This is **not** exhaustive because the `ObjoScript.NonAlpha` dictionary
 		  /// doesn't contain every non-alpha character.
 		  
+		  // An empty string is obviously not alphanumeric
+		  If c = "" Then Return False
+		  
 		  Return Not ObjoScript.NonAlpha.HasKey(c)
 		End Function
 	#tag EndMethod
