@@ -7,7 +7,7 @@ I needed an embeddable scripting language for an app I'm working on that's writt
 ## Major features
 1. Integrated debugger - step through code line-by-line and inspect local and global variable names and values.
 2. Familiar syntax. It's C-like but semicolon free. 
-3. Implemented via a stack-based VM. This makes it much faster than tree-walk interpreter languages.
+3. Implemented via a stack-based virtual machine. This makes it much faster than tree-walk interpreter languages.
 4. Object-oriented. All code executes either within a function or the method of a class. Class fields are private by default and are accessed through method calls.
 5. Lovingly crafted. Almost every line of code is commented and there is rich documentation within the source code.
 6. Comprehensive test suite. Several hundred tests have been implemented testing every facet of the language and the core library.
@@ -16,5 +16,10 @@ I needed an embeddable scripting language for an app I'm working on that's writt
 
 ## More information
 For detailed instructions on how to use and for further documentation about the language, see the [Wiki].
+
+## What's in this repo?
+1. ObjoScript compiler and virtual machine.
+2. Basic IDE including a syntax-highlighting code editor, interactive debugger, bytecode disassembler and AST viewer.
+3. Comprehensive automated test suite.
 
 [Wiki]: https://github.com/gkjpettet/ObjoScript/wiki
