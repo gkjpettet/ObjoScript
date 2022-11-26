@@ -911,6 +911,8 @@ End
 		  EditSelectAll.Enabled = Editor.Contents.Length > 0
 		  EditUndo.Enabled = UndoManager.CanUndo
 		  
+		  // Run
+		  FileRun.Text = "Run"
 		End Sub
 	#tag EndEvent
 
@@ -1077,6 +1079,16 @@ End
 		  
 		  Return True
 		  
+		End Function
+	#tag EndMenuHandler
+
+	#tag MenuHandler
+		Function FileRun() As Boolean Handles FileRun.Action
+		  ButtonStop.Enabled = True
+		  
+		  BeginVM(ObjoScript.VM.StepModes.None)
+		  
+		  Return True
 		End Function
 	#tag EndMenuHandler
 

@@ -15,7 +15,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
    MacProcID       =   0
    MaximumHeight   =   32000
    MaximumWidth    =   32000
-   MenuBar         =   733814783
+   MenuBar         =   910139391
    MenuBarVisible  =   True
    MinimumHeight   =   64
    MinimumWidth    =   64
@@ -968,6 +968,12 @@ End
 
 #tag WindowCode
 	#tag Event
+		Sub MenuBarSelected()
+		  FileRun.Text = "Run Tests"
+		End Sub
+	#tag EndEvent
+
+	#tag Event
 		Sub Opening()
 		  #If TargetMacOS
 		    Me.Top = 100
@@ -1105,7 +1111,7 @@ End
 	#tag EndMenuHandler
 
 	#tag MenuHandler
-		Function FileRunTests() As Boolean Handles FileRunTests.Action
+		Function FileRun() As Boolean Handles FileRun.Action
 		  RunTests
 		  
 		  Return True

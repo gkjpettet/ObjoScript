@@ -418,25 +418,25 @@ Protected Module List
 		  /// List.[index]
 		  
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
-		  Var rawIndex As Variant = vm.GetSlotValue(1)
+		  Var arg As Variant = vm.GetSlotValue(1)
 		  
 		  // The index must be an integer.
-		  If Not ObjoScript.VariantIsIntegerDouble(rawIndex) Then
+		  If Not ObjoScript.VariantIsIntegerDouble(arg) Then
 		    vm.Error("Subscript index must be an integer.")
 		  End If
-		  Var index As Integer = rawIndex
+		  Var index As Integer = arg
 		  
 		  Var data As ObjoScript.Core.List.ListData = instance.ForeignData
 		  
+		  // Adjust `index`, accounting for backwards counting.
+		  index = If(index >= 0, index, data.Count + index)
+		  
 		  // Bounds check.
-		  If index < 0 Then
-		    vm.Error("Subscript index must be >= 0.")
-		  ElseIf index > data.Items.LastIndex Then
-		    vm.Error("Subscript index out of bounds (" + index.ToString + ").")
+		  If index > data.LastIndex Or index < 0 Then
+		    vm.Error("List index is out of bounds.")
 		  End If
 		  
 		  vm.SetReturn(data.Items(index))
-		  
 		End Sub
 	#tag EndMethod
 

@@ -98,6 +98,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub SubscriptNegativeIndicesTest()
+		  AssertOutputsEqual("core.list.subscript_negative_indices")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub SwapTest()
 		  AssertOutputsEqual("core.list.swap")
 		End Sub
