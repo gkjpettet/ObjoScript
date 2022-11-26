@@ -232,6 +232,9 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.NotEqual
 		    Return "<>"
 		    
+		  Case ObjoScript.TokenTypes.None
+		    Return "NONE"
+		    
 		  Case ObjoScript.TokenTypes.Nothing
 		    Return "nothing"
 		    
@@ -512,6 +515,7 @@ Protected Module ObjoScript
 		  Minus
 		  MinusEqual
 		  MinusMinus
+		  None
 		  Not_
 		  NotEqual
 		  Nothing

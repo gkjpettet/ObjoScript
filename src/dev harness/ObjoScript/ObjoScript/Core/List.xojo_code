@@ -228,7 +228,7 @@ Protected Module List
 		  ///
 		  /// The index may be one past the last index in the list to append an element.
 		  /// If `index` is < 0 it counts backwards from the end of the list. It bases the
-		  /// computation on the length of the list after inserted the element, so 
+		  /// computation on the length of the list _after_ the inserted the element, so 
 		  /// that -1 will append the element, not insert it before the last element.
 		  ///
 		  /// If `index` is not an integer or is out of bounds, a runtime error occurs.

@@ -20,6 +20,9 @@ Implements ObjoScript.PrefixParselet
 		    Loop Until Not parser.Match(ObjoScript.TokenTypes.Comma)
 		  End If
 		  
+		  // Permit an optional newline before the closing curly brace.
+		  Call parser.Match(ObjoScript.TokenTypes.EOL)
+		  
 		  parser.Consume(ObjoScript.TokenTypes.RCurly, "Expected a `}` after the Map's key-values.")
 		  
 		  Return New ObjoScript.MapLiteral(lcurly, keyValues)

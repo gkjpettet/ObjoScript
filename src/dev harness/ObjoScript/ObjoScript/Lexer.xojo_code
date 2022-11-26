@@ -994,15 +994,31 @@ Protected Class Lexer
 		      End If
 		      
 		    Case EndOfLine.UNIX
+		      Var lastToken As ObjoScript.TokenTypes
+		      If mTokens.Count > 0 Then
+		        lastToken = mTokens(mTokens.LastIndex).Type
+		      Else
+		        lastToken = ObjoScript.TokenTypes.None
+		      End If
+		      
 		      // Is the last token an underscore? If so, we remove the underscore
 		      // token and omit adding an EOL token. To the parser, this will
 		      // appear as though the tokens before the underscore token and those
 		      // following this newline are on the same line.
-		      If mTokens.Count > 0 And _ 
-		        mTokens(mTokens.LastIndex).Type = ObjoScript.TokenTypes.Underscore Then
+		      If lastToken = ObjoScript.TokenTypes.Underscore Then
 		        Call mTokens.Pop
 		        Call Advance
 		        mLineNumber = mLineNumber + 1
+		        
+		      ElseIf lastToken = ObjoScript.TokenTypes.Comma Or lastToken = ObjoScript.TokenTypes.LCurly Or _
+		        lastToken = ObjoScript.TokenTypes.LSquare Then
+		        // The last token is a comma, `[` or `{`. Omit adding an EOL token. To the parser, this will
+		        // appear as though the tokens before this and those
+		        // following this new line are on the same line.
+		        // This allows us to split map and list literals over multiple lines.
+		        Call Advance
+		        mLineNumber = mLineNumber + 1
+		        
 		      Else
 		        AddToken(MakeToken(ObjoScript.TokenTypes.EOL))
 		        Call Advance
