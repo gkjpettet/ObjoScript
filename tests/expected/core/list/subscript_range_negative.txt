@@ -1,0 +1,1 @@
+Expected range index to be a positive integer. Instead got `-1`.

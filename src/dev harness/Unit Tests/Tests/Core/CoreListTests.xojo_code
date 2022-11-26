@@ -104,6 +104,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub SubscriptRangeNegativeTest()
+		  AssertRuntimeError("core.list.subscript_range_negative")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub SubscriptRangeTest()
 		  AssertOutputsEqual("core.list.subscript_range")
 		End Sub
