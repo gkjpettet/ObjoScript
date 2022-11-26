@@ -2002,7 +2002,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///  var seq* = iterable
 		  ///  while (iter* = seq*.iterate(iter*)) {
 		  ///   var i = seq*.iteratorValue(iter*)
-		  ///   print i
+		  ///   System.print(i)
 		  ///  }
 		  /// ```
 		  /// Note that `iter*` and `seq*` are invalid variable names and are internally declared by the compiler.
