@@ -414,29 +414,57 @@ Protected Module List
 		  ///
 		  /// Assumes:
 		  /// - Slot 0 contains a List instance.
-		  /// - Slot 1 is the index (needs to be an integer double).
+		  /// - Slot 1 is the index (needs to be an integer double or a positive range).
 		  /// List.[index]
 		  
 		  Var instance As ObjoScript.Instance = vm.GetSlotValue(0)
 		  Var arg As Variant = vm.GetSlotValue(1)
-		  
-		  // The index must be an integer.
-		  If Not ObjoScript.VariantIsIntegerDouble(arg) Then
-		    vm.Error("Subscript index must be an integer.")
-		  End If
-		  Var index As Integer = arg
-		  
 		  Var data As ObjoScript.Core.List.ListData = instance.ForeignData
 		  
-		  // Adjust `index`, accounting for backwards counting.
-		  index = If(index >= 0, index, data.Count + index)
-		  
-		  // Bounds check.
-		  If index > data.LastIndex Or index < 0 Then
-		    vm.Error("List index is out of bounds.")
+		  // The index can be an integer or a positive range.
+		  If ObjoScript.VariantIsIntegerDouble(arg) Then
+		    // E.g: list[3]
+		    Var index As Integer = arg
+		    
+		    // Adjust `index`, accounting for backwards counting.
+		    index = If(index >= 0, index, data.Count + index)
+		    
+		    // Bounds check.
+		    If index > data.LastIndex Or index < 0 Then
+		      vm.Error("List index is out of bounds.")
+		    End If
+		    
+		    vm.SetReturn(data.Items(index))
+		    
+		    Return
+		    
+		  ElseIf arg IsA ObjoScript.Instance And ObjoScript.Instance(arg).Klass.Name.CompareCase("List") Then
+		    // E.g: list[1..2]
+		    Var rangeIndices() As Variant = ObjoScript.Core.List.ListData(ObjoScript.Instance(arg).ForeignData).Items
+		    
+		    // Create a new list instance.
+		    Var newList As New ObjoScript.Instance(vm, vm.ListClass)
+		    Var newListData As New ObjoScript.Core.List.ListData
+		    newList.ForeignData = newListData
+		    
+		    // Copy the elements in the specified range.
+		    For Each v As Variant In rangeIndices
+		      If Not ObjoScript.VariantIsPositiveInteger(v) Then
+		        vm.Error("Expected range index to be a positive integer. Instead got `" + vm.ValueToString(v) + "`.")
+		      End If
+		      If v < 0 Or v > data.Items.LastIndex Then
+		        vm.Error("Range index is out of bounds.")
+		      End If
+		      newListData.Items.Add(data.Items(v))
+		    Next v
+		    
+		    vm.SetReturn(newList)
+		    
+		    Return
+		  Else
+		    vm.Error("Subscript index must be an integer or a range.")
 		  End If
 		  
-		  vm.SetReturn(data.Items(index))
 		End Sub
 	#tag EndMethod
 
