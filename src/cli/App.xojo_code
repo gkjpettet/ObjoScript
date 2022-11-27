@@ -35,61 +35,99 @@ Inherits ConsoleApplication
 		    
 		  Catch le As ObjoScript.LexerException
 		    // Something went wrong tokenising the source code.
-		    Error(le.Message, ExitCodes.LexerError)
+		    Error(le)
 		    
 		  Catch pe As ObjoScript.ParserException
-		    // One or more parsing errors occurred.
-		    Var errors() As ObjoScript.ParserException = compiler.ParserErrors
-		    If errors.Count = 1 Then
-		      Error(errors(0).Message, ExitCodes.ParserError)
-		    Else
-		      Var errorMessages() As String
-		      For Each err As ObjoScript.ParserException In errors
-		        errorMessages.Add(err.Message)
-		      Next err
-		      Error(errorMessages, ExitCodes.ParserError)
-		    End If
+		    // One or more parsing error occurred.
+		    Error(compiler.ParserErrors, True)
 		    
 		  Catch ce As ObjoScript.CompilerException
 		    // A compilation error occurred.
-		    Error(ce.Message, ExitCodes.CompilerError)
+		    Error(ce)
 		  End Try
 		  
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 50726573656E747320746865206572726F72206D6573736167657320616E64207175697473207468652061707020776974682074686520696E74656765722076616C7565206F662074686520737065636966696564206065786974436F6465602E
-		Sub Error(messages() As String, exitCode As ExitCodes)
-		  /// Presents the error messages and quits the app with the integer value of the specified `exitCode`.
+	#tag Method, Flags = &h0, Description = 50726573656E7473206120636F6D70696C6572206572726F7220616E6420717569747320746865206170702E
+		Sub Error(ce As ObjoScript.CompilerException)
+		  /// Presents a compiler error and quits the app.
 		  
-		  For Each message As String In messages
-		    Print(FormatErrorMessage(message))
-		  Next message
+		  Print(CLIForecolor("Compiler error on line " + ce.Location.LineNumber.ToString + ":", COLOUR_RED))
+		  Print("")
+		  Print(CLIForecolor(ce.Message, COLOUR_RED))
 		  
-		  Quit(Integer(exitCode))
+		  Quit(Integer(ExitCodes.CompilerError))
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 50726573656E747320746865206572726F7220606D6573736167656020616E64207175697473207468652061707020776974682074686520696E74656765722076616C7565206F662074686520737065636966696564206065786974436F6465602E
+	#tag Method, Flags = &h0, Description = 50726573656E74732061206C6578696E67206572726F7220616E6420717569747320746865206170702E
+		Sub Error(le As ObjoScript.LexerException)
+		  /// Presents a lexing error and quits the app.
+		  
+		  Var message As String = _
+		  CLIForecolor("Error on line " + le.LineNumber.ToString + ", col " + le.LineCharacterPosition.ToString + ": " + le.Message, COLOUR_RED)
+		  
+		  Print(message)
+		  
+		  Quit(Integer(ExitCodes.LexerError))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 50726573656E7473206F6E65206F72206D6F72652070617273696E67206572726F727320616E64206F7074696F6E616C6C7920717569747320746865206170702E
+		Sub Error(errors() As ObjoScript.ParserException, shouldQuit As Boolean)
+		  /// Presents one or more parsing errors and optionally quits the app.
+		  
+		  If errors.Count = 0 Then
+		    If shouldQuit Then
+		      Quit(Integer(ExitCodes.ParserError))
+		    Else
+		      Return
+		    End If
+		  End If
+		  
+		  If errors.Count = 1 Then
+		    Error(errors(0), shouldQuit)
+		    Return
+		  Else
+		    For Each pe As ObjoScript.ParserException In errors
+		      Error(pe, False)
+		    Next pe
+		  End If
+		  
+		  If shouldQuit Then
+		    Quit(Integer(ExitCodes.ParserError))
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 50726573656E747320612070617273696E67206572726F7220616E64206F7074696F6E616C6C7920717569747320746865206170702E
+		Sub Error(pe As ObjoScript.ParserException, shouldQuit As Boolean)
+		  /// Presents a parsing error and optionally quits the app.
+		  
+		  Print(CLIForecolor("Parsing error on line " + pe.Location.LineNumber.ToString + ":", COLOUR_RED))
+		  Print("")
+		  Print(CLIForecolor(pe.Message, COLOUR_RED))
+		  
+		  If shouldQuit Then
+		    Quit(Integer(ExitCodes.ParserError))
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 50726573656E747320612067656E65726963206572726F72206D65737361676520616E6420717569747320746865206170702E
 		Sub Error(message As String, exitCode As ExitCodes)
-		  /// Presents the error `message` and quits the app with the integer value of the specified `exitCode`.
+		  /// Presents a generic error message and quits the app.
 		  
-		  Print(FormatErrorMessage(message))
+		  Print(CLIForecolor("Error: " + message, COLOUR_RED))
+		  
 		  Quit(Integer(exitCode))
 		  
 		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Function FormatErrorMessage(message As String) As String
-		  /// Returns a a formatted version of an error message.
-		  
-		  #Pragma Warning "TODO"
-		  
-		  Return message
-		  
-		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
