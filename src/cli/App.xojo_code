@@ -94,6 +94,7 @@ Inherits ConsoleApplication
 		  Else
 		    For Each pe As ObjoScript.ParserException In errors
 		      Error(pe, False)
+		      Print("")
 		    Next pe
 		  End If
 		  
@@ -109,13 +110,33 @@ Inherits ConsoleApplication
 		  /// Presents a parsing error and optionally quits the app.
 		  
 		  Print(CLIForecolor("Parsing error on line " + pe.Location.LineNumber.ToString + ":", COLOUR_RED))
-		  Print("")
-		  Print(CLIForecolor(pe.Message, COLOUR_RED))
+		  Print(pe.Message)
 		  
 		  If shouldQuit Then
 		    Quit(Integer(ExitCodes.ParserError))
 		  End If
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 50726573656E7473206120564D2072756E74696D65206572726F7220616E6420717569747320746865206170702E
+		Sub Error(vme As ObjoScript.VMException)
+		  /// Presents a VM runtime error and quits the app.
+		  
+		  Print(CLIForecolor("======================", COLOUR_RED))
+		  Print(CLIForecolor("RUNTIME ERROR", COLOUR_RED))
+		  Print(CLIForecolor("======================", COLOUR_RED))
+		  Print("[line " + vme.LineNumber.ToString + "]: " + vme.Message)
+		  Print("")
+		  Print("STACK DUMP")
+		  Print(vme.StackDump)
+		  Print("")
+		  Print("STACK TRACE")
+		  Print("")
+		  Print(String.FromArray(vme.VMStackTrace))
+		  Print("")
+		  
+		  Quit(Integer(ExitCodes.RuntimeError))
 		End Sub
 	#tag EndMethod
 
@@ -186,7 +207,7 @@ Inherits ConsoleApplication
 		    VM.Interpret(func)
 		    Quit(0)
 		  Catch e As ObjoScript.VMException
-		    Error(e.Message, ExitCodes.RuntimeError)
+		    Error(e)
 		  End Try
 		  
 		End Function
