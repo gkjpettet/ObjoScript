@@ -8,15 +8,12 @@ Inherits ConsoleApplication
 		  
 		  // Does the user want the version number?
 		  If Options.BooleanValue("version") Then
-		    PrintVersion
+		    Print(ObjoVersion)
 		    Return 0
 		  End If
 		  
 		  // REPL or script execution?
-		  If args.Count = 0 Then
-		    // REPL
-		    Repl
-		  ElseIf Options.FileValue("file") <> Nil Then
+		  If Options.FileValue("file") <> Nil Then
 		    // Script execution.
 		    Return RunScript(Options.FileValue("file"))
 		  Else
@@ -66,7 +63,7 @@ Inherits ConsoleApplication
 		  /// Presents the error messages and quits the app with the integer value of the specified `exitCode`.
 		  
 		  For Each message As String In messages
-		    Print(message)
+		    Print(FormatErrorMessage(message))
 		  Next message
 		  
 		  Quit(Integer(exitCode))
@@ -78,21 +75,34 @@ Inherits ConsoleApplication
 		Sub Error(message As String, exitCode As ExitCodes)
 		  /// Presents the error `message` and quits the app with the integer value of the specified `exitCode`.
 		  
-		  Print(message)
+		  Print(FormatErrorMessage(message))
 		  Quit(Integer(exitCode))
 		  
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Function FormatErrorMessage(message As String) As String
+		  /// Returns a a formatted version of an error message.
+		  
+		  #Pragma Warning "TODO"
+		  
+		  Return message
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function ObjoVersion() As String
+		  /// Returns a string representation of the interpreter.
+		  
+		  Return App.MajorVersion.ToString + "." + App.MinorVersion.ToString + "." + App.BugVersion.ToString
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 5061727365732074686520617267756D656E74732070617373656420746F20746865206170706C69636174696F6E2E
 		Sub ParseOptions(args() As String)
 		  /// Parses the arguments passed to the application.
-		  
-		  // If there are no arguments we start the interpreter in interactive mode (REPL mode).
-		  If args.Count = 0 Then
-		    Repl
-		    Return
-		  End If
 		  
 		  Options = New ConsoleKit.CKOptionParser
 		  Var o As ConsoleKit.CKOption
@@ -111,26 +121,11 @@ Inherits ConsoleApplication
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 5072696E7473207468652063757272656E742076657273696F6E20746F2074686520636F6E736F6C652E
-		Sub PrintVersion()
-		  /// Prints the current version to the console.
-		  
-		  Print("objoCLI v" + App.MajorVersion.ToString + "." + App.MinorVersion.ToString + "." + App.BugVersion.ToString)
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = 52756E2074686520696E74657270726574657220696E20696E746572616374697665206D6F64652E
-		Sub Repl()
-		  /// Run the interpreter in interactive mode.
-		  
-		  #Pragma Warning "TODO"
-		  
-		End Sub
-	#tag EndMethod
-
 	#tag Method, Flags = &h0, Description = 52756E7320616E204F626A6F536372697074207363726970742066696C6520286066602920616E642072657475726E7320616E206578697420636F64652E
 		Function RunScript(f As FolderItem) As Integer
 		  /// Runs an ObjoScript script file (`f`) and returns an exit code.
+		  
+		  #Pragma BreakOnExceptions False
 		  
 		  // Get the source code from the file.
 		  Var source As String
@@ -172,8 +167,14 @@ Inherits ConsoleApplication
 		Sub Usage()
 		  /// Prints the usage of the interpreter to the terminal.
 		  
-		  #Pragma Warning "TODO"
+		  Const TAB = &u0009
 		  
+		  Welcome
+		  
+		  Print(CLIForecolor("Usage: objo [option]", COLOUR_YELLOW))
+		  Print("objo -f" + TAB + TAB + ": Run a script file (`f`)")
+		  Print("objo -v" + TAB + TAB + ": Display the interpreter's version number")
+		  Print("")
 		  
 		End Sub
 	#tag EndMethod
@@ -188,6 +189,16 @@ Inherits ConsoleApplication
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 5072696E747320612077656C636F6D65206D6573736167652E
+		Sub Welcome()
+		  /// Prints a welcome message.
+		  
+		  Print("")
+		  Print("Objo interpreter (v" + ObjoVersion + ")")
+		  Print("")
+		End Sub
+	#tag EndMethod
+
 
 	#tag Property, Flags = &h0, Description = 54686520636F6D6D616E64206C696E65206F7074696F6E207061727365722E
 		Options As ConsoleKit.CKOptionParser
@@ -196,6 +207,22 @@ Inherits ConsoleApplication
 	#tag Property, Flags = &h0, Description = 546865206170702773204F626A6F53637269707420696E7465727072657465722E
 		VM As ObjoScript.VM
 	#tag EndProperty
+
+
+	#tag Constant, Name = COLOUR_BLACK, Type = Double, Dynamic = False, Default = \"0", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = COLOUR_BLUE, Type = Double, Dynamic = False, Default = \"33", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = COLOUR_RED, Type = Double, Dynamic = False, Default = \"1", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = COLOUR_WHITE, Type = Double, Dynamic = False, Default = \"255", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = COLOUR_YELLOW, Type = Double, Dynamic = False, Default = \"226", Scope = Public
+	#tag EndConstant
 
 
 	#tag Enum, Name = ExitCodes, Type = Integer, Flags = &h0
