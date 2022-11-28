@@ -2,7 +2,7 @@
 ObjoScript is a full-featured standalone and embeddable object-oriented dynamic programming language written entirely in Xojo.
 
 ## Why create it?
-I needed an embeddable scripting language for an app I'm working on that's written in Xojo. Xojo provides its own scripting engine (XojoScript) and there are several other scripting languages available via plugins (e.g. Wren and Python) however none of them provide any way to debug code written in the scripting language. For my app, it's crucial that the end user is able to step through code written in the scripting language and inspect variables values to help them debug. This is simply impossible in the currently available engines so I decided to implement my own.
+I needed an embeddable scripting language for an app I'm working on that's written in Xojo. Xojo provides its own scripting engine (XojoScript) and there are several other scripting languages available via plugins (e.g. Wren and Python) however none of them provide any way to debug code written in the scripting language. For my app, it's crucial that the end user is able to step through code written in the scripting language and inspect variables to help them debug. This is simply impossible in the currently available engines so I decided to implement my own.
 
 ## Major features
 1. Integrated debugger - step through code line-by-line and inspect local and global variable names and values.
