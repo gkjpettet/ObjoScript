@@ -21,6 +21,7 @@ For detailed instructions on how to use and for further documentation about the 
 1. ObjoScript compiler and virtual machine.
 2. Basic IDE including a syntax-highlighting code editor, interactive debugger, bytecode disassembler and AST viewer.
 3. Comprehensive automated test suite.
+4. 4. A command line tool project to run scripts from the Terminal.
 
 [Wiki]: https://github.com/gkjpettet/ObjoScript/wiki
 
