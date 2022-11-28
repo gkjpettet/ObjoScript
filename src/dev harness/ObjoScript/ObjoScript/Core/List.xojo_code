@@ -97,16 +97,13 @@ Protected Module List
 		  
 		  Var data As ObjoScript.Core.List.ListData = list.ForeignData
 		  
-		  Var newList As New ObjoScript.Instance(vm, vm.ListClass)
-		  Var newListData As New ObjoScript.Core.List.ListData
-		  
+		  // Shallow clone the items.
+		  Var clonedItems() As Variant
 		  For Each item As Variant In data.Items
-		    newListData.Items.Add(item)
+		    clonedItems.Add(item)
 		  Next item
 		  
-		  newList.ForeignData = newListData
-		  
-		  Return newList
+		  Return vm.NewList(clonedItems)
 		  
 		End Function
 	#tag EndMethod
@@ -148,15 +145,14 @@ Protected Module List
 		    End If
 		  End If
 		  
-		  // Create the list.
-		  Var list As New ObjoScript.Instance(vm, vm.ListClass)
-		  list.ForeignData = New ObjoScript.Core.List.ListData
+		  // Construct an array with the new list's items.
+		  Var newItems() As Variant
 		  For i As Integer = 1 To size
-		    ObjoScript.Core.List.ListData(list.ForeignData).Items.Add(element)
+		    newItems.Add(element)
 		  Next i
 		  
-		  // Return the new list.
-		  vm.SetReturn(list)
+		  // Return a new list.
+		  vm.SetReturn(vm.NewList(newItems))
 		End Sub
 	#tag EndMethod
 
@@ -442,12 +438,8 @@ Protected Module List
 		    // E.g: list[1..2]
 		    Var rangeIndices() As Variant = ObjoScript.Core.List.ListData(ObjoScript.Instance(arg).ForeignData).Items
 		    
-		    // Create a new list instance.
-		    Var newList As New ObjoScript.Instance(vm, vm.ListClass)
-		    Var newListData As New ObjoScript.Core.List.ListData
-		    newList.ForeignData = newListData
-		    
-		    // Copy the elements in the specified range.
+		    // Copy the items in the specified range.
+		    Var newListItems() As Variant
 		    For Each v As Variant In rangeIndices
 		      If Not ObjoScript.VariantIsPositiveInteger(v) Then
 		        vm.Error("Expected range index to be a positive integer. Instead got `" + vm.ValueToString(v) + "`.")
@@ -455,10 +447,11 @@ Protected Module List
 		      If v < 0 Or v > data.Items.LastIndex Then
 		        vm.Error("Range index is out of bounds.")
 		      End If
-		      newListData.Items.Add(data.Items(v))
+		      newListItems.Add(data.Items(v))
 		    Next v
 		    
-		    vm.SetReturn(newList)
+		    // Return a new list.
+		    vm.SetReturn(vm.NewList(newListItems))
 		    
 		    Return
 		  Else

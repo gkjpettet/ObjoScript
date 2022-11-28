@@ -508,7 +508,7 @@ Protected Class VM
 		    mKeyValueClass = klass
 		    
 		  ElseIf klass.Name.CompareCase("List") Then
-		    mListClass = klass
+		    ListClass = klass
 		    
 		  ElseIf klass.Name.CompareCase("Nothing") Then
 		    mNothingClass = klass
@@ -1121,6 +1121,42 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 4372656174657320616E642072657475726E732061206E657720656D707479206C6973742E
+		Function NewList() As ObjoScript.Instance
+		  /// Creates and returns a new empty list.
+		  
+		  Var list As New ObjoScript.Instance(Self, ListClass)
+		  list.ForeignData = New ObjoScript.Core.List.ListData
+		  
+		  Return list
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 4372656174657320616E642072657475726E732061206E6577206C69737420636F6E73697374696E67206F6620606974656D73602E
+		Function NewList(items() As String) As ObjoScript.Instance
+		  /// Creates and returns a new list consisting of `items`.
+		  
+		  Var list As New ObjoScript.Instance(Self, ListClass)
+		  list.ForeignData = New ObjoScript.Core.List.ListData(items)
+		  
+		  Return list
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 4372656174657320616E642072657475726E732061206E6577206C69737420636F6E73697374696E67206F6620606974656D73602E
+		Function NewList(items() As Variant) As ObjoScript.Instance
+		  /// Creates and returns a new list consisting of `items`.
+		  
+		  Var list As New ObjoScript.Instance(Self, ListClass)
+		  list.ForeignData = New ObjoScript.Core.List.ListData(items)
+		  
+		  Return list
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E73207468652076616C7565206064697374616E6365602066726F6D2074686520746F70206F662074686520737461636B2E204C6561766573207468652076616C7565206F6E2074686520737461636B2E20412076616C7565206F662060306020776F756C642072657475726E2074686520746F70206974656D2E
 		Private Function Peek(distance As Integer) As Variant
 		  /// Returns the value `distance` from the top of the stack. Leaves the value on the stack. A value of `0` would return the top item.
@@ -1293,7 +1329,7 @@ Protected Class VM
 		  mStringClass = Nil
 		  mNothingClass = Nil
 		  mKeyValueClass = Nil
-		  mListClass = Nil
+		  ListClass = Nil
 		  
 		  RandomInstance = Nil
 		End Sub
@@ -1810,6 +1846,19 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 536574732060736C6F746020746F20626F6F6C65616E2076616C7565206062602E
+		Sub SetSlot(slot As Integer, b As Boolean)
+		  /// Sets `slot` to boolean value `b`.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
+		  APISlots(slot) = b
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 536574732060736C6F746020746F20646F75626C652076616C7565206064602E
 		Sub SetSlot(slot As Integer, d As Double)
 		  /// Sets `slot` to double value `d`.
@@ -2224,14 +2273,9 @@ Protected Class VM
 		Private LastStoppedScriptID As Integer = -1
 	#tag EndProperty
 
-	#tag ComputedProperty, Flags = &h0, Description = 41207265666572656E636520746F20746865206275696C742D696E204C697374206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
-		#tag Getter
-			Get
-			  Return mListClass
-			End Get
-		#tag EndGetter
-		ListClass As ObjoScript.Klass
-	#tag EndComputedProperty
+	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E204C697374206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
+		Private ListClass As ObjoScript.Klass
+	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E20426F6F6C65616E206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
 		Private mBooleanClass As ObjoScript.Klass
@@ -2243,10 +2287,6 @@ Protected Class VM
 
 	#tag Property, Flags = &h21, Description = 546865206C696E65206F6620636F64652074686520564D206C6173742073746F70706564206F6E2E
 		Private mLastStoppedLine As Integer = -1
-	#tag EndProperty
-
-	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E204C697374206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E
-		Private mListClass As ObjoScript.Klass
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 41207265666572656E636520746F20746865206275696C742D696E204E6F7468696E67206B6C6173732E204D6179206265204E696C207768696C737420626F6F74737472617070696E672E

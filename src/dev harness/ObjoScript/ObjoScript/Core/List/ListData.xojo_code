@@ -1,5 +1,28 @@
 #tag Class
 Protected Class ListData
+	#tag Method, Flags = &h0
+		Sub Constructor()
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub Constructor(initialItems() As String)
+		  // The Xojo compiler isn't smart enough to cast from String() to Variant().
+		  For Each stringItem As String In initialItems
+		    Self.Items.Add(stringItem)
+		  Next stringItem
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub Constructor(initialItems() As Variant)
+		  Self.Items = initialItems
+		End Sub
+	#tag EndMethod
+
+
 	#tag ComputedProperty, Flags = &h0, Description = 546865206E756D626572206F66206974656D7320696E207468652061727261792E
 		#tag Getter
 			Get

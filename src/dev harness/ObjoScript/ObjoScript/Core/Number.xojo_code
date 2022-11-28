@@ -363,12 +363,8 @@ Protected Module Number
 		    End If
 		  End If
 		  
-		  // Create a new lists with the computed values.
-		  Var list As New ObjoScript.Instance(vm, vm.ListClass)
-		  list.ForeignData = New ObjoScript.Core.List.ListData
-		  ObjoScript.Core.List.ListData(list.ForeignData).Items = values
-		  
-		  vm.SetReturn(list)
+		  // Return a new list with the computed values.
+		  vm.SetReturn(vm.NewList(values))
 		  
 		End Sub
 	#tag EndMethod
@@ -405,12 +401,8 @@ Protected Module Number
 		    Wend
 		  End If
 		  
-		  // Create a new lists with the computed values.
-		  Var list As New ObjoScript.Instance(vm, vm.ListClass)
-		  list.ForeignData = New ObjoScript.Core.List.ListData
-		  ObjoScript.Core.List.ListData(list.ForeignData).Items = values
-		  
-		  vm.SetReturn(list)
+		  // Return a new list with the computed values.
+		  vm.SetReturn(vm.NewList(values))
 		  
 		End Sub
 	#tag EndMethod
