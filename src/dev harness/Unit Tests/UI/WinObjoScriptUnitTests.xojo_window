@@ -873,6 +873,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
    Begin ObjoScriptTestController Controller
       AllTestCount    =   0
       Duration        =   0.0
+      Enabled         =   True
       FailedCount     =   0
       GroupCount      =   0
       Index           =   -2147483648
@@ -981,7 +982,7 @@ End
 		  #EndIf
 		  
 		  // Setup the editor.
-		  TestSourceCodeArea.Formatter = New ObjoScriptFormatter
+		  TestSourceCodeArea.Formatter = New XUICEObjoScriptFormatter
 		  TestSourceCodeArea.Theme = XUICETheme.FromFile(SpecialFolder.Resource("EditorTheme.toml"))
 		  
 		  Controller.LoadTestGroups

@@ -1,5 +1,5 @@
 #tag Class
-Protected Class ObjoScriptFormatter
+Protected Class XUICEObjoScriptFormatter
 Inherits XUICEAbstractFormatter
 Implements XUICEFormatter
 	#tag Method, Flags = &h21
