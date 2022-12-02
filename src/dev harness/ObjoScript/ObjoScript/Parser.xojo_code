@@ -744,7 +744,7 @@ Protected Class Parser
 		  TokenTypes.GreaterEqual         : BinaryOperator(Precedences.Comparison), _
 		  TokenTypes.GreaterGreater       : BinaryOperator(Precedences.BitwiseShift), _
 		  TokenTypes.Identifier           : Prefix(New VariableParselet), _
-		  TokenTypes.If_                  : Unused, _
+		  TokenTypes.If_                  : NewRule(Nil, New ConditionalParselet, Precedences.Assignment), _
 		  TokenTypes.Import               : Unused, _
 		  TokenTypes.In_                  : Unused, _
 		  TokenTypes.Is_                  : NewRule(Nil, New IsParselet, Precedences.Is_), _
@@ -767,7 +767,7 @@ Protected Class Parser
 		  TokenTypes.Plus                 : BinaryOperator(Precedences.Term), _
 		  TokenTypes.PlusEqual            : Unused, _
 		  TokenTypes.PlusPlus             : Postfix, _
-		  TokenTypes.Query                : NewRule(Nil, New ConditionalParselet, Precedences.Assignment), _
+		  TokenTypes.Query                : Unused, _
 		  TokenTypes.RCurly               : Unused, _
 		  TokenTypes.Return_              : Unused, _
 		  TokenTypes.RParen               : Unused, _

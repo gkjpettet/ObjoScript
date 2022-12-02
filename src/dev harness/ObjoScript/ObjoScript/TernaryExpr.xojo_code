@@ -11,22 +11,22 @@ Implements ObjoScript.Expr
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(condition As ObjoScript.Expr, thenBranch As ObjoScript.Expr, elseBranch As ObjoScript.Expr, query As ObjoScript.Token)
+		Sub Constructor(condition As ObjoScript.Expr, thenBranch As ObjoScript.Expr, elseBranch As ObjoScript.Expr, ifKeyword As ObjoScript.Token)
 		  Self.Condition = condition
 		  Self.ThenBranch = thenBranch
 		  Self.ElseBranch = elseBranch
-		  mQuery = query
+		  mIfKeyword = ifKeyword
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 54686520603F6020746F6B656E2E
+	#tag Method, Flags = &h0, Description = 546865206069666020746F6B656E2E
 		Function Location() As ObjoScript.Token
-		  /// The `?` token.
+		  /// The `if` token.
 		  ///
 		  /// Part of the ObjoScript.Expr interface.
 		  
-		  Return mQuery
+		  Return mIfKeyword
 		  
 		End Function
 	#tag EndMethod
@@ -41,7 +41,7 @@ Implements ObjoScript.Expr
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Private mQuery As ObjoScript.Token
+		Private mIfKeyword As ObjoScript.Token
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
