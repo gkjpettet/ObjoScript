@@ -1,0 +1,26 @@
+class Person {
+constructor(name, age) { 
+_name = name
+_age = age 
+
+}
+>(other) { return age > other.age }
+<(other) { return age < other.age }
+==(other) { return age == other.age }
+
+age {return _age}
+
+toString() { return _name }
+}
+
+var garry = Person("Garry", 41)
+var aoife = Person("Aoife", 10)
+var carole = Person("Carole", 68)
+var fiona = Person("Fiona", 41)
+
+var people = [garry, fiona, aoife, carole]
+
+people.sort
+
+// Sort by age ascending.
+foreach person in people { System.print(person.toString) }
