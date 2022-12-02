@@ -8,10 +8,6 @@ Implements ObjoScript.InfixParselet
 		  ///
 		  /// Part of the ObjoScript.InfixParselet interface.
 		  
-		  #Pragma Warning "BROKEN: Precedence is wrong - interfere with conditionals"
-		  ' Also can't do this: 
-		  ' var a = 1 : 2
-		  
 		  #Pragma Unused canAssign
 		  
 		  Var colon As ObjoScript.Token = parser.Previous
