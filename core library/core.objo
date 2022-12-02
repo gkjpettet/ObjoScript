@@ -257,7 +257,7 @@ foreign iteratorValue(iter)
 foreign remove(item)
 foreign removeAt(index)
 
-/// Sorts a single dimension list using a bubblesort algorithm
+/// Sorts a single dimension list using a bubblesort algorithm.
 sort() {
 var n = this.count
 if n < 2 then return
@@ -266,7 +266,7 @@ var swapped = false
 foreach i in 1..n-1 {
 if this[i-1] > this[i] {
 var t = this[i-1]
-this[i-1] =this[i]
+this[i-1] = this[i]
 this[i] = t
 swapped = true
 }
@@ -276,7 +276,6 @@ if not swapped then return
 }
 
 foreign sortFast()
-
 foreign swap(index0, index1)
 foreign toString()
 

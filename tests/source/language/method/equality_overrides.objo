@@ -1,0 +1,19 @@
+class Person {
+constructor(age) { _age = age }
+>(other) { return age > other.age }
+<(other) { return age < other.age }
+==(other) { return age == other.age }
+
+age {return _age}
+}
+
+var garry = Person(41)
+var aoife = Person(10)
+var carole = Person(68)
+var fiona = Person(41)
+
+System.print(garry > carole) // Expect false
+System.print(garry < carole) // Expect true
+System.print(garry > aoife) // Expect true
+System.print(garry < aoife) // Expect false
+System.print(garry == fiona) // Expect true

@@ -38,6 +38,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub EqualityOverridesTest()
+		  AssertOutputsEqual("language.method.equality_overrides")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub LongNameTest()
 		  AssertOutputsEqual("language.method.long_name")
 		End Sub
