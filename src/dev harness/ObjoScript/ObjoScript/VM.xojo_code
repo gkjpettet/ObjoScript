@@ -35,6 +35,9 @@ Protected Class VM
 		  If className.CompareCase("Boolean") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.Boolean_.Allocate, Nil)
 		    
+		  ElseIf className.CompareCase("File") Then
+		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.File.Allocate, Nil)
+		    
 		  ElseIf className.CompareCase("KeyValue") Then
 		    Return New ObjoScript.ForeignClassDelegates(AddressOf ObjoScript.Core.KeyValue.Allocate, Nil)
 		    
@@ -82,6 +85,9 @@ Protected Class VM
 		  
 		  If className.CompareCase("Boolean") Then
 		    Return Core.Boolean_.BindForeignMethod(signature, isStatic)
+		    
+		  ElseIf className.CompareCase("File") Then
+		    Return Core.File.BindForeignMethod(signature, isStatic)
 		    
 		  ElseIf className.CompareCase("KeyValue") Then
 		    Return Core.KeyValue.BindForeignMethod(signature, isStatic)

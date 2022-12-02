@@ -483,10 +483,11 @@ Protected Module List
 		  
 		  Var data As ObjoScript.Core.List.ListData = instance.ForeignData
 		  
+		  // Adjust `index`, accounting for backwards counting.
+		  index = If(index >= 0, index, data.Count + index)
+		  
 		  // Bounds check.
-		  If index < 0 Then
-		    vm.Error("Subscript index must be >= 0.")
-		  ElseIf index > data.Items.LastIndex Then
+		  If index < 0 Or index > data.Items.LastIndex Then
 		    vm.Error("Subscript index out of bounds (" + index.ToString + ").")
 		  End If
 		  

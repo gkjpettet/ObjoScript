@@ -143,6 +143,28 @@ Protected Module Number
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 417474656D70747320746F207061727365206076616C756560206173206120646563696D616C206C69746572616C20616E642072657475726E20697420617320616E20696E7374616E6365206F66204E756D6265722E20496620746865206E756D6265722063616E6E6F7420626520706172736564207468656E20606E6F7468696E67602077696C6C2062652072657475726E65642E
+		Protected Sub FromString(vm As ObjoScript.VM)
+		  /// Attempts to parse `value` as a decimal literal and return it as an instance of Number. 
+		  /// If the number cannot be parsed then `nothing` will be returned.
+		  ///
+		  /// It's a runtime error if `value` is not a string.
+		  /// Number.fromString>(value) -> Number
+		  
+		  // Assert `value` is a string.
+		  If Not vm.GetSlotValue(1).Type = Variant.TypeString Then
+		    vm.Error("Expected a string argument to `Number.fromString(_)`.")
+		  End If
+		  
+		  Try
+		    vm.SetReturn(Double.FromString(vm.GetSlotValue(1)))
+		  Catch e As RuntimeException
+		    vm.Error("`value` cannot be parsed into a number.")
+		  End Try
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 52657475726E73206074727565602069662074686973206973203E20606F74686572602E
 		Protected Sub Greater(vm As ObjoScript.VM)
 		  /// Returns `true` if this is > `other`.
@@ -216,6 +238,8 @@ Protected Module Number
 		  /// Returns a case-sensitive dictionary mapping the signatures of foreign static methods to Xojo method addresses.
 		  
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
+		  
+		  d.Value("fromString(_)") = AddressOf FromString
 		  
 		  Return d
 		  

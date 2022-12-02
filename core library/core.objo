@@ -96,6 +96,8 @@ foreign sqrt()
 foreign sin()
 foreign tan()
 foreign toString()
+
+foreign static fromString(value)
 }
 
 /// ----------------------------------------------------
@@ -336,4 +338,13 @@ foreign inRange(min, max)
 /// Returns a random integer (`result`) where: `0 <= result < upper`.
 foreign lessThan(upper)
 foreign number()
+}
+
+/// ----------------------------------------------------
+/// FILE
+/// ----------------------------------------------------
+/// A class used to read/write files.
+foreign class File {
+constructor(path) {}
+foreign readLines()
 }
