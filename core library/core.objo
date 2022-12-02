@@ -273,8 +273,10 @@ swapped = true
 }
 if not swapped then return
 }
-
 }
+
+foreign sortFast()
+
 foreign swap(index0, index1)
 foreign toString()
 

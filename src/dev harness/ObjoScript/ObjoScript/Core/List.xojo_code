@@ -188,6 +188,7 @@ Protected Module List
 		  d.Value("iteratorValue(_)") = AddressOf IteratorValue
 		  d.Value("remove(_)")        = AddressOf Remove
 		  d.Value("removeAt(_)")      = AddressOf RemoveAt
+		  d.Value("sortFast()")       = AddressOf SortFast
 		  d.Value("swap(_,_)")        = AddressOf Swap
 		  d.Value("toString()")       = AddressOf ToString
 		  d.Value("[_]=(_)")          = AddressOf SubscriptSetter
@@ -402,6 +403,73 @@ Protected Module List
 		    vm.Error("Expected an integer index.")
 		    
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 536F7274732074686973206C697374206F66207072696D69746976657320696E20706C6163652E2052657475726E732074686973206C6973742E
+		Protected Sub SortFast(vm As ObjoScript.VM)
+		  /// Sorts this list of primitives in place. Returns this list.
+		  ///
+		  /// Assumes slot 0 contains a List instance whose elements are all primitives (numbers, strings).
+		  /// This is faster than `List.sort()`.
+		  /// List.sortFast() -> List
+		  
+		  Var list As ObjoScript.Instance = vm.GetSlotValue(0)
+		  Var items() As Variant = ObjoScript.Core.List.ListData(list.ForeignData).Items
+		  
+		  // If every item is a number we'll use one sort delegate, otherwise we will sort on 
+		  // string value.
+		  Var usenumberSort As Boolean = True
+		  For Each item As Variant In items
+		    If item.Type <> Variant.TypeDouble Then
+		      usenumberSort = False
+		      Exit
+		    End If
+		  Next item
+		  
+		  If usenumberSort Then
+		    items.Sort(AddressOf SortFastStringDelegate)
+		  Else
+		    items.Sort(AddressOf SortFastStringDelegate)
+		  End If
+		  
+		  vm.SetReturn(list)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 412064656C656761746520666F7220736F7274696E6720616E206172726179206F6620646F75626C65732E2055736564206279207468652060536F727446617374282960206D6574686F642E
+		Private Function SortFastNumberDelegate(d1 As Double, d2 As Double) As Integer
+		  /// A delegate for sorting an array of doubles.
+		  /// Used by the `SortFast()` method.
+		  
+		  If d1 > d2 Then
+		    Return 1
+		  ElseIf d1 < d2 Then
+		    Return -1
+		  Else
+		    Return 0
+		  End If
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 412064656C656761746520666F7220736F7274696E6720616E206172726179206F66206974656D7320696E2061204C6973742E2055736564206279207468652060536F727446617374282960206D6574686F642E
+		Private Function SortFastStringDelegate(v1 As Variant, v2 As Variant) As Integer
+		  /// A delegate for sorting an array of items in a List.
+		  /// Used by the `SortFast()` method.
+		  
+		  Var s1 As String = ObjoScript.VM.ValueToString(v1)
+		  Var s2 As String = ObjoScript.VM.ValueToString(v2)
+		  
+		  If s1 > s2 Then
+		    Return 1
+		  ElseIf s1 < s2 Then
+		    Return -1
+		  Else
+		    Return 0
+		  End If
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h1, Description = 52657475726E732066616C736520696620746865726520617265206E6F206D6F7265206974656D7320746F2069746572617465206F722072657475726E7320746865206E6578742076616C756520696E207468652073657175656E63652E
