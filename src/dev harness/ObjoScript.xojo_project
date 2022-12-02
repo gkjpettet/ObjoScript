@@ -59,6 +59,7 @@ Class=BinaryParselet;ObjoScript/ObjoScript/BinaryParselet.xojo_code;&h0000000045
 Class=LogicalParselet;ObjoScript/ObjoScript/LogicalParselet.xojo_code;&h000000006FA6E7FF;&h000000004D1497FF;false
 Class=SubscriptParselet;ObjoScript/ObjoScript/SubscriptParselet.xojo_code;&h000000002BDCD7FF;&h000000004D1497FF;false
 Class=RangeParselet;ObjoScript/ObjoScript/RangeParselet.xojo_code;&h0000000011CCFFFF;&h000000004D1497FF;false
+Class=KeyValueParselet;ObjoScript/ObjoScript/KeyValueParselet.xojo_code;&h000000000991F7FF;&h000000004D1497FF;false
 Class=BinaryExpr;ObjoScript/ObjoScript/BinaryExpr.xojo_code;&h000000003EFFFFFF;&h000000004D1497FF;false
 Class=LogicalExpr;ObjoScript/ObjoScript/LogicalExpr.xojo_code;&h00000000249137FF;&h000000004D1497FF;false
 Class=RangeExpr;ObjoScript/ObjoScript/RangeExpr.xojo_code;&h00000000403797FF;&h000000004D1497FF;false
