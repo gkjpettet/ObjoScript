@@ -1,0 +1,13 @@
+var list1 = [6, 4, 2, 8, 9, 0, 0, 1, 3, 3]
+list1.sortFast()
+System.print(list1) // Expect [0, 0, 1, 2, 3, 3, 4, 6, 8, 9]
+
+var list2 = [6, 4, 2, "a", 9, 0, 0, 1, 3, 3]
+list2.sortFast()
+System.print(list2) // Expect [0, 0, 1, 2, 3, 3, 4, 6, 9, a]
+
+class Person {}
+
+var list3 = [Person(), 4, 2, "a", 9, 0, 0, 1, 3, 3]
+list3.sortFast()
+System.print(list3) // Expect [0, 0, 1, 2, 3, 3, 4, 9, a, Person instance]
