@@ -256,6 +256,7 @@ foreign iterate(iter)
 foreign iteratorValue(iter)
 foreign remove(item)
 foreign removeAt(index)
+sort() {}
 foreign swap(index0, index1)
 foreign toString()
 

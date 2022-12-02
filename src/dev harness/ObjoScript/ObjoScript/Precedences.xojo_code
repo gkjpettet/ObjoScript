@@ -3,6 +3,7 @@ Protected Class Precedences
 	#tag Method, Flags = &h21, Description = 5468697320636C617373206973206E6F7420696E74656E64656420746F20626520696E7374616E7469617465642E
 		Private Sub Constructor()
 		  /// This class is not intended to be instantiated.
+		  
 		End Sub
 	#tag EndMethod
 
@@ -55,19 +56,19 @@ Protected Class Precedences
 	#tag Constant, Name = None, Type = Double, Dynamic = False, Default = \"0", Scope = Public
 	#tag EndConstant
 
-	#tag Constant, Name = Postfix, Type = Double, Dynamic = False, Default = \"18", Scope = Public
+	#tag Constant, Name = Postfix, Type = Double, Dynamic = False, Default = \"17", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = Primary, Type = Double, Dynamic = False, Default = \"20", Scope = Public
 	#tag EndConstant
 
-	#tag Constant, Name = Range, Type = Double, Dynamic = False, Default = \"19", Scope = Public
+	#tag Constant, Name = Range, Type = Double, Dynamic = False, Default = \"14", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = Term, Type = Double, Dynamic = False, Default = \"15", Scope = Public
 	#tag EndConstant
 
-	#tag Constant, Name = Unary, Type = Double, Dynamic = False, Default = \"17", Scope = Public
+	#tag Constant, Name = Unary, Type = Double, Dynamic = False, Default = \"18", Scope = Public
 	#tag EndConstant
 
 
