@@ -16,7 +16,12 @@ Implements ObjoScript.PrefixParselet
 		  Var keyValues() As ObjoScript.KeyValueExpr
 		  If Not parser.Check(ObjoScript.TokenTypes.RCurly) Then
 		    Do
-		      keyValues.Add(ParseKeyValue(parser))
+		      Var kv As ObjoScript.Expr = parser.Expression
+		      If kv IsA ObjoScript.KeyValueExpr = False Then
+		        parser.Error("Expected a key-value pair.")
+		      Else
+		        keyValues.Add(ObjoScript.KeyValueExpr(kv))
+		      End If
 		    Loop Until Not parser.Match(ObjoScript.TokenTypes.Comma)
 		  End If
 		  

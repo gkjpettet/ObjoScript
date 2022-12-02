@@ -375,17 +375,20 @@ Protected Class VM
 		  #Pragma NilObjectChecking False
 		  #Pragma StackOverflowChecking False
 		  
-		  // Pop the key and value.
-		  Var data As Pair = Pop : Pop
+		  // Call the 2 argument KeyValue constructor.
+		  Call CallClass(Peek(2), 2)
 		  
-		  // Call the default list constructor.
-		  Call CallClass(Peek(0), 0)
+		  // Read the key and value.
+		  Var data As Pair = Pop : Pop
 		  
 		  // The top of the stack will now be a KeyValue instance.
 		  // Set it's foreign data.
 		  Var kv As ObjoScript.Instance = Stack(StackTop - 1)
 		  kv.ForeignData = data
 		  
+		  // Update the current call frame (since CallClass doesn't do this for us) and
+		  // we have invoked an actual constructor.
+		  CurrentFrame = Frames(FrameCount - 1)
 		End Sub
 	#tag EndMethod
 
@@ -431,7 +434,7 @@ Protected Class VM
 		    keyValues.Value(Pop) = Pop
 		  Next i
 		  
-		  // Call the default list constructor.
+		  // Call the 0 argument Map constructor.
 		  Call CallClass(Peek(0), 0)
 		  
 		  // The top of the stack will now be a Map instance.

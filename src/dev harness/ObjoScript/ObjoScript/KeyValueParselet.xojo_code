@@ -16,7 +16,7 @@ Implements ObjoScript.InfixParselet
 		  
 		  Var colon As ObjoScript.Token = parser.Previous
 		  
-		  Var right As ObjoScript.Expr = parser.ParsePrecedence(Precedences.Conditional)
+		  Var right As ObjoScript.Expr = parser.Expression
 		  
 		  Return New KeyValueExpr(colon, left, right)
 		  

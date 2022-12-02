@@ -3,4 +3,5 @@ class Foo {}
 // Classes get a default 0-parameter constructor by default.
 var foo = Foo()
 
-foo is Foo ? System.print("true") : System.print("false") // expect: true.
+// Expect: true
+foo is System.print(true) if Foo else System.print("false")

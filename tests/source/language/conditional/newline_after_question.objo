@@ -1,3 +1,0 @@
-// Newline after '?'.
-System.print(true ?
-  "yes" : "no") // expect error.

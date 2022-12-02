@@ -186,7 +186,7 @@ foreach element in this { action(element) }
 /// Relies on the fact that calling `iterate(nothing)` on an object that implements
 /// the `iterator protocol` returns the first item or `false` if there are no items.
 isEmpty {
-return this.iterate(nothing) ? false : true
+return false if this.iterate(nothing) else true
 }
 }
 

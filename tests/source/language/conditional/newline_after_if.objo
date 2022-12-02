@@ -1,0 +1,3 @@
+// Newline after 'if'.
+System.print("yes" if 
+true else "no") // Expect error.

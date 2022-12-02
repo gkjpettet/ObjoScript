@@ -719,7 +719,7 @@ Protected Class Parser
 		  TokenTypes.Breakpoint           : Unused, _
 		  TokenTypes.Caret                : BinaryOperator(Precedences.BitwiseXor), _
 		  TokenTypes.Class_               : Unused, _
-		  TokenTypes.Colon                : Unused, _
+		  TokenTypes.Colon                : NewRule(Nil, New KeyValueParselet, Precedences.Range), _
 		  TokenTypes.Comma                : Unused, _
 		  TokenTypes.Constructor          : Unused, _
 		  TokenTypes.Continue_            : Unused, _
