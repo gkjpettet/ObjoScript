@@ -6,6 +6,8 @@ _age = age
 }
 >(other) { return age > other.age }
 <(other) { return age < other.age }
+<=(other) { return age <= other.age }
+>=(other) { return age >= other.age }
 ==(other) { return age == other.age }
 
 age {return _age}
@@ -17,8 +19,9 @@ var garry = Person("Garry", 41)
 var aoife = Person("Aoife", 10)
 var carole = Person("Carole", 68)
 var fiona = Person("Fiona", 41)
+var gaga = Person("Gaga", 74)
 
-var people = [garry, fiona, aoife, carole]
+var people = [gaga, garry, fiona, aoife, carole]
 
 people.sort
 

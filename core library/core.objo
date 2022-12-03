@@ -254,28 +254,67 @@ foreign indexOf(item)
 foreign insert(index, item)
 foreign iterate(iter)
 foreign iteratorValue(iter)
+foreign pop()
 foreign remove(item)
 foreign removeAt(index)
 
-/// Sorts a single dimension list using a bubblesort algorithm.
+/// Sorts a single dimension list using an iterative quicksort algorithm.
 sort() {
-var n = this.count
-if n < 2 then return
-while true {
-var swapped = false
-foreach i in 1..n-1 {
-if this[i-1] > this[i] {
-var t = this[i-1]
-this[i-1] = this[i]
-this[i] = t
-swapped = true
-}
-}
-if not swapped then return
+// Create a stack for storing sublist start and end index.
+var stack = []
+
+// Get the starting and ending index of a given list.
+var start = 0
+var end = this.count - 1
+
+// Push the start and end index of the array into the stack.
+stack.add(start : end)
+
+// Loop until the stack is empty.
+while not stack.isEmpty {
+// Remove top pair from the list and get sublist starting and ending indices.
+var pair = stack.pop()
+start = pair.key
+end = pair.value
+
+// Rearrange elements across pivot.
+// Pick the rightmost element as a pivot from the list.
+var pivot = this[end]
+
+// Elements less than the pivot will go to the left of `pIndex`
+// Elements more than the pivot will go to the right of `pIndex`
+// Equal elements can go either way
+var pIndex = start
+
+// Each time we find an element less than or equal to the pivot,
+// `pIndex` is incremented, and that element would be placed
+// before the pivot.
+foreach i in start...end {
+if this[i] <= pivot {
+this.swap(i, pIndex)
+pIndex = pIndex + 1
 }
 }
 
-foreign sortFast()
+// Swap `pIndex` with pivot
+this.swap(pIndex, end)
+
+// We now have index of the pivot element.
+pivot = pIndex
+
+// Push sublist indices containing elements that are
+// less than the current pivot to stack.
+if pivot - 1 > start {
+stack.add(start : pivot - 1)
+}
+
+// Push sublist indices containing elements that are
+// more than the current pivot to stack.
+if pivot + 1 < end {
+stack.add(pivot + 1 : end)
+}
+}
+}
 
 foreign swap(index0, index1)
 foreign toString()
