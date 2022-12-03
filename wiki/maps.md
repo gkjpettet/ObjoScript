@@ -12,6 +12,14 @@ var heroes = {
 
 This creates a map that associates a key (the alter ego) with a value (the superhero's name). String keys and values are shown above but the keys and values can be any type.
 
+It's worth noting that ObjoScript has built-in support for a `KeyValue` class comprised of key-value pairs. The syntax for creating them is:
+
+```objo
+var kv = 1 : 2
+System.print(kv.key) // 1
+System.print(kv.value) // 2
+```
+
 ## Adding entries
 You add new key-values entries to the map using the subscript operator:
 

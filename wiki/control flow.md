@@ -61,13 +61,19 @@ System.print(1 or 2) // 1
 ```
 
 ## The conditional operator
-This is also known as the _ternary operator_ since it takes three arguments:
+This is also known as the _ternary operator_ since it takes three arguments. It mimics Python's expression:
 
-```objo
-System.print(1 <> 2 ? "Maths checks out" : "Maths is broken")
+```nohighlight
+trueValue if condition else falseValue
 ```
 
-It takes a condition expression followed by `?`, followed by a _then_ expression, a `:` and finally an _else_ expression. It evaluates the condition and it it is true then it evaluates and returns the _then_ expression. Otherwise it evaluates and returns the _else_ expression. 
+Example:
+
+```objo
+System.print("Maths checks out" if 1 <> 2 else "Maths is broken")
+```
+
+It returns `trueValue` if `condition` is `true` otherwise it returns `falseValue`.
 
 ## While loops
 A `while` loop is the simplest type of looping mechanism in ObjoScript. It continues to execute a block of code whilst its condition is true:
