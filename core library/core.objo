@@ -401,10 +401,11 @@ foreign number()
 }
 
 /// ----------------------------------------------------
-/// FSItem
+/// FSITEM
 /// ----------------------------------------------------
 /// A class used to represent file system items.
 foreign class FSItem {
 constructor(path) {}
 foreign readLines()
+foreign static resources()
 }

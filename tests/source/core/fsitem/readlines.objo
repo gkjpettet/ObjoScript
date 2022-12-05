@@ -1,0 +1,4 @@
+var f = FSItem(FSItem.resources + "/tests/files/readLines.txt")
+foreach line in f.readLines {
+System.print(line)
+}

@@ -244,6 +244,7 @@ Class=CoreNumberTests;Unit Tests/Tests/Core/CoreNumberTests.xojo_code;&h00000000
 Class=CoreMapTests;Unit Tests/Tests/Core/CoreMapTests.xojo_code;&h0000000068535FFF;&h000000006FA827FF;false
 Class=CoreMathsTest;Unit Tests/Tests/Core/CoreMathsTest.xojo_code;&h000000001525F7FF;&h000000006FA827FF;false
 Class=CoreListTests;Unit Tests/Tests/Core/CoreListTests.xojo_code;&h0000000041BB07FF;&h000000006FA827FF;false
+Class=CoreFSItemTests;Unit Tests/Tests/Core/CoreFSItemTests.xojo_code;&h00000000194CB7FF;&h000000006FA827FF;false
 Class=CoreObjectTests;Unit Tests/Tests/Core/CoreObjectTests.xojo_code;&h00000000184627FF;&h000000006FA827FF;false
 Module=StringExtensions;ObjoScript/StringExtensions.xojo_code;&h000000000F5A47FF;&h00000000000A4FFF;false
 Module=ObjoScript;ObjoScript/ObjoScript.xojo_code;&h000000004D1497FF;&h00000000000A4FFF;false

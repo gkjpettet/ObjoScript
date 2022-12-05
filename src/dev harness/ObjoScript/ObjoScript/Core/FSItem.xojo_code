@@ -61,6 +61,8 @@ Protected Module FSItem
 		  
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  
+		  d.Value("resources()") = AddressOf Resources
+		  
 		  Return d
 		  
 		End Function
@@ -97,6 +99,17 @@ Protected Module FSItem
 		  End Try
 		  
 		  vm.SetReturn(vm.NewList(lines))
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320746865207061746820746F20746865207265736F757263657320666F6C646572206F662074686520686F7374206170706C69636174696F6E2E
+		Protected Sub Resources(vm As ObjoScript.VM)
+		  /// Returns the path to the resources folder of the host application.
+		  ///
+		  /// FSItem.resources() -> string
+		  
+		  vm.SetReturn(SpecialFolder.Resources.NativePath)
 		  
 		End Sub
 	#tag EndMethod

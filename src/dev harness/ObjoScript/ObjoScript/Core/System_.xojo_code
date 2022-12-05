@@ -1,8 +1,8 @@
 #tag Module
 Protected Module System_
-	#tag Method, Flags = &h1, Description = 54686520757365722069732063616C6C696E67207468652053797374656D20636C61737320636F6E7374727563746F722E
+	#tag Method, Flags = &h1, Description = 54686520757365722069732063616C6C696E6720746865206053797374656D6020636C61737320636F6E7374727563746F722E
 		Protected Sub Allocate(vm As ObjoScript.VM, instance As ObjoScript.Instance, args() As Variant)
-		  /// The user is calling the System class constructor.
+		  /// The user is calling the `System` class constructor.
 		  
 		  #Pragma Unused instance
 		  #Pragma Unused args

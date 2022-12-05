@@ -46,6 +46,7 @@ Inherits TestController
 		  group = New CoreNumberTests(Self, "Core - Number")
 		  group = New CoreStringTests(Self, "Core - String")
 		  group = New CoreMathsTest(Self, "Core - Maths")
+		  group = New CoreFSItemTests(Self, "Core - FSItem")
 		End Sub
 	#tag EndEvent
 
