@@ -1,8 +1,8 @@
 #tag Module
-Protected Module File
-	#tag Method, Flags = &h1, Description = 54686520757365722069732063616C6C696E67207468652046696C6520636C61737320636F6E7374727563746F722E
+Protected Module FSItem
+	#tag Method, Flags = &h1, Description = 54686520757365722069732063616C6C696E67207468652046534974656D20636C61737320636F6E7374727563746F722E
 		Protected Sub Allocate(vm As ObjoScript.VM, instance As ObjoScript.Instance, args() As Variant)
-		  /// The user is calling the File class constructor.
+		  /// The user is calling the FSItem class constructor.
 		  ///
 		  /// constructor(path)
 		  
@@ -25,9 +25,10 @@ Protected Module File
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h1, Description = 52657475726E7320746865206D6574686F6420746F20696E766F6B6520666F72206120666F726569676E206D6574686F64207769746820607369676E617475726560206F6E20746865206046696C656020636C617373206F72204E696C206966207468657265206973206E6F2073756368206D6574686F642E
+	#tag Method, Flags = &h1, Description = 52657475726E7320746865206D6574686F6420746F20696E766F6B6520666F72206120666F726569676E206D6574686F64207769746820607369676E617475726560206F6E20746865206046534974656D6020636C617373206F72204E696C206966207468657265206973206E6F2073756368206D6574686F642E
 		Protected Function BindForeignMethod(signature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
-		  /// Returns the method to invoke for a foreign method with `signature` on the `File` class or Nil if there is no such method.
+		  /// Returns the method to invoke for a foreign method with `signature` on the `FSItem` class or Nil 
+		  /// if there is no such method.
 		  
 		  If isStatic Then
 		    Return StaticMethods.Lookup(signature, Nil)
@@ -40,7 +41,8 @@ Protected Module File
 
 	#tag Method, Flags = &h21, Description = 52657475726E73206120636173652D73656E7369746976652064696374696F6E617279206D617070696E6720746865207369676E617475726573206F6620666F726569676E20696E7374616E6365206D6574686F647320746F20586F6A6F206D6574686F64206164647265737365732E
 		Private Function InitialiseInstanceMethodsDictionary() As Dictionary
-		  /// Returns a case-sensitive dictionary mapping the signatures of foreign instance methods to Xojo method addresses.
+		  /// Returns a case-sensitive dictionary mapping the signatures of foreign instance 
+		  /// methods to Xojo method addresses.
 		  
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  
@@ -54,7 +56,8 @@ Protected Module File
 
 	#tag Method, Flags = &h21, Description = 52657475726E73206120636173652D73656E7369746976652064696374696F6E617279206D617070696E6720746865207369676E617475726573206F6620666F726569676E20737461746963206D6574686F647320746F20586F6A6F206D6574686F64206164647265737365732E
 		Private Function InitialiseStaticMethodsDictionary() As Dictionary
-		  /// Returns a case-sensitive dictionary mapping the signatures of foreign static methods to Xojo method addresses.
+		  /// Returns a case-sensitive dictionary mapping the signatures of foreign static methods to 
+		  /// Xojo method addresses.
 		  
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  
@@ -67,7 +70,7 @@ Protected Module File
 		Protected Sub ReadLines(vm As ObjoScript.VM)
 		  /// Returns a list where each item is a line in the file.
 		  ///
-		  /// File.readLines() -> List
+		  /// FSItem.readLines() -> List
 		  
 		  Var file As ObjoScript.Instance = vm.GetSlotValue(0)
 		  
@@ -98,11 +101,11 @@ Protected Module File
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h1, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F6620746869732046696C652E
+	#tag Method, Flags = &h1, Description = 52657475726E73206120737472696E6720726570726573656E746174696F6E206F6620746869732046534974656D2E
 		Protected Sub ToString(vm As ObjoScript.VM)
-		  /// Returns a string representation of this File.
+		  /// Returns a string representation of this FSItem.
 		  ///
-		  /// File.toString() -> string
+		  /// FSItem.toString() -> string
 		  
 		  vm.SetReturn(FolderItem(vm.GetSlotValue(0)).NativePath)
 		  
