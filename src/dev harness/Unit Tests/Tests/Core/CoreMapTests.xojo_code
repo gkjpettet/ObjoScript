@@ -3,25 +3,25 @@ Protected Class CoreMapTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub ClearTest()
-		  AssertOutputsEqual("core.map.clear")
+		  AssertOutputEquals("core.map.clear")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ContainsKeyTest()
-		  AssertOutputsEqual("core.map.containsKey")
+		  AssertOutputEquals("core.map.containsKey")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub KeysTest()
-		  AssertOutputsEqual("core.map.keys")
+		  AssertOutputEquals("core.map.keys")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub RemoveTest()
-		  AssertOutputsEqual("core.map.remove")
+		  AssertOutputEquals("core.map.remove")
 		End Sub
 	#tag EndMethod
 
@@ -39,7 +39,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub ValueIterateTest()
-		  AssertOutputsEqual("core.map.value_iterate")
+		  AssertOutputEquals("core.map.value_iterate")
 		End Sub
 	#tag EndMethod
 

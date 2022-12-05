@@ -9,13 +9,13 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub ThisInMethodTest()
-		  AssertOutputsEqual("language.this.this_in_method")
+		  AssertOutputEquals("language.this.this_in_method")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ThisInStaticMethodTest()
-		  AssertOutputsEqual("language.this.this_in_static_method")
+		  AssertOutputEquals("language.this.this_in_static_method")
 		End Sub
 	#tag EndMethod
 

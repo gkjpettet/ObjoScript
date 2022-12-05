@@ -33,13 +33,13 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub GrowShrinkTest()
-		  AssertOutputsEqual("language.list.grow_shrink")
+		  AssertOutputEquals("language.list.grow_shrink")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub NewlinesTest()
-		  AssertOutputsEqual("language.list.newlines")
+		  AssertOutputEquals("language.list.newlines")
 		End Sub
 	#tag EndMethod
 

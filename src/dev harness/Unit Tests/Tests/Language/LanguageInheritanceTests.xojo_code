@@ -9,7 +9,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub InheritFieldsTest()
-		  AssertOutputsEqual("language.inheritance.inherit_fields")
+		  AssertOutputEquals("language.inheritance.inherit_fields")
 		End Sub
 	#tag EndMethod
 
@@ -51,13 +51,13 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub InheritMethodsTest()
-		  AssertOutputsEqual("language.inheritance.inherit_methods")
+		  AssertOutputEquals("language.inheritance.inherit_methods")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub IsTest()
-		  AssertOutputsEqual("language.inheritance.is")
+		  AssertOutputEquals("language.inheritance.is")
 		End Sub
 	#tag EndMethod
 

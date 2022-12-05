@@ -3,109 +3,109 @@ Protected Class CoreNumberTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub AbsTest()
-		  AssertOutputsEqual("core.number.abs")
+		  AssertOutputEquals("core.number.abs")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ACosTest()
-		  AssertOutputsEqual("core.number.acos")
+		  AssertOutputEquals("core.number.acos")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ASinTest()
-		  AssertOutputsEqual("core.number.asin")
+		  AssertOutputEquals("core.number.asin")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ATanTest()
-		  AssertOutputsEqual("core.number.atan")
+		  AssertOutputEquals("core.number.atan")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub CeilTest()
-		  AssertOutputsEqual("core.number.ceil")
+		  AssertOutputEquals("core.number.ceil")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub CosTest()
-		  AssertOutputsEqual("core.number.cos")
+		  AssertOutputEquals("core.number.cos")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ExpTest()
-		  AssertOutputsEqual("core.number.exp")
+		  AssertOutputEquals("core.number.exp")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub FloorTest()
-		  AssertOutputsEqual("core.number.floor")
+		  AssertOutputEquals("core.number.floor")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub IsIntegerTest()
-		  AssertOutputsEqual("core.number.isInteger")
+		  AssertOutputEquals("core.number.isInteger")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub LogTest()
-		  AssertOutputsEqual("core.number.log")
+		  AssertOutputEquals("core.number.log")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub MaxTest()
-		  AssertOutputsEqual("core.number.max")
+		  AssertOutputEquals("core.number.max")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub MinTest()
-		  AssertOutputsEqual("core.number.min")
+		  AssertOutputEquals("core.number.min")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub PowTest()
-		  AssertOutputsEqual("core.number.pow")
+		  AssertOutputEquals("core.number.pow")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub RoundTest()
-		  AssertOutputsEqual("core.number.round")
+		  AssertOutputEquals("core.number.round")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub SignTest()
-		  AssertOutputsEqual("core.number.sign")
+		  AssertOutputEquals("core.number.sign")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub SinTest()
-		  AssertOutputsEqual("core.number.sin")
+		  AssertOutputEquals("core.number.sin")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub SqrtTest()
-		  AssertOutputsEqual("core.number.sqrt")
+		  AssertOutputEquals("core.number.sqrt")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub TanTest()
-		  AssertOutputsEqual("core.number.tan")
+		  AssertOutputEquals("core.number.tan")
 		End Sub
 	#tag EndMethod
 

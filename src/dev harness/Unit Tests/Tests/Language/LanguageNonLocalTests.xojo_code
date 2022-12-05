@@ -3,7 +3,7 @@ Protected Class LanguageNonLocalTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub AssignmentTest()
-		  AssertOutputsEqual("language.non_local.assignment")
+		  AssertOutputEquals("language.non_local.assignment")
 		End Sub
 	#tag EndMethod
 
@@ -15,7 +15,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub InBlockScopeTest()
-		  AssertOutputsEqual("language.non_local.in_block_scope")
+		  AssertOutputEquals("language.non_local.in_block_scope")
 		End Sub
 	#tag EndMethod
 
@@ -27,7 +27,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub MutualRecursionTest()
-		  AssertOutputsEqual("language.non_local.mutual_recursion")
+		  AssertOutputEquals("language.non_local.mutual_recursion")
 		End Sub
 	#tag EndMethod
 
@@ -39,7 +39,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub NonLocalWithoutInitialiserTest()
-		  AssertOutputsEqual("language.non_local.nonlocal_without_initialiser")
+		  AssertOutputEquals("language.non_local.nonlocal_without_initialiser")
 		End Sub
 	#tag EndMethod
 
@@ -51,25 +51,25 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub UseInFunctionBeforeDefinitionTest()
-		  AssertOutputsEqual("language.non_local.use_in_function_before_definition")
+		  AssertOutputEquals("language.non_local.use_in_function_before_definition")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub UseInFunctionTest()
-		  AssertOutputsEqual("language.non_local.use_in_function")
+		  AssertOutputEquals("language.non_local.use_in_function")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub UseInMethodBeforeDeclarationTest()
-		  AssertOutputsEqual("language.non_local.use_in_method_before_declaration")
+		  AssertOutputEquals("language.non_local.use_in_method_before_declaration")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub UseInMethodTest()
-		  AssertOutputsEqual("language.non_local.use_in_method")
+		  AssertOutputEquals("language.non_local.use_in_method")
 		End Sub
 	#tag EndMethod
 

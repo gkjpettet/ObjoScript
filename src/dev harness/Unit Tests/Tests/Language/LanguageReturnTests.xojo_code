@@ -3,37 +3,37 @@ Protected Class LanguageReturnTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub AfterElseTest()
-		  AssertOutputsEqual("language.return.after_else")
+		  AssertOutputEquals("language.return.after_else")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub AfterIfTest()
-		  AssertOutputsEqual("language.return.after_if")
+		  AssertOutputEquals("language.return.after_if")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub AfterWhileTest()
-		  AssertOutputsEqual("language.return.after_while")
+		  AssertOutputEquals("language.return.after_while")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub InFunctionTest()
-		  AssertOutputsEqual("language.return.in_function")
+		  AssertOutputEquals("language.return.in_function")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub InMethodTest()
-		  AssertOutputsEqual("language.return.in_method")
+		  AssertOutputEquals("language.return.in_method")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ReturnNothingIfNewlineTest()
-		  AssertOutputsEqual("language.return.return_nothing_if_newline")
+		  AssertOutputEquals("language.return.return_nothing_if_newline")
 		End Sub
 	#tag EndMethod
 

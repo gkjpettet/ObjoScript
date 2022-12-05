@@ -3,49 +3,49 @@ Protected Class LanguageMiscTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub BitwisePrecedenceTest()
-		  AssertOutputsEqual("language.misc.bitwise_precedence")
+		  AssertOutputEquals("language.misc.bitwise_precedence")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ChainedTest()
-		  AssertOutputsEqual("language.misc.chained")
+		  AssertOutputEquals("language.misc.chained")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub EmptyBlockTest()
-		  AssertOutputsEqual("language.misc.empty_block")
+		  AssertOutputEquals("language.misc.empty_block")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub EmptyFileTest()
-		  AssertOutputsEqual("language.misc.empty_file")
+		  AssertOutputEquals("language.misc.empty_file")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub KeyValueConstructorTest()
-		  AssertOutputsEqual("language.misc.keyvalue_constructor")
+		  AssertOutputEquals("language.misc.keyvalue_constructor")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub KeyValueEqualityTest()
-		  AssertOutputsEqual("language.misc.keyvalue_equality")
+		  AssertOutputEquals("language.misc.keyvalue_equality")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub NoTrailingNewlineTest()
-		  AssertOutputsEqual("language.misc.no_trailing_newline")
+		  AssertOutputEquals("language.misc.no_trailing_newline")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub PrecedenceTest()
-		  AssertOutputsEqual("language.misc.precedence")
+		  AssertOutputEquals("language.misc.precedence")
 		End Sub
 	#tag EndMethod
 
@@ -63,7 +63,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub WhitespaceTest()
-		  AssertOutputsEqual("language.misc.whitespace")
+		  AssertOutputEquals("language.misc.whitespace")
 		End Sub
 	#tag EndMethod
 

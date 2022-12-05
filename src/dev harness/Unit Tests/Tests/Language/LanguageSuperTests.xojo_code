@@ -3,38 +3,38 @@ Protected Class LanguageSuperTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub CallDifferentArityTest()
-		  AssertOutputsEqual("language.super.call_different_arity")
+		  AssertOutputEquals("language.super.call_different_arity")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub CallOtherMethodTest()
-		  AssertOutputsEqual("language.super.call_other_method")
+		  AssertOutputEquals("language.super.call_other_method")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ImplicitNameTest()
-		  AssertOutputsEqual("language.super.implicit_name")
+		  AssertOutputEquals("language.super.implicit_name")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub IndirectlyInheritedTest()
-		  AssertOutputsEqual("language.super.indirectly_inherited")
+		  AssertOutputEquals("language.super.indirectly_inherited")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub NestedInvocationTest()
-		  AssertOutputsEqual("language.super.nested_invocation")
+		  AssertOutputEquals("language.super.nested_invocation")
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub NestedSettersTest()
-		  AssertOutputsEqual("language.super.nested_setters")
+		  AssertOutputEquals("language.super.nested_setters")
 		  
 		End Sub
 	#tag EndMethod
@@ -53,13 +53,13 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub SuperInInheritedMethodTest()
-		  AssertOutputsEqual("language.super.super_in_inherited_method")
+		  AssertOutputEquals("language.super.super_in_inherited_method")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub SuperInStaticMethodTest()
-		  AssertOutputsEqual("language.super.super_in_static_method")
+		  AssertOutputEquals("language.super.super_in_static_method")
 		End Sub
 	#tag EndMethod
 

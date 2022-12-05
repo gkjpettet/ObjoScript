@@ -9,19 +9,19 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub ReturnInsideTest()
-		  AssertOutputsEqual("language.while.return_inside")
+		  AssertOutputEquals("language.while.return_inside")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub SyntaxTest()
-		  AssertOutputsEqual("language.while.syntax")
+		  AssertOutputEquals("language.while.syntax")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub TruthTest()
-		  AssertOutputsEqual("language.while.truth")
+		  AssertOutputEquals("language.while.truth")
 		End Sub
 	#tag EndMethod
 

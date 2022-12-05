@@ -3,21 +3,21 @@ Protected Class LanguageExitTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub FunctionInForEachTest()
-		  AssertOutputsEqual("language.exit.function_in_foreach")
+		  AssertOutputEquals("language.exit.function_in_foreach")
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub FunctionInWhileTest()
-		  AssertOutputsEqual("language.exit.function_in_while")
+		  AssertOutputEquals("language.exit.function_in_while")
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub InForLoopTest()
-		  AssertOutputsEqual("language.exit.in_for_loop")
+		  AssertOutputEquals("language.exit.in_for_loop")
 		  
 		End Sub
 	#tag EndMethod
@@ -38,14 +38,14 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub NestedForEachLoopTest()
-		  AssertOutputsEqual("language.exit.nested_foreach_loop")
+		  AssertOutputEquals("language.exit.nested_foreach_loop")
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub NestedWhileLoopTest()
-		  AssertOutputsEqual("language.exit.nested_while_loop")
+		  AssertOutputEquals("language.exit.nested_while_loop")
 		  
 		End Sub
 	#tag EndMethod
@@ -59,7 +59,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub PopLocalScopesTest()
-		  AssertOutputsEqual("language.exit.pop_local_scopes")
+		  AssertOutputEquals("language.exit.pop_local_scopes")
 		  
 		End Sub
 	#tag EndMethod

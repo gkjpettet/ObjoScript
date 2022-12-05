@@ -3,19 +3,19 @@ Protected Class LanguageIfTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub ChainedSingleLineTest()
-		  AssertOutputsEqual("language.if.chained_single_line")
+		  AssertOutputEquals("language.if.chained_single_line")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ElseTest()
-		  AssertOutputsEqual("language.if.else")
+		  AssertOutputEquals("language.if.else")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub IfTest()
-		  AssertOutputsEqual("language.if.if")
+		  AssertOutputEquals("language.if.if")
 		End Sub
 	#tag EndMethod
 
@@ -33,7 +33,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub TruthTest()
-		  AssertOutputsEqual("language.if.truth")
+		  AssertOutputEquals("language.if.truth")
 		End Sub
 	#tag EndMethod
 

@@ -9,13 +9,13 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub EmptyBodyTest()
-		  AssertOutputsEqual("language.function.empty_body")
+		  AssertOutputEquals("language.function.empty_body")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub NewlineBodyTest()
-		  AssertOutputsEqual("language.function.newline_body")
+		  AssertOutputEquals("language.function.newline_body")
 		End Sub
 	#tag EndMethod
 
@@ -27,13 +27,13 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub ParametersTest()
-		  AssertOutputsEqual("language.function.parameters")
+		  AssertOutputEquals("language.function.parameters")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub SyntaxTest()
-		  AssertOutputsEqual("language.function.syntax")
+		  AssertOutputEquals("language.function.syntax")
 		End Sub
 	#tag EndMethod
 

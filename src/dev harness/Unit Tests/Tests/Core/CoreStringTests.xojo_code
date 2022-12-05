@@ -3,43 +3,43 @@ Protected Class CoreStringTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub AddTest()
-		  AssertOutputsEqual("core.string.add")
+		  AssertOutputEquals("core.string.add")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub CodepointsTest()
-		  AssertOutputsEqual("core.string.codepoints")
+		  AssertOutputEquals("core.string.codepoints")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ContainsTest()
-		  AssertOutputsEqual("core.string.contains")
+		  AssertOutputEquals("core.string.contains")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub CountTest()
-		  AssertOutputsEqual("core.string.count")
+		  AssertOutputEquals("core.string.count")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub EndsWithTest()
-		  AssertOutputsEqual("core.string.endsWith")
+		  AssertOutputEquals("core.string.endsWith")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ForEachTest()
-		  AssertOutputsEqual("core.string.foreach")
+		  AssertOutputEquals("core.string.foreach")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub FromCodepointTest()
-		  AssertOutputsEqual("core.string.fromCodepoint")
+		  AssertOutputEquals("core.string.fromCodepoint")
 		End Sub
 	#tag EndMethod
 
@@ -51,7 +51,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub IndexOfTest()
-		  AssertOutputsEqual("core.string.indexOf")
+		  AssertOutputEquals("core.string.indexOf")
 		End Sub
 	#tag EndMethod
 
@@ -63,19 +63,19 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub IndexTest()
-		  AssertOutputsEqual("core.string.index")
+		  AssertOutputEquals("core.string.index")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub LeftTest()
-		  AssertOutputsEqual("core.string.left")
+		  AssertOutputEquals("core.string.left")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub LowercaseTest()
-		  AssertOutputsEqual("core.string.lowercase")
+		  AssertOutputEquals("core.string.lowercase")
 		End Sub
 	#tag EndMethod
 
@@ -93,73 +93,73 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub MiddleTest()
-		  AssertOutputsEqual("core.string.middle")
+		  AssertOutputEquals("core.string.middle")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub MultiplyTest()
-		  AssertOutputsEqual("core.string.multiply")
+		  AssertOutputEquals("core.string.multiply")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ReplaceAllTest()
-		  AssertOutputsEqual("core.string.replaceAll")
+		  AssertOutputEquals("core.string.replaceAll")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ReplaceTest()
-		  AssertOutputsEqual("core.string.replace")
+		  AssertOutputEquals("core.string.replace")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub RightTest()
-		  AssertOutputsEqual("core.string.right")
+		  AssertOutputEquals("core.string.right")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub SplitTest()
-		  AssertOutputsEqual("core.string.split")
+		  AssertOutputEquals("core.string.split")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub StartsWithTest()
-		  AssertOutputsEqual("core.string.startsWith")
+		  AssertOutputEquals("core.string.startsWith")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub TitlecaseTest()
-		  AssertOutputsEqual("core.string.titlecase")
+		  AssertOutputEquals("core.string.titlecase")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub TrimEndTest()
-		  AssertOutputsEqual("core.string.trimEnd")
+		  AssertOutputEquals("core.string.trimEnd")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub TrimStartTest()
-		  AssertOutputsEqual("core.string.trimStart")
+		  AssertOutputEquals("core.string.trimStart")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub TrimTest()
-		  AssertOutputsEqual("core.string.trim")
+		  AssertOutputEquals("core.string.trim")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub UppercaseTest()
-		  AssertOutputsEqual("core.string.uppercase")
+		  AssertOutputEquals("core.string.uppercase")
 		End Sub
 	#tag EndMethod
 

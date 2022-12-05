@@ -3,7 +3,7 @@ Protected Class LanguageNothingTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub LiteralTest()
-		  AssertOutputsEqual("language.nothing.literal")
+		  AssertOutputEquals("language.nothing.literal")
 		End Sub
 	#tag EndMethod
 

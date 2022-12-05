@@ -3,14 +3,14 @@ Protected Class LanguageAssignmentTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub AssociativityTest()
-		  AssertOutputsEqual("language.assignment.associativity")
+		  AssertOutputEquals("language.assignment.associativity")
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub GlobalTest()
-		  AssertOutputsEqual("language.assignment.global")
+		  AssertOutputEquals("language.assignment.global")
 		  
 		End Sub
 	#tag EndMethod
@@ -29,7 +29,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub LocalTest()
-		  AssertOutputsEqual("language.assignment.local")
+		  AssertOutputEquals("language.assignment.local")
 		  
 		End Sub
 	#tag EndMethod
@@ -42,7 +42,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub SyntaxTest()
-		  AssertOutputsEqual("language.assignment.syntax")
+		  AssertOutputEquals("language.assignment.syntax")
 		  
 		End Sub
 	#tag EndMethod

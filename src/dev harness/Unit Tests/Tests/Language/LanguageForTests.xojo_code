@@ -3,14 +3,14 @@ Protected Class LanguageForTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub CompleteTest()
-		  AssertOutputsEqual("language.for.complete")
+		  AssertOutputEquals("language.for.complete")
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub GlobalLoopCounterTest()
-		  AssertOutputsEqual("language.for.global_loop_counter")
+		  AssertOutputEquals("language.for.global_loop_counter")
 		  
 		End Sub
 	#tag EndMethod

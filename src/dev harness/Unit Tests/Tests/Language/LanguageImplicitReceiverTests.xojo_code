@@ -3,31 +3,31 @@ Protected Class LanguageImplicitReceiverTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub InheritedMethodsTest()
-		  AssertOutputsEqual("language.implicit_receiver.inherited_methods")
+		  AssertOutputEquals("language.implicit_receiver.inherited_methods")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub InstanceMethodsTest()
-		  AssertOutputsEqual("language.implicit_receiver.instance_methods")
+		  AssertOutputEquals("language.implicit_receiver.instance_methods")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub LocalsShadowGetterTest()
-		  AssertOutputsEqual("language.implicit_receiver.locals_shadow_getter")
+		  AssertOutputEquals("language.implicit_receiver.locals_shadow_getter")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub LocalsShadowSetterTest()
-		  AssertOutputsEqual("language.implicit_receiver.locals_shadow_setter")
+		  AssertOutputEquals("language.implicit_receiver.locals_shadow_setter")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub StaticMethodsTest()
-		  AssertOutputsEqual("language.implicit_receiver.static_methods")
+		  AssertOutputEquals("language.implicit_receiver.static_methods")
 		End Sub
 	#tag EndMethod
 

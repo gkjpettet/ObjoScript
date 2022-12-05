@@ -21,7 +21,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub GlobalWithoutInitialiserTest()
-		  AssertOutputsEqual("language.variable.global_without_initialiser")
+		  AssertOutputEquals("language.variable.global_without_initialiser")
 		End Sub
 	#tag EndMethod
 
@@ -45,31 +45,31 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub LocalInMiddleOfBlockTest()
-		  AssertOutputsEqual("language.variable.local_in_middle_of_block")
+		  AssertOutputEquals("language.variable.local_in_middle_of_block")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub LocalInNestedBlockTest()
-		  AssertOutputsEqual("language.variable.local_in_nested_block")
+		  AssertOutputEquals("language.variable.local_in_nested_block")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub LocalWithoutInitialiserTest()
-		  AssertOutputsEqual("language.variable.local_without_initialiser")
+		  AssertOutputEquals("language.variable.local_without_initialiser")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ManyLocalsTest()
-		  AssertOutputsEqual("language.variable.many_locals")
+		  AssertOutputEquals("language.variable.many_locals")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ManyNonSimultaneousLocalsTest()
-		  AssertOutputsEqual("language.variable.many_nonsimultaneous_locals")
+		  AssertOutputEquals("language.variable.many_nonsimultaneous_locals")
 		End Sub
 	#tag EndMethod
 
@@ -87,49 +87,49 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub OutsideMethodTest()
-		  AssertOutputsEqual("language.variable.outside_method")
+		  AssertOutputEquals("language.variable.outside_method")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ScopeIfTest()
-		  AssertOutputsEqual("language.variable.scope_if")
+		  AssertOutputEquals("language.variable.scope_if")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ScopeReuseInDifferentBlocksTest()
-		  AssertOutputsEqual("language.variable.scope_reuse_in_different_blocks")
+		  AssertOutputEquals("language.variable.scope_reuse_in_different_blocks")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ScopeWhileTest()
-		  AssertOutputsEqual("language.variable.scope_while")
+		  AssertOutputEquals("language.variable.scope_while")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ShadowAndLocalTest()
-		  AssertOutputsEqual("language.variable.shadow_and_local")
+		  AssertOutputEquals("language.variable.shadow_and_local")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ShadowGlobalTest()
-		  AssertOutputsEqual("language.variable.shadow_global")
+		  AssertOutputEquals("language.variable.shadow_global")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ShadowInInitialiserTest()
-		  AssertOutputsEqual("language.variable.shadow_in_initialiser")
+		  AssertOutputEquals("language.variable.shadow_in_initialiser")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ShadowLocalTest()
-		  AssertOutputsEqual("language.variable.shadow_local")
+		  AssertOutputEquals("language.variable.shadow_local")
 		End Sub
 	#tag EndMethod
 

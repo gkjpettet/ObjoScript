@@ -3,7 +3,7 @@ Protected Class LanguageFieldTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub DefaultToNothingTest()
-		  AssertOutputsEqual("language.field.default_to_nothing")
+		  AssertOutputEquals("language.field.default_to_nothing")
 		  
 		End Sub
 	#tag EndMethod
@@ -17,14 +17,14 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub MultipleTest()
-		  AssertOutputsEqual("language.field.multiple")
+		  AssertOutputEquals("language.field.multiple")
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ObjectReferenceTest()
-		  AssertOutputsEqual("language.field.object_reference")
+		  AssertOutputEquals("language.field.object_reference")
 		  
 		End Sub
 	#tag EndMethod
@@ -37,7 +37,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub UseBeforeSetTest()
-		  AssertOutputsEqual("language.field.use_before_set")
+		  AssertOutputEquals("language.field.use_before_set")
 		  
 		End Sub
 	#tag EndMethod

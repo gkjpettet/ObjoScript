@@ -3,13 +3,13 @@ Protected Class CoreObjectTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub HasMethodStaticTest()
-		  AssertOutputsEqual("core.object.hasMethod_static")
+		  AssertOutputEquals("core.object.hasMethod_static")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub HasMethodTest()
-		  AssertOutputsEqual("core.object.hasMethod")
+		  AssertOutputEquals("core.object.hasMethod")
 		End Sub
 	#tag EndMethod
 

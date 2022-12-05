@@ -3,19 +3,19 @@ Protected Class LanguageStaticFieldTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub DefaultToNothingTest()
-		  AssertOutputsEqual("language.static_field.default_to_nothing")
+		  AssertOutputEquals("language.static_field.default_to_nothing")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub InInstanceMethodTest()
-		  AssertOutputsEqual("language.static_field.in_instance_method")
+		  AssertOutputEquals("language.static_field.in_instance_method")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub MultipleTest()
-		  AssertOutputsEqual("language.static_field.multiple")
+		  AssertOutputEquals("language.static_field.multiple")
 		End Sub
 	#tag EndMethod
 
@@ -27,7 +27,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub UseBeforeSetTest()
-		  AssertOutputsEqual("language.static_field.use_before_set")
+		  AssertOutputEquals("language.static_field.use_before_set")
 		End Sub
 	#tag EndMethod
 

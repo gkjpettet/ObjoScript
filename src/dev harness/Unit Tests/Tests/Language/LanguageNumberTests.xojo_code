@@ -3,13 +3,13 @@ Protected Class LanguageNumberTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub HexLiteralsTest()
-		  AssertOutputsEqual("language.number.hex_literals")
+		  AssertOutputEquals("language.number.hex_literals")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub LiteralsTest()
-		  AssertOutputsEqual("language.number.literals")
+		  AssertOutputEquals("language.number.literals")
 		End Sub
 	#tag EndMethod
 

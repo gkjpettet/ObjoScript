@@ -3,7 +3,7 @@ Protected Class CoreFSItemTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub ReadLinesTest()
-		  AssertOutputsEqual("core.fsitem.readlines")
+		  AssertOutputEquals("core.fsitem.readlines")
 		End Sub
 	#tag EndMethod
 

@@ -3,7 +3,7 @@ Protected Class CoreMathsTest
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub ConstantsTest()
-		  AssertOutputsEqual("core.maths.constants")
+		  AssertOutputEquals("core.maths.constants")
 		End Sub
 	#tag EndMethod
 

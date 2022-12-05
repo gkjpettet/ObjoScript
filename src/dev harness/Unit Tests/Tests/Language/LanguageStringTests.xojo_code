@@ -15,13 +15,13 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub LiteralsTest()
-		  AssertOutputsEqual("language.string.literals")
+		  AssertOutputEquals("language.string.literals")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub UnicodeEscapesTest()
-		  AssertOutputsEqual("language.string.unicode_escapes")
+		  AssertOutputEquals("language.string.unicode_escapes")
 		End Sub
 	#tag EndMethod
 

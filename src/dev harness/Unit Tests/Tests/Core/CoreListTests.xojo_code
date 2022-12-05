@@ -3,31 +3,31 @@ Protected Class CoreListTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub AddAllTest()
-		  AssertOutputsEqual("core.list.addAll")
+		  AssertOutputEquals("core.list.addAll")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub CloneTest()
-		  AssertOutputsEqual("core.list.clone")
+		  AssertOutputEquals("core.list.clone")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub CountTest()
-		  AssertOutputsEqual("core.list.count")
+		  AssertOutputEquals("core.list.count")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub FilledTest()
-		  AssertOutputsEqual("core.list.filled")
+		  AssertOutputEquals("core.list.filled")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub IndexOfTest()
-		  AssertOutputsEqual("core.list.indexOf")
+		  AssertOutputEquals("core.list.indexOf")
 		End Sub
 	#tag EndMethod
 
@@ -51,19 +51,19 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub InsertTest()
-		  AssertOutputsEqual("core.list.insert")
+		  AssertOutputEquals("core.list.insert")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub MultiplyTest()
-		  AssertOutputsEqual("core.list.multiply")
+		  AssertOutputEquals("core.list.multiply")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub PlusTest()
-		  AssertOutputsEqual("core.list.plus")
+		  AssertOutputEquals("core.list.plus")
 		End Sub
 	#tag EndMethod
 
@@ -87,25 +87,25 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub RemoveAtTest()
-		  AssertOutputsEqual("core.list.removeAt")
+		  AssertOutputEquals("core.list.removeAt")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub RemoveTest()
-		  AssertOutputsEqual("core.list.remove")
+		  AssertOutputEquals("core.list.remove")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub SortTest()
-		  AssertOutputsEqual("core.list.sort")
+		  AssertOutputEquals("core.list.sort")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub SubscriptNegativeIndicesTest()
-		  AssertOutputsEqual("core.list.subscript_negative_indices")
+		  AssertOutputEquals("core.list.subscript_negative_indices")
 		End Sub
 	#tag EndMethod
 
@@ -117,13 +117,13 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub SubscriptRangeTest()
-		  AssertOutputsEqual("core.list.subscript_range")
+		  AssertOutputEquals("core.list.subscript_range")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub SwapTest()
-		  AssertOutputsEqual("core.list.swap")
+		  AssertOutputEquals("core.list.swap")
 		End Sub
 	#tag EndMethod
 

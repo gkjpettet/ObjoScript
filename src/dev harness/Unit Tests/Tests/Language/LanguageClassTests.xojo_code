@@ -30,13 +30,13 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub StaticInstanceNameResolutionTest()
-		  AssertOutputsEqual("language.class.static_instance_name_resolution")
+		  AssertOutputEquals("language.class.static_instance_name_resolution")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ThisInStaticMethodTest()
-		  AssertOutputsEqual("language.class.this_in_static_method")
+		  AssertOutputEquals("language.class.this_in_static_method")
 		  
 		End Sub
 	#tag EndMethod

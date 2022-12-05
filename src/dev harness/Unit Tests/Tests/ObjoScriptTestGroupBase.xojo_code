@@ -45,7 +45,7 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320746865207465737420736F7572636520666F722060746573744E616D65602C2072756E7320697420616E642061737365727473207468617420697473206F7574707574206D61746368657320746865206578706563746564206F75747075742E
-		Sub AssertOutputsEqual(testName As String)
+		Sub AssertOutputEquals(testName As String)
 		  /// Compiles the test source for `testName`, runs it and asserts that its output matches the expected output.
 		  ///
 		  /// Expects `testName` to be in the format: topic.subtopic.testName

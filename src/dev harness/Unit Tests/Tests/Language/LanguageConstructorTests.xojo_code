@@ -15,7 +15,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub DefaultTest()
-		  AssertOutputsEqual("language.constructor.default")
+		  AssertOutputEquals("language.constructor.default")
 		End Sub
 	#tag EndMethod
 
@@ -33,13 +33,13 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub ReturnWithoutValueTest()
-		  AssertOutputsEqual("language.constructor.return_without_value")
+		  AssertOutputEquals("language.constructor.return_without_value")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub SuperclassTest()
-		  AssertOutputsEqual("language.constructor.superclass")
+		  AssertOutputEquals("language.constructor.superclass")
 		End Sub
 	#tag EndMethod
 

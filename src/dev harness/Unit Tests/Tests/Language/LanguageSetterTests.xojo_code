@@ -3,7 +3,7 @@ Protected Class LanguageSetterTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub AssociativityTest()
-		  AssertOutputsEqual("language.setter.associativity")
+		  AssertOutputEquals("language.setter.associativity")
 		End Sub
 	#tag EndMethod
 
@@ -21,7 +21,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub InstanceTest()
-		  AssertOutputsEqual("language.setter.instance")
+		  AssertOutputEquals("language.setter.instance")
 		End Sub
 	#tag EndMethod
 
@@ -39,19 +39,19 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub ResultTest()
-		  AssertOutputsEqual("language.setter.result")
+		  AssertOutputEquals("language.setter.result")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub SameNameAsMethodTest()
-		  AssertOutputsEqual("language.setter.same_name_as_method")
+		  AssertOutputEquals("language.setter.same_name_as_method")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub StaticTest()
-		  AssertOutputsEqual("language.setter.static")
+		  AssertOutputEquals("language.setter.static")
 		End Sub
 	#tag EndMethod
 

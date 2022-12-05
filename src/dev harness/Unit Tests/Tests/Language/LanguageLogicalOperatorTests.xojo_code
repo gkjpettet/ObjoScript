@@ -3,25 +3,25 @@ Protected Class LanguageLogicalOperatorTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub AndTest()
-		  AssertOutputsEqual("language.logical_operator.and")
+		  AssertOutputEquals("language.logical_operator.and")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub AndTruthTest()
-		  AssertOutputsEqual("language.logical_operator.and_truth")
+		  AssertOutputEquals("language.logical_operator.and_truth")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub OrTest()
-		  AssertOutputsEqual("language.logical_operator.or")
+		  AssertOutputEquals("language.logical_operator.or")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub OrTruthTest()
-		  AssertOutputsEqual("language.logical_operator.or_truth")
+		  AssertOutputEquals("language.logical_operator.or_truth")
 		End Sub
 	#tag EndMethod
 

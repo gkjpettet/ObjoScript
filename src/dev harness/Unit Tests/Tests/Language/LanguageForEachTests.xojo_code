@@ -3,32 +3,32 @@ Protected Class LanguageForEachTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub CustomIterableTest()
-		  AssertOutputsEqual("language.foreach.custom_iterable")
+		  AssertOutputEquals("language.foreach.custom_iterable")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub IterateRangeTest()
-		  AssertOutputsEqual("language.foreach.iterate_range")
+		  AssertOutputEquals("language.foreach.iterate_range")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub OnlyEvaluateSequenceOnceTest()
-		  AssertOutputsEqual("language.foreach.only_evaluate_sequence_once")
+		  AssertOutputEquals("language.foreach.only_evaluate_sequence_once")
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub RangeTest()
-		  AssertOutputsEqual("language.foreach.range")
+		  AssertOutputEquals("language.foreach.range")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ReturnInsideFunctionTest()
-		  AssertOutputsEqual("language.foreach.return_inside_function")
+		  AssertOutputEquals("language.foreach.return_inside_function")
 		  
 		End Sub
 	#tag EndMethod

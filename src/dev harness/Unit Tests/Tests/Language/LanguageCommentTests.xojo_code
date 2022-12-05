@@ -3,28 +3,28 @@ Protected Class LanguageCommentTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub AtEOFTest()
-		  AssertOutputsEqual("language.comments.at_eof")
+		  AssertOutputEquals("language.comments.at_eof")
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub OnlyCommentAndEOLTest()
-		  AssertOutputsEqual("language.comments.only_comment_and_eol")
+		  AssertOutputEquals("language.comments.only_comment_and_eol")
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub OnlyCommentTest()
-		  AssertOutputsEqual("language.comments.only_comment")
+		  AssertOutputEquals("language.comments.only_comment")
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub UnicodeTest()
-		  AssertOutputsEqual("language.comments.unicode")
+		  AssertOutputEquals("language.comments.unicode")
 		  
 		End Sub
 	#tag EndMethod

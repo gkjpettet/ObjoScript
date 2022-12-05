@@ -3,7 +3,7 @@ Protected Class LanguageMethodTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub ArityTest()
-		  AssertOutputsEqual("language.method.arity")
+		  AssertOutputEquals("language.method.arity")
 		End Sub
 	#tag EndMethod
 
@@ -21,7 +21,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub EmptyBlockTest()
-		  AssertOutputsEqual("language.method.empty_block")
+		  AssertOutputEquals("language.method.empty_block")
 		End Sub
 	#tag EndMethod
 
@@ -39,19 +39,19 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub EqualityOverridesTest()
-		  AssertOutputsEqual("language.method.equality_overrides")
+		  AssertOutputEquals("language.method.equality_overrides")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub LongNameTest()
-		  AssertOutputsEqual("language.method.long_name")
+		  AssertOutputEquals("language.method.long_name")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub ManyMethodsTest()
-		  AssertOutputsEqual("language.method.many_methods")
+		  AssertOutputEquals("language.method.many_methods")
 		End Sub
 	#tag EndMethod
 
@@ -75,13 +75,13 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub OperatorsTest()
-		  AssertOutputsEqual("language.method.operators")
+		  AssertOutputEquals("language.method.operators")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub PermittedDuplicateMethodsTest()
-		  AssertOutputsEqual("language.method.permitted_duplicate_methods")
+		  AssertOutputEquals("language.method.permitted_duplicate_methods")
 		End Sub
 	#tag EndMethod
 
@@ -93,19 +93,19 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub StaticOperatorsTest()
-		  AssertOutputsEqual("language.method.static_operators")
+		  AssertOutputEquals("language.method.static_operators")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub StaticTest()
-		  AssertOutputsEqual("language.method.static")
+		  AssertOutputEquals("language.method.static")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub SubscriptOperatorsTest()
-		  AssertOutputsEqual("language.method.subscript_operators")
+		  AssertOutputEquals("language.method.subscript_operators")
 		End Sub
 	#tag EndMethod
 
