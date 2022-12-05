@@ -7,6 +7,24 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub ResourcesTest()
+		  #Pragma Warning "TODO: Test on Windows and Linux"
+		  
+		  Const TEST_NAME = "core.fsitem.resources"
+		  
+		  // Get and compile the source code for the test.
+		  Var source As String = GetTestSourceCode(TEST_NAME)
+		  Var func As ObjoScript.Func = CompileTest(source)
+		  
+		  // Get the output of the compiled test.
+		  Var result As String = RunFunc(func)
+		  
+		  Assert.IsTrue(result.EndsWith("Contents/Resources"), "Output:" + EndOfLine + EndOfLine + result, source)
+		  
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
