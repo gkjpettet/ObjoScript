@@ -11,10 +11,8 @@ Inherits ObjoScriptTestGroupBase
 		Sub ResourcesTest()
 		  #Pragma Warning "TODO: Test on Windows and Linux"
 		  
-		  Const TEST_NAME = "core.fsitem.resources"
-		  
 		  // Get and compile the source code for the test.
-		  Var source As String = GetTestSourceCode(TEST_NAME)
+		  Var source As String = GetTestSourceCode("core.fsitem.resources")
 		  Var func As ObjoScript.Func = CompileTest(source)
 		  
 		  // Get the output of the compiled test.
