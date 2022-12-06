@@ -63,6 +63,7 @@ Protected Module FSItem
 		  d.Value("exists()")    = AddressOf Exists
 		  d.value("name()")      = AddressOf Name
 		  d.Value("path()")      = AddressOf Path
+		  d.Value("readAll()")   = AddressOf ReadAll
 		  d.Value("readLines()") = AddressOf ReadLines
 		  d.Value("toString()")  = AddressOf ToString
 		  
@@ -109,6 +110,36 @@ Protected Module FSItem
 		  Var file As FolderItem = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
 		  
 		  vm.SetReturn(file.NativePath)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52656164732074686520636F6E74656E7473206F6620746869732066696C6520616E642072657475726E73206974206173206120737472696E672E
+		Protected Sub ReadAll(vm As ObjoScript.VM)
+		  /// Reads the contents of this file and returns it as a string.
+		  ///
+		  /// FSItem.readAll() -> string
+		  
+		  Var file As ObjoScript.Instance = vm.GetSlotValue(0)
+		  
+		  // Error checks.
+		  If file.ForeignData = Nil Or FolderItem(file.ForeignData).Exists = False Then
+		    vm.Error("The file does not exist.")
+		  ElseIf FolderItem(file.ForeignData).IsFolder Then
+		    vm.Error("Cannot read a folder.")
+		  ElseIf Not FolderItem(file.ForeignData).IsReadable Then
+		    vm.Error("Cannot read file.")
+		  End If
+		  
+		  Var tin As TextInputStream
+		  Try
+		    tin = TextInputStream.Open(file.ForeignData)
+		    vm.SetReturn(tin.ReadAll)
+		  Catch e As RuntimeException
+		    vm.Error("An error occurred whilst reading the file: `" + e.Message + "`.")
+		  Finally
+		    tin.Close
+		  End Try
 		  
 		End Sub
 	#tag EndMethod

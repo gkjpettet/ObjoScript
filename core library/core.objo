@@ -410,6 +410,7 @@ constructor(path) {}
 foreign exists()
 foreign name()
 foreign path()
+foreign readAll()
 foreign readLines()
 
 foreign static resources()

@@ -30,6 +30,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub ReadAllTest()
+		  AssertOutputEquals("core.fsitem.readAll")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub ReadLinesTest()
 		  AssertOutputEquals("core.fsitem.readlines")
 		End Sub
