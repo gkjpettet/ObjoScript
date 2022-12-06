@@ -6,6 +6,8 @@ Protected Module FSItem
 		  ///
 		  /// constructor(path)
 		  
+		  #Pragma Warning "TODO: The path should be a normalised ObjoScript path"
+		  
 		  If args.Count <> 1 Then
 		    vm.Error("Invalid number of arguments (expected 1, got " + args.Count.ToString + ").")
 		  End If
@@ -106,6 +108,8 @@ Protected Module FSItem
 		  ///
 		  /// Assumes slot 0 is a FSItem instance.
 		  /// FSItem.path() -> string
+		  
+		  #Pragma Warning "TODO: Return an ObjoScript normalised path"
 		  
 		  Var file As FolderItem = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
 		  
