@@ -46,6 +46,7 @@ Protected Module FSItem
 		  
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  
+		  d.value("name()")      = AddressOf Name
 		  d.Value("path()")      = AddressOf Path
 		  d.Value("readLines()") = AddressOf ReadLines
 		  d.Value("toString()")  = AddressOf ToString
@@ -67,6 +68,20 @@ Protected Module FSItem
 		  Return d
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 52657475726E7320746865206E616D65206F6620746869732066696C652E
+		Protected Sub Name(vm As ObjoScript.VM)
+		  /// Returns the name of this file.
+		  ///
+		  /// Assumes slot 0 is a FSItem instance.
+		  /// FSItem.name() -> string
+		  
+		  Var file As FolderItem = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
+		  
+		  vm.SetReturn(file.Name)
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h1, Description = 52657475726E7320746865207061746820746F20746869732066696C652073797374656D206974656D2E

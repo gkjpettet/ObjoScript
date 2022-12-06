@@ -2,6 +2,12 @@
 Protected Class CoreFSItemTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
+		Sub NameTest()
+		  AssertOutputEquals("core.fsitem.name")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub PathTest()
 		  #Pragma Warning "TODO: Test on Windows and Linux"
 		  
