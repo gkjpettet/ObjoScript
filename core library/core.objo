@@ -407,6 +407,7 @@ foreign number()
 foreign class FSItem {
 constructor(path) {}
 
+foreign exists()
 foreign name()
 foreign path()
 foreign readLines()

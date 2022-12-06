@@ -39,6 +39,20 @@ Protected Module FSItem
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 52657475726E7320746865207472756520696620746869732066696C6520657869737473206F6E206469736B206F722066616C7365206966206E6F742E
+		Protected Sub Exists(vm As ObjoScript.VM)
+		  /// Returns the true if this file exists on disk or false if not.
+		  ///
+		  /// Assumes slot 0 is a FSItem instance.
+		  /// FSItem.exists() -> boolean
+		  
+		  Var file As FolderItem = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
+		  
+		  vm.SetReturn(file.Exists)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E73206120636173652D73656E7369746976652064696374696F6E617279206D617070696E6720746865207369676E617475726573206F6620666F726569676E20696E7374616E6365206D6574686F647320746F20586F6A6F206D6574686F64206164647265737365732E
 		Private Function InitialiseInstanceMethodsDictionary() As Dictionary
 		  /// Returns a case-sensitive dictionary mapping the signatures of foreign instance 
@@ -46,6 +60,7 @@ Protected Module FSItem
 		  
 		  Var d As Dictionary = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  
+		  d.Value("exists()")    = AddressOf Exists
 		  d.value("name()")      = AddressOf Name
 		  d.Value("path()")      = AddressOf Path
 		  d.Value("readLines()") = AddressOf ReadLines
