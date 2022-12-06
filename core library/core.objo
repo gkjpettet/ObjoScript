@@ -406,6 +406,9 @@ foreign number()
 /// A class used to represent file system items.
 foreign class FSItem {
 constructor(path) {}
+
+foreign path()
 foreign readLines()
+
 foreign static resources()
 }

@@ -2,6 +2,22 @@
 Protected Class CoreFSItemTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
+		Sub PathTest()
+		  #Pragma Warning "TODO: Test on Windows and Linux"
+		  
+		  // Get and compile the source code for the test.
+		  Var source As String = GetTestSourceCode("core.fsitem.path")
+		  Var func As ObjoScript.Func = CompileTest(source)
+		  
+		  // Get the output of the compiled test.
+		  Var result As String = RunFunc(func)
+		  
+		  Assert.IsTrue(result.EndsWith("path.txt"), "Output:" + EndOfLine + EndOfLine + result, source)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub ReadLinesTest()
 		  AssertOutputEquals("core.fsitem.readlines")
 		End Sub
