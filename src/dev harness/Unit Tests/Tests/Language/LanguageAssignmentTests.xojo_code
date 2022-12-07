@@ -53,6 +53,12 @@ Inherits ObjoScriptTestGroupBase
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub VariableCompoundAssignmentTest()
+		  AssertOutputEquals("language.assignment.variable_compound_assignment")
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

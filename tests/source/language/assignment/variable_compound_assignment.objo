@@ -1,0 +1,8 @@
+var a = 0
+
+a += 10
+a -= 4
+a *= 3
+a /= 2
+
+System.print(a) // Expect 9
