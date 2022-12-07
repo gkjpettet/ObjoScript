@@ -9,6 +9,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub FieldCompoundAssignmentTest()
+		  AssertOutputEquals("language.assignment.field_compound_assignment")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub GlobalTest()
 		  AssertOutputEquals("language.assignment.global")
 		  
@@ -37,6 +43,12 @@ Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
 		Sub PrefixOperatorTest()
 		  AssertCompilerError("language.assignment.prefix_operator")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub StaticFieldCompoundAssignmentTest()
+		  AssertOutputEquals("language.assignment.static_field_compound_assignment")
 		End Sub
 	#tag EndMethod
 

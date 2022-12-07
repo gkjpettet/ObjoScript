@@ -1,0 +1,12 @@
+class Person {
+constructor () {
+_age = 0
+_age += 1
+_age -= 2
+_age *= 6
+_age /= 2
+System.print(_age)
+}
+}
+
+var garry = Person() // Expect -3

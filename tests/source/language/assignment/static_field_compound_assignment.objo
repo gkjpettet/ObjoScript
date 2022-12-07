@@ -1,0 +1,12 @@
+class Person {
+static test () {
+__age = 0
+__age += 1
+__age -= 2
+__age *= 6
+__age /= 2
+System.print(__age)
+}
+}
+
+Person.test // Expect -3

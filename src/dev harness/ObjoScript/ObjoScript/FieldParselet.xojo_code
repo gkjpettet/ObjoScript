@@ -20,8 +20,6 @@ Implements ObjoScript.PrefixParselet
 		  ///
 		  /// We return either a static or instance field assignment expression for the compiler.
 		  
-		  #Pragma Warning "TODO: Test"
-		  
 		  // Synthesise the correct binary operator token.
 		  Var opType As ObjoScript.TokenTypes
 		  Select Case operator.Type
@@ -56,8 +54,6 @@ Implements ObjoScript.PrefixParselet
 		  /// Assumes the field identifier token has just been consumed by the `parser`.
 		  ///
 		  /// Part of the ObjoScript.PrefixParselet interface.
-		  
-		  #Pragma Warning "TODO: Test"
 		  
 		  Var identifier As ObjoScript.Token = parser.Previous
 		  Var isStatic As Boolean = If(identifier.Type = ObjoScript.TokenTypes.StaticFieldIdentifier, True, False)
