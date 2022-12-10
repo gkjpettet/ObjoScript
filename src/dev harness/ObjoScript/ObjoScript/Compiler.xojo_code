@@ -1402,8 +1402,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///  }
 		  /// }
 		  /// ```
-		  
-		  #Pragma Warning "TODO: Refactor to simplify"
+		  ///
+		  /// Assumes the switch statement contains at least one case.
 		  
 		  Var statements() As ObjoScript.Stmt
 		  
@@ -1414,23 +1414,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  statements.Add(consider)
 		  
 		  // Build the `if` statement.
-		  If sw.Cases.Count = 0 And sw.ElseCase <> Nil Then
-		    // Single default case. This code will always execute.
-		    statements.Add(sw.ElseCase.Body)
-		  ElseIf sw.Cases.Count = 1 And sw.ElseCase = Nil Then
-		    // Single case, no default.
-		    Var case_ As ObjoScript.CaseStmt = sw.Cases(0)
-		    Var condition As ObjoScript.Expr = CaseValuesToCondition(case_, sw.Location)
-		    statements.Add(New ObjoScript.IfStmt(condition, case_.Body, Nil, case_.Location))
-		  ElseIf sw.Cases.Count = 1 And sw.ElseCase <> Nil Then
-		    // Single case with a default.
-		    Var case_ As ObjoScript.CaseStmt = sw.Cases(0)
-		    Var condition As ObjoScript.Expr = CaseValuesToCondition(case_, sw.Location)
-		    statements.Add(New ObjoScript.IfStmt(condition, case_.Body, sw.ElseCase.Body, case_.Location))
-		  Else
-		    // Multiple cases.
-		    statements.Add(SwitchToNestedIf(sw))
-		  End If
+		  statements.Add(SwitchToNestedIf(sw))
 		  
 		  // Wrap these statements in a synthetic block and return.
 		  Var openingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "{", sw.Location.ScriptID)
@@ -1443,8 +1427,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag Method, Flags = &h21, Description = 436F6E76657274732061207377697463682073746174656D656E7420746F2061206E657374656420606966602073746174656D656E742E
 		Private Function SwitchToNestedIf(switch As ObjoScript.SwitchStmt) As ObjoScript.IfStmt
 		  /// Converts a switch statement to a nested `if` statement.
-		  
-		  #Pragma Warning "TODO"
 		  
 		  Var stack() As ObjoScript.Stmt
 		  For Each expr As ObjoScript.CaseStmt In switch.Cases
@@ -1479,7 +1461,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Wend
 		  
 		  // Optional final switch "else" case.
-		  ObjoScript.IfStmt(ObjoScript.IfStmt(stack(0)).ElseBranch).ElseBranch = switch.ElseCase.Body
+		  If switch.ElseCase <> Nil Then
+		    ObjoScript.IfStmt(ObjoScript.IfStmt(stack(0)).ElseBranch).ElseBranch = switch.ElseCase.Body
+		  End If
 		  
 		  // stack(0) should be the if statement we need.
 		  Return ObjoScript.IfStmt(stack(0))
@@ -2913,6 +2897,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compile a `switch` statement.
 		  ///
 		  /// Part of the `ObjoScript.StmtVisitor` interface.
+		  
+		  // Validate the switch statement first.
+		  If switch.Cases.Count = 0 Then
+		    Error("A switch statement must include at least one case.")
+		  End If
 		  
 		  // Convert this switch statement to an if...else statement contained within a block.
 		  Var block As ObjoScript.BlockStmt = SwitchToBlock(switch)
