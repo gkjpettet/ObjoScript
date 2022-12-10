@@ -1405,6 +1405,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Assumes the switch statement contains at least one case.
 		  
+		  // Create an array to hold the statements of the block we will return.
 		  Var statements() As ObjoScript.Stmt
 		  
 		  // First we need to declare a variable named `consider*` and assign to it the switch statement's
@@ -1413,28 +1414,14 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  sw.Consider, sw.Location)
 		  statements.Add(consider)
 		  
-		  // Build the `if` statement.
-		  statements.Add(SwitchToNestedIf(sw))
-		  
-		  // Wrap these statements in a synthetic block and return.
-		  Var openingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "{", sw.Location.ScriptID)
-		  Var closingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "{", sw.Location.ScriptID)
-		  Return New ObjoScript.BlockStmt(statements, openingBrace, closingBrace)
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21, Description = 436F6E76657274732061207377697463682073746174656D656E7420746F2061206E657374656420606966602073746174656D656E742E
-		Private Function SwitchToNestedIf(switch As ObjoScript.SwitchStmt) As ObjoScript.IfStmt
-		  /// Converts a switch statement to a nested `if` statement.
-		  
+		  // We need a stack so we can avoid recursion.
 		  Var stack() As ObjoScript.Stmt
-		  For Each expr As ObjoScript.CaseStmt In switch.Cases
+		  For Each expr As ObjoScript.CaseStmt In sw.Cases
 		    stack.Add(ObjoScript.Stmt(expr))
 		  Next expr
 		  
 		  // Create a new if statement from the first case that will contain the other cases.
-		  Var if_ As New ObjoScript.IfStmt(CaseValuesToCondition(switch.Cases(0), switch.Location), switch.Cases(0).Body, Nil, switch.Cases(0).Location)
+		  Var if_ As New ObjoScript.IfStmt(CaseValuesToCondition(sw.Cases(0), sw.Location), sw.Cases(0).Body, Nil, sw.Cases(0).Location)
 		  
 		  // Add the parent if to the front of the stack.
 		  stack.AddAt(0, ObjoScript.Stmt(if_))
@@ -1451,7 +1438,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    stack.RemoveAt(0)
 		    
 		    // Create an "elseif" branch from this case.
-		    Var elif As New ObjoScript.IfStmt(CaseValuesToCondition(case_, switch.Location), case_.Body, Nil, case_.Location)
+		    Var elif As New ObjoScript.IfStmt(CaseValuesToCondition(case_, sw.Location), case_.Body, Nil, case_.Location)
 		    
 		    // Set this elseif statement as the "else" branch of the preceding if statement.
 		    parentIf.ElseBranch = elif
@@ -1461,12 +1448,17 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Wend
 		  
 		  // Optional final switch "else" case.
-		  If switch.ElseCase <> Nil Then
-		    ObjoScript.IfStmt(ObjoScript.IfStmt(stack(0)).ElseBranch).ElseBranch = switch.ElseCase.Body
+		  If sw.ElseCase <> Nil Then
+		    ObjoScript.IfStmt(ObjoScript.IfStmt(stack(0)).ElseBranch).ElseBranch = sw.ElseCase.Body
 		  End If
 		  
-		  // stack(0) should be the if statement we need.
-		  Return ObjoScript.IfStmt(stack(0))
+		  // stack(0) should be the `if` statement we need.
+		  statements.Add(ObjoScript.IfStmt(stack(0)))
+		  
+		  // Wrap these statements in a synthetic block and return.
+		  Var openingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "{", sw.Location.ScriptID)
+		  Var closingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "{", sw.Location.ScriptID)
+		  Return New ObjoScript.BlockStmt(statements, openingBrace, closingBrace)
 		  
 		End Function
 	#tag EndMethod
