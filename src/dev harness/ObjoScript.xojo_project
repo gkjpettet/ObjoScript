@@ -230,6 +230,7 @@ Class=LanguageConditionalTests;Unit Tests/Tests/Language/LanguageConditionalTest
 Class=LanguageConstructorTests;Unit Tests/Tests/Language/LanguageConstructorTests.xojo_code;&h00000000242847FF;&h00000000414F7FFF;false
 Class=LanguageClassTests;Unit Tests/Tests/Language/LanguageClassTests.xojo_code;&h000000003DBFFFFF;&h00000000414F7FFF;false
 Class=LanguageIfTests;Unit Tests/Tests/Language/LanguageIfTests.xojo_code;&h0000000056B50FFF;&h00000000414F7FFF;false
+Class=LanguageSwitchTests;Unit Tests/Tests/Language/LanguageSwitchTests.xojo_code;&h000000001A5017FF;&h00000000414F7FFF;false
 Class=LanguageImplicitReceiverTests;Unit Tests/Tests/Language/LanguageImplicitReceiverTests.xojo_code;&h0000000073303FFF;&h00000000414F7FFF;false
 Class=LanguageInheritanceTests;Unit Tests/Tests/Language/LanguageInheritanceTests.xojo_code;&h000000006A30DFFF;&h00000000414F7FFF;false
 Class=LanguageListTests;Unit Tests/Tests/Language/LanguageListTests.xojo_code;&h000000006DE5C7FF;&h00000000414F7FFF;false

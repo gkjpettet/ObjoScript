@@ -38,6 +38,7 @@ Inherits TestController
 		  group = New LanguageWhileTests(Self, "Language - While")
 		  group = New LanguageMiscTests(Self, "Language - Misc")
 		  group = New LanguageMapTests(Self, "Language - Map")
+		  group = New LanguageSwitchTests(Self, "Language - Switch")
 		  
 		  // Core.
 		  group = New CoreObjectTests(Self, "Core - Object")
