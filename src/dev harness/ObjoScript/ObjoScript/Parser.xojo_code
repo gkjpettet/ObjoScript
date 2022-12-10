@@ -1223,10 +1223,81 @@ Protected Class Parser
 		  ElseIf Match(ObjoScript.TokenTypes.Breakpoint) Then
 		    Return BreakpointStatement
 		    
+		  ElseIf Match(ObjoScript.TokenTypes.Switch) Then
+		    Return SwitchStatement
+		    
 		  Else
 		    Return ExpressionStatement
 		  End If
 		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 50617273657320612060737769746368602073746174656D656E742E20417373756D6573207468652070617273657220686173206A75737420636F6E73756D65642074686520607377697463686020746F6B656E2E
+		Private Function SwitchStatement() As ObjoScript.Stmt
+		  /// Parses a `switch` statement. Assumes the parser has just consumed the `switch` token.
+		  ///
+		  /// ```
+		  /// switch consider {
+		  ///  case value1 {}
+		  ///  case value2, value3 {}
+		  ///  else {}
+		  /// }
+		  /// ```
+		  
+		  Var switchKeyword As ObjoScript.Token = Previous
+		  
+		  Var consider As ObjoScript.Expr = Expression
+		  
+		  // Optional newline.
+		  Call Match(ObjoScript.TokenTypes.EOL)
+		  
+		  // Opening brace.
+		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the switch expression to consider.")
+		  
+		  Var cases() As ObjoScript.CaseStmt
+		  While Match(ObjoScript.TokenTypes.Case_)
+		    Var caseKeyword As ObjoScript.Token = Previous
+		    
+		    // Get this case's value(s).
+		    Var values() As ObjoScript.Expr
+		    Do
+		      values.Add(Expression)
+		    Loop Until Not Match(ObjoScript.TokenTypes.Comma)
+		    
+		    // Optional newline.
+		    Call Match(ObjoScript.TokenTypes.EOL)
+		    
+		    // Consume the body block.
+		    Consume(ObjoScript.TokenTypes.LCurly, "Expected a block after the case's value(s).")
+		    Var body As ObjoScript.Stmt = Block
+		    
+		    // Optional newline.
+		    Call Match(ObjoScript.TokenTypes.EOL)
+		    
+		    cases.Add(New ObjoScript.CaseStmt(values, body, caseKeyword))
+		  Wend
+		  
+		  // Optional `else` case.
+		  Var elseCase As ObjoScript.ElseCaseStmt
+		  If Match(ObjoScript.TokenTypes.Else_) Then
+		    Var elseKeyword As ObjoScript.Token = Previous
+		    
+		    // Optional newline.
+		    Call Match(ObjoScript.TokenTypes.EOL)
+		    
+		    // Body.
+		    Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the `else` keyword.")
+		    elseCase = New ObjoScript.ElseCaseStmt(Block, elseKeyword)
+		  End If
+		  
+		  // Optional newline.
+		  Call Match(ObjoScript.TokenTypes.EOL)
+		  
+		  // Closing brace.
+		  Consume(ObjoScript.TokenTypes.RCurly, "Expected a `}` after the final switch case.")
+		  
+		  Return New ObjoScript.SwitchStmt(consider, cases, elseCase, switchKeyword)
 		End Function
 	#tag EndMethod
 

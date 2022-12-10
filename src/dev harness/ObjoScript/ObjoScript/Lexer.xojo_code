@@ -524,6 +524,7 @@ Protected Class Lexer
 		  d.Value("as")          = ObjoScript.TokenTypes.As_
 		  d.Value("assert")      = ObjoScript.TokenTypes.Assert
 		  d.Value("breakpoint")  = ObjoScript.TokenTypes.Breakpoint
+		  d.Value("case")        = ObjoScript.TokenTypes.Case_
 		  d.Value("class")       = ObjoScript.TokenTypes.Class_
 		  d.Value("continue")    = ObjoScript.TokenTypes.Continue_
 		  d.Value("constructor") = ObjoScript.TokenTypes.Constructor
@@ -545,6 +546,7 @@ Protected Class Lexer
 		  d.Value("return")      = ObjoScript.TokenTypes.Return_
 		  d.Value("static")      = ObjoScript.TokenTypes.Static_
 		  d.Value("super")       = ObjoScript.TokenTypes.Super_
+		  d.Value("switch")      = ObjoScript.TokenTypes.Switch
 		  d.Value("then")        = ObjoScript.TokenTypes.Then_
 		  d.Value("this")        = ObjoScript.TokenTypes.This
 		  d.Value("true")        = ObjoScript.TokenTypes.Boolean_

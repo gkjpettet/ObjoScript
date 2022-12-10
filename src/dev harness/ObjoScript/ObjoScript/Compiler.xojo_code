@@ -167,6 +167,72 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 436F6E636174656E61746573206120636173652073746174656D656E7427732076616C756573207573696E6720746865206C6F676963616C20606F7260206F70657261746F7220696E746F20612073696E676C6520636F6E646974696F6E20746861742063616E206265207573656420696E20616E20606966602073746174656D656E742E
+		Private Function CaseValuesToCondition(case_ As ObjoScript.CaseStmt, switchLocation As ObjoScript.Token) As ObjoScript.Expr
+		  /// Concatenates a case statement's values using the logical `or` 
+		  /// operator into a single condition that can be used in an `if` statement.
+		  ///
+		  /// E.g: 
+		  ///
+		  /// ```objo
+		  /// case 10, 20, true, "a"
+		  /// ```
+		  ///
+		  /// becomes:
+		  ///
+		  /// ```objo
+		  /// consider* == 10 or consider* == 20 or consider* == true or consider* == "a"
+		  /// ```
+		  
+		  If case_.Values.Count = 0 Then
+		    Raise New InvalidArgumentException("Did not expect an empty `values()` array.")
+		  End If
+		  
+		  // Create a statement to produce the value of the hidden `consider*` variable.
+		  Var consider As New ObjoScript.VariableExpr(SyntheticToken("consider*", switchLocation.ScriptID))
+		  
+		  // Create a synthetic `or` token.
+		  Var orToken As New ObjoScript.Token(ObjoScript.TokenTypes.Or_, case_.Location.StartPosition, _
+		  case_.Location.LineNumber, "or", case_.Location.ScriptID)
+		  
+		  // Create a synthetic `==` token for the comparison of the case value to `consider*`.
+		  Var equalToken As New ObjoScript.Token(ObjoScript.TokenTypes.EqualEqual, case_.Location.StartPosition, _
+		  case_.Location.LineNumber, "==", case_.Location.ScriptID)
+		  
+		  // Quick exit? If there's only one value then it just needs to be compared to `consider*`.
+		  If case_.Values.Count = 1 Then
+		    Return New ObjoScript.BinaryExpr(consider, equalToken, case_.Values(0))
+		  End If
+		  
+		  // Clone the passed array.
+		  Var stack() As ObjoScript.Expr
+		  For Each value As ObjoScript.Expr In case_.Values
+		    stack.Add(value)
+		  Next value
+		  
+		  // Iterate the stack to create a logical or expression.
+		  While stack.Count > 1
+		    Var left As Variant = stack(0)
+		    Var right As Variant = stack(1)
+		    
+		    // The expressions need to be an equality checks against `consider*`.
+		    left = New ObjoScript.BinaryExpr(consider, equalToken, left)
+		    right = New ObjoScript.BinaryExpr(consider, equalToken, right)
+		    
+		    // Remove the left and right expressions from the stack.
+		    stack.RemoveAt(0)
+		    stack.RemoveAt(0)
+		    
+		    // Push the logical or expression to the front of the stack.
+		    stack.AddAt(0, New ObjoScript.LogicalExpr(left, orToken, right))
+		  Wend
+		  
+		  // stack(0) should now be the logical or expression we need.
+		  Return stack(0)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060737562636C617373602068617320286F722068617320696E686572697465642920616E20696E7374616E6365206D6574686F64207769746820607369676E6174757265602E
 		Private Function ClassHierarchyHasInstanceMethodWithSignature(subclass As ObjoScript.ClassData, signature As String) As Boolean
 		  /// Returns True if `subclass` has (or has inherited) an instance method with `signature`.
@@ -1300,6 +1366,127 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 44652D73756761727320612060737769746368602073746174656D656E7420746F20616E20606966602073746174656D656E7420656E636C6F7365642077697468696E206120626C6F636B2E
+		Private Function SwitchToBlock(sw As ObjoScript.SwitchStmt) As ObjoScript.BlockStmt
+		  /// De-sugars a `switch` statement to an `if` statement enclosed within a block.
+		  ///
+		  /// We de-sugar the switch statement to a series of `if` statements.
+		  /// We only evaluate the `consider` expression once and make it available as a 
+		  /// secret local variable (`consider*`).
+		  ///
+		  /// ```objo
+		  /// switch consider {
+		  ///  case a, b {
+		  ///   // First case.
+		  ///  }
+		  ///  case is < 10 {
+		  ///   // Second case.
+		  ///  }
+		  ///  else {
+		  ///   // Default case.
+		  ///  }
+		  /// }
+		  /// ```
+		  ///
+		  /// becomes:
+		  ///
+		  /// ```objo
+		  /// {
+		  ///  var consider* = consider
+		  ///  if (a == consider*) or (b == consider*) {
+		  ///    // First case.
+		  ///  } else if consider* < 10 {
+		  ///    // Second case.
+		  ///  } else {
+		  //     // Default case.
+		  ///  }
+		  /// }
+		  /// ```
+		  
+		  #Pragma Warning "TODO: Refactor to simplify"
+		  
+		  Var statements() As ObjoScript.Stmt
+		  
+		  // First we need to declare a variable named `consider*` and assign to it the switch statement's
+		  // `consider` expression.
+		  Var consider As New ObjoScript.VarDeclStmt(SyntheticToken("consider*", sw.Location.ScriptID), _
+		  sw.Consider, sw.Location)
+		  statements.Add(consider)
+		  
+		  // Build the `if` statement.
+		  If sw.Cases.Count = 0 And sw.ElseCase <> Nil Then
+		    // Single default case. This code will always execute.
+		    statements.Add(sw.ElseCase.Body)
+		  ElseIf sw.Cases.Count = 1 And sw.ElseCase = Nil Then
+		    // Single case, no default.
+		    Var case_ As ObjoScript.CaseStmt = sw.Cases(0)
+		    Var condition As ObjoScript.Expr = CaseValuesToCondition(case_, sw.Location)
+		    statements.Add(New ObjoScript.IfStmt(condition, case_.Body, Nil, case_.Location))
+		  ElseIf sw.Cases.Count = 1 And sw.ElseCase <> Nil Then
+		    // Single case with a default.
+		    Var case_ As ObjoScript.CaseStmt = sw.Cases(0)
+		    Var condition As ObjoScript.Expr = CaseValuesToCondition(case_, sw.Location)
+		    statements.Add(New ObjoScript.IfStmt(condition, case_.Body, sw.ElseCase.Body, case_.Location))
+		  Else
+		    // Multiple cases.
+		    statements.Add(SwitchToNestedIf(sw))
+		  End If
+		  
+		  // Wrap these statements in a synthetic block and return.
+		  Var openingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "{", sw.Location.ScriptID)
+		  Var closingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "{", sw.Location.ScriptID)
+		  Return New ObjoScript.BlockStmt(statements, openingBrace, closingBrace)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 436F6E76657274732061207377697463682073746174656D656E7420746F2061206E657374656420606966602073746174656D656E742E
+		Private Function SwitchToNestedIf(switch As ObjoScript.SwitchStmt) As ObjoScript.IfStmt
+		  /// Converts a switch statement to a nested `if` statement.
+		  
+		  #Pragma Warning "TODO"
+		  
+		  Var stack() As ObjoScript.Stmt
+		  For Each expr As ObjoScript.CaseStmt In switch.Cases
+		    stack.Add(ObjoScript.Stmt(expr))
+		  Next expr
+		  
+		  // Create a new if statement from the first case that will contain the other cases.
+		  Var if_ As New ObjoScript.IfStmt(CaseValuesToCondition(switch.Cases(0), switch.Location), switch.Cases(0).Body, Nil, switch.Cases(0).Location)
+		  
+		  // Add the parent if to the front of the stack.
+		  stack.AddAt(0, ObjoScript.Stmt(if_))
+		  
+		  While stack.Count > 1
+		    // The front of the stack is always the if statement we're going to return.
+		    Var parentIf As ObjoScript.IfStmt = ObjoScript.IfStmt(stack(0))
+		    
+		    // The adjacent value in the stack will be the next case.
+		    Var case_ As ObjoScript.CaseStmt = ObjoScript.CaseStmt(stack(1))
+		    
+		    // Remove the left and right values from the stack.
+		    stack.RemoveAt(0)
+		    stack.RemoveAt(0)
+		    
+		    // Create an "elseif" branch from this case.
+		    Var elif As New ObjoScript.IfStmt(CaseValuesToCondition(case_, switch.Location), case_.Body, Nil, case_.Location)
+		    
+		    // Set this elseif statement as the "else" branch of the preceding if statement.
+		    parentIf.ElseBranch = elif
+		    
+		    // Add the parent `if` to the front of the stack.
+		    stack.AddAt(0, ObjoScript.Stmt(parentIf))
+		  Wend
+		  
+		  // Optional final switch "else" case.
+		  ObjoScript.IfStmt(ObjoScript.IfStmt(stack(0)).ElseBranch).ElseBranch = switch.ElseCase.Body
+		  
+		  // stack(0) should be the if statement we need.
+		  Return ObjoScript.IfStmt(stack(0))
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E7320612073796E746865746963206E756D626572206C69746572616C20746F6B656E2077697468206076616C756560206174206C696E6520302C20706F73203020696E20607363726970744944602E
 		Private Function SyntheticNumberToken(value As Double, isInteger As Boolean, scriptID As Integer = -1) As ObjoScript.Token
 		  /// Returns a synthetic number literal token with `value` at line 0, pos 0 in `scriptID`.
@@ -1670,6 +1857,19 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120636173652077697468696E20612060737769746368602073746174656D656E742E
+		Function VisitCaseStmt(c As ObjoScript.CaseStmt) As Variant
+		  /// Compiles a case within a `switch` statement.
+		  ///
+		  /// Part of the `ObjoScript.StmtVisitor` interface.
+		  
+		  mLocation = c.Location
+		  
+		  #Pragma Warning "TODO"
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D70696C65732072657472696576696E67206120676C6F62616C20636C6173732E
 		Function VisitClass(c As ObjoScript.ClassExpr) As Variant
 		  /// Compiles retrieving a global class.
@@ -1895,6 +2095,19 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Emit a jump back to the top of the current loop.
 		  EmitLoop(CurrentLoop.Start)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C6573207468652060656C7365602063617365206F6620612060737769746368602073746174656D656E742E
+		Function VisitElseCaseStmt(ec As ObjoScript.ElseCaseStmt) As Variant
+		  /// Compiles the `else` case of a `switch` statement.
+		  ///
+		  /// Part of the `ObjoScript.StmtVisitor` interface.
+		  
+		  mLocation = ec.Location
+		  
+		  #Pragma Warning "TODO"
 		  
 		End Function
 	#tag EndMethod
@@ -2695,6 +2908,21 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C6520612060737769746368602073746174656D656E742E
+		Function VisitSwitchStmt(switch As ObjoScript.SwitchStmt) As Variant
+		  /// Compile a `switch` statement.
+		  ///
+		  /// Part of the `ObjoScript.StmtVisitor` interface.
+		  
+		  // Convert this switch statement to an if...else statement contained within a block.
+		  Var block As ObjoScript.BlockStmt = SwitchToBlock(switch)
+		  
+		  // Visit the newly created if statement.
+		  Call block.Accept(Self)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D70696C65732061207465726E61727920636F6E646974696F6E616C2065787072657373696F6E2E
 		Function VisitTernary(t As ObjoScript.TernaryExpr) As Variant
 		  /// Compiles a ternary conditional expression.
@@ -2859,7 +3087,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  LoopBody(stmt.Body)
 		  
 		  EndLoop
-		  
 		  
 		End Function
 	#tag EndMethod

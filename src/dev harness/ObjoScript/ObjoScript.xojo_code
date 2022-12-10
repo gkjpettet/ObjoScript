@@ -109,6 +109,9 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.Caret
 		    Return "^"
 		    
+		  Case ObjoScript.TokenTypes.Case_
+		    Return "Case"
+		    
 		  Case ObjoScript.TokenTypes.Class_
 		    Return "class"
 		    
@@ -291,6 +294,9 @@ Protected Module ObjoScript
 		    
 		  Case ObjoScript.TokenTypes.String_
 		    Return "String"
+		    
+		  Case ObjoScript.TokenTypes.Switch
+		    Return "Switch"
 		    
 		  Case ObjoScript.TokenTypes.Super_
 		    Return "super"
@@ -476,6 +482,7 @@ Protected Module ObjoScript
 		  Boolean_
 		  Breakpoint
 		  Caret
+		  Case_
 		  Class_
 		  Colon
 		  Comma
@@ -538,14 +545,15 @@ Protected Module ObjoScript
 		  StaticFieldIdentifier
 		  String_
 		  Super_
+		  Switch
+		  Then_
 		  This
 		  Tilde
 		  Underscore
 		  UppercaseIdentifier
 		  Var_
 		  While_
-		  Xor_
-		Then_
+		Xor_
 	#tag EndEnum
 
 	#tag Enum, Name = ValueTypes, Type = Integer, Flags = &h1

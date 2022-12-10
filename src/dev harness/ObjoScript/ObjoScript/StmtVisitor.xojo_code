@@ -18,6 +18,12 @@ Protected Interface StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E672061206063617365602073746174656D656E742E
+		Function VisitCaseStmt(c As ObjoScript.CaseStmt) As Variant
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E67206120636C617373206465636C61726174696F6E2E
 		Function VisitClassDeclaration(c As ObjoScript.ClassDeclStmt) As Variant
 		  
@@ -32,6 +38,12 @@ Protected Interface StmtVisitor
 
 	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E6720616E2060636F6E74696E7565602073746174656D656E742E
 		Function VisitContinueStmt(stmt As ObjoScript.ContinueStmt) As Variant
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E6720616E2060656C7365602073746174656D656E742077697468696E20612060737769746368602073746174656D656E742E
+		Function VisitElseCaseStmt(ec As ObjoScript.ElseCaseStmt) As Variant
 		  
 		End Function
 	#tag EndMethod
@@ -86,6 +98,12 @@ Protected Interface StmtVisitor
 
 	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E6720612072657475726E2073746174656D656E742E
 		Function VisitReturn(r As ObjoScript.ReturnStmt) As Variant
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E6720612060737769746368602073746174656D656E742E
+		Function VisitSwitchStmt(switch As ObjoScript.SwitchStmt) As Variant
 		  
 		End Function
 	#tag EndMethod

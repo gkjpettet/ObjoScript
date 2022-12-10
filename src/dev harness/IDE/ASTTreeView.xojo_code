@@ -160,6 +160,26 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Function VisitCaseStmt(c As ObjoScript.CaseStmt) As Variant
+		  Var node As New TreeViewNode("Case:")
+		  
+		  Var valuesNode As New TreeViewNode("Value(s):")
+		  For Each value As ObjoScript.Expr In c.Values
+		    valuesNode.AppendNode(value.Accept(Self))
+		  Next value
+		  node.AppendNode(valuesNode)
+		  
+		  Var bodyNode As New TreeViewNode("Body:")
+		  bodyNode.AppendNode(c.Body.Accept(Self))
+		  
+		  node.AppendNode(bodyNode)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 50617274206F6620746865204F626A6F5363726970742E4578707256697369746F7220696E746572666163652E
 		Function VisitClass(c As ObjoScript.ClassExpr) As Variant
 		  /// Part of the ObjoScript.ExprVisitor interface.
@@ -255,6 +275,18 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  #Pragma Unused stmt
 		  
 		  Return New TreeViewNode("Continue")
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function VisitElseCaseStmt(ec As ObjoScript.ElseCaseStmt) As Variant
+		  Var node As New TreeViewNode("Else:")
+		  
+		  // Body.
+		  node.AppendNode(ec.Body.Accept(Self))
+		  
+		  Return node
+		  
 		End Function
 	#tag EndMethod
 
@@ -784,6 +816,30 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var node As New TreeViewNode("Super setter")
 		  Var valueNode As New TreeViewNode("Value to assign:")
 		  valueNode.AppendNode(s.ValueToAssign.Accept(Self))
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function VisitSwitchStmt(switch As ObjoScript.SwitchStmt) As Variant
+		  Var node AS New TreeViewNode("Switch")
+		  
+		  // Consider.
+		  Var consider As New TreeViewNode("Consider:")
+		  consider.AppendNode(switch.Consider.Accept(Self))
+		  node.AppendNode(consider)
+		  
+		  // Cases.
+		  For Each c As ObjoScript.CaseStmt In switch.Cases
+		    node.AppendNode(c.Accept(Self))
+		  Next c
+		  
+		  // Optional else.
+		  If switch.ElseCase <> Nil Then
+		    node.AppendNode(switch.ElseCase.Accept(Self))
+		  End If
 		  
 		  Return node
 		  
