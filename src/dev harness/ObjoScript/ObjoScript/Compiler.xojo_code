@@ -2895,7 +2895,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Error("A switch statement must include at least one case.")
 		  End If
 		  
-		  // Convert this switch statement to an if...else statement contained within a block.
+		  // Convert this switch statement to an `if...else` statement contained within a block.
 		  Var block As ObjoScript.BlockStmt = SwitchToBlock(switch)
 		  
 		  // Visit the newly created if statement.
