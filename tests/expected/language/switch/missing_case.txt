@@ -1,0 +1,1 @@
+A switch statement must include at least one case.

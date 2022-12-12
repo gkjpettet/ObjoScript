@@ -1,0 +1,11 @@
+function return4() { return 4 }
+
+function alsoReturn4() { return 4 }
+
+// Expect error as we are switching on the function `return4` 
+// **not** the value it returns.
+switch return4 {
+case alsoReturn4() {System.print("nope") }
+
+else { System.print("nope") }
+}

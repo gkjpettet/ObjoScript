@@ -1,0 +1,21 @@
+// Test a nested switch.
+// Expect:
+// ok
+// ok
+
+switch 10 {
+case 5 {
+System.print("nope")
+}
+else {
+System.print("ok")
+switch 3 {
+case 3 {
+System.print("ok")
+}
+case 5 {
+System.print("nope")
+}
+}
+}
+}

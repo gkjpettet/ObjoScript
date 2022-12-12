@@ -1,0 +1,9 @@
+function return4() { return 4 }
+
+function alsoReturn4() { return 4 }
+
+switch return4() {
+case alsoReturn4() {System.print("ok") }
+
+else { System.print("nope") }
+}

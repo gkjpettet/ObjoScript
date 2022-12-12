@@ -1,0 +1,7 @@
+var consider = 10
+
+switch consider {
+case false, 10 { System.print("ok") }
+}
+
+// Expect ok

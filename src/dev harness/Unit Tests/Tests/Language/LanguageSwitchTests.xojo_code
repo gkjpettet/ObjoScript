@@ -2,8 +2,62 @@
 Protected Class LanguageSwitchTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
+		Sub ElseTest()
+		  AssertOutputEquals("language.switch.else")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub FunctionValueFunctionCaseTest()
+		  AssertOutputEquals("language.switch.function_value_function_case")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub IfWithinSwitchTest()
+		  AssertOutputEquals("language.switch.if_within_switch")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub MissingCaseTest()
+		  AssertCompilerError("language.switch.missing_case")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub MultipleCasesTest()
+		  AssertOutputEquals("language.switch.multiple_cases")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub NestedTest()
+		  AssertOutputEquals("language.switch.nested")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub SingleCase1Test()
 		  AssertOutputEquals("language.switch.single_case1")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub SingleCase2Test()
+		  AssertOutputEquals("language.switch.single_case2")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub SingleCase3Test()
+		  AssertOutputEquals("language.switch.single_case3")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub SwitchOnFunctionObjectTest()
+		  AssertRuntimeError("language.switch.switch_on_function_object")
 		End Sub
 	#tag EndMethod
 

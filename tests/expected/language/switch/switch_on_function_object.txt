@@ -1,0 +1,1 @@
+return4() does not implement `==(_)`.

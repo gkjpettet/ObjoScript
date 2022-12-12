@@ -1,0 +1,12 @@
+var consider = 10
+
+// Expect ok.
+switch consider {
+case 10 {
+if true {
+System.print("ok")
+} else {
+System.print("nope")
+}
+}
+}

@@ -1839,9 +1839,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the `ObjoScript.StmtVisitor` interface.
 		  
-		  mLocation = c.Location
-		  
-		  #Pragma Warning "TODO"
+		  // The compiler doesn't visit this as switch statements are compiled into nested `if` statements.
+		  #Pragma Unused c
 		  
 		End Function
 	#tag EndMethod
@@ -2081,9 +2080,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the `ObjoScript.StmtVisitor` interface.
 		  
-		  mLocation = ec.Location
+		  // The compiler doesn't visit this as switch statements are compiled into nested `if` statements.
+		  #Pragma Unused ec
 		  
-		  #Pragma Warning "TODO"
 		  
 		End Function
 	#tag EndMethod
