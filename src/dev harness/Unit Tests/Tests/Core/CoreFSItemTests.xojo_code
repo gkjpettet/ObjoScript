@@ -9,8 +9,6 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub NameTest()
-		  #Pragma Warning "TODO: Test on Linux"
-		  
 		  #If TargetMacOS
 		    AssertOutputEqualsLiteral("core.fsitem.name", "name.txt")
 		    
@@ -18,7 +16,7 @@ Inherits ObjoScriptTestGroupBase
 		    AssertOutputEqualsLiteral("core.fsitem.name", "/tests/files/name.txt")
 		    
 		  #ElseIf TargetLinux
-		    AssertOutputEqualsLiteral("core.fsitem.name", "")
+		    AssertOutputEqualsLiteral("core.fsitem.name", "name.txt")
 		  #EndIf
 		End Sub
 	#tag EndMethod
@@ -39,7 +37,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub ReadAllTest()
-		  AssertOutputEquals("core.fsitem.readAll")
+		  AssertOutputEquals("core.fsitem.readall")
 		End Sub
 	#tag EndMethod
 
@@ -51,8 +49,6 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub ResourcesTest()
-		  #Pragma Warning "TODO: Test on Linux"
-		  
 		  // Get and compile the source code for the test.
 		  Var source As String = GetTestSourceCode("core.fsitem.resources")
 		  Var func As ObjoScript.Func = CompileTest(source)
@@ -67,7 +63,7 @@ Inherits ObjoScriptTestGroupBase
 		    Assert.IsTrue(result.EndsWith("ObjoScript Resources\"), "Output:" + EndOfLine + EndOfLine + result, source)
 		    
 		  #ElseIf TargetLinux
-		    Break
+		    Assert.IsTrue(result.EndsWith("ObjoScript Resources/"), "Output:" + EndOfLine + EndOfLine + result, source)
 		  #EndIf
 		End Sub
 	#tag EndMethod
