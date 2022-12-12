@@ -25,8 +25,6 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub PathTest()
-		  #Pragma Warning "TODO: Test on Windows and Linux"
-		  
 		  // Get and compile the source code for the test.
 		  Var source As String = GetTestSourceCode("core.fsitem.path")
 		  Var func As ObjoScript.Func = CompileTest(source)
