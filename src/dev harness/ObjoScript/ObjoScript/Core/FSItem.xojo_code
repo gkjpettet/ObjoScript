@@ -4,9 +4,11 @@ Protected Module FSItem
 		Protected Sub Allocate(vm As ObjoScript.VM, instance As ObjoScript.Instance, args() As Variant)
 		  /// The user is calling the FSItem class constructor.
 		  ///
+		  /// Note: ObjoScript does nothing to accomodate POSIX vs Windows paths.
+		  /// Internally it uses the Xojo FolderItem so it will expect a Windows path if the 
+		  /// VM is running on Windows and a POSIX path if running on macOS or Linux.
+		  ///
 		  /// constructor(path)
-		  
-		  #Pragma Warning "TODO: The path should be a normalised ObjoScript path"
 		  
 		  If args.Count <> 1 Then
 		    vm.Error("Invalid number of arguments (expected 1, got " + args.Count.ToString + ").")
@@ -106,10 +108,12 @@ Protected Module FSItem
 		Protected Sub Path(vm As ObjoScript.VM)
 		  /// Returns the path to this file system item.
 		  ///
+		  /// Note: ObjoScript does nothing to accomodate POSIX vs Windows paths.
+		  /// Internally it uses the Xojo FolderItem so it will expect a Windows path if the 
+		  /// VM is running on Windows and a POSIX path if running on macOS or Linux.
+		  ///
 		  /// Assumes slot 0 is a FSItem instance.
 		  /// FSItem.path() -> string
-		  
-		  #Pragma Warning "TODO: Return an ObjoScript normalised path"
 		  
 		  Var file As FolderItem = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
 		  

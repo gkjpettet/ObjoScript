@@ -75,6 +75,27 @@ System.print("Maths checks out" if 1 <> 2 else "Maths is broken")
 
 It returns `trueValue` if `condition` is `true` otherwise it returns `falseValue`.
 
+## Switch statements
+A switch statement is an alternative to chained `if`...`else` statements. The statement switches the code path to execute depending on `someValue`_:
+
+```objo
+switch someValue {
+  case anotherValue {
+    // Code...
+  }
+  
+  case aFunctionCall(), "literal", 3 * 2 {
+    // Code...
+  }
+  
+  else {
+    // Executes if none of the cases match `someValue`
+  }
+}
+```
+
+As you can see from the example above, a `switch` statement comprises one or more _cases_. Each case evaluates one or more case values and/or expressions separated by commas. If any of a case's values match the value switched on then the case's body executes. If you provide an optional `else` block then that will execute if none of the cases match.
+
 ## While loops
 A `while` loop is the simplest type of looping mechanism in ObjoScript. It continues to execute a block of code whilst its condition is true:
 

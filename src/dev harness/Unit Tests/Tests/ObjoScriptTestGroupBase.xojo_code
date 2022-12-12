@@ -59,6 +59,20 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C657320746865207465737420736F7572636520666F722060746573744E616D65602C2072756E7320697420616E642061737365727473207468617420697473206F7574707574206D61746368657320606578706563746564602E
+		Sub AssertOutputEqualsLiteral(testName As String, expected As String)
+		  /// Compiles the test source for `testName`, runs it and asserts that its output matches `expected`.
+		  ///
+		  /// Expects `testName` to be in the format: topic.subtopic.testName
+		  
+		  Var source As String = GetTestSourceCode(testName)
+		  Var func As ObjoScript.Func = CompileTest(source)
+		  Var result As String = RunFunc(func)
+		  Assert.AreSame(expected, result, "Output:" + EndOfLine + EndOfLine + result, source)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320746865207465737420736F7572636520666F722060746573744E616D65602C2072756E7320697420616E642061737365727473207468617420612072756E74696D65206572726F72206F63637572732077686F7365206572726F72206D657373616765206D61746368657320746865207465787420666F756E6420696E206074657374732F65787065637465642F746573744E616D65602E
 		Sub AssertRuntimeError(testName As String)
 		  /// Compiles the test source for `testName`, runs it and asserts that a runtime error occurs
