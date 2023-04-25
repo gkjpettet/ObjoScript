@@ -783,7 +783,7 @@ Protected Class Parser
 		  TokenTypes.This                 : Prefix(New ThisParselet), _
 		  TokenTypes.Tilde                : NewRule(New UnaryParselet, Nil, Precedences.None), _
 		  TokenTypes.Underscore           : Unused, _
-		  TokenTypes.UppercaseIdentifier : Prefix(New ClassParselet), _
+		  TokenTypes.UppercaseIdentifier  : Prefix(New ClassParselet), _
 		  TokenTypes.Var_                 : Unused, _
 		  TokenTypes.While_               : Unused, _
 		  TokenTypes.Xor_                 : LogicalOperator(Precedences.LogicalXor) _
@@ -1114,7 +1114,7 @@ Protected Class Parser
 		  // a normal expression because it requires us to handle the LHS specially
 		  // (it needs to be an lvalue, not an rvalue). 
 		  // So, for each of the kinds of expressions that are valid 
-		  /// lvalues (e.g. names, subscripts, fields, etc) we pass in whether or not 
+		  // lvalues (e.g. names, subscripts, fields, etc) we pass in whether or not 
 		  // it appears in a context loose enough to allow "=". 
 		  // If so, it will parse the "=" itself and handle it appropriately.
 		  Var canAssign As Boolean = precedence <= Precedences.Conditional
