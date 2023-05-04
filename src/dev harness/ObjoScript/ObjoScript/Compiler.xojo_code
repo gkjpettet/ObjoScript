@@ -326,9 +326,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Resets by default but if this is being called internally (after the compiler has tokenised and parsed the source) 
 		  /// then we skip resetting by setting `shouldResetFirst` to True.
 		  
-		  mStopWatch.Start
-		  
 		  If shouldResetFirst Then Reset
+		  
+		  mStopWatch.Start
 		  
 		  Self.Enclosing = enclosingCompiler
 		  
@@ -361,7 +361,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Call stmt.Accept(Self)
 		  Next stmt
 		  
-		  // Handle an empty body/AST.
+		  // Determine the end location for this AST.
 		  Var endLocation As ObjoScript.Token
 		  If mAST.Count = 0 Then
 		    // Synthesise a fake end location token.
@@ -386,8 +386,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Private Function CompileMainFunction(body() As ObjoScript.Stmt) As ObjoScript.Func
 		  /// Takes an array of statements and returns the compiled entry-level "main" function.
 		  
-		  // Synthesise a token for the (non-existent) opening and closing curly braces and the 
-		  // (non-existent) `function` keyword of this implicit main function.
+		  // Synthesise a token for the (non-existent) opening and closing curly braces.
 		  Var openingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "", -1)
 		  Var closingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.RCurly, 0, 0, "", -1)
 		  
@@ -1485,9 +1484,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52657475726E7320612073796E74686574696320746F6B656E206174206C696E6520302C20706F732030207769746820606C6578656D656020696E20607363726970744944602E
+	#tag Method, Flags = &h21, Description = 52657475726E7320612073796E746865746963206964656E74696669657220746F6B656E206174206C696E6520302C20706F732030207769746820606C6578656D656020696E20607363726970744944602E
 		Private Function SyntheticToken(lexeme As String, scriptID As Integer = -1) As ObjoScript.Token
-		  /// Returns a synthetic token at line 0, pos 0 with `lexeme` in `scriptID`.
+		  /// Returns a synthetic identifier token at line 0, pos 0 with `lexeme` in `scriptID`.
 		  
 		  Return New ObjoScript.Token(ObjoScript.TokenTypes.Identifier, 0, 0, lexeme, scriptID)
 		  
@@ -3090,7 +3089,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		CurrentChunk As ObjoScript.Chunk
 	#tag EndComputedProperty
 
-	#tag Property, Flags = &h21, Description = 49662074686520636F6D70696C65722069732063757272656E746C7920636F6D70696C696E67206120636C6173732C207468697320646174612061626F75742069742028696E636C7564696E6720697473206465636C61726174696F6E292E204D6179206265204E696C2E
+	#tag Property, Flags = &h21, Description = 446174612061626F75742074686520636C61732063757272656E746C79206265696E6720636F6D70696C6564206F72206E696C2069662074686520636F6D70696C65722069736E27742063757272656E746C7920636F6D70696C696E67206120636C6173732E
 		Private CurrentClass As ObjoScript.ClassData
 	#tag EndProperty
 
