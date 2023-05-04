@@ -53,7 +53,7 @@ Protected Class Parser
 		  
 		  Consume(ObjoScript.TokenTypes.RParen, "Expected a closing parenthesis after the assert message.")
 		  
-		  ConsumeNewLine("Expected a new line EOL after the assert statement.")
+		  ConsumeNewLine("Expected a new line after the assert statement.")
 		  
 		  Return New ObjoScript.AssertStmt(condition, message, location)
 		End Function
@@ -491,7 +491,7 @@ Protected Class Parser
 
 	#tag Method, Flags = &h21, Description = 50617273657320612060666F7260206C6F6F702E20417373756D65732077652068617665206A75737420636F6E73756D6564207468652060666F7260206B6579776F72642E
 		Private Function ForEachStatement() As ObjoScript.Stmt
-		  /// Parses a `forEach` loop.
+		  /// Parses a `foreach` loop.
 		  /// Assumes we have just consumed the `foreach` keyword.
 		  ///
 		  /// Syntax:

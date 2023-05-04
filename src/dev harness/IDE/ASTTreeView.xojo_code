@@ -195,6 +195,15 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Class name.
 		  node.AppendNode(New TreeViewNode("Name: " + c.Name))
 		  
+		  // Constructors.
+		  If c.Constructors.Count > 0 Then
+		    Var constructors As New TreeViewNode("Constructors")
+		    For Each constructor As ObjoScript.ConstructorDeclStmt In c.Constructors
+		      constructors.AppendNode(constructor.Accept(Self))
+		    Next Constructor
+		    node.AppendNode(constructors)
+		  End If
+		  
 		  // Instance methods
 		  If c.Methods.KeyCount > 0 Then
 		    Var methods As New TreeViewNode("Instance methods")

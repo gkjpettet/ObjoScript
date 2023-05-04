@@ -873,7 +873,6 @@ Begin DesktopWindow WinObjoScriptUnitTests
    Begin ObjoScriptTestController Controller
       AllTestCount    =   0
       Duration        =   0.0
-      Enabled         =   True
       FailedCount     =   0
       GroupCount      =   0
       Index           =   -2147483648
@@ -890,6 +889,7 @@ Begin DesktopWindow WinObjoScriptUnitTests
    Begin DesktopProgressWheel ProgressWheel1
       Active          =   False
       AllowAutoDeactivate=   True
+      AllowTabStop    =   False
       Enabled         =   True
       Height          =   16
       Index           =   -2147483648
@@ -904,7 +904,6 @@ Begin DesktopWindow WinObjoScriptUnitTests
       Scope           =   0
       TabIndex        =   6
       TabPanelIndex   =   0
-      TabStop         =   True
       Tooltip         =   ""
       Top             =   7
       Transparent     =   False
