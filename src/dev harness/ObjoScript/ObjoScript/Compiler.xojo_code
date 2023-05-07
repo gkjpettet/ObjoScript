@@ -2798,6 +2798,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Compile the operand to put it on the stack.
 		  Call s.Operand.Accept(Self)
 		  
+		  // 254 not 255 because the value to assign to a setter has to be accounted for.
+		  If s.Indices.Count > 254 Then
+		    Error("The maximum number of subscript indexes is 254.")
+		  End If
+		  
 		  // Compile the arguments.
 		  For Each arg As ObjoScript.Expr In s.Indices
 		    Call arg.Accept(Self)
@@ -2806,7 +2811,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Compile the value to assign.
 		  Call s.ValueToAssign.Accept(Self)
 		  
-		  // Emit the OP_INVOKE instruction and the index of the signature in the constant pool
+		  // Emit the OP_INVOKE instruction and the index of the signature in the constant pool.
 		  EmitIndexedOpcode(ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_INVOKE_LONG, index, s.Location)
 		  
 		  // Emit the argument count.
