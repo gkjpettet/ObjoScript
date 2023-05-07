@@ -19,9 +19,9 @@ Protected Class Chunk
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 52657475726E7320746865206C696E65206E756D62657220666F7220746865206279746520636F646520617420606F6666736574602E
+	#tag Method, Flags = &h0, Description = 52657475726E7320746865206C696E65206E756D62657220666F72207468652062797465636F646520617420606F6666736574602E
 		Function LineForOffset(offset As Integer) As UInt32
-		  /// Returns the line number for the byte code at `offset`.
+		  /// Returns the line number for the bytecode at `offset`.
 		  ///
 		  /// This is abstracted out to its own method in case I ever implement any 
 		  /// compression for how the line numbers are stored.
@@ -50,9 +50,9 @@ Protected Class Chunk
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 52657475726E73207468652073637269707420494420666F7220746865206279746520636F646520617420606F6666736574602E
+	#tag Method, Flags = &h0, Description = 52657475726E73207468652073637269707420494420666F72207468652062797465636F646520617420606F6666736574602E
 		Function ScriptIDForOffset(offset As Integer) As Integer
-		  /// Returns the script ID for the byte code at `offset`.
+		  /// Returns the script ID for the bytecode at `offset`.
 		  ///
 		  /// This is abstracted out to its own method in case I ever implement any 
 		  /// compression for how the script IDs are stored.

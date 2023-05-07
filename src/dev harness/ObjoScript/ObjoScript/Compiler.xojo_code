@@ -561,7 +561,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// actually undeclare variables or pop any scopes. 
 		  /// Returns the number of local variables that were eliminated.
 		  ///
-		  /// This is called directly when compiling "exit" statements to ditch the local variables
+		  /// This is called directly when compiling `continue` and `exit` statements to ditch the local variables
 		  /// before jumping out of the loop even though they are still in scope *past*
 		  /// the exit instruction.
 		  
@@ -747,8 +747,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 43616C6C6564207768656E2074686520636F6D70696C65722066696E69736865732E
-		Sub EndCompiler(location As ObjoScript.Token)
+	#tag Method, Flags = &h21, Description = 43616C6C6564207768656E2074686520636F6D70696C65722066696E69736865732E
+		Private Sub EndCompiler(location As ObjoScript.Token)
 		  /// Called when the compiler finishes.
 		  
 		  // Implicitly return an appropriate value if the user did not explictly specify one.
@@ -2687,7 +2687,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = r.Location
 		  
-		  // Handle the return value. If none was specified then the parser will synthesis a NothingLiteral.
+		  // Handle the return value. If none was specified then the parser will synthesise a NothingLiteral.
 		  If Self.Type = ObjoScript.FunctionTypes.Constructor Then
 		    // Constructors must always return `this` which will be at slot 0 in the call frame.
 		    If r.Value IsA ObjoScript.NothingLiteral Then
@@ -2766,12 +2766,16 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Load the signature into the constant pool.
 		  Var index As Integer = AddConstant(s.Signature)
 		  
+		  If s.Indices.Count > 255 Then
+		    Error("The maximum number of subscript indexes is 255.")
+		  End If
+		  
 		  // Compile the indices.
 		  For Each i As ObjoScript.Expr In s.Indices
 		    Call i.Accept(Self)
 		  Next i
 		  
-		  // Emit the OP_INVOKE instruction and the index of the method's signature in the constant pool
+		  // Emit the OP_INVOKE instruction and the index of the method's signature in the constant pool.
 		  EmitIndexedOpcode(ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_INVOKE_LONG, index, s.Location)
 		  
 		  // Emit the index count.
