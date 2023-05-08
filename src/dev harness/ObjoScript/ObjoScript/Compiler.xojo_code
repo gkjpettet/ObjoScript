@@ -1587,8 +1587,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // a global function call.
 		  Var isMethod, isStatic As Boolean = False
 		  
-		  if bi.MethodName = "foo" then Break
-		  
 		  If CurrentClass <> Nil Then
 		    If ClassHierarchyHasInstanceMethodWithSignature(CurrentClass, bi.Signature) Then
 		      isMethod = True
