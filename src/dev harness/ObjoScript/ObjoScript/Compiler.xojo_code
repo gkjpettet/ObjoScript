@@ -1633,8 +1633,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Call arg.Accept(Self)
 		  Next arg
 		  
-		  // Emit the OP_INVOKE instruction and the index of the method's signature in the constant pool
+		  // Emit the OP_INVOKE instruction and the index of the method's signature in the constant pool.
 		  EmitIndexedOpcode(ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_INVOKE_LONG, index, bi.Location)
+		  
+		  If bi.Arguments.Count > 255 Then
+		    Error("An invocation cannot have more than 255 arguments.")
+		  End If
 		  
 		  // Emit the argument count.
 		  EmitByte(bi.Arguments.Count, bi.Location)
