@@ -148,6 +148,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = location
 		  
+		  If slot > 255 Then
+		    Error("The local variable slot must be <= 255.")
+		  End If
+		  
 		  // Tell the VM to push the local variable at `slot` on to the top of the stack.
 		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, slot)
 		  
