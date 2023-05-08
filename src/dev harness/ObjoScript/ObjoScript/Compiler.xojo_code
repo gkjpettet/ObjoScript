@@ -34,7 +34,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Private Sub Assignment(name As String)
 		  /// Compiles an assignment to a variable or setter named `name`.
 		  ///
-		  /// The value to assign will already be on the top of the stack.
+		  /// The value to assign is assumed to already be on the top of the stack.
 		  
 		  // This might be a setter call so compute its signature now.
 		  Var signature As String = ObjoScript.Func.ComputeSignature(name, 1, True)
@@ -1199,7 +1199,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag Method, Flags = &h21, Description = 54616B657320746865206F666673657420696E207468652063757272656E74206368756E6B206F6620746865207374617274206F662061206A756D7020706C616365686F6C64657220616E64207265706C616365732074686520706C616365686F6C6465722077697468207468652074686520616D6F756E74206E656564656420746F20616464656420746F2074686520564D277320495020746F20636175736520697420746F206A756D7020746F207468652063757272656E7420706F736974696F6E20696E20746865206368756E6B2E
 		Private Sub PatchJump(offset As Integer)
 		  /// Takes the offset in the current chunk of the start of a jump placeholder and 
-		  /// replaces the placeholder with the the amount needed to added to the VM's IP to 
+		  /// replaces that placeholder with the the amount needed to added to the VM's IP to 
 		  /// cause it to jump to the current position in the chunk.
 		  
 		  // Compute the distance to jump to get from the end of the placeholder operand to 
@@ -2391,7 +2391,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // code inside the "else branch".
 		  EmitByte(ObjoScript.VM.OP_POP)
 		  
-		  // Compile the optional "else" branch statements.
+		  // Compile the optional "else" branch statement.
 		  If ifstmt.ElseBranch <> Nil Then
 		    Call ifstmt.ElseBranch.Accept(Self)
 		  End If
