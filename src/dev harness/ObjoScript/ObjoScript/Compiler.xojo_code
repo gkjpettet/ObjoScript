@@ -124,7 +124,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var index As Integer = AddConstant(name)
 		  
 		  // Push the method's name on to the stack.
-		  EmitGetGlobal(index)
+		  GetGlobal(index)
 		  
 		  // Check the argument count is within the limit.
 		  If arguments.Count > 255 Then
@@ -636,28 +636,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 456D69747320616E20696E737472756374696F6E20746F20676574206120676C6F62616C207661726961626C652077686F7365206E616D652069732073746F72656420696E2074686520636F6E7374616E7420706F6F6C2061742060696E6465786020616E642070757368206974206F6E746F2074686520737461636B2E
-		Private Sub EmitGetGlobal(index As Integer, location As ObjoScript.Token = Nil)
-		  /// Emits an instruction to get a global variable whose name is stored in 
-		  /// the constant pool at `index` and push it onto the stack.
-		  ///
-		  /// It's a convenience method that exists to simplify the fact that there are two GET_GLOBAL 
-		  // instructions which depend on the size of `index`.
-		  
-		  location = If(location = Nil, mLocation, location)
-		  
-		  If index <= 255 Then
-		    // We only need a single byte operand to specify the index of the variable's name in the constant pool.
-		    EmitBytes(ObjoScript.VM.OP_GET_GLOBAL, index, location)
-		  Else
-		    // We need two bytes for the operand.
-		    EmitByte(ObjoScript.VM.OP_GET_GLOBAL_LONG, location)
-		    EmitUInt16(index, location)
-		  End If
-		  
-		End Sub
-	#tag EndMethod
-
 	#tag Method, Flags = &h21, Description = 49662060696E64657860203C3D20323535207468656E206073686F72744F70636F64656020697320656D697474656420666F6C6C6F776564206279207468652073696E676C6520627974652060696E646578602E204F746865727769736520606C6F6E674F70636F64656020697320656D697474656420666F6C6C6F776564206279207468652074776F20627974652060696E646578602E
 		Private Sub EmitIndexedOpcode(shortOpcode As UInt8, longOpcode As UInt8, index As Integer, location As ObjoScript.Token = Nil)
 		  /// If `index` <= 255 then `shortOpcode` is emitted followed by the single byte `index`. Otherwise `longOpcode` is emitted
@@ -1012,6 +990,28 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 456D69747320616E20696E737472756374696F6E20746F20676574206120676C6F62616C207661726961626C652077686F7365206E616D652069732073746F72656420696E2074686520636F6E7374616E7420706F6F6C2061742060696E6465786020616E642070757368206974206F6E746F2074686520737461636B2E
+		Private Sub GetGlobal(index As Integer, location As ObjoScript.Token = Nil)
+		  /// Emits an instruction to get a global variable whose name is stored in 
+		  /// the constant pool at `index` and push it onto the stack.
+		  ///
+		  /// It's a convenience method that exists to simplify the fact that there are two GET_GLOBAL 
+		  // instructions which depend on the size of `index`.
+		  
+		  location = If(location = Nil, mLocation, location)
+		  
+		  If index <= 255 Then
+		    // We only need a single byte operand to specify the index of the variable's name in the constant pool.
+		    EmitBytes(ObjoScript.VM.OP_GET_GLOBAL, index, location)
+		  Else
+		    // We need two bytes for the operand.
+		    EmitByte(ObjoScript.VM.OP_GET_GLOBAL_LONG, location)
+		    EmitUInt16(index, location)
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 526574726965766573206120676C6F62616C207661726961626C65206E616D656420606E616D65602E
 		Private Sub GlobalVariable(name As String)
 		  /// Retrieves a global variable named `name`.
@@ -1020,7 +1020,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var index As Integer = AddConstant(name)
 		  
 		  // Push the variable on to the stack.
-		  EmitGetGlobal(index)
+		  GetGlobal(index)
 		  
 		End Sub
 	#tag EndMethod
@@ -1859,7 +1859,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var index As Integer = AddConstant(c.Name)
 		  
 		  // Push the class on to the stack.
-		  EmitGetGlobal(index)
+		  GetGlobal(index)
 		  
 		End Function
 	#tag EndMethod
@@ -1949,7 +1949,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  DefineVariable(index)
 		  
 		  // Push the class back on to the stack so the methods can find it.
-		  EmitGetGlobal(index)
+		  GetGlobal(index)
 		  
 		  If Not bootstrapping Then
 		    If c.HasSuperclass Then
