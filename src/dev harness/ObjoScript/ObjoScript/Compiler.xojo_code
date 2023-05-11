@@ -410,7 +410,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = where
 		  
-		  // Super can only be used in classes.
+		  // `super` can only be used in classes.
 		  If Self.Type <> ObjoScript.FunctionTypes.Constructor Or CurrentClass = Nil Then
 		    Error("You can only call a superclass constructor from within a constructor.")
 		  End If
@@ -462,7 +462,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = where
 		  
-		  // Super can only be used in classes.
+		  // `super` can only be used in classes.
 		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
 		    Error("`super` can only be used within a method or constructor.")
 		  End If
@@ -852,9 +852,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52657475726E7320746865206669656C6420696E646578206F6620606669656C644E616D656020666F72202A746869732A20636C61737320286E6F74207375706572636C6173736573292E20546869732069732074686520696E646578207468652072756E74696D652077696C6C206163636573732E
+	#tag Method, Flags = &h21, Description = 52657475726E7320746865206669656C6420696E646578206F6620606669656C644E616D656020666F72202A746869732A20636C61737320286E6F7420616E79207375706572636C6173736573292E20546869732069732074686520696E646578207468652072756E74696D652077696C6C206163636573732E204966207468657265206973206E6F206669656C6420776974682074686973206E616D65207468656E2061206E6577206F6E6520697320637265617465642E
 		Private Function FieldIndex(fieldName As String) As Integer
-		  /// Returns the field index of `fieldName` for *this* class (not any superclasses). This is the index the runtime will access.
+		  /// Returns the field index of `fieldName` for *this* class (not any superclasses). 
+		  /// This is the index the runtime will access.
+		  /// If there is no field with this name then a new one is created.
 		  
 		  For i As Integer = 0 To CurrentClass.Fields.LastIndex
 		    If CurrentClass.Fields(i).CompareCase(fieldName) Then
@@ -1230,7 +1232,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles a "++" or "--" postfix expression.
 		  /// Assumes `postfix` is a "++" or "--" expression.
 		  
-		  // The "++" and "--" operators require a variable or field as their left hand operand.
+		  // The `++` and `--` operators require a variable or field as their left hand operand.
 		  Select Case postfix.Operand
 		  Case IsA ObjoScript.VariableExpr, IsA ObjoScript.FieldExpr, IsA ObjoScript.StaticFieldExpr
 		    // Allowed.
@@ -1657,7 +1659,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = s.Location
 		  
-		  // Super can only be used in classes.
+		  // `super` can only be used in classes.
 		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
 		    Error("`super` can only be used within a method or constructor.")
 		  End If
@@ -2606,7 +2608,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Call arg.Accept(Self)
 		  Next arg
 		  
-		  // Emit the OP_INVOKE instruction and the index of the method's signature in the constant pool
+		  // Emit the OP_INVOKE instruction and the index of the method's signature in the constant pool.
 		  EmitIndexedOpcode(ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_INVOKE_LONG, index, m.Location)
 		  
 		  // Emit the argument count.
@@ -2640,9 +2642,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C65206120706F73742D6669782065787072657373696F6E2E
+	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120706F73746669782065787072657373696F6E2E
 		Function VisitPostfix(expr As ObjoScript.PostfixExpr) As Variant
-		  /// Compile a post-fix expression.
+		  /// Compiles a postfix expression.
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
@@ -2888,7 +2890,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Compile the value to assign.
 		  Call s.ValueToAssign.Accept(Self)
 		  
-		  // Emit the OP_SUPER_SETTER instruction, the superclass name and the index of the 
+		  // Emit the OP_SUPER_SETTER instruction, the superclass name index and the index of the 
 		  // method's signature in the constant pool.
 		  EmitByte(ObjoScript.VM.OP_SUPER_SETTER, s.Location)
 		  EmitUInt16(superNameIndex, s.Location)
