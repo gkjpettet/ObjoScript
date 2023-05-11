@@ -1114,11 +1114,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var signature As String = ObjoScript.Func.ComputeSignature(name, 0, False)
 		  Var isGetter As Boolean = False
 		  
-		  Var arg As Integer = ResolveLocal(name)
-		  If arg <> -1 Then
+		  Var slot As Integer = ResolveLocal(name)
+		  If slot <> -1 Then
 		    // Simplest case - retrieve a local variable.
-		    // Tell the VM to push the value at slot `arg` on to the top of the stack.
-		    EmitBytes(ObjoScript.VM.OP_GET_LOCAL, arg)
+		    // Tell the VM to push the value at slot `slot` on to the top of the stack.
+		    EmitBytes(ObjoScript.VM.OP_GET_LOCAL, slot)
 		    
 		  ElseIf Self.Type = ObjoScript.FunctionTypes.Method Or Self.Type = ObjoScript.FunctionTypes.Constructor Then
 		    // We're within a method or constructor.
@@ -1462,7 +1462,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Wrap these statements in a synthetic block and return.
 		  Var openingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "{", sw.Location.ScriptID)
-		  Var closingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "{", sw.Location.ScriptID)
+		  Var closingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "}", sw.Location.ScriptID)
 		  Return New ObjoScript.BlockStmt(statements, openingBrace, closingBrace)
 		  
 		End Function
@@ -2212,12 +2212,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// The VM then calls `iteratorValue()` on `seq*` and passes in the iterator value that it just got from calling `iterate()`. 
 		  /// The sequence uses that to look up and return the appropriate element.
 		  
+		  // Track the current location.
 		  mLocation = stmt.Location
 		  
 		  BeginScope
-		  
-		  // Track the current location.
-		  mLocation = stmt.Location
 		  
 		  // Declare iter* as nothing.
 		  EmitByte(ObjoScript.VM.OP_NOTHING)
@@ -2904,6 +2902,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compile a `switch` statement.
 		  ///
 		  /// Part of the `ObjoScript.StmtVisitor` interface.
+		  
+		  #Pragma Warning "TODO: Rename `switch` to `select`"
 		  
 		  // Validate the switch statement first.
 		  If switch.Cases.Count = 0 Then
