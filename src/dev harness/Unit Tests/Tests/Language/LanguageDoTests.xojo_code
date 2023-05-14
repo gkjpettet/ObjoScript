@@ -2,6 +2,12 @@
 Protected Class LanguageDoTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
+		Sub ConditionTest()
+		  AssertOutputEquals("language.do.condition")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub NewlineAfterDoTest()
 		  AssertCompilerError("language.do.newline_after_do")
 		End Sub

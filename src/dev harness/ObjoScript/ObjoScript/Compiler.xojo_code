@@ -2105,8 +2105,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Track our location.
 		  mLocation = stmt.Location
 		  
-		  #Pragma Warning "TODO"
-		  
 		  StartLoop
 		  
 		  LoopBody(stmt.Body)

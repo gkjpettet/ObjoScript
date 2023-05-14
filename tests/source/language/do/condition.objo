@@ -1,0 +1,12 @@
+var i = 0
+do {
+System.print(i)
+i++
+} loop until i == 5
+
+// Expect:
+// 0
+// 1
+// 2
+// 3
+// 4
