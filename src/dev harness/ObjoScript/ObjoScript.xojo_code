@@ -130,11 +130,11 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.Dot
 		    Return "dot"
 		    
-		  Case ObjoScript.TokenTypes.DotDot
-		    Return "inclusive range"
+		  Case ObjoScript.TokenTypes.DotDotLess
+		    Return "exclusive range"
 		    
 		  Case ObjoScript.TokenTypes.DotDotDot
-		    Return "exclusive range"
+		    Return "inclusive range"
 		    
 		  Case ObjoScript.TokenTypes.EOF
 		    Return "EOF"
@@ -490,7 +490,7 @@ Protected Module ObjoScript
 		  Continue_
 		  Do_
 		  Dot
-		  DotDot
+		  DotDotLess
 		  DotDotDot
 		  Else_
 		  EOF

@@ -692,7 +692,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Function VisitRange(r As ObjoScript.RangeExpr) As Variant
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
-		  Var node As New TreeViewNode(If(r.Operator.Type = ObjoScript.TokenTypes.DotDot, "Inclusive", "Exclusive") + " range")
+		  Var node As New TreeViewNode(If(r.Operator.Type = ObjoScript.TokenTypes.DotDotDot, "Inclusive", "Exclusive") + " range")
 		  
 		  Var lower As TreeViewNode = r.Lower.Accept(Self)
 		  lower.Text = "Lower: " + lower.Text

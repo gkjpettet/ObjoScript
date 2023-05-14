@@ -772,8 +772,12 @@ Protected Class Lexer
 		        AddToken(MakeToken(ObjoScript.TokenTypes.DotDotDot, "...")) // ...
 		        Return
 		      Else
-		        AddToken(MakeToken(ObjoScript.TokenTypes.DotDot, "..")) // ..
-		        Return
+		        If Match("<") Then
+		          AddToken(MakeToken(ObjoScript.TokenTypes.DotDotLess, "..<")) // ..<
+		          Return
+		        Else
+		          Error("Unknown operator `..`.")
+		        End If
 		      End If
 		    Else
 		      AddToken(MakeToken(ObjoScript.TokenTypes.Dot, "."))

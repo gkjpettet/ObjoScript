@@ -12,7 +12,7 @@ System.print(1 if true else 2) // expect: 1
 System.print((1) if true else 2) // expect: 1
 System.print(1 if [true][0] else 2) // expect 1
 System.print(1 if Foo.bar else 2) // expect: 1
-System.print(1 if 3..4 else 2) // expect: 1
+System.print(1 if 3...4 else 2) // expect: 1
 System.print(1 if 3 * 4 else 2) // expect: 1
 System.print(1 if 3 + 4 else 2) // expect: 1
 System.print(1 if true or false else 2) // expect: 1
@@ -29,7 +29,7 @@ System.print(a) // expect: 1
 System.print((1) if true else 2) // expect: 1
 System.print([1][0] if true else 2) // expect: 1
 System.print(Foo.baz() if true else 2) // expect: 1
-System.print(3..4 if true else 2) // expect: [3, 4]
+System.print(3...4 if true else 2) // expect: [3, 4]
 System.print(3 * 4 if true else 2) // expect: 12
 System.print(3 + 4 if true else 2) // expect: 7
 System.print(1 or false if true else 2) // expect: 1
@@ -45,7 +45,7 @@ System.print(a) // expect: 5
 System.print(1 if false else (2)) // expect: 2
 System.print(1 if false else [2][0]) // expect: 2
 System.print(2 if false else Foo.baz()) // expect: 1
-System.print(1 if false else 3..4) // expect: [3, 4]
+System.print(1 if false else 3...4) // expect: [3, 4]
 System.print(1 if false else 3 * 4) // expect: 12
 System.print(1 if false else 3 + 4) // expect: 7
 System.print(i if false else 2 or false) // expect: 2

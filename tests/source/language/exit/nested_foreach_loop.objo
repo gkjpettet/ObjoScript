@@ -1,8 +1,8 @@
-foreach i in 0..2 {
+foreach i in 0...2 {
   System.print("outer " + i)
   if i > 1 then exit
 
-  foreach j in 0..2 {
+  foreach j in 0...2 {
 	System.print("inner " + j)
 	if j > 1 then exit
   }

@@ -206,8 +206,8 @@ Protected Module Number
 		  d.Value("<=(_)")       = AddressOf LessEqual
 		  d.Value(">(_)")        = AddressOf Greater
 		  d.Value(">=(_)")       = AddressOf GreaterEqual
-		  d.Value("..(_)")       = AddressOf RangeInclusive
-		  d.Value("...(_)")      = AddressOf RangeExclusive
+		  d.Value("..<(_)")      = AddressOf RangeExclusive
+		  d.Value("...(_)")      = AddressOf RangeInclusive
 		  d.Value("abs()")       = AddressOf Abs_
 		  d.Value("acos()")      = AddressOf ACos_
 		  d.Value("asin()")      = AddressOf ASin_
@@ -356,7 +356,7 @@ Protected Module Number
 		  /// Returns a list with elements ranging from this number to `upper` (exclusive).
 		  ///
 		  /// Since this is a built-in type, slot 0 will be a double.
-		  /// Number...upper -> List
+		  /// Number..<upper -> List
 		  
 		  Var lower As Double = vm.GetSlotValue(0)
 		  

@@ -75,7 +75,7 @@ foreign <(other)
 foreign <=(other)
 foreign >(other)
 foreign >=(other)
-foreign ..(upper)
+foreign ..<(upper)
 foreign ...(upper)
 foreign abs()
 foreign acos()
@@ -289,7 +289,7 @@ var pIndex = start
 // Each time we find an element less than or equal to the pivot,
 // `pIndex` is incremented, and that element would be placed
 // before the pivot.
-foreach i in start...end {
+foreach i in start..<end {
 if this[i] <= pivot {
 this.swap(i, pIndex)
 pIndex = pIndex + 1
@@ -336,7 +336,7 @@ assert(count.isInteger, "`count` must be an integer.")
 assert(count > 0, "`count` must be a non-negative integer.")
 
 var result = []
-foreach i in 0...count {
+foreach i in 0..<count {
 result.addAll(this)
 }
 return result

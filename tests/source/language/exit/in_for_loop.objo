@@ -1,4 +1,4 @@
-foreach i in 1..5 {
+foreach i in 1...5 {
   System.print(i)
   if i > 2 then exit
   System.print(i)

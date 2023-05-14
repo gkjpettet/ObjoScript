@@ -281,7 +281,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320726177204F626A6F20736F7572636520636F646520696E746F206120746F70206C6576656C2066756E6374696F6E2E204D6179207261697365206120604C65786572457863657074696F6E602C2060506172736572457863657074696F6E60206F722060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
 		Function Compile(source As String) As ObjoScript.Func
-		   /// Compiles raw Objo source code into a top level function. 
+		  /// Compiles raw Objo source code into a top level function. 
 		  /// May raise a `LexerException`, `ParserException` or `CompilerException` if an error occurs.
 		  
 		  Reset
@@ -960,10 +960,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  StartLoop
 		  
 		  // Compile the condition.
-		  // Inclusive: `loopCounter <= range.upper`
-		  // Exclusive: `loopCounter < range.upper`
+		  // Inclusive (...): `loopCounter <= range.upper`
+		  // Exclusive (..<): `loopCounter < range.upper`
 		  Var operator As ObjoScript.Token
-		  If range.Operator.Type = ObjoScript.TokenTypes.DotDot Then
+		  If range.Operator.Type = ObjoScript.TokenTypes.DotDotDot Then
 		    operator = SyntheticOperatorToken(ObjoScript.TokenTypes.LessEqual)
 		  Else
 		    operator = SyntheticOperatorToken(ObjoScript.TokenTypes.Less)
@@ -2660,7 +2660,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320616E20696E636C757369766520282E2E29206F72206578636C757369766520282E2E2E292072616E67652065787072657373696F6E2E
 		Function VisitRange(r As ObjoScript.RangeExpr) As Variant
-		  /// Compiles an inclusive (..) or exclusive (...) range expression.
+		  /// Compiles an inclusive (...) or exclusive (..<) range expression.
 		  ///
 		  /// a RANGE_OP b becomes: 
 		  ///  RANGE_OP  

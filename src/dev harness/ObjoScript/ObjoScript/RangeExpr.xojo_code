@@ -30,7 +30,7 @@ Implements ObjoScript.Expr
 	#tag ComputedProperty, Flags = &h0, Description = 54727565206966207468697320697320616E20696E636C75736976652072616E67652065787072657373696F6E20282E2E292E2046616C7365206966206578636C757369766520282E2E2E292E
 		#tag Getter
 			Get
-			  Return mOperator.Type = ObjoScript.TokenTypes.DotDot
+			  Return mOperator.Type = ObjoScript.TokenTypes.DotDotDot
 			  
 			End Get
 		#tag EndGetter

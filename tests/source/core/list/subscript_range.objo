@@ -1,6 +1,6 @@
 var heroes = ["Iron Man", "Hulk", "Black Panther"]
-System.print(heroes[0..1]) // [Iron Man, Hulk]
-System.print(heroes[1..2]) // [Hulk, Black Panther]
+System.print(heroes[0...1]) // [Iron Man, Hulk]
+System.print(heroes[1...2]) // [Hulk, Black Panther]
 
 // The original list is unaltered.
 System.print(heroes) // [Iron Man, Hulk, Black Panther]

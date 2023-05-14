@@ -1692,10 +1692,10 @@ Protected Class VM
 		      CurrentFrame.IP = CurrentFrame.IP - offset
 		      
 		    Case OP_RANGE_INCLUSIVE
-		      InvokeBinaryOperator("..(_)")
+		      InvokeBinaryOperator("...(_)")
 		      
 		    Case OP_RANGE_EXCLUSIVE
-		      InvokeBinaryOperator("...(_)")
+		      InvokeBinaryOperator("..<(_)")
 		      
 		    Case OP_EXIT
 		      Error("Unexpected `exit` placeholder instruction. The chunk is invalid.")

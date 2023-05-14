@@ -1,2 +1,2 @@
 var heroes = ["Iron Man", "Hulk", "Black Panther"]
-System.print(heroes[0..-1]) // Expect error
+System.print(heroes[0...-1]) // Expect error

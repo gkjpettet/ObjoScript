@@ -724,7 +724,7 @@ Protected Class Parser
 		  TokenTypes.Constructor          : Unused, _
 		  TokenTypes.Continue_            : Unused, _
 		  TokenTypes.Dot                  : NewRule(Nil, New DotParselet, Precedences.Call_), _
-		  TokenTypes.DotDot               : NewRule(Nil, New RangeParselet, Precedences.Range), _
+		  TokenTypes.DotDotLess           : NewRule(Nil, New RangeParselet, Precedences.Range), _
 		  TokenTypes.DotDotDot            : NewRule(Nil, New RangeParselet, Precedences.Range), _
 		  TokenTypes.Else_                : Unused, _
 		  TokenTypes.EOF                  : Unused, _
@@ -926,7 +926,7 @@ Protected Class Parser
 		  
 		  Static operators() As ObjoScript.TokenTypes = Array( _
 		  ObjoScript.TokenTypes.Ampersand, _
-		  ObjoScript.TokenTypes.DotDot, _
+		  ObjoScript.TokenTypes.DotDotLess, _
 		  ObjoScript.TokenTypes.DotDotDot, _
 		  ObjoScript.TokenTypes.EqualEqual, _
 		  ObjoScript.TokenTypes.ForwardSlash, _
@@ -1410,7 +1410,7 @@ Protected Class Parser
 		BitwiseXor   : ^
 		BitwiseAnd   : &
 		BitwiseShift : << >>
-		Range        : .. ...
+		Range        : ..< ...
 		Term         : + -
 		Factor       : * / %
 		Unary        : - not ~ ++
