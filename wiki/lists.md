@@ -29,18 +29,18 @@ System.print(heroes.count) // 3
 ```
 
 ### Ranges
-A `range` is a list of sequential numeric values. The `Number` class can create them with the inclusive (`..`) and exclusive (`...`) operators:
+A `range` is a list of sequential numeric values. The `Number` class can create them with the inclusive (`...`) and exclusive (`..<`) operators:
 
 ```objo
-1..5  // [1, 2, 3, 4, 5]
-1...5 // [1, 2, 3, 4]
+1...5  // [1, 2, 3, 4, 5]
+1..<5 // [1, 2, 3, 4]
 ```
 
 ## Slicing a list
 Sometimes you just want to get to a portion or _slice_ of a list. The easiest was to do this is to pass a `range` to the list's subscript operator:
 
 ```objo
-System.print(heroes[1..2]) // [Hulk, Black Panther]
+System.print(heroes[1...2]) // [Hulk, Black Panther]
 ```
 
 This returns a new list comprised of the elements in the original list whose indices were within the range.
