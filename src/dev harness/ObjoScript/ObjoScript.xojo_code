@@ -476,13 +476,6 @@ Protected Module ObjoScript
 	#tag EndComputedProperty
 
 
-	#tag Enum, Name = FunctionTypes, Type = Integer, Flags = &h1, Description = 54686520646966666572656E74207479706573206F662066756E6374696F6E2E
-		TopLevel
-		  Func
-		  Method
-		Constructor
-	#tag EndEnum
-
 	#tag Enum, Name = TokenTypes, Type = Integer, Flags = &h1
 		Ampersand
 		  And_

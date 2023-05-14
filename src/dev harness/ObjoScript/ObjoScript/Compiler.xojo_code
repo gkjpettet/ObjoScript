@@ -45,7 +45,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    // Simplest case - set a local variable.
 		    EmitBytes(ObjoScript.VM.OP_SET_LOCAL, arg)
 		    
-		  ElseIf (Self.Type = ObjoScript.FunctionTypes.Method Or Self.Type = ObjoScript.FunctionTypes.Constructor) And _
+		  ElseIf (Self.Type = FunctionTypes.Method Or Self.Type = FunctionTypes.Constructor) And _
 		    ClassHierarchyHasInstanceMethodWithSignature(CurrentClass, signature) Then
 		    // This is a call to an instance setter method.
 		    If Self.IsStaticMethod Then
@@ -56,7 +56,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    End If
 		    isSetter = True
 		    
-		  ElseIf (Self.Type = ObjoScript.FunctionTypes.Method Or Self.Type = ObjoScript.FunctionTypes.Constructor) And _
+		  ElseIf (Self.Type = FunctionTypes.Method Or Self.Type = FunctionTypes.Constructor) And _
 		    ClassHierarchyHasStaticMethodWithSignature(CurrentClass, signature) Then
 		    // This is a call to a static setter method.
 		    If Self.IsStaticMethod Then
@@ -324,7 +324,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320612066756E6374696F6E206465636C61726174696F6E20696E746F20612066756E6374696F6E2E2052616973657320612060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
-		Function Compile(name As String, parameters() As ObjoScript.Token, body As ObjoScript.BlockStmt, type As ObjoScript.FunctionTypes, currentClass As ObjoScript.ClassData, isStaticMethod As Boolean, debugMode As Boolean, shouldResetFirst As Boolean, enclosingCompiler As ObjoScript.Compiler) As ObjoScript.Func
+		Function Compile(name As String, parameters() As ObjoScript.Token, body As ObjoScript.BlockStmt, type As FunctionTypes, currentClass As ObjoScript.ClassData, isStaticMethod As Boolean, debugMode As Boolean, shouldResetFirst As Boolean, enclosingCompiler As ObjoScript.Compiler) As ObjoScript.Func
 		  /// Compiles a function declaration into a function. Raises a `CompilerException` if an error occurs.
 		  ///
 		  /// Resets by default but if this is being called internally (after the compiler has tokenised and parsed the source) 
@@ -344,7 +344,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Self.IsStaticMethod = isStaticMethod
 		  Self.CurrentClass = currentClass
 		  
-		  If type <> ObjoScript.FunctionTypes.TopLevel Then
+		  If type <> FunctionTypes.TopLevel Then
 		    BeginScope
 		    
 		    // Compile the parameters.
@@ -397,7 +397,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Empty parameters.
 		  Var params() As ObjoScript.Token
 		  
-		  Return Compile("", params, New ObjoScript.BlockStmt(body, openingBrace, closingBrace), ObjoScript.FunctionTypes.TopLevel, Nil, False, Self.DebugMode, False, Nil)
+		  Return Compile("", params, New ObjoScript.BlockStmt(body, openingBrace, closingBrace), FunctionTypes.TopLevel, Nil, False, Self.DebugMode, False, Nil)
 		  
 		End Function
 	#tag EndMethod
@@ -411,7 +411,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  mLocation = where
 		  
 		  // `super` can only be used in classes.
-		  If Self.Type <> ObjoScript.FunctionTypes.Constructor Or CurrentClass = Nil Then
+		  If Self.Type <> FunctionTypes.Constructor Or CurrentClass = Nil Then
 		    Error("You can only call a superclass constructor from within a constructor.")
 		  End If
 		  
@@ -463,7 +463,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  mLocation = where
 		  
 		  // `super` can only be used in classes.
-		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		  If Self.Type <> FunctionTypes.Method And Self.Type <> FunctionTypes.Constructor Then
 		    Error("`super` can only be used within a method or constructor.")
 		  End If
 		  
@@ -704,7 +704,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Emits a return instruction, defaulting to returning Nothing on function returns.
 		  /// Defaults to the current location.
 		  
-		  If Self.Type = ObjoScript.FunctionTypes.Constructor Then
+		  If Self.Type = FunctionTypes.Constructor Then
 		    // Rather than return "Nothing", constructors must default to 
 		    // returning `this` which will be in slot 0 of the call frame.
 		    EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0, location)
@@ -848,7 +848,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Private Sub FieldAssignment(fieldName As String)
 		  /// Assign the value on the top of the stack to the specified field.
 		  
-		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		  If Self.Type <> FunctionTypes.Method And Self.Type <> FunctionTypes.Constructor Then
 		    Error("Fields can only be accessed from within a method or constructor.")
 		  End If
 		  
@@ -1135,7 +1135,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    // Tell the VM to push the value at slot `slot` on to the top of the stack.
 		    EmitBytes(ObjoScript.VM.OP_GET_LOCAL, slot)
 		    
-		  ElseIf Self.Type = ObjoScript.FunctionTypes.Method Or Self.Type = ObjoScript.FunctionTypes.Constructor Then
+		  ElseIf Self.Type = FunctionTypes.Method Or Self.Type = FunctionTypes.Constructor Then
 		    // We're within a method or constructor.
 		    Var hasStatic, hasInstance As Boolean = False
 		    If ClassHierarchyHasInstanceMethodWithSignature(CurrentClass, signature) Then
@@ -1304,7 +1304,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // For methods and constructors it will be `this`.
 		  Var name As String = ""
 		  Select Case Type
-		  Case ObjoScript.FunctionTypes.Method, ObjoScript.FunctionTypes.Constructor
+		  Case FunctionTypes.Method, FunctionTypes.Constructor
 		    name = "this"
 		  End Select
 		  Var synthetic As New ObjoScript.Token(ObjoScript.TokenTypes.Identifier, 0, 1, name, -1)
@@ -1374,7 +1374,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Private Sub StaticFieldAssignment(fieldName As String)
 		  /// Assigns the value on the top of the stack to the static field named `fieldName`.
 		  
-		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		  If Self.Type <> FunctionTypes.Method And Self.Type <> FunctionTypes.Constructor Then
 		    Error("Static fields can only be accessed from within a method or constructor.")
 		  End If
 		  
@@ -1675,7 +1675,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  mLocation = s.Location
 		  
 		  // `super` can only be used in classes.
-		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		  If Self.Type <> FunctionTypes.Method And Self.Type <> FunctionTypes.Constructor Then
 		    Error("`super` can only be used within a method or constructor.")
 		  End If
 		  
@@ -1684,7 +1684,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Error("Class `" + CurrentClass.Name + "` does not have a superclass.")
 		  End If
 		  
-		  If Self.Type = ObjoScript.FunctionTypes.Constructor Then
+		  If Self.Type = FunctionTypes.Constructor Then
 		    // This is a call to a superclass' constructor.
 		    // Objo enforces that calls to constructors require parentheses (even when there are no arguments).
 		    If Not s.HasParentheses Then
@@ -1693,7 +1693,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		      CompileSuperConstructorInvocation(s.Arguments, s.Location)
 		    End If
 		    
-		  ElseIf Self.Type = ObjoScript.FunctionTypes.Method Then
+		  ElseIf Self.Type = FunctionTypes.Method Then
 		    // This is a call to a method on the superclass with the same name as the one we are currently compiling.
 		    CompileSuperMethodInvocation(Self.Func.Signature, s.Arguments, s.Location)
 		    
@@ -1900,7 +1900,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  End If
 		  
 		  // We only allow classes to be declared at the top level of a script.
-		  If Self.Type <> ObjoScript.FunctionTypes.TopLevel Then
+		  If Self.Type <> FunctionTypes.TopLevel Then
 		    Error("Classes can only be declared within the top level of a script.")
 		  End If
 		  
@@ -2062,7 +2062,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Compile the body.
 		  Var compiler As New ObjoScript.Compiler
-		  Var body As ObjoScript.Func = compiler.Compile("constructor", c.Parameters, c.Body, ObjoScript.FunctionTypes.Constructor, CurrentClass, False, Self.DebugMode, True, Self)
+		  Var body As ObjoScript.Func = compiler.Compile("constructor", c.Parameters, c.Body, FunctionTypes.Constructor, CurrentClass, False, Self.DebugMode, True, Self)
 		  
 		  // Store the compiled constructor body as a constant in this function's constant pool
 		  // and push it on to the stack.
@@ -2179,7 +2179,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
 		  // Assert that field access is valid.
-		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		  If Self.Type <> FunctionTypes.Method And Self.Type <> FunctionTypes.Constructor Then
 		    Error("Instance fields can only be accessed from within an instance method or constructor.")
 		  End If
 		  If Self.IsStaticMethod Then
@@ -2377,7 +2377,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Since we don't support closures, we only allow functions to be declared
 		  // at the top level of a script (i.e. not within other functions, methods, class declarations, etc).
-		  If Self.Type <> ObjoScript.FunctionTypes.TopLevel Then
+		  If Self.Type <> FunctionTypes.TopLevel Then
 		    Error("Functions can only be declared within the top level of a script.")
 		  End If
 		  
@@ -2390,7 +2390,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Compile the function body.
 		  Var compiler As New ObjoScript.Compiler
-		  Var f As ObjoScript.Func = compiler.Compile(funcDecl.Name.Lexeme, funcDecl.Parameters, funcDecl.Body, ObjoScript.FunctionTypes.Func, CurrentClass, False, Self.DebugMode, True, Self)
+		  Var f As ObjoScript.Func = compiler.Compile(funcDecl.Name.Lexeme, funcDecl.Parameters, funcDecl.Body, FunctionTypes.Func, CurrentClass, False, Self.DebugMode, True, Self)
 		  
 		  // Store the compiled function as a constant in this function's constant pool.
 		  Call EmitConstant(f)
@@ -2602,7 +2602,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Compile the body.
 		  Var compiler As New ObjoScript.Compiler
-		  Var body As ObjoScript.Func = compiler.Compile(m.Name, m.Parameters, m.Body, ObjoScript.FunctionTypes.Method, CurrentClass, m.IsStatic, Self.DebugMode, True, Self)
+		  Var body As ObjoScript.Func = compiler.Compile(m.Name, m.Parameters, m.Body, FunctionTypes.Method, CurrentClass, m.IsStatic, Self.DebugMode, True, Self)
 		  body.IsSetter = m.IsSetter
 		  
 		  // Store the compiled method body as a constant in this function's constant pool
@@ -2724,14 +2724,14 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Function VisitReturn(r As ObjoScript.ReturnStmt) As Variant
 		  /// Compiles a return statement.
 		  
-		  If Self.Type = ObjoScript.FunctionTypes.TopLevel Then
+		  If Self.Type = FunctionTypes.TopLevel Then
 		    Error("Cannot use the `return` keyword in top-level code.")
 		  End If
 		  
 		  mLocation = r.Location
 		  
 		  // Handle the return value. If none was specified then the parser will synthesise a NothingLiteral.
-		  If Self.Type = ObjoScript.FunctionTypes.Constructor Then
+		  If Self.Type = FunctionTypes.Constructor Then
 		    // Constructors must always return `this` which will be at slot 0 in the call frame.
 		    If r.Value IsA ObjoScript.NothingLiteral Then
 		      EmitBytes(ObjoScript.VM.OP_GET_LOCAL, 0)
@@ -2755,7 +2755,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
 		  // Assert that static field access is valid.
-		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		  If Self.Type <> FunctionTypes.Method And Self.Type <> FunctionTypes.Constructor Then
 		    Error("Static fields can only be accessed from within a method or a constructor.")
 		  End If
 		  
@@ -2890,7 +2890,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = s.Location
 		  
-		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		  If Self.Type <> FunctionTypes.Method And Self.Type <> FunctionTypes.Constructor Then
 		    Error("`super` can only be used within a method or constructor.")
 		  End If
 		  
@@ -2998,7 +2998,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = this.Location
 		  
-		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
+		  If Self.Type <> FunctionTypes.Method And Self.Type <> FunctionTypes.Constructor Then
 		    Error("`this` can only be used within a method or constructor.")
 		  End If
 		  
@@ -3256,12 +3256,20 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndComputedProperty
 
 	#tag Property, Flags = &h0, Description = 5468652074797065206F662066756E6374696F6E2063757272656E746C79206265696E6720636F6D70696C65642E
-		Type As ObjoScript.FunctionTypes = ObjoScript.FunctionTypes.TopLevel
+		Type As FunctionTypes = FunctionTypes.TopLevel
 	#tag EndProperty
 
 
 	#tag Constant, Name = MAX_LOCALS, Type = Double, Dynamic = False, Default = \"256", Scope = Public, Description = 546865206D6178696D756D206E756D626572206F66206C6F63616C207661726961626C657320746861742063616E20626520696E2073636F7065206174206F6E652074696D652E204C696D6974656420746F206F6E6520627974652064756520746F2074686520696E737472756374696F6E2773206F706572616E642073697A652E
 	#tag EndConstant
+
+
+	#tag Enum, Name = FunctionTypes, Type = Integer, Flags = &h21, Description = 54686520646966666572656E74207479706573206F662066756E6374696F6E2E
+		TopLevel
+		  Func
+		  Method
+		Constructor
+	#tag EndEnum
 
 
 	#tag ViewBehavior
