@@ -281,7 +281,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320726177204F626A6F20736F7572636520636F646520696E746F206120746F70206C6576656C2066756E6374696F6E2E204D6179207261697365206120604C65786572457863657074696F6E602C2060506172736572457863657074696F6E60206F722060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
 		Function Compile(source As String) As ObjoScript.Func
-		  /// Compiles raw Objo source code into a top level function. 
+		   /// Compiles raw Objo source code into a top level function. 
 		  /// May raise a `LexerException`, `ParserException` or `CompilerException` if an error occurs.
 		  
 		  Reset
@@ -2902,8 +2902,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compile a `switch` statement.
 		  ///
 		  /// Part of the `ObjoScript.StmtVisitor` interface.
-		  
-		  #Pragma Warning "TODO: Rename `switch` to `select`"
 		  
 		  // Validate the switch statement first.
 		  If switch.Cases.Count = 0 Then
