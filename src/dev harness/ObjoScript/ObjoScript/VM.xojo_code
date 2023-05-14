@@ -303,7 +303,7 @@ Protected Class VM
 		  #Pragma NilObjectChecking False
 		  #Pragma StackOverflowChecking False
 		  
-		  Var argCount As Integer = ObjoScript.Func.ComputeArityFromSignature(signature, Self)
+		  Var argCount As Integer = ObjoScript.ComputeArityFromSignature(signature, Self)
 		  
 		  // Check we have an instance or a class in slot 0.
 		  Var receiver As Variant = APISlots(0)

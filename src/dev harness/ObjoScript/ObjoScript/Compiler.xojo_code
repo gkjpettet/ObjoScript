@@ -37,7 +37,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// The value to assign is assumed to already be on the top of the stack.
 		  
 		  // This might be a setter call so compute its signature now.
-		  Var signature As String = ObjoScript.Func.ComputeSignature(name, 1, True)
+		  Var signature As String = ObjoScript.ComputeSignature(name, 1, True)
 		  Var isSetter As Boolean = False
 		  
 		  Var arg As Integer = ResolveLocal(name)
@@ -1126,7 +1126,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// named `name`.
 		  
 		  // This might be a getter call so compute its signature now.
-		  Var signature As String = ObjoScript.Func.ComputeSignature(name, 0, False)
+		  Var signature As String = ObjoScript.ComputeSignature(name, 0, False)
 		  Var isGetter As Boolean = False
 		  
 		  Var slot As Integer = ResolveLocal(name)
