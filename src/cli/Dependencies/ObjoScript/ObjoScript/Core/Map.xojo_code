@@ -217,13 +217,8 @@ Protected Module Map
 		  Var map As ObjoScript.Instance = vm.GetSlotValue(0)
 		  Var data As Dictionary = ObjoScript.Core.Map.MapData(map.ForeignData).Dict
 		  
-		  // Create a new list instance containing the map's keys.
-		  Var list As New ObjoScript.Instance(vm, vm.ListClass)
-		  list.ForeignData = New ObjoScript.Core.List.ListData
-		  ObjoScript.Core.List.ListData(list.ForeignData).Items = data.Keys
-		  
-		  vm.SetReturn(list)
-		  
+		  // Return a new list instance containing the map's keys.
+		  vm.SetReturn(vm.NewList(data.Keys))
 		End Sub
 	#tag EndMethod
 
@@ -318,13 +313,8 @@ Protected Module Map
 		  Var map As ObjoScript.Instance = vm.GetSlotValue(0)
 		  Var data As Dictionary = ObjoScript.Core.Map.MapData(map.ForeignData).Dict
 		  
-		  // Create a new list instance containing the map's values.
-		  Var list As New ObjoScript.Instance(vm, vm.ListClass)
-		  list.ForeignData = New ObjoScript.Core.List.ListData
-		  ObjoScript.Core.List.ListData(list.ForeignData).Items = data.Values
-		  
-		  vm.SetReturn(list)
-		  
+		  // Return a new list instance containing the map's values.
+		  vm.SetReturn(vm.NewList(data.Values))
 		End Sub
 	#tag EndMethod
 

@@ -109,6 +109,9 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.Caret
 		    Return "^"
 		    
+		  Case ObjoScript.TokenTypes.Case_
+		    Return "Case"
+		    
 		  Case ObjoScript.TokenTypes.Class_
 		    Return "class"
 		    
@@ -124,14 +127,17 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.Constructor
 		    Return "constructor"
 		    
+		  Case ObjoScript.TokenTypes.Do_
+		    Return "do"
+		    
 		  Case ObjoScript.TokenTypes.Dot
 		    Return "dot"
 		    
-		  Case ObjoScript.TokenTypes.DotDot
-		    Return "inclusive range"
+		  Case ObjoScript.TokenTypes.DotDotLess
+		    Return "exclusive range"
 		    
 		  Case ObjoScript.TokenTypes.DotDotDot
-		    Return "exclusive range"
+		    Return "inclusive range"
 		    
 		  Case ObjoScript.TokenTypes.EOF
 		    Return "EOF"
@@ -210,6 +216,9 @@ Protected Module ObjoScript
 		    
 		  Case ObjoScript.TokenTypes.LessLess
 		    Return "<<"
+		    
+		  Case ObjoScript.TokenTypes.Loop_
+		    Return "loop"
 		    
 		  Case ObjoScript.TokenTypes.LParen
 		    Return "lparen"
@@ -292,6 +301,9 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.String_
 		    Return "String"
 		    
+		  Case ObjoScript.TokenTypes.Switch
+		    Return "Switch"
+		    
 		  Case ObjoScript.TokenTypes.Super_
 		    Return "super"
 		    
@@ -306,6 +318,9 @@ Protected Module ObjoScript
 		    
 		  Case ObjoScript.TokenTypes.Underscore
 		    Return "underscore"
+		    
+		  Case ObjoScript.TokenTypes.Until_
+		    Return "until"
 		    
 		  Case ObjoScript.TokenTypes.UppercaseIdentifier
 		    Return "uppercase identifier"
@@ -425,7 +440,7 @@ Protected Module ObjoScript
 			  "&"    : &h0026, _
 			  "'"    : &h0027, _
 			  "("    : &h0028, _
-			  ")"    : &h0028, _
+			  ")"    : &h0029, _
 			  "*"    : &h002A, _
 			  "+"    : &h002B, _
 			  ","    : &h002C, _
@@ -476,13 +491,15 @@ Protected Module ObjoScript
 		  Boolean_
 		  Breakpoint
 		  Caret
+		  Case_
 		  Class_
 		  Colon
 		  Comma
 		  Constructor
 		  Continue_
+		  Do_
 		  Dot
-		  DotDot
+		  DotDotLess
 		  DotDotDot
 		  Else_
 		  EOF
@@ -510,6 +527,7 @@ Protected Module ObjoScript
 		  Less
 		  LessEqual
 		  LessLess
+		  Loop_
 		  LParen
 		  LSquare
 		  Minus
@@ -538,14 +556,16 @@ Protected Module ObjoScript
 		  StaticFieldIdentifier
 		  String_
 		  Super_
+		  Switch
+		  Then_
 		  This
 		  Tilde
 		  Underscore
+		  Until_
 		  UppercaseIdentifier
 		  Var_
 		  While_
-		  Xor_
-		Then_
+		Xor_
 	#tag EndEnum
 
 	#tag Enum, Name = ValueTypes, Type = Integer, Flags = &h1

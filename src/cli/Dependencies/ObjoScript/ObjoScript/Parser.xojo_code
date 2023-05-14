@@ -53,7 +53,7 @@ Protected Class Parser
 		  
 		  Consume(ObjoScript.TokenTypes.RParen, "Expected a closing parenthesis after the assert message.")
 		  
-		  ConsumeNewLine("Expected a new line EOL after the assert statement.")
+		  ConsumeNewLine("Expected a new line after the assert statement.")
 		  
 		  Return New ObjoScript.AssertStmt(condition, message, location)
 		End Function
@@ -98,8 +98,9 @@ Protected Class Parser
 		  Var closingBrace As ObjoScript.Token = _
 		  Consume(ObjoScript.TokenTypes.RCurly, "Expected a closing brace after block.")
 		  
-		  // Edge case: The else keyword is permitted after a closing brace in if statements.
-		  If Not Check(ObjoScript.TokenTypes.Else_) Then
+		  // Edge cases: The `else` keyword is permitted after a closing brace in `if` statements and 
+		  // the `loop` keyword is permitted after a closing brace in `do` loops.
+		  If Not Check(ObjoScript.TokenTypes.Else_, ObjoScript.TokenTypes.Loop_) Then
 		    ConsumeNewLine
 		  End If
 		  
@@ -416,6 +417,36 @@ Protected Class Parser
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 50617273657320612060646F602073746174656D656E742E20417373756D6573207468652060646F6020746F6B656E20686173206A757374206265656E20636F6E73756D65642E
+		Private Function DoStatement() As ObjoScript.Stmt
+		  /// Parses a `do` statement.
+		  /// Assumes the `do` token has just been consumed.
+		  ///
+		  /// ```objo
+		  /// do {
+		  ///  statements
+		  /// } loop until condition
+		  /// ```
+		  
+		  Var doKeyword As ObjoScript.Token = Previous
+		  
+		  // Optional new line.
+		  Call Match(ObjoScript.TokenTypes.EOL)
+		  
+		  // Body.
+		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the `do` keyword.")
+		  Var body As ObjoScript.Stmt = Block
+		  
+		  Consume(ObjoScript.TokenTypes.Loop_, "Expected the `loop` keyword after the closing brace.")
+		  Consume(ObjoScript.TokenTypes.Until_, "Expected the `until` keyword after `loop`.")
+		  
+		  Var condition As ObjoScript.Expr = Expression
+		  
+		  Return New ObjoScript.DoStmt(condition, body, doKeyword)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 526169736573206120506172736572457863657074696F6E206174207468652063757272656E74206C6F636174696F6E2E20496620746865206572726F72206973206E6F74206174207468652063757272656E74206C6F636174696F6E2C20606C6F636174696F6E60206D61792062652070617373656420696E73746561642E
 		Sub Error(message As String, location As ObjoScript.Token = Nil)
 		  /// Raises a ParserException at the current location. If the error is not at the current location,
@@ -491,7 +522,7 @@ Protected Class Parser
 
 	#tag Method, Flags = &h21, Description = 50617273657320612060666F7260206C6F6F702E20417373756D65732077652068617665206A75737420636F6E73756D6564207468652060666F7260206B6579776F72642E
 		Private Function ForEachStatement() As ObjoScript.Stmt
-		  /// Parses a `forEach` loop.
+		  /// Parses a `foreach` loop.
 		  /// Assumes we have just consumed the `foreach` keyword.
 		  ///
 		  /// Syntax:
@@ -719,12 +750,12 @@ Protected Class Parser
 		  TokenTypes.Breakpoint           : Unused, _
 		  TokenTypes.Caret                : BinaryOperator(Precedences.BitwiseXor), _
 		  TokenTypes.Class_               : Unused, _
-		  TokenTypes.Colon                : Unused, _
+		  TokenTypes.Colon                : NewRule(Nil, New KeyValueParselet, Precedences.Range), _
 		  TokenTypes.Comma                : Unused, _
 		  TokenTypes.Constructor          : Unused, _
 		  TokenTypes.Continue_            : Unused, _
 		  TokenTypes.Dot                  : NewRule(Nil, New DotParselet, Precedences.Call_), _
-		  TokenTypes.DotDot               : NewRule(Nil, New RangeParselet, Precedences.Range), _
+		  TokenTypes.DotDotLess           : NewRule(Nil, New RangeParselet, Precedences.Range), _
 		  TokenTypes.DotDotDot            : NewRule(Nil, New RangeParselet, Precedences.Range), _
 		  TokenTypes.Else_                : Unused, _
 		  TokenTypes.EOF                  : Unused, _
@@ -744,7 +775,7 @@ Protected Class Parser
 		  TokenTypes.GreaterEqual         : BinaryOperator(Precedences.Comparison), _
 		  TokenTypes.GreaterGreater       : BinaryOperator(Precedences.BitwiseShift), _
 		  TokenTypes.Identifier           : Prefix(New VariableParselet), _
-		  TokenTypes.If_                  : Unused, _
+		  TokenTypes.If_                  : NewRule(Nil, New ConditionalParselet, Precedences.Assignment), _
 		  TokenTypes.Import               : Unused, _
 		  TokenTypes.In_                  : Unused, _
 		  TokenTypes.Is_                  : NewRule(Nil, New IsParselet, Precedences.Is_), _
@@ -767,7 +798,7 @@ Protected Class Parser
 		  TokenTypes.Plus                 : BinaryOperator(Precedences.Term), _
 		  TokenTypes.PlusEqual            : Unused, _
 		  TokenTypes.PlusPlus             : Postfix, _
-		  TokenTypes.Query                : NewRule(Nil, New ConditionalParselet, Precedences.Assignment), _
+		  TokenTypes.Query                : Unused, _
 		  TokenTypes.RCurly               : Unused, _
 		  TokenTypes.Return_              : Unused, _
 		  TokenTypes.RParen               : Unused, _
@@ -783,7 +814,7 @@ Protected Class Parser
 		  TokenTypes.This                 : Prefix(New ThisParselet), _
 		  TokenTypes.Tilde                : NewRule(New UnaryParselet, Nil, Precedences.None), _
 		  TokenTypes.Underscore           : Unused, _
-		  TokenTypes.UppercaseIdentifier : Prefix(New ClassParselet), _
+		  TokenTypes.UppercaseIdentifier  : Prefix(New ClassParselet), _
 		  TokenTypes.Var_                 : Unused, _
 		  TokenTypes.While_               : Unused, _
 		  TokenTypes.Xor_                 : LogicalOperator(Precedences.LogicalXor) _
@@ -926,7 +957,7 @@ Protected Class Parser
 		  
 		  Static operators() As ObjoScript.TokenTypes = Array( _
 		  ObjoScript.TokenTypes.Ampersand, _
-		  ObjoScript.TokenTypes.DotDot, _
+		  ObjoScript.TokenTypes.DotDotLess, _
 		  ObjoScript.TokenTypes.DotDotDot, _
 		  ObjoScript.TokenTypes.EqualEqual, _
 		  ObjoScript.TokenTypes.ForwardSlash, _
@@ -1114,7 +1145,7 @@ Protected Class Parser
 		  // a normal expression because it requires us to handle the LHS specially
 		  // (it needs to be an lvalue, not an rvalue). 
 		  // So, for each of the kinds of expressions that are valid 
-		  /// lvalues (e.g. names, subscripts, fields, etc) we pass in whether or not 
+		  // lvalues (e.g. names, subscripts, fields, etc) we pass in whether or not 
 		  // it appears in a context loose enough to allow "=". 
 		  // If so, it will parse the "=" itself and handle it appropriately.
 		  Var canAssign As Boolean = precedence <= Precedences.Conditional
@@ -1223,10 +1254,84 @@ Protected Class Parser
 		  ElseIf Match(ObjoScript.TokenTypes.Breakpoint) Then
 		    Return BreakpointStatement
 		    
+		  ElseIf Match(ObjoScript.TokenTypes.Switch) Then
+		    Return SwitchStatement
+		    
+		  ElseIf Match(ObjoScript.TokenTypes.Do_) Then
+		    Return DoStatement
+		    
 		  Else
 		    Return ExpressionStatement
 		  End If
 		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 50617273657320612060737769746368602073746174656D656E742E20417373756D6573207468652070617273657220686173206A75737420636F6E73756D65642074686520607377697463686020746F6B656E2E
+		Private Function SwitchStatement() As ObjoScript.Stmt
+		  /// Parses a `switch` statement. Assumes the parser has just consumed the `switch` token.
+		  ///
+		  /// ```
+		  /// switch consider {
+		  ///  case value1 {}
+		  ///  case value2, value3 {}
+		  ///  else {}
+		  /// }
+		  /// ```
+		  
+		  Var switchKeyword As ObjoScript.Token = Previous
+		  
+		  Var consider As ObjoScript.Expr = Expression
+		  
+		  // Optional newline.
+		  Call Match(ObjoScript.TokenTypes.EOL)
+		  
+		  // Opening brace.
+		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the switch expression to consider.")
+		  
+		  Var cases() As ObjoScript.CaseStmt
+		  While Match(ObjoScript.TokenTypes.Case_)
+		    Var caseKeyword As ObjoScript.Token = Previous
+		    
+		    // Get this case's value(s).
+		    Var values() As ObjoScript.Expr
+		    Do
+		      values.Add(Expression)
+		    Loop Until Not Match(ObjoScript.TokenTypes.Comma)
+		    
+		    // Optional newline.
+		    Call Match(ObjoScript.TokenTypes.EOL)
+		    
+		    // Consume the body block.
+		    Consume(ObjoScript.TokenTypes.LCurly, "Expected a block after the case's value(s).")
+		    Var body As ObjoScript.Stmt = Block
+		    
+		    // Optional newline.
+		    Call Match(ObjoScript.TokenTypes.EOL)
+		    
+		    cases.Add(New ObjoScript.CaseStmt(values, body, caseKeyword))
+		  Wend
+		  
+		  // Optional `else` case.
+		  Var elseCase As ObjoScript.ElseCaseStmt
+		  If Match(ObjoScript.TokenTypes.Else_) Then
+		    Var elseKeyword As ObjoScript.Token = Previous
+		    
+		    // Optional newline.
+		    Call Match(ObjoScript.TokenTypes.EOL)
+		    
+		    // Body.
+		    Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the `else` keyword.")
+		    elseCase = New ObjoScript.ElseCaseStmt(Block, elseKeyword)
+		  End If
+		  
+		  // Optional newline.
+		  Call Match(ObjoScript.TokenTypes.EOL)
+		  
+		  // Closing brace.
+		  Consume(ObjoScript.TokenTypes.RCurly, "Expected a `}` after the final switch case.")
+		  
+		  Return New ObjoScript.SwitchStmt(consider, cases, elseCase, switchKeyword)
 		End Function
 	#tag EndMethod
 
@@ -1339,7 +1444,7 @@ Protected Class Parser
 		BitwiseXor   : ^
 		BitwiseAnd   : &
 		BitwiseShift : << >>
-		Range        : .. ...
+		Range        : ..< ...
 		Term         : + -
 		Factor       : * / %
 		Unary        : - not ~ ++

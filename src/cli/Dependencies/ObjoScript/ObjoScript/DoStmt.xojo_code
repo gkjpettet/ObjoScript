@@ -1,51 +1,45 @@
 #tag Class
-Protected Class TernaryExpr
-Implements ObjoScript.Expr
+Protected Class DoStmt
+Implements ObjoScript.Stmt
 	#tag Method, Flags = &h0
-		Function Accept(visitor As ObjoScript.ExprVisitor) As Variant
-		  /// Part of the ObjoScript.Expr interface.
+		Function Accept(visitor As ObjoScript.StmtVisitor) As Variant
+		  /// Part of the ObjoScript.Stmt interface.
 		  
-		  Return visitor.VisitTernary(Self)
-		  
+		  Return visitor.VisitDoStmt(Self)
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(condition As ObjoScript.Expr, thenBranch As ObjoScript.Expr, elseBranch As ObjoScript.Expr, ifKeyword As ObjoScript.Token)
+		Sub Constructor(condition As ObjoScript.Expr, body As ObjoScript.Stmt, doKeyword As ObjoScript.Token)
 		  Self.Condition = condition
-		  Self.ThenBranch = thenBranch
-		  Self.ElseBranch = elseBranch
-		  mIfKeyword = ifKeyword
+		  Self.Body = body
+		  mDoKeyword = doKeyword
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 546865206069666020746F6B656E2E
+	#tag Method, Flags = &h0, Description = 5468652060646F60206B6579776F726420746F6B656E2E
 		Function Location() As ObjoScript.Token
-		  /// The `if` token.
+		  /// The `do` keyword token.
 		  ///
-		  /// Part of the ObjoScript.Expr interface.
+		  /// Part of the ObjoScript.Stmt interface.
 		  
-		  Return mIfKeyword
+		  Return mDoKeyword
 		  
 		End Function
 	#tag EndMethod
 
 
-	#tag Property, Flags = &h0, Description = 54686520636F6E646974696F6E20746F206576616C756174652E
+	#tag Property, Flags = &h0, Description = 54686520626F6479206F6620746865206C6F6F702E
+		Body As ObjoScript.Stmt
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 546865206C6F6F7020636F6E646974696F6E20746F206576616C756174652E
 		Condition As ObjoScript.Expr
 	#tag EndProperty
 
-	#tag Property, Flags = &h0, Description = 5468652065787072657373696F6E20746F206576616C756174652069662060436F6E646974696F6E60206576616C756174657320746F2066616C73652E
-		ElseBranch As ObjoScript.Expr
-	#tag EndProperty
-
-	#tag Property, Flags = &h21
-		Private mIfKeyword As ObjoScript.Token
-	#tag EndProperty
-
-	#tag Property, Flags = &h0
-		ThenBranch As ObjoScript.Expr
+	#tag Property, Flags = &h21, Description = 5468652060646F60206B6579776F726420746F6B656E2E
+		Private mDoKeyword As ObjoScript.Token
 	#tag EndProperty
 
 

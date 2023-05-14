@@ -517,16 +517,18 @@ Protected Class Lexer
 		  /// Initialises the reserved words dictionary.
 		  /// Key = keyword (case sensitive), Value = ObjoScript.TokenTypes)
 		  
-		  // HACK Create a case sensitive dictionary.
+		  // HACK: Create a case sensitive dictionary.
 		  Var d As Dictionary = ParseJSON("{}")
 		  
 		  d.Value("and")         = ObjoScript.TokenTypes.And_
 		  d.Value("as")          = ObjoScript.TokenTypes.As_
 		  d.Value("assert")      = ObjoScript.TokenTypes.Assert
 		  d.Value("breakpoint")  = ObjoScript.TokenTypes.Breakpoint
+		  d.Value("case")        = ObjoScript.TokenTypes.Case_
 		  d.Value("class")       = ObjoScript.TokenTypes.Class_
 		  d.Value("continue")    = ObjoScript.TokenTypes.Continue_
 		  d.Value("constructor") = ObjoScript.TokenTypes.Constructor
+		  d.Value("do")          = ObjoScript.TokenTypes.Do_
 		  d.Value("else")        = ObjoScript.TokenTypes.Else_
 		  d.Value("exit")        = ObjoScript.TokenTypes.Exit_
 		  d.Value("export")      = ObjoScript.TokenTypes.Export
@@ -539,15 +541,18 @@ Protected Class Lexer
 		  d.Value("import")      = ObjoScript.TokenTypes.Import
 		  d.Value("in")          = ObjoScript.TokenTypes.In_
 		  d.Value("is")          = ObjoScript.TokenTypes.Is_
+		  d.Value("loop")        = ObjoScript.TokenTypes.Loop_
 		  d.Value("not")         = ObjoScript.TokenTypes.Not_
 		  d.Value("nothing")     = ObjoScript.TokenTypes.Nothing
 		  d.Value("or")          = ObjoScript.TokenTypes.Or_
 		  d.Value("return")      = ObjoScript.TokenTypes.Return_
 		  d.Value("static")      = ObjoScript.TokenTypes.Static_
 		  d.Value("super")       = ObjoScript.TokenTypes.Super_
+		  d.Value("switch")      = ObjoScript.TokenTypes.Switch
 		  d.Value("then")        = ObjoScript.TokenTypes.Then_
 		  d.Value("this")        = ObjoScript.TokenTypes.This
 		  d.Value("true")        = ObjoScript.TokenTypes.Boolean_
+		  d.Value("until")       = ObjoScript.TokenTypes.Until_
 		  d.Value("var")         = ObjoScript.TokenTypes.Var_
 		  d.Value("while")       = ObjoScript.TokenTypes.While_
 		  d.Value("xor")         = ObjoScript.TokenTypes.Xor_
@@ -768,8 +773,12 @@ Protected Class Lexer
 		        AddToken(MakeToken(ObjoScript.TokenTypes.DotDotDot, "...")) // ...
 		        Return
 		      Else
-		        AddToken(MakeToken(ObjoScript.TokenTypes.DotDot, "..")) // ..
-		        Return
+		        If Match("<") Then
+		          AddToken(MakeToken(ObjoScript.TokenTypes.DotDotLess, "..<")) // ..<
+		          Return
+		        Else
+		          Error("Unknown operator `..`.")
+		        End If
 		      End If
 		    Else
 		      AddToken(MakeToken(ObjoScript.TokenTypes.Dot, "."))

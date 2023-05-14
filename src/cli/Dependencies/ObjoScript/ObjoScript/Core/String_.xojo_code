@@ -689,19 +689,9 @@ Protected Module String_
 		  // Split the string.
 		  Var columns() As String = s.Split(vm.GetSlotValue(1))
 		  
-		  // Create a new list instance.
-		  Var list As ObjoScript.Instance = New ObjoScript.Instance(vm, vm.ListClass)
-		  list.ForeignData = New ObjoScript.Core.List.ListData
+		  // Return a new list.
+		  vm.SetReturn(vm.NewList(columns))
 		  
-		  // The Xojo compiler isn't smart enough to let us assign our array of
-		  // strings the the list's Variant Items array so we need to loop 
-		  // through it.
-		  For Each column As String In columns
-		    ObjoScript.Core.List.ListData(list.ForeignData).Items.Add(column)
-		  Next column
-		  
-		  // Return the list.
-		  vm.SetReturn(list)
 		  
 		End Sub
 	#tag EndMethod

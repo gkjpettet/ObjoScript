@@ -45,7 +45,7 @@ Implements ObjoScript.Expr
 		Operand As ObjoScript.Expr
 	#tag EndProperty
 
-	#tag ComputedProperty, Flags = &h0, Description = 546865207369676E6174757265206F662074686973207375627363726970742073657474657263616C6C2E
+	#tag ComputedProperty, Flags = &h0, Description = 546865207369676E6174757265206F66207468697320737562736372697074207365747465722063616C6C2E
 		#tag Getter
 			Get
 			  Return mSignature

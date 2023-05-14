@@ -34,7 +34,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Private Sub Assignment(name As String)
 		  /// Compiles an assignment to a variable or setter named `name`.
 		  ///
-		  /// The value to assign will already be on the top of the stack.
+		  /// The value to assign is assumed to already be on the top of the stack.
 		  
 		  // This might be a setter call so compute its signature now.
 		  Var signature As String = ObjoScript.Func.ComputeSignature(name, 1, True)
@@ -124,7 +124,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var index As Integer = AddConstant(name)
 		  
 		  // Push the method's name on to the stack.
-		  EmitGetGlobal(index)
+		  GetGlobal(index)
 		  
 		  // Check the argument count is within the limit.
 		  If arguments.Count > 255 Then
@@ -148,6 +148,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = location
 		  
+		  If slot > 255 Then
+		    Error("The local variable slot must be <= 255.")
+		  End If
+		  
 		  // Tell the VM to push the local variable at `slot` on to the top of the stack.
 		  EmitBytes(ObjoScript.VM.OP_GET_LOCAL, slot)
 		  
@@ -165,6 +169,72 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  EmitBytes(ObjoScript.VM.OP_CALL, arguments.Count)
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 436F6E636174656E61746573206120636173652073746174656D656E7427732076616C756573207573696E6720746865206C6F676963616C20606F7260206F70657261746F7220696E746F20612073696E676C6520636F6E646974696F6E20746861742063616E206265207573656420696E20616E20606966602073746174656D656E742E
+		Private Function CaseValuesToCondition(case_ As ObjoScript.CaseStmt, switchLocation As ObjoScript.Token) As ObjoScript.Expr
+		  /// Concatenates a case statement's values using the logical `or` 
+		  /// operator into a single condition that can be used in an `if` statement.
+		  ///
+		  /// E.g: 
+		  ///
+		  /// ```objo
+		  /// case 10, 20, true, "a"
+		  /// ```
+		  ///
+		  /// becomes:
+		  ///
+		  /// ```objo
+		  /// consider* == 10 or consider* == 20 or consider* == true or consider* == "a"
+		  /// ```
+		  
+		  If case_.Values.Count = 0 Then
+		    Raise New InvalidArgumentException("Did not expect an empty `values()` array.")
+		  End If
+		  
+		  // Create a statement to produce the value of the hidden `consider*` variable.
+		  Var consider As New ObjoScript.VariableExpr(SyntheticToken("consider*", switchLocation.ScriptID))
+		  
+		  // Create a synthetic `or` token.
+		  Var orToken As New ObjoScript.Token(ObjoScript.TokenTypes.Or_, case_.Location.StartPosition, _
+		  case_.Location.LineNumber, "or", case_.Location.ScriptID)
+		  
+		  // Create a synthetic `==` token for the comparison of the case value to `consider*`.
+		  Var equalToken As New ObjoScript.Token(ObjoScript.TokenTypes.EqualEqual, case_.Location.StartPosition, _
+		  case_.Location.LineNumber, "==", case_.Location.ScriptID)
+		  
+		  // Quick exit? If there's only one value then it just needs to be compared to `consider*`.
+		  If case_.Values.Count = 1 Then
+		    Return New ObjoScript.BinaryExpr(consider, equalToken, case_.Values(0))
+		  End If
+		  
+		  // Clone the passed array.
+		  Var stack() As ObjoScript.Expr
+		  For Each value As ObjoScript.Expr In case_.Values
+		    stack.Add(value)
+		  Next value
+		  
+		  // Iterate the stack to create a logical or expression.
+		  While stack.Count > 1
+		    Var left As Variant = stack(0)
+		    Var right As Variant = stack(1)
+		    
+		    // The expressions need to be an equality checks against `consider*`.
+		    left = New ObjoScript.BinaryExpr(consider, equalToken, left)
+		    right = New ObjoScript.BinaryExpr(consider, equalToken, right)
+		    
+		    // Remove the left and right expressions from the stack.
+		    stack.RemoveAt(0)
+		    stack.RemoveAt(0)
+		    
+		    // Push the logical or expression to the front of the stack.
+		    stack.AddAt(0, New ObjoScript.LogicalExpr(left, orToken, right))
+		  Wend
+		  
+		  // stack(0) should now be the logical or expression we need.
+		  Return stack(0)
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 52657475726E7320547275652069662060737562636C617373602068617320286F722068617320696E686572697465642920616E20696E7374616E6365206D6574686F64207769746820607369676E6174757265602E
@@ -260,9 +330,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Resets by default but if this is being called internally (after the compiler has tokenised and parsed the source) 
 		  /// then we skip resetting by setting `shouldResetFirst` to True.
 		  
-		  mStopWatch.Start
-		  
 		  If shouldResetFirst Then Reset
+		  
+		  mStopWatch.Start
 		  
 		  Self.Enclosing = enclosingCompiler
 		  
@@ -295,7 +365,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Call stmt.Accept(Self)
 		  Next stmt
 		  
-		  // Handle an empty body/AST.
+		  // Determine the end location for this AST.
 		  Var endLocation As ObjoScript.Token
 		  If mAST.Count = 0 Then
 		    // Synthesise a fake end location token.
@@ -320,8 +390,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Private Function CompileMainFunction(body() As ObjoScript.Stmt) As ObjoScript.Func
 		  /// Takes an array of statements and returns the compiled entry-level "main" function.
 		  
-		  // Synthesise a token for the (non-existent) opening and closing curly braces and the 
-		  // (non-existent) `function` keyword of this implicit main function.
+		  // Synthesise a token for the (non-existent) opening and closing curly braces.
 		  Var openingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "", -1)
 		  Var closingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.RCurly, 0, 0, "", -1)
 		  
@@ -341,7 +410,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = where
 		  
-		  // Super can only be used in classes.
+		  // `super` can only be used in classes.
 		  If Self.Type <> ObjoScript.FunctionTypes.Constructor Or CurrentClass = Nil Then
 		    Error("You can only call a superclass constructor from within a constructor.")
 		  End If
@@ -393,7 +462,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = where
 		  
-		  // Super can only be used in classes.
+		  // `super` can only be used in classes.
 		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
 		    Error("`super` can only be used within a method or constructor.")
 		  End If
@@ -496,7 +565,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// actually undeclare variables or pop any scopes. 
 		  /// Returns the number of local variables that were eliminated.
 		  ///
-		  /// This is called directly when compiling "exit" statements to ditch the local variables
+		  /// This is called directly when compiling `continue` and `exit` statements to ditch the local variables
 		  /// before jumping out of the loop even though they are still in scope *past*
 		  /// the exit instruction.
 		  
@@ -565,28 +634,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Return index
 		  
 		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21, Description = 456D69747320616E20696E737472756374696F6E20746F20676574206120676C6F62616C207661726961626C652077686F7365206E616D652069732073746F72656420696E2074686520636F6E7374616E7420706F6F6C2061742060696E6465786020616E642070757368206974206F6E746F2074686520737461636B2E
-		Private Sub EmitGetGlobal(index As Integer, location As ObjoScript.Token = Nil)
-		  /// Emits an instruction to get a global variable whose name is stored in 
-		  /// the constant pool at `index` and push it onto the stack.
-		  ///
-		  /// It's a convenience method that exists to simplify the fact that there are two GET_GLOBAL 
-		  // instructions which depend on the size of `index`.
-		  
-		  location = If(location = Nil, mLocation, location)
-		  
-		  If index <= 255 Then
-		    // We only need a single byte operand to specify the index of the variable's name in the constant pool.
-		    EmitBytes(ObjoScript.VM.OP_GET_GLOBAL, index, location)
-		  Else
-		    // We need two bytes for the operand.
-		    EmitByte(ObjoScript.VM.OP_GET_GLOBAL_LONG, location)
-		    EmitUInt16(index, location)
-		  End If
-		  
-		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 49662060696E64657860203C3D20323535207468656E206073686F72744F70636F64656020697320656D697474656420666F6C6C6F776564206279207468652073696E676C6520627974652060696E646578602E204F746865727769736520606C6F6E674F70636F64656020697320656D697474656420666F6C6C6F776564206279207468652074776F20627974652060696E646578602E
@@ -682,8 +729,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 43616C6C6564207768656E2074686520636F6D70696C65722066696E69736865732E
-		Sub EndCompiler(location As ObjoScript.Token)
+	#tag Method, Flags = &h21, Description = 43616C6C6564207768656E2074686520636F6D70696C65722066696E69736865732E
+		Private Sub EndCompiler(location As ObjoScript.Token)
 		  /// Called when the compiler finishes.
 		  
 		  // Implicitly return an appropriate value if the user did not explictly specify one.
@@ -782,6 +829,21 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 456D69747320746865204F505F4A554D505F49465F5452554520696E737472756374696F6E20616E6420616E204F505F504F50207573656420746F207465737420746865206C6F6F7020636F6E646974696F6E20616E6420706F74656E7469616C6C79206578697420746865206C6F6F702E204B6565707320747261636B206F662074686520696E737472756374696F6E20736F2077652063616E207061746368206974206C61746572206F6E6365207765206B6E6F772077686572652074686520656E64206F662074686520626F64792069732E
+		Private Sub ExitLoopIfTrue()
+		  /// Emits the OP_JUMP_IF_TRUE instruction and an OP_POP used to test the loop condition and
+		  /// potentially exit the loop. Keeps track of the instruction so we can patch it
+		  /// later once we know where the end of the body is.
+		  ///
+		  /// Assumes a loop is currently being compiled.
+		  
+		  Self.CurrentLoop.ExitJump = EmitJump(ObjoScript.VM.OP_JUMP_IF_TRUE)
+		  
+		  // Pop the condition before executing the body.
+		  EmitByte(ObjoScript.VM.OP_POP)
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 41737369676E207468652076616C7565206F6E2074686520746F70206F662074686520737461636B20746F2074686520737065636966696564206669656C642E
 		Private Sub FieldAssignment(fieldName As String)
 		  /// Assign the value on the top of the stack to the specified field.
@@ -805,9 +867,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52657475726E7320746865206669656C6420696E646578206F6620606669656C644E616D656020666F72202A746869732A20636C61737320286E6F74207375706572636C6173736573292E20546869732069732074686520696E646578207468652072756E74696D652077696C6C206163636573732E
+	#tag Method, Flags = &h21, Description = 52657475726E7320746865206669656C6420696E646578206F6620606669656C644E616D656020666F72202A746869732A20636C61737320286E6F7420616E79207375706572636C6173736573292E20546869732069732074686520696E646578207468652072756E74696D652077696C6C206163636573732E204966207468657265206973206E6F206669656C6420776974682074686973206E616D65207468656E2061206E6577206F6E6520697320637265617465642E
 		Private Function FieldIndex(fieldName As String) As Integer
-		  /// Returns the field index of `fieldName` for *this* class (not any superclasses). This is the index the runtime will access.
+		  /// Returns the field index of `fieldName` for *this* class (not any superclasses). 
+		  /// This is the index the runtime will access.
+		  /// If there is no field with this name then a new one is created.
 		  
 		  For i As Integer = 0 To CurrentClass.Fields.LastIndex
 		    If CurrentClass.Fields(i).CompareCase(fieldName) Then
@@ -911,10 +975,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  StartLoop
 		  
 		  // Compile the condition.
-		  // Inclusive: `loopCounter <= range.upper`
-		  // Exclusive: `loopCounter < range.upper`
+		  // Inclusive (...): `loopCounter <= range.upper`
+		  // Exclusive (..<): `loopCounter < range.upper`
 		  Var operator As ObjoScript.Token
-		  If range.Operator.Type = ObjoScript.TokenTypes.DotDot Then
+		  If range.Operator.Type = ObjoScript.TokenTypes.DotDotDot Then
 		    operator = SyntheticOperatorToken(ObjoScript.TokenTypes.LessEqual)
 		  Else
 		    operator = SyntheticOperatorToken(ObjoScript.TokenTypes.Less)
@@ -943,6 +1007,28 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 456D69747320616E20696E737472756374696F6E20746F20676574206120676C6F62616C207661726961626C652077686F7365206E616D652069732073746F72656420696E2074686520636F6E7374616E7420706F6F6C2061742060696E6465786020616E642070757368206974206F6E746F2074686520737461636B2E
+		Private Sub GetGlobal(index As Integer, location As ObjoScript.Token = Nil)
+		  /// Emits an instruction to get a global variable whose name is stored in 
+		  /// the constant pool at `index` and push it onto the stack.
+		  ///
+		  /// It's a convenience method that exists to simplify the fact that there are two GET_GLOBAL 
+		  // instructions which depend on the size of `index`.
+		  
+		  location = If(location = Nil, mLocation, location)
+		  
+		  If index <= 255 Then
+		    // We only need a single byte operand to specify the index of the variable's name in the constant pool.
+		    EmitBytes(ObjoScript.VM.OP_GET_GLOBAL, index, location)
+		  Else
+		    // We need two bytes for the operand.
+		    EmitByte(ObjoScript.VM.OP_GET_GLOBAL_LONG, location)
+		    EmitUInt16(index, location)
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 526574726965766573206120676C6F62616C207661726961626C65206E616D656420606E616D65602E
 		Private Sub GlobalVariable(name As String)
 		  /// Retrieves a global variable named `name`.
@@ -951,7 +1037,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var index As Integer = AddConstant(name)
 		  
 		  // Push the variable on to the stack.
-		  EmitGetGlobal(index)
+		  GetGlobal(index)
 		  
 		End Sub
 	#tag EndMethod
@@ -1043,11 +1129,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var signature As String = ObjoScript.Func.ComputeSignature(name, 0, False)
 		  Var isGetter As Boolean = False
 		  
-		  Var arg As Integer = ResolveLocal(name)
-		  If arg <> -1 Then
+		  Var slot As Integer = ResolveLocal(name)
+		  If slot <> -1 Then
 		    // Simplest case - retrieve a local variable.
-		    // Tell the VM to push the value at slot `arg` on to the top of the stack.
-		    EmitBytes(ObjoScript.VM.OP_GET_LOCAL, arg)
+		    // Tell the VM to push the value at slot `slot` on to the top of the stack.
+		    EmitBytes(ObjoScript.VM.OP_GET_LOCAL, slot)
 		    
 		  ElseIf Self.Type = ObjoScript.FunctionTypes.Method Or Self.Type = ObjoScript.FunctionTypes.Constructor Then
 		    // We're within a method or constructor.
@@ -1134,7 +1220,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag Method, Flags = &h21, Description = 54616B657320746865206F666673657420696E207468652063757272656E74206368756E6B206F6620746865207374617274206F662061206A756D7020706C616365686F6C64657220616E64207265706C616365732074686520706C616365686F6C6465722077697468207468652074686520616D6F756E74206E656564656420746F20616464656420746F2074686520564D277320495020746F20636175736520697420746F206A756D7020746F207468652063757272656E7420706F736974696F6E20696E20746865206368756E6B2E
 		Private Sub PatchJump(offset As Integer)
 		  /// Takes the offset in the current chunk of the start of a jump placeholder and 
-		  /// replaces the placeholder with the the amount needed to added to the VM's IP to 
+		  /// replaces that placeholder with the the amount needed to added to the VM's IP to 
 		  /// cause it to jump to the current position in the chunk.
 		  
 		  // Compute the distance to jump to get from the end of the placeholder operand to 
@@ -1161,7 +1247,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles a "++" or "--" postfix expression.
 		  /// Assumes `postfix` is a "++" or "--" expression.
 		  
-		  // The "++" and "--" operators require a variable or field as their left hand operand.
+		  // The `++` and `--` operators require a variable or field as their left hand operand.
 		  Select Case postfix.Operand
 		  Case IsA ObjoScript.VariableExpr, IsA ObjoScript.FieldExpr, IsA ObjoScript.StaticFieldExpr
 		    // Allowed.
@@ -1300,6 +1386,103 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 44652D73756761727320612060737769746368602073746174656D656E7420746F20616E20606966602073746174656D656E7420656E636C6F7365642077697468696E206120626C6F636B2E
+		Private Function SwitchToBlock(sw As ObjoScript.SwitchStmt) As ObjoScript.BlockStmt
+		  /// De-sugars a `switch` statement to an `if` statement enclosed within a block.
+		  ///
+		  /// We de-sugar the switch statement to a series of `if` statements.
+		  /// We only evaluate the `consider` expression once and make it available as a 
+		  /// secret local variable (`consider*`).
+		  ///
+		  /// ```objo
+		  /// switch consider {
+		  ///  case a, b {
+		  ///   // First case.
+		  ///  }
+		  ///  case is < 10 {
+		  ///   // Second case.
+		  ///  }
+		  ///  else {
+		  ///   // Default case.
+		  ///  }
+		  /// }
+		  /// ```
+		  ///
+		  /// becomes:
+		  ///
+		  /// ```objo
+		  /// {
+		  ///  var consider* = consider
+		  ///  if (a == consider*) or (b == consider*) {
+		  ///    // First case.
+		  ///  } else if consider* < 10 {
+		  ///    // Second case.
+		  ///  } else {
+		  //     // Default case.
+		  ///  }
+		  /// }
+		  /// ```
+		  ///
+		  /// Assumes the switch statement contains at least one case.
+		  
+		  // Create an array to hold the statements of the block we will return.
+		  Var statements() As ObjoScript.Stmt
+		  
+		  // First we need to declare a variable named `consider*` and assign to it the switch statement's
+		  // `consider` expression.
+		  Var consider As New ObjoScript.VarDeclStmt(SyntheticToken("consider*", sw.Location.ScriptID), _
+		  sw.Consider, sw.Location)
+		  statements.Add(consider)
+		  
+		  // We need a stack so we can avoid recursion.
+		  Var stack() As ObjoScript.Stmt
+		  For Each expr As ObjoScript.CaseStmt In sw.Cases
+		    stack.Add(ObjoScript.Stmt(expr))
+		  Next expr
+		  
+		  // Create a new if statement from the first case that will contain the other cases.
+		  Var if_ As New ObjoScript.IfStmt(CaseValuesToCondition(sw.Cases(0), sw.Location), sw.Cases(0).Body, Nil, sw.Cases(0).Location)
+		  
+		  // Add the parent if to the front of the stack.
+		  stack.AddAt(0, ObjoScript.Stmt(if_))
+		  
+		  While stack.Count > 1
+		    // The front of the stack is always the if statement we're going to return.
+		    Var parentIf As ObjoScript.IfStmt = ObjoScript.IfStmt(stack(0))
+		    
+		    // The adjacent value in the stack will be the next case.
+		    Var case_ As ObjoScript.CaseStmt = ObjoScript.CaseStmt(stack(1))
+		    
+		    // Remove the left and right values from the stack.
+		    stack.RemoveAt(0)
+		    stack.RemoveAt(0)
+		    
+		    // Create an "elseif" branch from this case.
+		    Var elif As New ObjoScript.IfStmt(CaseValuesToCondition(case_, sw.Location), case_.Body, Nil, case_.Location)
+		    
+		    // Set this elseif statement as the "else" branch of the preceding if statement.
+		    parentIf.ElseBranch = elif
+		    
+		    // Add the parent `if` to the front of the stack.
+		    stack.AddAt(0, ObjoScript.Stmt(parentIf))
+		  Wend
+		  
+		  // Optional final switch "else" case.
+		  If sw.ElseCase <> Nil Then
+		    ObjoScript.IfStmt(ObjoScript.IfStmt(stack(0)).ElseBranch).ElseBranch = sw.ElseCase.Body
+		  End If
+		  
+		  // stack(0) should be the `if` statement we need.
+		  statements.Add(ObjoScript.IfStmt(stack(0)))
+		  
+		  // Wrap these statements in a synthetic block and return.
+		  Var openingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "{", sw.Location.ScriptID)
+		  Var closingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "}", sw.Location.ScriptID)
+		  Return New ObjoScript.BlockStmt(statements, openingBrace, closingBrace)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 52657475726E7320612073796E746865746963206E756D626572206C69746572616C20746F6B656E2077697468206076616C756560206174206C696E6520302C20706F73203020696E20607363726970744944602E
 		Private Function SyntheticNumberToken(value As Double, isInteger As Boolean, scriptID As Integer = -1) As ObjoScript.Token
 		  /// Returns a synthetic number literal token with `value` at line 0, pos 0 in `scriptID`.
@@ -1322,9 +1505,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52657475726E7320612073796E74686574696320746F6B656E206174206C696E6520302C20706F732030207769746820606C6578656D656020696E20607363726970744944602E
+	#tag Method, Flags = &h21, Description = 52657475726E7320612073796E746865746963206964656E74696669657220746F6B656E206174206C696E6520302C20706F732030207769746820606C6578656D656020696E20607363726970744944602E
 		Private Function SyntheticToken(lexeme As String, scriptID As Integer = -1) As ObjoScript.Token
-		  /// Returns a synthetic token at line 0, pos 0 with `lexeme` in `scriptID`.
+		  /// Returns a synthetic identifier token at line 0, pos 0 with `lexeme` in `scriptID`.
 		  
 		  Return New ObjoScript.Token(ObjoScript.TokenTypes.Identifier, 0, 0, lexeme, scriptID)
 		  
@@ -1425,8 +1608,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // a global function call.
 		  Var isMethod, isStatic As Boolean = False
 		  
-		  if bi.MethodName = "foo" then Break
-		  
 		  If CurrentClass <> Nil Then
 		    If ClassHierarchyHasInstanceMethodWithSignature(CurrentClass, bi.Signature) Then
 		      isMethod = True
@@ -1473,8 +1654,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Call arg.Accept(Self)
 		  Next arg
 		  
-		  // Emit the OP_INVOKE instruction and the index of the method's signature in the constant pool
+		  // Emit the OP_INVOKE instruction and the index of the method's signature in the constant pool.
 		  EmitIndexedOpcode(ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_INVOKE_LONG, index, bi.Location)
+		  
+		  If bi.Arguments.Count > 255 Then
+		    Error("An invocation cannot have more than 255 arguments.")
+		  End If
 		  
 		  // Emit the argument count.
 		  EmitByte(bi.Arguments.Count, bi.Location)
@@ -1489,7 +1674,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = s.Location
 		  
-		  // Super can only be used in classes.
+		  // `super` can only be used in classes.
 		  If Self.Type <> ObjoScript.FunctionTypes.Method And Self.Type <> ObjoScript.FunctionTypes.Constructor Then
 		    Error("`super` can only be used within a method or constructor.")
 		  End If
@@ -1670,6 +1855,18 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120636173652077697468696E20612060737769746368602073746174656D656E742E
+		Function VisitCaseStmt(c As ObjoScript.CaseStmt) As Variant
+		  /// Compiles a case within a `switch` statement.
+		  ///
+		  /// Part of the `ObjoScript.StmtVisitor` interface.
+		  
+		  // The compiler doesn't visit this as switch statements are compiled into nested `if` statements.
+		  #Pragma Unused c
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D70696C65732072657472696576696E67206120676C6F62616C20636C6173732E
 		Function VisitClass(c As ObjoScript.ClassExpr) As Variant
 		  /// Compiles retrieving a global class.
@@ -1679,7 +1876,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var index As Integer = AddConstant(c.Name)
 		  
 		  // Push the class on to the stack.
-		  EmitGetGlobal(index)
+		  GetGlobal(index)
 		  
 		End Function
 	#tag EndMethod
@@ -1769,7 +1966,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  DefineVariable(index)
 		  
 		  // Push the class back on to the stack so the methods can find it.
-		  EmitGetGlobal(index)
+		  GetGlobal(index)
 		  
 		  If Not bootstrapping Then
 		    If c.HasSuperclass Then
@@ -1899,6 +2096,41 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 436F6D70696C6520612060646F60206C6F6F702E
+		Function VisitDoStmt(stmt As ObjoScript.DoStmt) As Variant
+		  /// Compile a `do` loop.
+		  ///
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  
+		  // Track our location.
+		  mLocation = stmt.Location
+		  
+		  StartLoop
+		  
+		  LoopBody(stmt.Body)
+		  
+		  Call stmt.Condition.Accept(Self)
+		  
+		  ExitLoopIfTrue
+		  
+		  EndLoop
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C6573207468652060656C7365602063617365206F6620612060737769746368602073746174656D656E742E
+		Function VisitElseCaseStmt(ec As ObjoScript.ElseCaseStmt) As Variant
+		  /// Compiles the `else` case of a `switch` statement.
+		  ///
+		  /// Part of the `ObjoScript.StmtVisitor` interface.
+		  
+		  // The compiler doesn't visit this as switch statements are compiled into nested `if` statements.
+		  #Pragma Unused ec
+		  
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 436F6D70696C6520616E206065786974602073746174656D656E742E
 		Function VisitExitStmt(stmt As ObjoScript.ExitStmt) As Variant
 		  /// Compile an `exit` statement.
@@ -2017,12 +2249,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// The VM then calls `iteratorValue()` on `seq*` and passes in the iterator value that it just got from calling `iterate()`. 
 		  /// The sequence uses that to look up and return the appropriate element.
 		  
+		  // Track the current location.
 		  mLocation = stmt.Location
 		  
 		  BeginScope
-		  
-		  // Track the current location.
-		  mLocation = stmt.Location
 		  
 		  // Declare iter* as nothing.
 		  EmitByte(ObjoScript.VM.OP_NOTHING)
@@ -2204,7 +2434,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // code inside the "else branch".
 		  EmitByte(ObjoScript.VM.OP_POP)
 		  
-		  // Compile the optional "else" branch statements.
+		  // Compile the optional "else" branch statement.
 		  If ifstmt.ElseBranch <> Nil Then
 		    Call ifstmt.ElseBranch.Accept(Self)
 		  End If
@@ -2413,7 +2643,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Call arg.Accept(Self)
 		  Next arg
 		  
-		  // Emit the OP_INVOKE instruction and the index of the method's signature in the constant pool
+		  // Emit the OP_INVOKE instruction and the index of the method's signature in the constant pool.
 		  EmitIndexedOpcode(ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_INVOKE_LONG, index, m.Location)
 		  
 		  // Emit the argument count.
@@ -2447,9 +2677,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C65206120706F73742D6669782065787072657373696F6E2E
+	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120706F73746669782065787072657373696F6E2E
 		Function VisitPostfix(expr As ObjoScript.PostfixExpr) As Variant
-		  /// Compile a post-fix expression.
+		  /// Compiles a postfix expression.
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
@@ -2467,7 +2697,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320616E20696E636C757369766520282E2E29206F72206578636C757369766520282E2E2E292072616E67652065787072657373696F6E2E
 		Function VisitRange(r As ObjoScript.RangeExpr) As Variant
-		  /// Compiles an inclusive (..) or exclusive (...) range expression.
+		  /// Compiles an inclusive (...) or exclusive (..<) range expression.
 		  ///
 		  /// a RANGE_OP b becomes: 
 		  ///  RANGE_OP  
@@ -2500,7 +2730,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = r.Location
 		  
-		  // Handle the return value. If none was specified then the parser will synthesis a NothingLiteral.
+		  // Handle the return value. If none was specified then the parser will synthesise a NothingLiteral.
 		  If Self.Type = ObjoScript.FunctionTypes.Constructor Then
 		    // Constructors must always return `this` which will be at slot 0 in the call frame.
 		    If r.Value IsA ObjoScript.NothingLiteral Then
@@ -2579,12 +2809,16 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Load the signature into the constant pool.
 		  Var index As Integer = AddConstant(s.Signature)
 		  
+		  If s.Indices.Count > 255 Then
+		    Error("The maximum number of subscript indexes is 255.")
+		  End If
+		  
 		  // Compile the indices.
 		  For Each i As ObjoScript.Expr In s.Indices
 		    Call i.Accept(Self)
 		  Next i
 		  
-		  // Emit the OP_INVOKE instruction and the index of the method's signature in the constant pool
+		  // Emit the OP_INVOKE instruction and the index of the method's signature in the constant pool.
 		  EmitIndexedOpcode(ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_INVOKE_LONG, index, s.Location)
 		  
 		  // Emit the index count.
@@ -2607,6 +2841,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Compile the operand to put it on the stack.
 		  Call s.Operand.Accept(Self)
 		  
+		  // 254 not 255 because the value to assign to a setter has to be accounted for.
+		  If s.Indices.Count > 254 Then
+		    Error("The maximum number of subscript indexes is 254.")
+		  End If
+		  
 		  // Compile the arguments.
 		  For Each arg As ObjoScript.Expr In s.Indices
 		    Call arg.Accept(Self)
@@ -2615,7 +2854,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Compile the value to assign.
 		  Call s.ValueToAssign.Accept(Self)
 		  
-		  // Emit the OP_INVOKE instruction and the index of the signature in the constant pool
+		  // Emit the OP_INVOKE instruction and the index of the signature in the constant pool.
 		  EmitIndexedOpcode(ObjoScript.VM.OP_INVOKE, ObjoScript.VM.OP_INVOKE_LONG, index, s.Location)
 		  
 		  // Emit the argument count.
@@ -2686,11 +2925,31 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Compile the value to assign.
 		  Call s.ValueToAssign.Accept(Self)
 		  
-		  // Emit the OP_SUPER_SETTER instruction, the superclass name and the index of the 
+		  // Emit the OP_SUPER_SETTER instruction, the superclass name index and the index of the 
 		  // method's signature in the constant pool.
 		  EmitByte(ObjoScript.VM.OP_SUPER_SETTER, s.Location)
 		  EmitUInt16(superNameIndex, s.Location)
 		  EmitUInt16(index, s.Location)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C6520612060737769746368602073746174656D656E742E
+		Function VisitSwitchStmt(switch As ObjoScript.SwitchStmt) As Variant
+		  /// Compile a `switch` statement.
+		  ///
+		  /// Part of the `ObjoScript.StmtVisitor` interface.
+		  
+		  // Validate the switch statement first.
+		  If switch.Cases.Count = 0 Then
+		    Error("A switch statement must include at least one case.")
+		  End If
+		  
+		  // Convert this switch statement to an `if...else` statement contained within a block.
+		  Var block As ObjoScript.BlockStmt = SwitchToBlock(switch)
+		  
+		  // Visit the newly created if statement.
+		  Call block.Accept(Self)
 		  
 		End Function
 	#tag EndMethod
@@ -2860,7 +3119,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  EndLoop
 		  
-		  
 		End Function
 	#tag EndMethod
 
@@ -2883,7 +3141,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		CurrentChunk As ObjoScript.Chunk
 	#tag EndComputedProperty
 
-	#tag Property, Flags = &h21, Description = 49662074686520636F6D70696C65722069732063757272656E746C7920636F6D70696C696E67206120636C6173732C207468697320646174612061626F75742069742028696E636C7564696E6720697473206465636C61726174696F6E292E204D6179206265204E696C2E
+	#tag Property, Flags = &h21, Description = 446174612061626F75742074686520636C61732063757272656E746C79206265696E6720636F6D70696C6564206F72206E696C2069662074686520636F6D70696C65722069736E27742063757272656E746C7920636F6D70696C696E67206120636C6173732E
 		Private CurrentClass As ObjoScript.ClassData
 	#tag EndProperty
 

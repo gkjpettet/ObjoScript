@@ -97,16 +97,13 @@ Protected Module List
 		  
 		  Var data As ObjoScript.Core.List.ListData = list.ForeignData
 		  
-		  Var newList As New ObjoScript.Instance(vm, vm.ListClass)
-		  Var newListData As New ObjoScript.Core.List.ListData
-		  
+		  // Shallow clone the items.
+		  Var clonedItems() As Variant
 		  For Each item As Variant In data.Items
-		    newListData.Items.Add(item)
+		    clonedItems.Add(item)
 		  Next item
 		  
-		  newList.ForeignData = newListData
-		  
-		  Return newList
+		  Return vm.NewList(clonedItems)
 		  
 		End Function
 	#tag EndMethod
@@ -148,15 +145,14 @@ Protected Module List
 		    End If
 		  End If
 		  
-		  // Create the list.
-		  Var list As New ObjoScript.Instance(vm, vm.ListClass)
-		  list.ForeignData = New ObjoScript.Core.List.ListData
+		  // Construct an array with the new list's items.
+		  Var newItems() As Variant
 		  For i As Integer = 1 To size
-		    ObjoScript.Core.List.ListData(list.ForeignData).Items.Add(element)
+		    newItems.Add(element)
 		  Next i
 		  
-		  // Return the new list.
-		  vm.SetReturn(list)
+		  // Return a new list.
+		  vm.SetReturn(vm.NewList(newItems))
 		End Sub
 	#tag EndMethod
 
@@ -190,6 +186,7 @@ Protected Module List
 		  d.Value("insert(_,_)")      = AddressOf Insert
 		  d.Value("iterate(_)")       = AddressOf Iterate
 		  d.Value("iteratorValue(_)") = AddressOf IteratorValue
+		  d.Value("pop()")            = AddressOf Pop
 		  d.Value("remove(_)")        = AddressOf Remove
 		  d.Value("removeAt(_)")      = AddressOf RemoveAt
 		  d.Value("swap(_,_)")        = AddressOf Swap
@@ -339,6 +336,26 @@ Protected Module List
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1, Description = 506F707320746865206869676865737420696E646578206974656D206F666620746865206C69737420616E642072657475726E732069742E204974277320612072756E74696D65206572726F7220696620746865206C69737420697320656D7074792E
+		Protected Sub Pop(vm As ObjoScript.VM)
+		  /// Pops the highest index item off the list and returns it. 
+		  /// It's a runtime error if the list is empty.
+		  ///
+		  /// Assumes:
+		  /// - Slot 0 contains a List instance.
+		  /// List.pop() -> item
+		  
+		  Var data As ObjoScript.Core.List.ListData = ObjoScript.Instance(vm.GetSlotValue(0)).ForeignData
+		  
+		  If data.Items.Count = 0 Then
+		    vm.Error("Cannot pop an empty list.")
+		  Else
+		    vm.SetReturn(data.Items.Pop)
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h1, Description = 52656D6F766573207468652066697273742076616C756520666F756E642074686174206D6174636865732074686520676976656E206076616C7565602E20547261696C696E6720656C656D656E747320617265207368696674656420757020746F2066696C6C20696E207768657265207468652072656D6F76656420656C656D656E74207761732E2052657475726E73207468652072656D6F7665642076616C756520696620666F756E64206F72206E6F7468696E67206966206E6F7420666F756E642E
 		Protected Sub Remove(vm As ObjoScript.VM)
 		  /// Removes the first value found that matches the given `value`.
@@ -442,12 +459,8 @@ Protected Module List
 		    // E.g: list[1..2]
 		    Var rangeIndices() As Variant = ObjoScript.Core.List.ListData(ObjoScript.Instance(arg).ForeignData).Items
 		    
-		    // Create a new list instance.
-		    Var newList As New ObjoScript.Instance(vm, vm.ListClass)
-		    Var newListData As New ObjoScript.Core.List.ListData
-		    newList.ForeignData = newListData
-		    
-		    // Copy the elements in the specified range.
+		    // Copy the items in the specified range.
+		    Var newListItems() As Variant
 		    For Each v As Variant In rangeIndices
 		      If Not ObjoScript.VariantIsPositiveInteger(v) Then
 		        vm.Error("Expected range index to be a positive integer. Instead got `" + vm.ValueToString(v) + "`.")
@@ -455,10 +468,11 @@ Protected Module List
 		      If v < 0 Or v > data.Items.LastIndex Then
 		        vm.Error("Range index is out of bounds.")
 		      End If
-		      newListData.Items.Add(data.Items(v))
+		      newListItems.Add(data.Items(v))
 		    Next v
 		    
-		    vm.SetReturn(newList)
+		    // Return a new list.
+		    vm.SetReturn(vm.NewList(newListItems))
 		    
 		    Return
 		  Else
@@ -490,10 +504,11 @@ Protected Module List
 		  
 		  Var data As ObjoScript.Core.List.ListData = instance.ForeignData
 		  
+		  // Adjust `index`, accounting for backwards counting.
+		  index = If(index >= 0, index, data.Count + index)
+		  
 		  // Bounds check.
-		  If index < 0 Then
-		    vm.Error("Subscript index must be >= 0.")
-		  ElseIf index > data.Items.LastIndex Then
+		  If index < 0 Or index > data.Items.LastIndex Then
 		    vm.Error("Subscript index out of bounds (" + index.ToString + ").")
 		  End If
 		  
