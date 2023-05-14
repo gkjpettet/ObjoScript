@@ -127,6 +127,9 @@ Protected Module ObjoScript
 		  Case ObjoScript.TokenTypes.Constructor
 		    Return "constructor"
 		    
+		  Case ObjoScript.TokenTypes.Do_
+		    Return "do"
+		    
 		  Case ObjoScript.TokenTypes.Dot
 		    Return "dot"
 		    
@@ -213,6 +216,9 @@ Protected Module ObjoScript
 		    
 		  Case ObjoScript.TokenTypes.LessLess
 		    Return "<<"
+		    
+		  Case ObjoScript.TokenTypes.Loop_
+		    Return "loop"
 		    
 		  Case ObjoScript.TokenTypes.LParen
 		    Return "lparen"
@@ -312,6 +318,9 @@ Protected Module ObjoScript
 		    
 		  Case ObjoScript.TokenTypes.Underscore
 		    Return "underscore"
+		    
+		  Case ObjoScript.TokenTypes.Until_
+		    Return "until"
 		    
 		  Case ObjoScript.TokenTypes.UppercaseIdentifier
 		    Return "uppercase identifier"
@@ -552,6 +561,7 @@ Protected Module ObjoScript
 		  This
 		  Tilde
 		  Underscore
+		  Until_
 		  UppercaseIdentifier
 		  Var_
 		  While_

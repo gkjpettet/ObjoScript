@@ -98,8 +98,9 @@ Protected Class Parser
 		  Var closingBrace As ObjoScript.Token = _
 		  Consume(ObjoScript.TokenTypes.RCurly, "Expected a closing brace after block.")
 		  
-		  // Edge case: The else keyword is permitted after a closing brace in if statements.
-		  If Not Check(ObjoScript.TokenTypes.Else_) Then
+		  // Edge cases: The `else` keyword is permitted after a closing brace in `if` statements and 
+		  // the `loop` keyword is permitted after a closing brace in `do` loops.
+		  If Not Check(ObjoScript.TokenTypes.Else_, ObjoScript.TokenTypes.Loop_) Then
 		    ConsumeNewLine
 		  End If
 		  
@@ -412,6 +413,36 @@ Protected Class Parser
 		  Else
 		    Return Statement
 		  End If
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 50617273657320612060646F602073746174656D656E742E20417373756D6573207468652060646F6020746F6B656E20686173206A757374206265656E20636F6E73756D65642E
+		Private Function DoStatement() As ObjoScript.Stmt
+		  /// Parses a `do` statement.
+		  /// Assumes the `do` token has just been consumed.
+		  ///
+		  /// ```objo
+		  /// do {
+		  ///  statements
+		  /// } loop until condition
+		  /// ```
+		  
+		  Var doKeyword As ObjoScript.Token = Previous
+		  
+		  // Optional new line.
+		  Call Match(ObjoScript.TokenTypes.EOL)
+		  
+		  // Body.
+		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the `do` keyword.")
+		  Var body As ObjoScript.Stmt = Block
+		  
+		  Consume(ObjoScript.TokenTypes.Loop_, "Expected the `loop` keyword after the closing brace.")
+		  Consume(ObjoScript.TokenTypes.Until_, "Expected the `until` keyword after `loop`.")
+		  
+		  Var condition As ObjoScript.Expr = Expression
+		  
+		  Return New ObjoScript.DoStmt(condition, body, doKeyword)
 		  
 		End Function
 	#tag EndMethod
@@ -1225,6 +1256,9 @@ Protected Class Parser
 		    
 		  ElseIf Match(ObjoScript.TokenTypes.Switch) Then
 		    Return SwitchStatement
+		    
+		  ElseIf Match(ObjoScript.TokenTypes.Do_) Then
+		    Return DoStatement
 		    
 		  Else
 		    Return ExpressionStatement

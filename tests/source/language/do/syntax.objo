@@ -1,0 +1,17 @@
+// Single expression body.
+var c = 0
+do { System.print(c = c + 1) } loop until c > 2
+// expect: 1
+// expect: 2
+// expect: 3
+
+// Block body.
+var a = 0
+do {
+ System.print(a)
+ a = a + 1
+} loop until a > 2
+
+// expect: 0
+// expect: 1
+// expect: 2

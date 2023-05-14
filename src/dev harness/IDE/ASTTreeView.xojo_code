@@ -288,6 +288,27 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function VisitDoStmt(stmt As ObjoScript.DoStmt) As Variant
+		  Var node As New TreeViewNode("Do")
+		  
+		  Var condition As New TreeViewNode("Condition")
+		  condition.AppendNode(stmt.Condition.Accept(Self))
+		  node.AppendNode(condition)
+		  
+		  Var body As New TreeViewNode("Body")
+		  If stmt.Body = Nil Then
+		    body.Text = "Empty body"
+		  Else
+		    body.AppendNode(stmt.Body.Accept(Self))
+		  End If
+		  node.AppendNode(body)
+		  
+		  Return node
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function VisitElseCaseStmt(ec As ObjoScript.ElseCaseStmt) As Variant
 		  Var node As New TreeViewNode("Else:")
 		  

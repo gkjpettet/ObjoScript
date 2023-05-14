@@ -829,6 +829,21 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 456D69747320746865204F505F4A554D505F49465F46414C534520696E737472756374696F6E207573656420746F207465737420746865206C6F6F7020636F6E646974696F6E20616E6420706F74656E7469616C6C79206578697420746865206C6F6F702E204B6565707320747261636B206F662074686520696E737472756374696F6E20736F2077652063616E207061746368206974206C61746572206F6E6365207765206B6E6F772077686572652074686520656E64206F662074686520626F64792069732E
+		Private Sub ExitLoopIfTrue()
+		  /// Emits the OP_JUMP_IF_TRUE instruction and an OP_POP used to test the loop condition and
+		  /// potentially exit the loop. Keeps track of the instruction so we can patch it
+		  /// later once we know where the end of the body is.
+		  ///
+		  /// Assumes a loop is currently being compiled.
+		  
+		  Self.CurrentLoop.ExitJump = EmitJump(ObjoScript.VM.OP_JUMP_IF_TRUE)
+		  
+		  // Pop the condition before executing the body.
+		  EmitByte(ObjoScript.VM.OP_POP)
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 41737369676E207468652076616C7565206F6E2074686520746F70206F662074686520737461636B20746F2074686520737065636966696564206669656C642E
 		Private Sub FieldAssignment(fieldName As String)
 		  /// Assign the value on the top of the stack to the specified field.
@@ -2077,6 +2092,30 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Emit a jump back to the top of the current loop.
 		  EmitLoop(CurrentLoop.Start)
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 436F6D70696C6520612060646F60206C6F6F702E
+		Function VisitDoStmt(stmt As ObjoScript.DoStmt) As Variant
+		  /// Compile a `do` loop.
+		  ///
+		  /// Part of the ObjoScript.StmtVisitor interface.
+		  
+		  // Track our location.
+		  mLocation = stmt.Location
+		  
+		  #Pragma Warning "TODO"
+		  
+		  StartLoop
+		  
+		  LoopBody(stmt.Body)
+		  
+		  Call stmt.Condition.Accept(Self)
+		  
+		  ExitLoopIfTrue
+		  
+		  EndLoop
 		  
 		End Function
 	#tag EndMethod

@@ -42,6 +42,12 @@ Protected Interface StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E6720612060646F60206C6F6F702E
+		Function VisitDoStmt(stmt As ObjoScript.DoStmt) As Variant
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 5468652076697369746F72206973207669736974696E6720616E2060656C7365602073746174656D656E742077697468696E20612060737769746368602073746174656D656E742E
 		Function VisitElseCaseStmt(ec As ObjoScript.ElseCaseStmt) As Variant
 		  

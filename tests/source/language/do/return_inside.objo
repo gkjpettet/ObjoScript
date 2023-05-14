@@ -1,0 +1,9 @@
+function test() {
+ do {
+   var i = "i"
+   return i
+ } loop until false
+}
+
+System.print(test())
+// expect: i

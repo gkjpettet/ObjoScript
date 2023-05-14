@@ -552,6 +552,7 @@ Protected Class Lexer
 		  d.Value("then")        = ObjoScript.TokenTypes.Then_
 		  d.Value("this")        = ObjoScript.TokenTypes.This
 		  d.Value("true")        = ObjoScript.TokenTypes.Boolean_
+		  d.Value("until")       = ObjoScript.TokenTypes.Until_
 		  d.Value("var")         = ObjoScript.TokenTypes.Var_
 		  d.Value("while")       = ObjoScript.TokenTypes.While_
 		  d.Value("xor")         = ObjoScript.TokenTypes.Xor_

@@ -8,6 +8,8 @@ Inherits TestController
 		  Var group As TestGroup
 		  
 		  // Language.
+		  group = New LanguageDoTests(Self, "Language - Do")
+		  group = New LanguageWhileTests(Self, "Language - While")
 		  group = New LanguageAssignmentTests(Self, "Language - Assignment")
 		  group = New LanguageExitTests(Self, "Language - Exit")
 		  group = New LanguageClassTests(Self, "Language - Class")
@@ -35,7 +37,6 @@ Inherits TestController
 		  group = New LanguageSuperTests(Self, "Language - Super")
 		  group = New LanguageThisTests(Self, "Language - This")
 		  group = New LanguageVariableTests(Self, "Language - Variable")
-		  group = New LanguageWhileTests(Self, "Language - While")
 		  group = New LanguageMiscTests(Self, "Language - Misc")
 		  group = New LanguageMapTests(Self, "Language - Map")
 		  group = New LanguageSwitchTests(Self, "Language - Switch")

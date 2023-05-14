@@ -364,6 +364,7 @@ Implements XUICEFormatter
 		  d.Value("class")       = Nil
 		  d.Value("continue")    = Nil
 		  d.Value("constructor") = Nil
+		  d.Value("do")          = Nil
 		  d.Value("else")        = Nil
 		  d.Value("exit")        = Nil
 		  d.Value("export")      = Nil
@@ -376,6 +377,7 @@ Implements XUICEFormatter
 		  d.Value("import")      = Nil
 		  d.Value("in")          = Nil
 		  d.Value("is")          = Nil
+		  d.Value("loop")        = Nil
 		  d.Value("not")         = Nil
 		  d.Value("nothing")     = Nil
 		  d.Value("or")          = Nil
@@ -386,6 +388,7 @@ Implements XUICEFormatter
 		  d.Value("then")        = Nil
 		  d.Value("this")        = Nil
 		  d.Value("true")        = Nil
+		  d.Value("until")       = Nil
 		  d.Value("var")         = Nil
 		  d.Value("while")       = Nil
 		  d.Value("xor")         = Nil
