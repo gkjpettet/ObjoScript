@@ -517,7 +517,7 @@ Protected Class Lexer
 		  /// Initialises the reserved words dictionary.
 		  /// Key = keyword (case sensitive), Value = ObjoScript.TokenTypes)
 		  
-		  // HACK Create a case sensitive dictionary.
+		  // HACK: Create a case sensitive dictionary.
 		  Var d As Dictionary = ParseJSON("{}")
 		  
 		  d.Value("and")         = ObjoScript.TokenTypes.And_
@@ -528,6 +528,7 @@ Protected Class Lexer
 		  d.Value("class")       = ObjoScript.TokenTypes.Class_
 		  d.Value("continue")    = ObjoScript.TokenTypes.Continue_
 		  d.Value("constructor") = ObjoScript.TokenTypes.Constructor
+		  d.Value("do")          = ObjoScript.TokenTypes.Do_
 		  d.Value("else")        = ObjoScript.TokenTypes.Else_
 		  d.Value("exit")        = ObjoScript.TokenTypes.Exit_
 		  d.Value("export")      = ObjoScript.TokenTypes.Export
@@ -540,6 +541,7 @@ Protected Class Lexer
 		  d.Value("import")      = ObjoScript.TokenTypes.Import
 		  d.Value("in")          = ObjoScript.TokenTypes.In_
 		  d.Value("is")          = ObjoScript.TokenTypes.Is_
+		  d.Value("loop")        = ObjoScript.TokenTypes.Loop_
 		  d.Value("not")         = ObjoScript.TokenTypes.Not_
 		  d.Value("nothing")     = ObjoScript.TokenTypes.Nothing
 		  d.Value("or")          = ObjoScript.TokenTypes.Or_

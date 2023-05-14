@@ -488,6 +488,7 @@ Protected Module ObjoScript
 		  Comma
 		  Constructor
 		  Continue_
+		  Do_
 		  Dot
 		  DotDot
 		  DotDotDot
@@ -517,6 +518,7 @@ Protected Module ObjoScript
 		  Less
 		  LessEqual
 		  LessLess
+		  Loop_
 		  LParen
 		  LSquare
 		  Minus
