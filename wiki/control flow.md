@@ -112,6 +112,20 @@ System.print(n)
 
 The above loop evaluates the expression `n <= 3`. If that's true then the body of the loop executes. After execution the program loops back to the top of the `while` statement and re-evaluates the condition. It keeps going until `n > 3`.
 
+## Do loops
+A `do` loop is similar to a `while` loop except the loop body is **always** executed at least once. The loop condition is tested at the end of the loop. If the condition is true the then loop exits:
+
+```objo
+var n = 1
+do {
+ System.print(n)
+ n = n + 1
+} loop until n > 3
+// 1
+// 2
+// 3
+```
+
 ## For loops
 ObjoScript supports the venerable `for` loop seen in C, Java and many other languages:
 
@@ -129,7 +143,7 @@ Within the `()` following the `for` keyword are three statements. Each is option
 More expressive than the `for` loop described above, the `foreach` loop allows you to iterate every item in a `Sequence`:
 
 ```objo
-foreach item in 1..3 {
+foreach item in 1...3 {
  System.print(item)
 }
 // 1
@@ -176,7 +190,7 @@ The `foreach` loop knows how to call two particular methods on the object that r
 When you write a loop like this:
 
 ```objo
-foreach i in 1..100 {
+foreach i in 1...100 {
  System.print(i)
 }
 ```
@@ -185,7 +199,7 @@ Internally ObjoScript compiles it into this:
 
 ```objo
 var iter* = nothing
-var seq* = 1..100
+var seq* = 1...100
 while iter* = seq*.iterate(iter*) {
  var i = seq*.iteratorValue(iter*)
  System.print(i)
