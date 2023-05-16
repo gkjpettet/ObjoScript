@@ -205,10 +205,10 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 43616C6C73206120636F6D70696C65642066756E6374696F6E2E2060617267436F756E746020697320746865206E756D626572206F6620617267756D656E7473206F6E2074686520737461636B20666F7220746869732066756E6374696F6E2063616C6C2E
+	#tag Method, Flags = &h21, Description = 43616C6C73206120636F6D70696C65642066756E6374696F6E2E2060617267436F756E746020697320746865206E756D626572206F6620617267756D656E7473206F6E2074686520737461636B20666F7220746869732066756E6374696F6E2063616C6C2E20546869732069732061737365727465642E
 		Private Sub CallFunction(f As ObjoScript.Func, argCount As Integer)
 		  /// Calls a compiled function.
-		  /// `argCount` is the number of arguments on the stack for this function call.
+		  /// `argCount` is the number of arguments on the stack for this function call. This is asserted.
 		  
 		  #Pragma DisableBoundsChecking
 		  #Pragma NilObjectChecking False
@@ -973,7 +973,7 @@ Protected Class VM
 		  If isStatic Then
 		    method = klass.StaticMethods.Lookup(signature, Nil)
 		    If method = Nil Then
-		      Error("There is no static method with signature `" +signature + "` on `" + klass.ToString + "`.")
+		      Error("There is no static method with signature `" + signature + "` on `" + klass.ToString + "`.")
 		    End If
 		  Else
 		    method = klass.Methods.Lookup(signature, Nil)
@@ -1122,7 +1122,7 @@ Protected Class VM
 		  
 		  Var klass As New ObjoScript.Klass(className, isForeign, fieldCount, firstFieldIndex)
 		  
-		  // All classes (except `Object`, obviously) always inherit Object's static methods.
+		  // All classes (except `Object`, obviously) inherit Object's static methods.
 		  If Not klass.Name.CompareCase("Object") Then
 		    klass.StaticMethods = ObjoScript.Klass(Globals.Value("Object")).StaticMethods.Clone
 		  End If
@@ -1382,7 +1382,6 @@ Protected Class VM
 		      
 		      If FrameCount = 0 Then
 		        // Exit the VM.
-		        Call Pop
 		        StackTop = 0
 		        RaiseEvent Finished
 		        Return
