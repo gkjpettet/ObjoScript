@@ -1346,7 +1346,8 @@ Protected Class VM
 
 	#tag Method, Flags = &h0, Description = 52756E732074686520696E7465727072657465722E20417373756D657320697420686173206265656E20696E697469616C69736564207072696F7220746F207468697320616E642068617320612076616C69642063616C6C206672616D6520746F20657865637574652E
 		Sub Run(stepMode As ObjoScript.VM.StepModes = ObjoScript.VM.StepModes.None)
-		  /// Runs the interpreter. Assumes it has been initialised prior to this and has a valid call frame to execute.
+		  /// Runs the interpreter. 
+		  /// Assumes it has been initialised prior to this and has a valid call frame to execute.
 		  
 		  #Pragma DisableBoundsChecking
 		  #Pragma NilObjectChecking False
@@ -1396,12 +1397,10 @@ Protected Class VM
 		      CurrentFrame = Frames(FrameCount - 1)
 		      
 		    Case OP_CONSTANT
-		      Var constant As Variant = ReadConstant
-		      Push(constant)
+		      Push(ReadConstant)
 		      
 		    Case OP_CONSTANT_LONG
-		      Var constant As Variant = ReadConstantLong
-		      Push(constant)
+		      Push(ReadConstantLong)
 		      
 		    Case OP_LOAD_0
 		      Push(CType(0, Double))
