@@ -922,9 +922,9 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 496E766F6B657320616E206F7665726C6F6164642062696E617279206F70657261746F72206D6574686F64207769746820607369676E617475726560206F6E2074686520696E7374616E63652F636C61737320616E64206F706572616E64206F6E2074686520737461636B2E
+	#tag Method, Flags = &h21, Description = 496E766F6B657320616E206F7665726C6F616465642062696E617279206F70657261746F72206D6574686F64207769746820607369676E617475726560206F6E2074686520696E7374616E63652F636C61737320616E64206F706572616E64206F6E2074686520737461636B2E
 		Private Sub InvokeBinaryOperator(signature As String)
-		  /// Invokes an overloadd binary operator method with `signature` on the 
+		  /// Invokes an overloaded binary operator method with `signature` on the 
 		  /// instance/class and operand on the stack.
 		  ///
 		  /// Raises a VM runtime error if the callee doesn't implement the overloaded operator.
