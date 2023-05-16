@@ -1509,7 +1509,7 @@ Protected Class VM
 		      Push(Nothing)
 		      
 		    Case OP_POP
-		      Call Pop
+		      StackTop = StackTop - 1
 		      
 		    Case OP_POP_N
 		      // Pop N values off the stack. N is the operand.
