@@ -924,31 +924,32 @@ Protected Class VM
 
 	#tag Method, Flags = &h21, Description = 496E766F6B657320612062696E617279206F70657261746F72206F7665726C6F6164206D6574686F64207769746820607369676E617475726560206F6E2074686520696E7374616E63652F636C61737320616E64206F706572616E64206F6E2074686520737461636B2E
 		Private Sub InvokeBinaryOperator(signature As String)
-		  /// Invokes a binary operator overload method with `signature` on the instance/class and operand on the stack.
+		  /// Invokes a binary operator overload method with `signature` on the 
+		  /// instance/class and operand on the stack.
 		  ///
 		  /// Raises a VM runtime error if the value doesn't implement the operator overload.
 		  /// operand             <---- top of the stack
 		  /// value to invoke on  <---- should be class/instance
 		  
-		  Var value As Variant = Peek(1)
+		  Var callee As Variant = Peek(1)
 		  
-		  If value.Type = Variant.TypeDouble Then
-		    InvokeFromClass(NumberClass, signature, 1, False)
-		    
-		  ElseIf value.Type = Variant.TypeString Then
+		  If callee.Type = Variant.TypeString Then
 		    InvokeFromClass(StringClass, signature, 1, False)
 		    
-		  ElseIf value.Type = Variant.TypeBoolean Then
+		  ElseIf callee.Type = Variant.TypeDouble Then
+		    InvokeFromClass(NumberClass, signature, 1, False)
+		    
+		  ElseIf callee.Type = Variant.TypeBoolean Then
 		    InvokeFromClass(BooleanClass, signature, 1, False)
 		    
-		  ElseIf value IsA ObjoScript.Instance Then
-		    InvokeFromClass(ObjoScript.Instance(value).Klass, signature, 1, False)
+		  ElseIf callee IsA ObjoScript.Instance Then
+		    InvokeFromClass(ObjoScript.Instance(callee).Klass, signature, 1, False)
 		    
-		  ElseIf value IsA ObjoScript.Klass Then
-		    InvokeFromClass(ObjoScript.Klass(value), signature, 1, True)
+		  ElseIf callee IsA ObjoScript.Klass Then
+		    InvokeFromClass(ObjoScript.Klass(callee), signature, 1, True)
 		    
 		  Else
-		    Error(ValueToString(value) + " does not implement `" + signature + "`.")
+		    Error(ValueToString(callee) + " does not implement `" + signature + "`.")
 		  End If
 		  
 		End Sub
@@ -1197,7 +1198,7 @@ Protected Class VM
 		  /// Pops the top value off the stack and replaces the value underneath with `v`.
 		  /// The effect is to reduce the stack height by 1.
 		  ///
-		  /// This method exists but several operations require us to pop two values off the stack
+		  /// This method exists as several operations require us to pop two values off the stack
 		  /// and then immediately push one back. This method saves a few method calls.
 		  
 		  Stack(StackTop - 2) = v
