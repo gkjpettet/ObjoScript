@@ -30,7 +30,7 @@
 			Begin BuildStepList Mac OS X
 				Begin BuildProjectStep Build
 				End
-				Begin CopyFilesBuildStep CopyCore
+				Begin CopyFilesBuildStep CopyCoreMac
 					AppliesTo = 0
 					Architecture = 0
 					Target = 0

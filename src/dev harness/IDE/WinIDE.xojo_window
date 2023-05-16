@@ -99,6 +99,7 @@ Begin DesktopWindow WinIDE
       Active          =   False
       AllowAutoDeactivate=   True
       AllowFocus      =   True
+      AllowTabStop    =   True
       BackgroundColor =   &c00000000
       BevelStyle      =   0
       Bold            =   False
@@ -131,7 +132,6 @@ Begin DesktopWindow WinIDE
       Scope           =   2
       TabIndex        =   1
       TabPanelIndex   =   0
-      TabStop         =   True
       TextColor       =   &c00000000
       Tooltip         =   ""
       Top             =   20
@@ -149,6 +149,7 @@ Begin DesktopWindow WinIDE
       Active          =   False
       AllowAutoDeactivate=   True
       AllowFocus      =   True
+      AllowTabStop    =   True
       BackgroundColor =   &c00000000
       BevelStyle      =   0
       Bold            =   False
@@ -181,7 +182,6 @@ Begin DesktopWindow WinIDE
       Scope           =   2
       TabIndex        =   2
       TabPanelIndex   =   0
-      TabStop         =   True
       TextColor       =   &c00000000
       Tooltip         =   ""
       Top             =   20
@@ -199,6 +199,7 @@ Begin DesktopWindow WinIDE
       Active          =   False
       AllowAutoDeactivate=   True
       AllowFocus      =   True
+      AllowTabStop    =   True
       BackgroundColor =   &c00000000
       BevelStyle      =   0
       Bold            =   False
@@ -231,7 +232,6 @@ Begin DesktopWindow WinIDE
       Scope           =   2
       TabIndex        =   3
       TabPanelIndex   =   0
-      TabStop         =   True
       TextColor       =   &c00000000
       Tooltip         =   ""
       Top             =   20
@@ -249,6 +249,7 @@ Begin DesktopWindow WinIDE
       Active          =   False
       AllowAutoDeactivate=   True
       AllowFocus      =   True
+      AllowTabStop    =   True
       BackgroundColor =   &c00000000
       BevelStyle      =   0
       Bold            =   False
@@ -281,7 +282,6 @@ Begin DesktopWindow WinIDE
       Scope           =   2
       TabIndex        =   5
       TabPanelIndex   =   0
-      TabStop         =   True
       TextColor       =   &c00000000
       Tooltip         =   ""
       Top             =   20
@@ -828,6 +828,7 @@ Begin DesktopWindow WinIDE
       Active          =   False
       AllowAutoDeactivate=   True
       AllowFocus      =   True
+      AllowTabStop    =   True
       BackgroundColor =   &c00000000
       BevelStyle      =   0
       Bold            =   False
@@ -860,7 +861,6 @@ Begin DesktopWindow WinIDE
       Scope           =   2
       TabIndex        =   14
       TabPanelIndex   =   0
-      TabStop         =   True
       TextColor       =   &c00000000
       Tooltip         =   ""
       Top             =   20
@@ -1374,7 +1374,7 @@ End
 		  // Create a new VM and add the required event handlers.
 		  SetupVM
 		  
-		  //Since no script is currenty running, disable the stop and step-in buttons.
+		  // Since no script is currenty running, disable the stop and step-in buttons.
 		  ButtonStepIn.Enabled = False
 		  ButtonStop.Enabled = False
 		  

@@ -966,7 +966,13 @@ Protected Class Lexer
 		  /// Resets the lexer, ready to tokenise more source code.
 		  
 		  mChars.ResizeTo(-1)
-		  mTokens.ResizeTo(-1)
+		  
+		  // We need a new token array. we can't just resize the old one since it
+		  // may be being referenced elsewhere in the app. This looks clunky but 
+		  // it's the safest way to achieve this.
+		  Var newTokens(-1) As ObjoScript.Token
+		  mTokens = newTokens
+		  
 		  mTokenStart = 0
 		  mCurrent = 0
 		  mLineNumber = 1
