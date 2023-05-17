@@ -1408,6 +1408,9 @@ Protected Class VM
 		    Case OP_LOAD_1
 		      Push(CType(1, Double))
 		      
+		    Case OP_LOAD_2
+		      Push(CType(2, Double))
+		      
 		    Case OP_LOAD_MINUS1
 		      Push(CType(-1, Double))
 		      
@@ -2211,6 +2214,8 @@ Protected Class VM
 		74: OP_SET_STATIC_FIELD (1)
 		75: OP_SET_STATIC_FIELD_LONG (2)
 		76: OP_FOREIGN_METHOD (3)
+		77: OP_LOAD_2 (0)
+		
 	#tag EndNote
 
 
@@ -2412,7 +2417,8 @@ Protected Class VM
 			  OP_MAP                    : 1, _
 			  OP_KEYVALUE               : 0, _
 			  OP_BREAKPOINT             : 0, _
-			  OP_RANGE_EXCLUSIVE        : 0 _
+			  OP_RANGE_EXCLUSIVE        : 0, _
+			  OP_LOAD_2                 : 0 _
 			  )
 			  
 			  Return d
@@ -2593,6 +2599,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_LOAD_1, Type = Double, Dynamic = False, Default = \"25", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_LOAD_2, Type = Double, Dynamic = False, Default = \"77", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_LOAD_MINUS1, Type = Double, Dynamic = False, Default = \"27", Scope = Public

@@ -708,6 +708,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Case 1.0
 		      EmitByte(ObjoScript.VM.OP_LOAD_1, location)
 		      Return -1
+		    Case 2.0
+		      EmitByte(ObjoScript.VM.OP_LOAD_2, location)
+		      Return -1
 		    End Select
 		  End If
 		  

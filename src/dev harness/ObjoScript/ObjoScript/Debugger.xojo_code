@@ -364,6 +364,9 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_RANGE_EXCLUSIVE
 		    Return SimpleInstruction("RANGE_EXCLUSIVE", offset)
 		    
+		  Case ObjoScript.VM.OP_LOAD_2
+		    Return SimpleInstruction("LOAD2", offset)
+		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")
 		  End Select
