@@ -114,6 +114,90 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 506572666F726D7320612062696E617279206F7065726174696F6E206F6E2074776F206E756D65726963206C69746572616C732C20606C6566746020616E64206072696768746020616E642074656C6C732074686520564D20746F207075742074686520726573756C74206F6E2074686520737461636B2E
+		Private Sub BinaryLiterals(operator As ObjoScript.TokenTypes, left As Double, right As Double)
+		  /// Performs a binary operation on two numeric literals, `left` and `right` and tells
+		  /// the VM to put the result on the stack.
+		  ///
+		  /// This is an optimisation for binary operators where both operands are known in 
+		  /// advance to be numeric literals.
+		  
+		  Select Case operator
+		  Case ObjoScript.TokenTypes.Plus
+		    Var result As Double = left + right
+		    EmitIndexedOpcode(VM.OP_CONSTANT, VM.OP_CONSTANT_LONG, CurrentChunk.AddConstant(result))
+		    
+		  Case ObjoScript.TokenTypes.Minus
+		    Var result As Double = left - right
+		    EmitIndexedOpcode(VM.OP_CONSTANT, VM.OP_CONSTANT_LONG, CurrentChunk.AddConstant(result))
+		    
+		  Case ObjoScript.TokenTypes.ForwardSlash
+		    Var result As Double = left / right
+		    EmitIndexedOpcode(VM.OP_CONSTANT, VM.OP_CONSTANT_LONG, CurrentChunk.AddConstant(result))
+		    
+		  Case ObjoScript.TokenTypes.Star
+		    Var result As Double = left * right
+		    EmitIndexedOpcode(VM.OP_CONSTANT, VM.OP_CONSTANT_LONG, CurrentChunk.AddConstant(result))
+		    
+		  Case ObjoScript.TokenTypes.Percent
+		    Var result As Double = left Mod right
+		    EmitIndexedOpcode(VM.OP_CONSTANT, VM.OP_CONSTANT_LONG, CurrentChunk.AddConstant(result))
+		    
+		  Case ObjoScript.TokenTypes.Less
+		    EmitByte(If(left < right, VM.OP_TRUE, VM.OP_FALSE))
+		    
+		  Case ObjoScript.TokenTypes.LessEqual
+		    EmitByte(If(left <= right, VM.OP_TRUE, VM.OP_FALSE))
+		    
+		  Case ObjoScript.TokenTypes.Greater
+		    EmitByte(If(left > right, VM.OP_TRUE, VM.OP_FALSE))
+		    
+		  Case ObjoScript.TokenTypes.GreaterEqual
+		    EmitByte(If(left >= right, VM.OP_TRUE, VM.OP_FALSE))
+		    
+		  Case ObjoScript.TokenTypes.EqualEqual
+		    EmitByte(If(left = right, VM.OP_TRUE, VM.OP_FALSE))
+		    
+		  Case ObjoScript.TokenTypes.NotEqual
+		    EmitByte(If(left <> right, VM.OP_TRUE, VM.OP_FALSE))
+		    
+		  Case ObjoScript.TokenTypes.LessLess
+		    Var leftInt As Integer = left
+		    Var rightInt As Integer = right
+		    Var result As Double = Bitwise.ShiftLeft(leftInt, rightInt)
+		    EmitIndexedOpcode(VM.OP_CONSTANT, VM.OP_CONSTANT_LONG, CurrentChunk.AddConstant(result))
+		    
+		  Case ObjoScript.TokenTypes.GreaterGreater
+		    Var leftInt As Integer = left
+		    Var rightInt As Integer = right
+		    Var result As Double = Bitwise.ShiftRight(leftInt, rightInt)
+		    EmitIndexedOpcode(VM.OP_CONSTANT, VM.OP_CONSTANT_LONG, CurrentChunk.AddConstant(result))
+		    
+		  Case ObjoScript.TokenTypes.Ampersand
+		    Var leftInt As UInt32 = left
+		    Var rightInt As UInt32 = right
+		    Var result As Double = CType(leftInt And rightInt, Double)
+		    EmitIndexedOpcode(VM.OP_CONSTANT, VM.OP_CONSTANT_LONG, CurrentChunk.AddConstant(result))
+		    
+		  Case ObjoScript.TokenTypes.Caret
+		    Var leftInt As UInt32 = left
+		    Var rightInt As UInt32 = right
+		    Var result As Double = CType(leftInt Xor rightInt, Double)
+		    EmitIndexedOpcode(VM.OP_CONSTANT, VM.OP_CONSTANT_LONG, CurrentChunk.AddConstant(result))
+		    
+		  Case ObjoScript.TokenTypes.Pipe
+		    Var leftInt As UInt32 = left
+		    Var rightInt As UInt32 = right
+		    Var result As Double = CType(leftInt Or rightInt, Double)
+		    EmitIndexedOpcode(VM.OP_CONSTANT, VM.OP_CONSTANT_LONG, CurrentChunk.AddConstant(result))
+		    
+		  Else
+		    Error("Unknown binary operator """ + operator.ToString + """")
+		  End Select
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 436F6D70696C657320612063616C6C20746F206120676C6F62616C2066756E6374696F6E2E
 		Private Sub CallGlobalFunction(name As String, arguments() As ObjoScript.Expr, location As ObjoScript.Token)
 		  /// Compiles a call to a global function.
@@ -1714,6 +1798,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
 		  mLocation = expr.Location
+		  
+		  // If both operands are numeric literals, we can do the arithmetic upfront and just tell the 
+		  // VM to produce the result.
+		  If expr.Left IsA NumberLiteral And expr.Right IsA NumberLiteral Then
+		    BinaryLiterals(expr.Operator, NumberLiteral(expr.Left).Value, NumberLiteral(expr.Right).Value)
+		    Return Nil
+		  End If
 		  
 		  // Compile the left and right operands - this will leave them on the stack.
 		  Call expr.Left.Accept(Self)  // a
