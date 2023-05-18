@@ -1098,20 +1098,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Private Sub GetGlobal(index As Integer, location As ObjoScript.Token = Nil)
 		  /// Emits an instruction to get a global variable whose name is stored in 
 		  /// the constant pool at `index` and push it onto the stack.
-		  ///
-		  /// It's a convenience method that exists to simplify the fact that there are two GET_GLOBAL 
-		  /// instructions which depend on the size of `index`.
 		  
 		  location = If(location = Nil, mLocation, location)
 		  
-		  If index <= 255 Then
-		    // We only need a single byte operand to specify the index of the variable's name in the constant pool.
-		    EmitBytes(ObjoScript.VM.OP_GET_GLOBAL, index, location)
-		  Else
-		    // We need two bytes for the operand.
-		    EmitByte(ObjoScript.VM.OP_GET_GLOBAL_LONG, location)
-		    EmitUInt16(index, location)
-		  End If
+		  EmitIndexedOpcode(VM.OP_GET_GLOBAL, VM.OP_GET_GLOBAL_LONG, index, location)
 		  
 		End Sub
 	#tag EndMethod
