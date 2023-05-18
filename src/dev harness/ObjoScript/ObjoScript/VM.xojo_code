@@ -1639,7 +1639,7 @@ Protected Class VM
 		      
 		    Case OP_GET_LOCAL
 		      // The operand is the stack slot where the local variable lives.
-		      // Load the value at that index and then push it on to the top of the stack.
+		      // Load the value at that slot and then push it on to the top of the stack.
 		      Push(Stack(CurrentFrame.StackBase + ReadByte))
 		      
 		    Case OP_LOCAL_VAR_DEC

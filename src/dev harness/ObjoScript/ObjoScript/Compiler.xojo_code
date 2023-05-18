@@ -207,7 +207,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Add the name of the method to the constant pool and get its index.
 		  Var index As Integer = AddConstant(name)
 		  
-		  // Push the method's name on to the stack.
+		  // Retrieve the global function and put it on the stack.
 		  GetGlobal(index)
 		  
 		  // Check the argument count is within the limit.
@@ -1100,7 +1100,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// the constant pool at `index` and push it onto the stack.
 		  ///
 		  /// It's a convenience method that exists to simplify the fact that there are two GET_GLOBAL 
-		  // instructions which depend on the size of `index`.
+		  /// instructions which depend on the size of `index`.
 		  
 		  location = If(location = Nil, mLocation, location)
 		  
