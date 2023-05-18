@@ -658,12 +658,15 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  End If
 		  
 		  Var local As Integer = Locals.LastIndex
+		  Var discardCount As Integer = 0
 		  While local >= 0 And Locals(local).Depth >= depth
-		    EmitByte(ObjoScript.VM.OP_POP)
+		    discardCount = discardCount + 1
 		    local = local - 1
 		  Wend
 		  
-		  Return Locals.Count - local - 1
+		  EmitBytes(ObjoScript.VM.OP_POP_N, discardCount)
+		  
+		  Return discardCount
 		End Function
 	#tag EndMethod
 
