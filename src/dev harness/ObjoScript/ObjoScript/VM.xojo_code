@@ -2213,7 +2213,7 @@ Protected Class VM
 		73: OP_GET_STATIC_FIELD_LONG (2)
 		74: OP_SET_STATIC_FIELD (1)
 		75: OP_SET_STATIC_FIELD_LONG (2)
-		76: OP_FOREIGN_METHOD (3)
+		76: OP_FOREIGN_METHOD (4)
 		77: OP_LOAD_2 (0)
 		
 	#tag EndNote
@@ -2404,7 +2404,7 @@ Protected Class VM
 			  OP_GET_STATIC_FIELD_LONG  : 2, _
 			  OP_SET_STATIC_FIELD       : 1, _
 			  OP_SET_STATIC_FIELD_LONG  : 2, _
-			  OP_FOREIGN_METHOD         : 3, _
+			  OP_FOREIGN_METHOD         : 4, _
 			  OP_IS                     : 0, _
 			  OP_GET_LOCAL_CLASS        : 1, _
 			  OP_LOCAL_VAR_DEC          : 3, _

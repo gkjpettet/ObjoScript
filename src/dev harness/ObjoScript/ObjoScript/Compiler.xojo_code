@@ -1187,8 +1187,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 4D61726B7320746865206D6F737420726563656E74206C6F63616C207661726961626C6520617320696E697469616C697365642062792073657474696E67206974732073636F70652064657074682E
+	#tag Method, Flags = &h21, Description = 436F6E76656E69656E6365206D6574686F642E204D61726B7320746865206D6F737420726563656E74206C6F63616C207661726961626C6520617320696E697469616C697365642062792073657474696E67206974732073636F70652064657074682E
 		Private Sub MarkInitialised()
+		  /// Convenience method.
 		  /// Marks the most recent local variable as initialised by setting its scope depth.
 		  
 		  If ScopeDepth = 0 Then Return
@@ -2383,11 +2384,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Function VisitForeignMethodDeclaration(fmd As ObjoScript.ForeignMethodDeclStmt) As Variant
 		  /// Compiles a foreign method declaration.
 		  ///
-		  /// Part of the ObjoScript.StmtVisitor interface.
 		  /// To define a new foreign method, the VM needs three things:
 		  ///  1. The name of the method.
 		  ///  2. The arity of the method.
+		  ///  3. Whether or not this is an instance or static method.
 		  /// At runtime, the class to bind to should be on the top of the stack.
+		  ///
+		  /// Part of the ObjoScript.StmtVisitor interface.
 		  
 		  mLocation = fmd.Location
 		  
