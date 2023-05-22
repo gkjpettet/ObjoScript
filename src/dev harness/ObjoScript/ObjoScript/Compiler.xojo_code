@@ -2609,7 +2609,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var compiler As New ObjoScript.Compiler
 		  Var f As ObjoScript.Func = compiler.Compile(funcDecl.Name.Lexeme, funcDecl.Parameters, funcDecl.Body, FunctionTypes.Func, CurrentClass, False, Self.DebugMode, True, Self)
 		  
-		  // Store the compiled function as a constant in this function's constant pool.
+		  // Store the compiled function as a constant in this function's 
+		  // constant pool and push it on to the stack.
 		  Call EmitConstant(f)
 		  
 		  Var index As Integer
