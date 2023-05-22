@@ -1327,8 +1327,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// }
 		  /// ```
 		  
-		  #Pragma Warning "BROKEN: Counting down not working"
-		  
 		  mLocation = location
 		  
 		  Var forKeyword As New ObjoScript.Token(ObjoScript.TokenTypes.For_, 0, 0, "", location.ScriptID)
@@ -2465,8 +2463,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		      End If
 		    End If
 		  End If
-		  
-		  
 		  
 		  // Track the current location.
 		  mLocation = stmt.Location
