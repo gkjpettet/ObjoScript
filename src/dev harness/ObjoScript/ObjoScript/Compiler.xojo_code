@@ -1289,6 +1289,108 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 436F6D70696C657320616E206F7074696D697365642060666F726561636860206C6F6F7020776865726520746865206C6F77657220286061602920616E6420757070657220286062602920626F756E647320617265206C69746572616C20696E746567657273206173207468697320697320666173746572207468616E20746865206D6F726520636F6D706C6578206974657261626C6520696D706C656D656E746174696F6E2E
+		Private Sub OptimisedForEach(aValue As Double, bValue As Double, loopCounterToken As ObjoScript.Token, body As ObjoScript.BlockStmt, location As ObjoScript.Token)
+		  /// Compiles an optimised `foreach` loop where the lower (`aValue`) and upper (`bValue`) bounds
+		  /// are literal integers as this is faster than the more complex iterable implementation.
+		  ///
+		  /// Synthesises a `for` statement depending on whether `bValue` is greater or less than `aValue`.
+		  /// Before calling this function, the compiler will have converted things to an inclusive foreach.
+		  ///
+		  /// Translates:
+		  ///
+		  /// ```objo
+		  /// foreach i in a...b {
+		  ///  body 
+		  /// }
+		  /// ```
+		  ///
+		  /// To:
+		  ///
+		  /// ```objo
+		  /// for (var i = a; i <= b; i++) {
+		  ///   body
+		  /// }
+		  /// ```
+		  ///
+		  /// Since number ranges allow counting backwards:
+		  ///
+		  /// ```objo
+		  /// # b >= a (e.g: a...b). Count upwards.
+		  /// for (var i = a i <= b i++) {
+		  ///  body
+		  /// }
+		  ///
+		  /// # b < a (e.g: a...b). Count backwards.
+		  /// for (var i = b i >= a i--) {
+		  ///  body
+		  /// }
+		  /// ```
+		  
+		  #Pragma Warning "BROKEN: Counting down not working"
+		  
+		  mLocation = location
+		  
+		  Var forKeyword As New ObjoScript.Token(ObjoScript.TokenTypes.For_, 0, 0, "", location.ScriptID)
+		  
+		  // The loop counter needs to be a variable lookup expression.
+		  Var loopCounter As New VariableExpr(loopCounterToken)
+		  
+		  // ==================================
+		  // Initialiser (var i = a)
+		  // ==================================
+		  Var aToken As New ObjoScript.Token(ObjoScript.TokenTypes.Number, 0, 0, "", location.ScriptID)
+		  aToken.NumberValue = aValue
+		  aToken.IsInteger = True
+		  Var bToken As New ObjoScript.Token(ObjoScript.TokenTypes.Number, 0, 0, "", location.ScriptID)
+		  bToken.NumberValue = bValue
+		  bToken.IsInteger = True
+		  
+		  Var initialiser As ObjoScript.VarDeclStmt = _
+		  New ObjoScript.VarDeclStmt(loopCounterToken, New ObjoScript.NumberLiteral(aToken), location)
+		  
+		  // ==================================
+		  // Condition (e.g: i <= a)
+		  // ==================================
+		  Var operator As ObjoScript.Token
+		  If aValue <= bValue Then
+		    // E.g: 1(a)...5(b)
+		    // Count up from a to b.
+		    // i <= b
+		    operator = New ObjoScript.Token(ObjoScript.TokenTypes.LessEqual, 0, 0, "", location.ScriptID)
+		  Else
+		    // E.g: 5(a)...1(b)
+		    // count down from a to b.
+		    // i >= b
+		    operator = New ObjoScript.Token(ObjoScript.TokenTypes.GreaterEqual, 0, 0, "", location.ScriptID)
+		  End If
+		  Var b As New ObjoScript.NumberLiteral(bToken)
+		  Var condition As ObjoScript.BinaryExpr = New ObjoScript.BinaryExpr(loopCounter, operator, b)
+		  
+		  // ==================================
+		  // Post-body expression
+		  // ==================================
+		  Var postbodyOperator As ObjoScript.Token
+		  If aValue <= bValue Then
+		    // E.g: 1(a)...5(b)
+		    // Count up from a to b.
+		    postbodyOperator = New ObjoScript.Token(ObjoScript.TokenTypes.PlusPlus, 0, 0, "", location.ScriptID)
+		  Else
+		    // E.g: 5(a)...1(b)
+		    // count down from a to b.
+		    postbodyOperator = New ObjoScript.Token(ObjoScript.TokenTypes.MinusMinus, 0, 0, "", location.ScriptID)
+		  End If
+		  Var postBodyExpr As New PostfixExpr(loopCounter, postbodyOperator)
+		  
+		  // Synthesise the `for` statement.
+		  Var forStmt As New ObjoScript.ForStmt(initialiser, condition, postBodyExpr, body, forKeyword)
+		  
+		  // Compile.
+		  Call forStmt.Accept(Self)
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 52657475726E7320616E206172726179206F6620616E792070617273657220657863657074696F6E732074686174206F6363757272656420647572696E67207468652070617273696E672070686173652E204D617920626520656D7074792E
 		Function ParserErrors() As ObjoScript.ParserException()
 		  /// Returns an array of any parser exceptions that occurred during the parsing phase. May be empty.
@@ -1796,11 +1898,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = expr.Location
 		  
-		  // If both operands are numeric literals, we can do the arithmetic upfront and just tell the 
-		  // VM to produce the result.
-		  If expr.Left IsA NumberLiteral And expr.Right IsA NumberLiteral Then
-		    BinaryLiterals(expr.Operator, NumberLiteral(expr.Left).Value, NumberLiteral(expr.Right).Value)
-		    Return Nil
+		  If Optimise Then
+		    // If both operands are numeric literals, we can do the arithmetic upfront and just tell the 
+		    // VM to produce the result.
+		    If expr.Left IsA NumberLiteral And expr.Right IsA NumberLiteral Then
+		      BinaryLiterals(expr.Operator, NumberLiteral(expr.Left).Value, NumberLiteral(expr.Right).Value)
+		      Return Nil
+		    End If
 		  End If
 		  
 		  // Compile the left and right operands - this will leave them on the stack.
@@ -2336,6 +2440,33 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// If anything else is returned, that means that we have advanced to a new valid element. To get that, 
 		  /// The VM then calls `iteratorValue()` on `seq*` and passes in the iterator value that it just got from calling `iterate()`. 
 		  /// The sequence uses that to look up and return the appropriate element.
+		  
+		  If Self.Optimise Then
+		    // Optimisation: If the range expression is a numeric literal range (e.g. 1...5) then
+		    // compile this as a `for` loop.
+		    If stmt.Range IsA RangeExpr Then
+		      Var range As ObjoScript.RangeExpr = ObjoScript.RangeExpr(stmt.Range)
+		      If range.Lower IsA NumberLiteral And NumberLiteral(range.Lower).IsInteger And _
+		        range.Upper IsA NumberLiteral And NumberLiteral(range.Upper).IsInteger Then
+		        Var a As Double = NumberLiteral(range.Lower).Value
+		        Var b As Double = NumberLiteral(range.Upper).Value
+		        If Not range.Inclusive Then
+		          If a < b Then // E.g: 1..<5
+		            b  = b - 1
+		          ElseIf a > b Then // E.g: 5..<1
+		            b = b + 1
+		          Else
+		            // E.g: 5..<5. This doesn't make sense.
+		            Error("A numeric literal exclusive range requires that the operands have different values") 
+		          End If
+		        End If
+		        OptimisedForEach(a, b, stmt.LoopCounter, stmt.Body, stmt.Location)
+		        Return Nil
+		      End If
+		    End If
+		  End If
+		  
+		  
 		  
 		  // Track the current location.
 		  mLocation = stmt.Location
@@ -3293,6 +3424,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 
 	#tag Property, Flags = &h21, Description = 54686520746F6B656E73207468697320636F6D70696C657220697320636F6D70696C696E672E204D617920626520656D7074792069662074686520636F6D70696C65722077617320696E737472756374656420746F20636F6D70696C6520616E20415354206469726563746C792E
 		Private mTokens() As ObjoScript.Token
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 49662054727565207468656E2074686520636F6D70696C65722077696C6C2074727920746F206F7074696D69736520636F646520776865726520706F737369626C652E
+		Optimise As Boolean = True
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0, Description = 52657475726E7320746865206F757465726D6F737420636F6D70696C65722E20546869732069732074686520636F6D70696C657220636F6D70696C696E6720746865206D61696E2066756E6374696F6E2E204974206D6179206265207468697320636F6D70696C65722E
