@@ -2221,7 +2221,7 @@ Protected Class VM
 		65: OP_RANGE_EXCLUSIVE (0)
 		66: OP_SUPER_SETTER (4)
 		67: **Unused**
-		68: OP_SUPER_INVOKE (4)
+		68: OP_SUPER_INVOKE (5)
 		69: **Unused**
 		70: OP_SUPER_CONSTRUCTOR (3)
 		71: **Unused**
@@ -2417,7 +2417,7 @@ Protected Class VM
 			  OP_INVOKE_LONG            : 3, _
 			  OP_INHERIT                : 0, _
 			  OP_SUPER_SETTER           : 4, _
-			  OP_SUPER_INVOKE           : 4, _
+			  OP_SUPER_INVOKE           : 5, _
 			  OP_GET_STATIC_FIELD       : 1, _
 			  OP_GET_STATIC_FIELD_LONG  : 2, _
 			  OP_SET_STATIC_FIELD       : 1, _
