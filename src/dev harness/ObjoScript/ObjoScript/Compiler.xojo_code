@@ -2802,11 +2802,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Function VisitMethodDeclaration(m As ObjoScript.MethodDeclStmt) As Variant
 		  /// Compiles a class method declaration.
 		  ///
+		  /// To define a new method, the VM needs four things:
+		  ///  1. The class to bind the method to on the stack.
+		  ///  2. The function that is the method body to be on the stack.
+		  ///  3. The name of the method.
+		  ///  4. Whether this is an instance or static method.
+		  ///
 		  /// Part of the ObjoScript.StmtVisitor interface.
-		  /// To define a new method, the VM needs three things:
-		  ///  1. The name of the method.
-		  ///  2. The function that is the method body.
-		  ///  3. The class to bind the method to.
 		  
 		  mLocation = m.Location
 		  
