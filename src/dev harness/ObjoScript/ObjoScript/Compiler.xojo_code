@@ -934,9 +934,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 41737369676E207468652076616C7565206F6E2074686520746F70206F662074686520737461636B20746F2074686520737065636966696564206669656C642E
+	#tag Method, Flags = &h21, Description = 41737369676E73207468652076616C7565206F6E2074686520746F70206F662074686520737461636B20746F2074686520737065636966696564206669656C642E
 		Private Sub FieldAssignment(fieldName As String)
-		  /// Assign the value on the top of the stack to the specified field.
+		  /// Assigns the value on the top of the stack to the specified field.
 		  
 		  If Self.Type <> FunctionTypes.Method And Self.Type <> FunctionTypes.Constructor Then
 		    Error("Fields can only be accessed from within a method or constructor.")
@@ -2966,9 +2966,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C652072657472696576696E67206120737461746963206669656C642E
+	#tag Method, Flags = &h0, Description = 436F6D70696C65732072657472696576696E67206120737461746963206669656C642E
 		Function VisitStaticField(expr As ObjoScript.StaticFieldExpr) As Variant
-		  /// Compile retrieving a static field.
+		  /// Compiles retrieving a static field.
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
@@ -2986,9 +2986,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C65206120737461746963206669656C642061737369676E6D656E742E
+	#tag Method, Flags = &h0, Description = 436F6D70696C6573206120737461746963206669656C642061737369676E6D656E742E
 		Function VisitStaticFieldAssignment(expr As ObjoScript.StaticFieldAssignmentExpr) As Variant
-		  /// Compile a static field assignment.
+		  /// Compiles a static field assignment.
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
