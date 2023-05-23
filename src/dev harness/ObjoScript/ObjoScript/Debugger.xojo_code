@@ -157,8 +157,14 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_ADD
 		    Return SimpleInstruction("ADD", offset)
 		    
+		  Case ObjoScript.VM.OP_ADD1
+		    Return SimpleInstruction("ADD1", offset)
+		    
 		  Case ObjoScript.VM.OP_SUBTRACT
 		    Return SimpleInstruction("SUBTRACT", offset)
+		    
+		  Case ObjoScript.VM.OP_SUBTRACT1
+		    Return SimpleInstruction("SUBTRACT1", offset)
 		    
 		  Case ObjoScript.VM.OP_DIVIDE
 		    Return SimpleInstruction("DIVIDE", offset)

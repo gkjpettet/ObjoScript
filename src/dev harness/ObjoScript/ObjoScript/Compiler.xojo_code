@@ -1443,13 +1443,11 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Select Case postfix.Operator
 		  Case ObjoScript.TokenTypes.PlusPlus
 		    // Increment the value on the top of the stack by 1.
-		    EmitByte(ObjoScript.VM.OP_LOAD_1)
-		    EmitByte(ObjoScript.VM.OP_ADD)
+		    EmitByte(ObjoScript.VM.OP_ADD1)
 		    
 		  Case ObjoScript.TokenTypes.MinusMinus
 		    // Decrement the value on the top of the stack by 1.
-		    EmitByte(ObjoScript.VM.OP_LOAD_1)
-		    EmitByte(ObjoScript.VM.OP_SUBTRACT)
+		    EmitByte(ObjoScript.VM.OP_SUBTRACT1)
 		  End Select
 		  
 		  // Do the assignment.

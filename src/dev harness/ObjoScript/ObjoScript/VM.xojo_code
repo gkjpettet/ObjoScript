@@ -1432,10 +1432,26 @@ Protected Class VM
 		        InvokeBinaryOperator("+(_)")
 		      End If
 		      
+		    Case OP_ADD1
+		      If Peek(0).Type = Variant.TypeDouble Then
+		        Push(CType(Pop, Double) + 1.0)
+		      Else
+		        Push(1.0)
+		        InvokeBinaryOperator("+(_)")
+		      End If
+		      
 		    Case OP_SUBTRACT
 		      If TopOfStackAreNumbers Then
 		        PopAndReplaceTop(CType(Peek(1) - Peek(0), Double))
 		      Else
+		        InvokeBinaryOperator("-(_)")
+		      End If
+		      
+		    Case OP_SUBTRACT1
+		      If Peek(0).Type = Variant.TypeDouble Then
+		        Push(CType(Pop, Double) - 1.0)
+		      Else
+		        Push(1.0)
 		        InvokeBinaryOperator("-(_)")
 		      End If
 		      
@@ -2215,6 +2231,8 @@ Protected Class VM
 		75: OP_SET_STATIC_FIELD_LONG (2)
 		76: OP_FOREIGN_METHOD (4)
 		77: OP_LOAD_2 (0)
+		78: OP_ADD1 (0)
+		79: OP_SUBTRACT1 (0)
 		
 	#tag EndNote
 
@@ -2418,7 +2436,9 @@ Protected Class VM
 			  OP_KEYVALUE               : 0, _
 			  OP_BREAKPOINT             : 0, _
 			  OP_RANGE_EXCLUSIVE        : 0, _
-			  OP_LOAD_2                 : 0 _
+			  OP_LOAD_2                 : 0, _
+			  OP_ADD1                   : 0, _
+			  OP_SUBTRACT1              : 0 _
 			  )
 			  
 			  Return d
@@ -2473,6 +2493,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_ADD, Type = Double, Dynamic = False, Default = \"4", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_ADD1, Type = Double, Dynamic = False, Default = \"78", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_ASSERT, Type = Double, Dynamic = False, Default = \"29", Scope = Public
@@ -2680,6 +2703,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SUBTRACT, Type = Double, Dynamic = False, Default = \"5", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SUBTRACT1, Type = Double, Dynamic = False, Default = \"79", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SUPER_CONSTRUCTOR, Type = Double, Dynamic = False, Default = \"70", Scope = Public
