@@ -931,8 +931,10 @@ Protected Class VM
 		    ElseIf callee IsA ObjoScript.Klass Then
 		      InvokeFromClass(ObjoScript.Klass(callee), signature, 1, True)
 		      
+		    ElseIf callee IsA ObjoScript.Value Then
+		      Error(ObjoScript.Value(callee).ToString + " does not implement `" + signature + "`.")
 		    Else
-		      Error(ValueToString(callee) + " does not implement `" + signature + "`.")
+		      Error("Expected a Value.")
 		    End If
 		  End Select
 		  
