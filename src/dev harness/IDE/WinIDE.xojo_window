@@ -1764,7 +1764,7 @@ End
 		  End If
 		  
 		  // Update the debugger.
-		  DebuggerTree.Display(VM, VM.GetCurrentFrame)
+		  DebuggerTree.Display(VM, VM.CurrentFrame)
 		  
 		End Sub
 	#tag EndEvent
