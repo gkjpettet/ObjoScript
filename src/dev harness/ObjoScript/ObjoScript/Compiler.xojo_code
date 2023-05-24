@@ -2049,7 +2049,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the `ObjoScript.StmtVisitor` interface.
 		  
-		  // The compiler doesn't visit this as switch statements are compiled into nested `if` statements.
+		  // The compiler doesn't visit this as switch statements are compiled into chained `if` statements.
 		  #Pragma Unused c
 		  
 		End Function
@@ -2312,7 +2312,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the `ObjoScript.StmtVisitor` interface.
 		  
-		  // The compiler doesn't visit this as switch statements are compiled into nested `if` statements.
+		  // The compiler doesn't visit this as switch statements are compiled into chained `if` statements.
 		  #Pragma Unused ec
 		  
 		  
