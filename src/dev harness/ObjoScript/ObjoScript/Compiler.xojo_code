@@ -303,7 +303,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Var left As Variant = stack(0)
 		    Var right As Variant = stack(1)
 		    
-		    // The expressions need to be an equality checks against `consider*`.
+		    // The expressions need to be equality checks against `consider*`.
 		    left = New ObjoScript.BinaryExpr(consider, equalToken, left)
 		    right = New ObjoScript.BinaryExpr(consider, equalToken, right)
 		    
@@ -1565,9 +1565,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 44652D73756761727320612060737769746368602073746174656D656E7420746F20616E20606966602073746174656D656E7420656E636C6F7365642077697468696E206120626C6F636B2E
-		Private Function SwitchToBlock(sw As ObjoScript.SwitchStmt) As ObjoScript.BlockStmt
-		  /// De-sugars a `switch` statement to an `if` statement enclosed within a block.
+	#tag Method, Flags = &h21, Description = 44652D73756761727320612060737769746368602073746174656D656E7420746F206120636861696E656420606966602073746174656D656E7420656E636C6F7365642077697468696E206120626C6F636B2E
+		Private Function SwitchToIfBlock(sw As ObjoScript.SwitchStmt) As ObjoScript.BlockStmt
+		  /// De-sugars a `switch` statement to a chained `if` statement enclosed within a block.
 		  ///
 		  /// We de-sugar the switch statement to a series of `if` statements.
 		  /// We only evaluate the `consider` expression once and make it available as a 
@@ -3164,7 +3164,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  End If
 		  
 		  // Convert this switch statement to an `if...else` statement contained within a block.
-		  Var block As ObjoScript.BlockStmt = SwitchToBlock(switch)
+		  Var block As ObjoScript.BlockStmt = SwitchToIfBlock(switch)
 		  
 		  // Visit the newly created if statement.
 		  Call block.Accept(Self)
