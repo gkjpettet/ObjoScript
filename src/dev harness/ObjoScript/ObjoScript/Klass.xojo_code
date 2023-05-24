@@ -1,6 +1,6 @@
 #tag Class
 Protected Class Klass
-Implements ObjoScript.Value
+Implements ObjoScript.Value, ObjoScript.MethodReceiver
 	#tag Method, Flags = &h0
 		Sub Constructor(name As String, isForeign As Boolean, fieldCount As Integer, firstFieldIndex As Integer)
 		  Self.Name = name

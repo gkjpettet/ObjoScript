@@ -53,7 +53,7 @@ Implements ObjoScript.Value
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 54686520636C617373206F7220696E7374616E63652074686973206D6574686F6420697320626F756E6420746F2E
-		Receiver As Variant
+		Receiver As MethodReceiver
 	#tag EndProperty
 
 

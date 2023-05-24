@@ -256,6 +256,7 @@ Module=StringExtensions;ObjoScript/StringExtensions.xojo_code;&h000000000F5A47FF
 Module=ObjoScript;ObjoScript/ObjoScript.xojo_code;&h000000004D1497FF;&h00000000000A4FFF;false
 Class=Debugger;ObjoScript/ObjoScript/Debugger.xojo_code;&h0000000040C92FFF;&h000000004D1497FF;false
 Class=XUICELine;IDE/XUI/XUICodeEditor/XUICELine.xojo_code;&h00000000691297FF;&h000000000FB79FFF;false
+Interface=MethodReceiver;ObjoScript/ObjoScript/MethodReceiver.xojo_code;&h0000000038EB2FFF;&h000000004D1497FF;false
 DefaultWindow=WinIDE
 AppMenuBar=MenuBarMain
 MajorVersion=1

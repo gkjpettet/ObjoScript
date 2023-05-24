@@ -998,9 +998,9 @@ Protected Class VM
 		  Next i
 		  
 		  If handle.IsConstructor Then
-		    CallClass(bound.Receiver, handle.ArgCount)
+		    CallClass(ObjoScript.Klass(bound.Receiver), handle.ArgCount)
 		  Else
-		    InvokeFromClass(bound.Receiver, bound.Method.Signature, handle.ArgCount, bound.IsStatic)
+		    InvokeFromClass(ObjoScript.Klass(bound.Receiver), bound.Method.Signature, handle.ArgCount, bound.IsStatic)
 		  End If
 		  
 		  Run
