@@ -928,29 +928,32 @@ Protected Class VM
 		  /// instance/class and operand on the stack.
 		  ///
 		  /// Raises a VM runtime error if the callee doesn't implement the overloaded operator.
-		  /// operand             <---- top of the stack
+		  /// operand              <---- top of the stack
 		  /// callee to invoke on  <---- should be class/instance
 		  
 		  Var callee As Variant = Peek(1)
 		  
-		  If callee.Type = Variant.TypeString Then
+		  Select Case callee.Type
+		  Case Variant.TypeString
 		    InvokeFromClass(StringClass, signature, 1, False)
 		    
-		  ElseIf callee.Type = Variant.TypeDouble Then
+		  Case Variant.TypeDouble
 		    InvokeFromClass(NumberClass, signature, 1, False)
 		    
-		  ElseIf callee.Type = Variant.TypeBoolean Then
+		  Case Variant.TypeBoolean
 		    InvokeFromClass(BooleanClass, signature, 1, False)
 		    
-		  ElseIf callee IsA ObjoScript.Instance Then
-		    InvokeFromClass(ObjoScript.Instance(callee).Klass, signature, 1, False)
-		    
-		  ElseIf callee IsA ObjoScript.Klass Then
-		    InvokeFromClass(ObjoScript.Klass(callee), signature, 1, True)
-		    
 		  Else
-		    Error(ValueToString(callee) + " does not implement `" + signature + "`.")
-		  End If
+		    If callee IsA ObjoScript.Instance Then
+		      InvokeFromClass(ObjoScript.Instance(callee).Klass, signature, 1, False)
+		      
+		    ElseIf callee IsA ObjoScript.Klass Then
+		      InvokeFromClass(ObjoScript.Klass(callee), signature, 1, True)
+		      
+		    Else
+		      Error(ValueToString(callee) + " does not implement `" + signature + "`.")
+		    End If
+		  End Select
 		  
 		End Sub
 	#tag EndMethod
