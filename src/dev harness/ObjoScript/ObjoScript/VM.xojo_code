@@ -302,7 +302,12 @@ Protected Class VM
 		  Var argCount As Integer = ObjoScript.ComputeArityFromSignature(signature, Self)
 		  
 		  // Check we have an instance or a class in slot 0.
-		  Var receiver As Variant = APISlots(0)
+		  Var receiver As ObjoScript.MethodReceiver
+		  Try
+		    receiver = APISlots(0)
+		  Catch e
+		    Error("Methods can only be invoked on classes and instances.")
+		  End Try
 		  Var isStatic As Boolean = False
 		  Var isConstructor As Boolean = False
 		  If receiver IsA ObjoScript.Klass Then
@@ -311,8 +316,14 @@ Protected Class VM
 		    Else
 		      isStatic = True
 		    End If
-		  ElseIf receiver IsA ObjoScript.Instance = False Then
-		    Error("Methods can only be invoked on classes and instances.")
+		  End If
+		  
+		  // Sanity checks.
+		  If isStatic And (receiver IsA ObjoScript.Klass = False) Then
+		    Error("Cannot call a bound static method on an instance.")
+		  End If
+		  If isConstructor And (receiver IsA ObjoScript.Klass = False) Then
+		    Error("Cannot call a bound constructor on an instance.")
 		  End If
 		  
 		  // Get the correct method. It might be Objo native or foreign.
