@@ -3241,9 +3241,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    // We can compile negation of numeric literals more efficiently
 		    // by letting the compiler negate the value and then emitting it as a constant.
 		    If expr.Operand IsA ObjoScript.NumberLiteral Then
-		      If ObjoScript.NumberLiteral(expr.Operand).Value = 1 Then
+		      If ObjoScript.NumberLiteral(expr.Operand).Value = 1.0 Then
 		        // -1 is a special case since it's used so often.
-		        EmitByte(ObjoScript.VM.OP_LOAD_Minus1, expr.Operand.Location)
+		        EmitByte(ObjoScript.VM.OP_LOAD_MINUS1, expr.Operand.Location)
+		      ElseIf ObjoScript.NumberLiteral(expr.Operand).Value = 2.0 Then
+		        // -2 is another special case.
+		        EmitByte(ObjoScript.VM.OP_LOAD_MINUS2, expr.Operand.Location)
 		      Else
 		        Call EmitConstant(-ObjoScript.NumberLiteral(expr.Operand).Value, expr.Operand.Location)
 		      End If

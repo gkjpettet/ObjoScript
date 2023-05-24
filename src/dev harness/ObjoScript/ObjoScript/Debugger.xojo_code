@@ -238,6 +238,9 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_LOAD_MINUS1
 		    Return SimpleInstruction("LOAD -1", offset)
 		    
+		  Case ObjoScript.VM.OP_LOAD_MINUS2
+		    Return SimpleInstruction("LOAD -2", offset)
+		    
 		  Case ObjoScript.VM.OP_ASSERT
 		    Return SimpleInstruction("ASSERT", offset)
 		    

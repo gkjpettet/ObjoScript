@@ -1414,6 +1414,9 @@ Protected Class VM
 		    Case OP_LOAD_MINUS1
 		      Push(CType(-1, Double))
 		      
+		    Case OP_LOAD_MINUS2
+		      Push(CType(-2, Double))
+		      
 		    Case OP_NEGATE
 		      If Peek(0).Type = Variant.TypeDouble Then
 		        Stack(StackTop - 1) = -Stack(StackTop - 1).DoubleValue
@@ -2220,7 +2223,7 @@ Protected Class VM
 		64: OP_LIST (1)
 		65: OP_RANGE_EXCLUSIVE (0)
 		66: OP_SUPER_SETTER (4)
-		67: **Unused**
+		67: OP_LOAD_MINUS2 (0)
 		68: OP_SUPER_INVOKE (5)
 		69: **Unused**
 		70: OP_SUPER_CONSTRUCTOR (3)
@@ -2438,7 +2441,8 @@ Protected Class VM
 			  OP_RANGE_EXCLUSIVE        : 0, _
 			  OP_LOAD_2                 : 0, _
 			  OP_ADD1                   : 0, _
-			  OP_SUBTRACT1              : 0 _
+			  OP_SUBTRACT1              : 0, _
+			  OP_LOAD_MINUS2            : 0 _
 			  )
 			  
 			  Return d
@@ -2628,6 +2632,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_LOAD_MINUS1, Type = Double, Dynamic = False, Default = \"27", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_LOAD_MINUS2, Type = Double, Dynamic = False, Default = \"67", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_LOCAL_VAR_DEC, Type = Double, Dynamic = False, Default = \"28", Scope = Public
