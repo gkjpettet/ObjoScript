@@ -1120,8 +1120,11 @@ Protected Class VM
 		  #Pragma NilObjectChecking False
 		  #Pragma StackOverflowChecking False
 		  
-		  Return Not IsFalsey(v)
-		  
+		  If (v.Type = Variant.TypeBoolean And v = False) Or v IsA ObjoScript.Nothing Then
+		    Return False
+		  Else
+		    Return True
+		  End If
 		End Function
 	#tag EndMethod
 
@@ -1669,9 +1672,9 @@ Protected Class VM
 		      Stack(CurrentFrame.StackBase + ReadByte) = Peek(0)
 		      
 		    Case OP_JUMP
-		      // Unconditionally jump `offset` bytes from the current instruction pointer.
-		      Var offset As UInt16 = ReadUInt16
-		      CurrentFrame.IP = CurrentFrame.IP + offset
+		      // Unconditionally jump the specified offset from the current instruction pointer.
+		      // +2 accounts for the 2 bytes we read.
+		      CurrentFrame.IP = CurrentFrame.IP + ReadUInt16 + 2
 		      
 		    Case OP_JUMP_IF_FALSE
 		      // Jump `offset` bytes from the current instruction pointer _if_ the value on the top of the stack is falsey.
