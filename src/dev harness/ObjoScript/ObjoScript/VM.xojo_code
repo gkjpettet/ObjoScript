@@ -1658,11 +1658,9 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_GET_LOCAL_CLASS
-		      // The operand is the stack slot where the local variable lives.
-		      // This local variable should be an instance. Load it and then push its
-		      // class onto the stack.
+		      // The operand is the stack slot where the local variable lives (should be an instance).
+		      // Load it and then push its class onto the stack.
 		      Var instance As ObjoScript.Instance = Stack(CurrentFrame.StackBase + ReadByte)
-		      // Load the value at that index and then push it on to the top of the stack.
 		      Push(instance.Klass)
 		      
 		    Case OP_SET_LOCAL
