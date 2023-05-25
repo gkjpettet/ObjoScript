@@ -573,18 +573,22 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 446566696E65732061206D6574686F64206E616D656420606E616D6560206F6E2074686520636C617373206A7573742062656C6F7720746865206D6574686F64277320626F6479206F6E2074686520737461636B2E
+	#tag Method, Flags = &h21, Description = 446566696E65732061206D6574686F64207769746820607369676E617475726560206F6E2074686520636C617373206A7573742062656C6F7720746865206D6574686F64277320626F6479206F6E2074686520737461636B2E20506F707320746865206D6574686F64206F66662074686520737461636B20627574206C65617665732074686520636C61737320696E20706C6163652E
 		Private Sub DefineMethod(signature As String, isStatic As Boolean)
 		  /// Defines a method with `signature` on the class just below the method's body on the stack.
+		  /// Pops the method off the stack but leaves the class in place.
 		  ///
-		  /// The method's body should be on the top of the stack with its class just beneath it.
+		  /// The method's body should be on the top of the stack with its class just beneath it:
+		  ///
+		  /// method
+		  /// class
 		  
 		  #Pragma DisableBoundsChecking
 		  #Pragma NilObjectChecking False
 		  #Pragma StackOverflowChecking False
 		  
-		  Var method As ObjoScript.Func = Peek(0)
-		  Var klass As ObjoScript.Klass = Peek(1)
+		  Var method As ObjoScript.Func = Pop
+		  Var klass As ObjoScript.Klass = Peek(0)
 		  
 		  If isStatic Then
 		    // Static method.
@@ -593,9 +597,6 @@ Protected Class VM
 		    // Instance method.
 		    klass.Methods.Value(signature) = method
 		  End If
-		  
-		  // Pop the method's body off the stack.
-		  Call Pop
 		  
 		End Sub
 	#tag EndMethod
