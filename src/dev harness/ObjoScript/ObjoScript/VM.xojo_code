@@ -289,9 +289,9 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 52657475726E732061207265757361626C652068616E646C6520746F20612063616C6C2061206D6574686F64207769746820607369676E617475726560206F6E2074686520636C6173732F696E7374616E63652063757272656E746C7920696E20736C6F7420302E
+	#tag Method, Flags = &h0, Description = 52657475726E732061207265757361626C652068616E646C6520746F2063616C6C2061206D6574686F64207769746820607369676E617475726560206F6E2074686520636C6173732F696E7374616E63652063757272656E746C7920696E20736C6F7420302E
 		Function CreateHandle(signature As String) As ObjoScript.CallHandle
-		  /// Returns a reusable handle to a call a method with `signature` on the class/instance currently in slot 0.
+		  /// Returns a reusable handle to call a method with `signature` on the class/instance currently in slot 0.
 		  ///
 		  /// The method can then be called again in the future using `VM.InvokeHandle()`.
 		  
@@ -463,18 +463,23 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 446566696E6573206120636F6E7374727563746F72206F6E2074686520636C617373206A7573742062656C6F772074686520636F6E7374727563746F72277320626F6479206F6E2074686520737461636B2E
+	#tag Method, Flags = &h21, Description = 446566696E6573206120636F6E7374727563746F72206F6E2074686520636C617373206A7573742062656C6F772074686520636F6E7374727563746F72277320626F6479206F6E2074686520737461636B2E20506F70732074686520636F6E7374727563746F72206F66662074686520737461636B20627574206C65617665732074686520636C61737320696E20706C6163652E
 		Private Sub DefineConstructor(argCount As Integer)
 		  /// Defines a constructor on the class just below the constructor's body on the stack.
+		  /// Pops the constructor off the stack but leaves the class in place.
 		  ///
-		  /// The constructor's body should be on the top of the stack with its class just beneath it.
+		  /// The constructor's body should be on the top of the stack with its class just beneath it:
+		  ///
+		  ///                   <---- stack top
+		  /// constructor body
+		  /// class
 		  
 		  #Pragma DisableBoundsChecking
 		  #Pragma NilObjectChecking False
 		  #Pragma StackOverflowChecking False
 		  
-		  Var constructor As ObjoScript.Func = Peek(0)
-		  Var klass As ObjoScript.Klass = Peek(1)
+		  Var constructor As ObjoScript.Func = Pop
+		  Var klass As ObjoScript.Klass = Peek(0)
 		  
 		  // Constructors are stored on the class by arity.
 		  If argCount > klass.Constructors.LastIndex Then
@@ -482,8 +487,6 @@ Protected Class VM
 		  End If
 		  klass.Constructors(argCount) = constructor
 		  
-		  // Pop the constructor's body off the stack.
-		  Call Pop
 		  
 		End Sub
 	#tag EndMethod
