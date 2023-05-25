@@ -1438,7 +1438,7 @@ Protected Class VM
 		      ElseIf Peek(0) IsA ObjoScript.Klass Then
 		        InvokeFromClass(ObjoScript.Klass(Peek(0)), "-()", 0, True)
 		      Else
-		        Error(ValueToString(Peek(0)) + " does not implement `+(_)`.")
+		        Error(ValueToString(Peek(0)) + " does not implement `-(_)`.")
 		      End If
 		      
 		    Case OP_ADD
