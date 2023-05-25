@@ -1433,12 +1433,8 @@ Protected Class VM
 		    Case OP_NEGATE
 		      If Peek(0).Type = Variant.TypeDouble Then
 		        Stack(StackTop - 1) = -Stack(StackTop - 1).DoubleValue
-		      ElseIf Peek(0) IsA ObjoScript.Instance Then
-		        InvokeFromClass(ObjoScript.Instance(Peek(0)).Klass, "-()", 0, False)
-		      ElseIf Peek(0) IsA ObjoScript.Klass Then
-		        InvokeFromClass(ObjoScript.Klass(Peek(0)), "-()", 0, True)
 		      Else
-		        Error(ValueToString(Peek(0)) + " does not implement `-(_)`.")
+		        Invoke("-()", 0)
 		      End If
 		      
 		    Case OP_ADD
