@@ -2,6 +2,12 @@
 Protected Class LanguageVariableTests
 Inherits ObjoScriptTestGroupBase
 	#tag Method, Flags = &h0
+		Sub DuplicateGlobalTest()
+		  AssertCompilerError("language.variable.duplicate_global")
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub DuplicateLocalTest()
 		  AssertCompilerError("language.variable.duplicate_local")
 		End Sub

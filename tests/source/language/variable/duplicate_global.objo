@@ -1,0 +1,2 @@
+var g1 = 1
+var g1 = 2 // expect error: "Redefined global variable `g1`."

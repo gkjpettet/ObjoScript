@@ -1589,28 +1589,14 @@ Protected Class VM
 		      If IsFalsey(Pop) Then Error("Failed assertion: " + message)
 		      
 		    Case OP_DEFINE_GLOBAL
-		      // Define a global variable, the name of which requires a single byte operand to get its index.
-		      Var name As String = ReadConstant
-		      
-		      // Is there a variable with this name already defined in the global scope?
-		      If globals.HasKey(name) Then
-		        Error("Redefined global variable `" + name + "`.")
-		      End If
-		      
-		      // The value of the variable is on the top of the stack.
-		      globals.Value(name) = Pop
+		      // We retrieve the name of the global variable and the value will then be
+		      // beneath that on the stack.
+		      globals.Value(ReadConstant) = Pop
 		      
 		    Case OP_DEFINE_GLOBAL_LONG
-		      // Define a global variable, the name of which requires a two byte operand to get its index.
-		      Var name As String = ReadConstantLong
-		      
-		      // Is there a variable with this name already defined in the global scope?
-		      If globals.HasKey(name) Then
-		        Error("Redefined global variable `" + name + "`.")
-		      End If
-		      
-		      // The value of the variable is on the top of the stack.
-		      globals.Value(name) = Pop
+		      // We retrieve the name of the global variable and the value will then be
+		      // beneath that on the stack.
+		      globals.Value(ReadConstantLong) = Pop
 		      
 		    Case OP_GET_GLOBAL
 		      // Get the name of the variable.

@@ -16,6 +16,16 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 547261636B7320746865206578697374656E6365206F66206120676C6F62616C207661726961626C65206E616D656420606E616D65602E
+		Private Sub AddGlobal(name As String)
+		  /// Tracks the existence of a global variable named `name`.
+		  
+		  // Only the outermost compiler stores the names of defined globals.
+		  OutermostCompiler.KnownGlobals.Value(name) = Nil
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 547261636B732061206C6F63616C207661726961626C6520696E207468652063757272656E742073636F70652E
 		Private Sub AddLocal(identifier As ObjoScript.Token, initialised As Boolean = False)
 		  /// Tracks a local variable in the current scope.
@@ -438,7 +448,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Func.Arity = parameters.Count
 		    
 		    For Each p As ObjoScript.Token In parameters
-		      DeclareVariable(p)
+		      DeclareVariable(p, False, False)
 		      DefineVariable(0) // The index value doesn't matter as the parameters are local.
 		    Next p
 		  End If
@@ -592,7 +602,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 466F72206C6F63616C207661726961626C65732C20746869732069732074686520706F696E742061742077686963682074686520636F6D70696C6572207265636F726473207468656972206578697374656E63652E
-		Sub DeclareVariable(identifier As ObjoScript.Token, initialised As Boolean = False)
+		Sub DeclareVariable(identifier As ObjoScript.Token, initialised As Boolean, trackAsGlobal As Boolean)
 		  /// For local variables, this is the point at which the compiler records their existence.
 		  ///
 		  /// `identifier` is the token representing the variable's name in the original source code.
@@ -600,8 +610,15 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  mLocation = identifier
 		  
-		  // Global variable? These are late bound so the compiler doesn't keep track of
-		  // which declarations for them it has seen. We're done.
+		  If trackAsGlobal Then
+		    If GlobalExists(identifier.Lexeme) Then
+		      Error("Redefined global identifier `" + identifier.Lexeme + "`.")
+		    Else
+		      AddGlobal(identifier.Lexeme)
+		    End If
+		  End If
+		  
+		  // If this is a global variable we're now done.
 		  If ScopeDepth = 0 Then
 		    Return
 		  End If
@@ -639,7 +656,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  End If
 		  
 		  EmitIndexedOpcode(ObjoScript.VM.OP_DEFINE_GLOBAL, ObjoScript.VM.OP_DEFINE_GLOBAL_LONG, index)
-		  
 		End Sub
 	#tag EndMethod
 
@@ -1109,6 +1125,15 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 52657475726E732054727565206966206120676C6F62616C206E616D657320606E616D65602068617320616C7265616479206265656E20646566696E6564206279207468697320636F6D70696C657220636861696E2E
+		Private Function GlobalExists(name As String) As Boolean
+		  /// Returns True if a global names `name` has already been defined by this compiler chain.
+		  
+		  Return OutermostCompiler.KnownGlobals.HasKey(name)
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 526574726965766573206120676C6F62616C207661726961626C65206E616D656420606E616D65602E
 		Private Sub GlobalVariable(name As String)
 		  /// Retrieves a global variable named `name`.
@@ -1493,7 +1518,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  CurrentClass = Nil
 		  KnownClasses = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		  Enclosing = Nil
-		  
+		  KnownGlobals = ParseJSON("{}") // HACK: Case-sensitive dictionary.
 		End Sub
 	#tag EndMethod
 
@@ -2123,7 +2148,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  KnownClasses.Value(c.Name) = CurrentClass
 		  
 		  // Declare the class name as a global variable.
-		  DeclareVariable(c.Identifier)
+		  DeclareVariable(c.Identifier, False, True)
 		  
 		  // Add the name of the class to the function's constants pool.
 		  Var index As Integer = AddConstant(c.Name)
@@ -2469,12 +2494,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Declare iter* as nothing.
 		  EmitByte(ObjoScript.VM.OP_NOTHING)
-		  DeclareVariable(SyntheticToken("iter*"))
+		  DeclareVariable(SyntheticToken("iter*"), False, False)
 		  MarkInitialised
 		  
 		  // Declare seq* equal to `stmt.Range`
 		  Call stmt.Range.Accept(Self)
-		  DeclareVariable(SyntheticToken("seq*"))
+		  DeclareVariable(SyntheticToken("seq*"), False, False)
 		  MarkInitialised
 		  
 		  StartLoop
@@ -2601,7 +2626,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Error("Cannot declare functions within a loop.")
 		  End If
 		  
-		  DeclareVariable(funcDecl.Name, True)
+		  DeclareVariable(funcDecl.Name, True, True)
 		  
 		  // Compile the function body.
 		  Var compiler As New ObjoScript.Compiler
@@ -2613,7 +2638,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  Var index As Integer
 		  If ScopeDepth = 0 Then
-		    // Global function. Add the name of the function to the function's constants pool.
+		    // Global function. 
+		    // Add the name of the function to the function's constants pool.
 		    index = AddConstant(funcDecl.Name.Lexeme)
 		  End If
 		  
@@ -3286,11 +3312,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // Compile the initialiser.
 		  Call stmt.Initialiser.Accept(Self)
 		  
-		  DeclareVariable(stmt.Identifier)
+		  DeclareVariable(stmt.Identifier, False, ScopeDepth = 0)
 		  
 		  Var index As Integer = -1 // -1 is a deliberate invalid index.
 		  If ScopeDepth = 0 Then
-		    // Global variable declaration. Add the name of the variable to the constant pool and get its index.
+		    // Global variable declaration.
+		    // Add the name of the variable to the constant pool and get its index.
 		    index = AddConstant(stmt.Name)
 		  End If
 		  
@@ -3388,6 +3415,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 
 	#tag Property, Flags = &h0, Description = 54686520636C617373657320616C726561647920636F6D70696C65642062792074686520636F6D70696C65722E204B6579203D20436C617373206E616D652C2056616C7565203D204F626A6F5363726970742E436C61737344617461
 		KnownClasses As Dictionary
+	#tag EndProperty
+
+	#tag Property, Flags = &h1, Description = 436F6E7461696E7320746865206E616D6573206F6620657665727920676C6F62616C207661726961626C65206465636C6172656420617320746865206B65792E204F6E6C7920746865206F757465726D6F737420636F6D70696C6572206B6565707320747261636B206F66206465636C61726564207661726961626C65732E204368696C6420636F6D70696C6572732C20616464206E657720676C6F62616C7320746F20746865206F757465726D6F737420706172656E742E205468657265666F72652C206D617920626520656D707479206576656E20696620746865726520617265206B6E6F776E20676C6F62616C732E204B6579203D20676C6F62616C206E616D652028537472696E67292C2056616C7565203D204E696C2E
+		Protected KnownGlobals As Dictionary
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 54686520636F6D70696C65722773206C657865722E205573656420746F20746F6B656E69736520736F7572636520636F64652E
@@ -3575,7 +3606,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 			Visible=false
 			Group="Behavior"
 			InitialValue="ObjoScript.FunctionTypes.TopLevel"
-			Type="ObjoScript.FunctionTypes"
+			Type="FunctionTypes"
 			EditorType="Enum"
 			#tag EnumValues
 				"0 - TopLevel"
@@ -3597,6 +3628,14 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 			Visible=false
 			Group="Behavior"
 			InitialValue="False"
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Optimise"
+			Visible=false
+			Group="Behavior"
+			InitialValue="True"
 			Type="Boolean"
 			EditorType=""
 		#tag EndViewProperty
