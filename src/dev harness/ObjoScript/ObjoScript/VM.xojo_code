@@ -664,6 +664,20 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 5265616473207468652076616C7565206F66206120676C6F62616C207661726961626C6564206E616D656420606E616D656020616E6420707573686573206974206F6E20746F2074686520737461636B2E2052616973657320612072756E74696D65206572726F722069662074686520676C6F62616C207661726961626C6520646F65736E27742065786973742E
+		Private Sub GetGlobal(name As String)
+		  /// Reads the value of a global variabled named `name` and pushes it on to the stack.
+		  /// Raises a runtime error if the global variable doesn't exist.
+		  
+		  Var value As Variant = Self.Globals.Lookup(name, Nil)
+		  If value = Nil Then
+		    Error("Undefined variable `" + name + "`.")
+		  Else
+		    Push(value)
+		  End If
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 52657475726E732074686520737472696E6720726570726573656E746174696F6E206F66207468652076616C756520696E2060736C6F74602E
 		Function GetSlotAsString(slot As Integer) As String
 		  /// Returns the string representation of the value in `slot`.
@@ -1604,26 +1618,10 @@ Protected Class VM
 		      globals.Value(ReadConstantLong) = Pop
 		      
 		    Case OP_GET_GLOBAL
-		      // Get the name of the variable.
-		      Var name As String = ReadConstant
-		      // Read its value from the globals dictionary, raising a runtime error if it doesn't exist.
-		      Var value As Variant = Self.Globals.Lookup(name, Nil)
-		      If value = Nil Then
-		        Error("Undefined variable `" + name + "`.")
-		      Else
-		        Push(value)
-		      End If
+		      GetGlobal(ReadConstant)
 		      
 		    Case OP_GET_GLOBAL_LONG
-		      // Get the name of the variable.
-		      Var name As String = ReadConstantLong
-		      // Read its value from the globals dictionary, raising a runtime error if it doesn't exist.
-		      Var value As Variant = Self.Globals.Lookup(name, Nil)
-		      If value = Nil Then
-		        Error("Undefined variable `" + name + "`.")
-		      Else
-		        Push(value)
-		      End If
+		      GetGlobal(ReadConstantLong)
 		      
 		    Case OP_SET_GLOBAL
 		      // Get the global variable's name (requires a single byte operand to get its index).
