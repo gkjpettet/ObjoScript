@@ -658,11 +658,8 @@ Protected Class VM
 		    End If
 		  End If
 		  
-		  // Get the value of the field from the instance.
-		  Var value As Variant = instance.Fields(fieldIndex)
-		  
-		  // Push the value on to the stack.
-		  Push(value)
+		  // Get the value of the field from the instance and push it on to the stack.
+		  Push(instance.Fields(fieldIndex))
 		  
 		End Sub
 	#tag EndMethod
