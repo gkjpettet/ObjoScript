@@ -1486,10 +1486,18 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_EQUAL
-		      InvokeBinaryOperator("==(_)")
+		      If TopOfStackAreNumbers Then
+		        PopAndReplaceTop(Peek(1).DoubleValue = Peek(0).DoubleValue)
+		      Else
+		        InvokeBinaryOperator("==(_)")
+		      End If
 		      
 		    Case OP_NOT_EQUAL
-		      InvokeBinaryOperator("<>(_)")
+		      If TopOfStackAreNumbers Then
+		        PopAndReplaceTop(Peek(1).DoubleValue <> Peek(0).DoubleValue)
+		      Else
+		        InvokeBinaryOperator("<>(_)")
+		      End If
 		      
 		    Case OP_GREATER
 		      If TopOfStackAreNumbers Then
