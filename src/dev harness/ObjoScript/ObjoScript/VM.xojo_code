@@ -1696,9 +1696,9 @@ Protected Class VM
 		      Push(IsTruthy(a) Xor IsTruthy(b))
 		      
 		    Case OP_LOOP
-		      // Unconditionally jump `offset` bytes _back_ from the current instruction pointer.
-		      Var offset AS UInt16 = ReadUInt16
-		      CurrentFrame.IP = CurrentFrame.IP - offset
+		      // Unconditionally jump the specified offset back from the current instruction pointer.
+		      // +2 accounts for the 2 bytes we read.
+		      CurrentFrame.IP = CurrentFrame.IP - ReadUInt16 + 2
 		      
 		    Case OP_RANGE_INCLUSIVE
 		      InvokeBinaryOperator("...(_)")
