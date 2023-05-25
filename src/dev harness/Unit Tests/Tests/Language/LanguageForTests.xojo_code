@@ -24,7 +24,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub UndefinedLoopCounterTest()
-		  AssertRuntimeError("language.for.undefined_loop_counter")
+		  AssertCompilerError("language.for.undefined_loop_counter")
 		  
 		End Sub
 	#tag EndMethod

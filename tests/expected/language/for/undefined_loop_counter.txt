@@ -1,1 +1,1 @@
-Undefined variable `i`.
+Undefined global variable `i`.

@@ -1,1 +1,1 @@
-Undefined variable `unknown`.
+Undefined global variable `unknown`.

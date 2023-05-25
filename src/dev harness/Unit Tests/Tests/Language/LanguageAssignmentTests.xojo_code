@@ -61,7 +61,7 @@ Inherits ObjoScriptTestGroupBase
 
 	#tag Method, Flags = &h0
 		Sub UndefinedTest()
-		  AssertRuntimeError("language.assignment.undefined")
+		  AssertCompilerError("language.assignment.undefined")
 		End Sub
 	#tag EndMethod
 

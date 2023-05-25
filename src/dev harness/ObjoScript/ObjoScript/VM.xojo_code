@@ -1624,24 +1624,10 @@ Protected Class VM
 		      GetGlobal(ReadConstantLong)
 		      
 		    Case OP_SET_GLOBAL
-		      // Get the global variable's name (requires a single byte operand to get its index).
-		      Var name As String = ReadConstant
-		      // Assign the value at the top of the stack to this variable, leaving the value on the stack.
-		      If Self.Globals.HasKey(name) Then
-		        Self.Globals.Value(name) = Peek(0)
-		      Else
-		        Error("Undefined variable `" + name + "`.")
-		      End If
+		      Self.Globals.Value(ReadConstant) = Peek(0)
 		      
 		    Case OP_SET_GLOBAL_LONG
-		      // Get the global variable's name (requires a two byte operand to get its index).
-		      Var name As String = ReadConstantLong
-		      // Assign the value at the top of the stack to this variable, leaving the value on the stack.
-		      If Self.Globals.HasKey(name) Then
-		        Self.Globals.Value(name) = Peek(0)
-		      Else
-		        Error("Undefined variable `" + name + "`.")
-		      End If
+		      Self.Globals.Value(ReadConstantLong) = Peek(0)
 		      
 		    Case OP_GET_LOCAL
 		      // The operand is the stack slot where the local variable lives.

@@ -81,10 +81,15 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    isSetter = True
 		    
 		  Else
-		    // Can't find a local variable or setter with this name. Assumes it's a global variable.
-		    // Add the name of the variable to the constant pool and get its index.
-		    Var index As Integer = AddConstant(name)
-		    EmitIndexedOpcode(ObjoScript.VM.OP_SET_GLOBAL, ObjoScript.VM.OP_SET_GLOBAL_LONG, index)
+		    // Can't find a local variable or setter with this name. 
+		    // Is it global?
+		    If GlobalExists(name) Then
+		      // Add the name of the variable to the constant pool and get its index.
+		      Var index As Integer = AddConstant(name)
+		      EmitIndexedOpcode(ObjoScript.VM.OP_SET_GLOBAL, ObjoScript.VM.OP_SET_GLOBAL_LONG, index)
+		    Else
+		      Error("Undefined global variable `" + name + "`.")
+		    End If
 		  End If
 		  
 		  If isSetter Then
