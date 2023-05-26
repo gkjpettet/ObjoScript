@@ -28,6 +28,10 @@ Inherits ConsoleApplication
 		  /// Compiles `source` into an executable ObjoScript function and returns it.
 		  /// If an error occurs, it is presented to the user and the app quits.
 		  
+		  Var tin As TextInputStream = TextInputStream.Open(SpecialFolder.Resource("core.objo"))
+		  Var coreSource As String = tin.ReadAll
+		  tin.Close
+		  
 		  Var compiler As New ObjoScript.Compiler
 		  
 		  Try

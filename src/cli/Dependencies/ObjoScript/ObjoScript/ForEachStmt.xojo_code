@@ -10,7 +10,7 @@ Implements ObjoScript.Stmt
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(foreachKeyword As ObjoScript.Token, loopCounter As ObjoScript.Token, rangeExpr As ObjoScript.Expr, body As ObjoScript.Stmt)
+		Sub Constructor(foreachKeyword As ObjoScript.Token, loopCounter As ObjoScript.Token, rangeExpr As ObjoScript.Expr, body As ObjoScript.BlockStmt)
 		  mForeachKeyword = foreachKeyword
 		  Self.LoopCounter = loopCounter
 		  Self.Range = rangeExpr
@@ -31,7 +31,7 @@ Implements ObjoScript.Stmt
 
 
 	#tag Property, Flags = &h0, Description = 54686520626F6479206F662074686520666F72656163682073746174656D656E742E
-		Body As ObjoScript.Stmt
+		Body As ObjoScript.BlockStmt
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 546865206C6F6F7020636F756E746572206964656E74696669657220746F6B656E2E

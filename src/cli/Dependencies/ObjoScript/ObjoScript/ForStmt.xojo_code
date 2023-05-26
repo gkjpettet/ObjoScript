@@ -10,7 +10,7 @@ Implements ObjoScript.Stmt
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(initialiser As ObjoScript.Stmt, condition As ObjoScript.Expr, increment As ObjoScript.Expr, body As ObjoScript.Stmt, forKeyword As ObjoScript.Token)
+		Sub Constructor(initialiser As ObjoScript.Stmt, condition As ObjoScript.Expr, increment As ObjoScript.Expr, body As ObjoScript.BlockStmt, forKeyword As ObjoScript.Token)
 		  Self.Initialiser = initialiser
 		  Self.Condition = condition
 		  Self.Increment = increment
@@ -33,7 +33,7 @@ Implements ObjoScript.Stmt
 
 
 	#tag Property, Flags = &h0, Description = 54686520626F6479206F66207468652060666F7260206C6F6F702E
-		Body As ObjoScript.Stmt
+		Body As ObjoScript.BlockStmt
 	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 4F7074696F6E616C206C6F6F7020636F6E646974696F6E2E204D6179206265204E696C2E

@@ -157,8 +157,14 @@ Protected Class Debugger
 		  Case ObjoScript.VM.OP_ADD
 		    Return SimpleInstruction("ADD", offset)
 		    
+		  Case ObjoScript.VM.OP_ADD1
+		    Return SimpleInstruction("ADD1", offset)
+		    
 		  Case ObjoScript.VM.OP_SUBTRACT
 		    Return SimpleInstruction("SUBTRACT", offset)
+		    
+		  Case ObjoScript.VM.OP_SUBTRACT1
+		    Return SimpleInstruction("SUBTRACT1", offset)
 		    
 		  Case ObjoScript.VM.OP_DIVIDE
 		    Return SimpleInstruction("DIVIDE", offset)
@@ -231,6 +237,9 @@ Protected Class Debugger
 		    
 		  Case ObjoScript.VM.OP_LOAD_MINUS1
 		    Return SimpleInstruction("LOAD -1", offset)
+		    
+		  Case ObjoScript.VM.OP_LOAD_MINUS2
+		    Return SimpleInstruction("LOAD -2", offset)
 		    
 		  Case ObjoScript.VM.OP_ASSERT
 		    Return SimpleInstruction("ASSERT", offset)
@@ -363,6 +372,9 @@ Protected Class Debugger
 		    
 		  Case ObjoScript.VM.OP_RANGE_EXCLUSIVE
 		    Return SimpleInstruction("RANGE_EXCLUSIVE", offset)
+		    
+		  Case ObjoScript.VM.OP_LOAD_2
+		    Return SimpleInstruction("LOAD2", offset)
 		    
 		  Else
 		    Raise New UnsupportedOperationException("Unknown opcode (byte value: " + opcode.ToString + ").")

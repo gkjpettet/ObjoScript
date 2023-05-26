@@ -14,7 +14,7 @@ Implements ObjoScript.Expr
 		  Self.Operand = operand
 		  Self.Arguments = arguments
 		  mIdentifier = identifier
-		  mSignature = ObjoScript.Func.ComputeSignature(identifier.Lexeme, arguments.Count, isSetter)
+		  mSignature = ObjoScript.ComputeSignature(identifier.Lexeme, arguments.Count, isSetter)
 		End Sub
 	#tag EndMethod
 

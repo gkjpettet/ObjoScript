@@ -16,7 +16,7 @@ Implements ObjoScript.Stmt
 		  Self.Parameters = params
 		  Self.Body = body
 		  mConstructorKeyword = constructorKeyword
-		  mSignature = ObjoScript.Func.ComputeSignature("constructor", params.Count, False)
+		  mSignature = ObjoScript.ComputeSignature("constructor", params.Count, False)
 		  
 		End Sub
 	#tag EndMethod

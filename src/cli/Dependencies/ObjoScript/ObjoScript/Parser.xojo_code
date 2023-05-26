@@ -77,7 +77,7 @@ Protected Class Parser
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 506172736573206120626C6F636B206F662073746174656D656E74732E20417373756D6573207468652070617273657220686173206A75737420636F6E73756D656420746865206C656164696E6720607B602E
-		Function Block() As ObjoScript.Stmt
+		Function Block() As ObjoScript.BlockStmt
 		  /// Parses a block of statements.
 		  /// Assumes the parser has just consumed the leading `{`.
 		  
@@ -547,7 +547,7 @@ Protected Class Parser
 		  
 		  // Expect a block.
 		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the range expression.")
-		  Var body As ObjoScript.Stmt = Block()
+		  Var body As ObjoScript.BlockStmt = Block()
 		  
 		  Return New ForEachStmt(foreachKeyword, loopCounter, rangeExpr, body)
 		  
@@ -648,7 +648,7 @@ Protected Class Parser
 		  
 		  // Expect a block.
 		  Consume(ObjoScript.TokenTypes.LCurly, "Expected a `{` after the `for` clauses.")
-		  Var body As ObjoScript.Stmt = Block()
+		  Var body As ObjoScript.BlockStmt = Block()
 		  
 		  Return New ObjoScript.ForStmt(initialiser, condition, increment, body, forKeyword)
 		  

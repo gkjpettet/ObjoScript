@@ -205,10 +205,10 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 43616C6C73206120636F6D70696C65642066756E6374696F6E2E2060617267436F756E746020697320746865206E756D626572206F6620617267756D656E7473206F6E2074686520737461636B20666F7220746869732066756E6374696F6E2063616C6C2E
+	#tag Method, Flags = &h21, Description = 43616C6C73206120636F6D70696C65642066756E6374696F6E2E2060617267436F756E746020697320746865206E756D626572206F6620617267756D656E7473206F6E2074686520737461636B20666F7220746869732066756E6374696F6E2063616C6C2E20546869732069732061737365727465642E
 		Private Sub CallFunction(f As ObjoScript.Func, argCount As Integer)
 		  /// Calls a compiled function.
-		  /// `argCount` is the number of arguments on the stack for this function call.
+		  /// `argCount` is the number of arguments on the stack for this function call. This is asserted.
 		  
 		  #Pragma DisableBoundsChecking
 		  #Pragma NilObjectChecking False
@@ -293,9 +293,9 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 52657475726E732061207265757361626C652068616E646C6520746F20612063616C6C2061206D6574686F64207769746820607369676E617475726560206F6E2074686520636C6173732F696E7374616E63652063757272656E746C7920696E20736C6F7420302E
+	#tag Method, Flags = &h0, Description = 52657475726E732061207265757361626C652068616E646C6520746F2063616C6C2061206D6574686F64207769746820607369676E617475726560206F6E2074686520636C6173732F696E7374616E63652063757272656E746C7920696E20736C6F7420302E
 		Function CreateHandle(signature As String) As ObjoScript.CallHandle
-		  /// Returns a reusable handle to a call a method with `signature` on the class/instance currently in slot 0.
+		  /// Returns a reusable handle to call a method with `signature` on the class/instance currently in slot 0.
 		  ///
 		  /// The method can then be called again in the future using `VM.InvokeHandle()`.
 		  
@@ -303,10 +303,15 @@ Protected Class VM
 		  #Pragma NilObjectChecking False
 		  #Pragma StackOverflowChecking False
 		  
-		  Var argCount As Integer = ObjoScript.Func.ComputeArityFromSignature(signature, Self)
+		  Var argCount As Integer = ObjoScript.ComputeArityFromSignature(signature, Self)
 		  
 		  // Check we have an instance or a class in slot 0.
-		  Var receiver As Variant = APISlots(0)
+		  Var receiver As ObjoScript.MethodReceiver
+		  Try
+		    receiver = APISlots(0)
+		  Catch e
+		    Error("Methods can only be invoked on classes and instances.")
+		  End Try
 		  Var isStatic As Boolean = False
 		  Var isConstructor As Boolean = False
 		  If receiver IsA ObjoScript.Klass Then
@@ -315,8 +320,14 @@ Protected Class VM
 		    Else
 		      isStatic = True
 		    End If
-		  ElseIf receiver IsA ObjoScript.Instance = False Then
-		    Error("Methods can only be invoked on classes and instances.")
+		  End If
+		  
+		  // Sanity checks.
+		  If isStatic And (receiver IsA ObjoScript.Klass = False) Then
+		    Error("Cannot call a bound static method on an instance.")
+		  End If
+		  If isConstructor And (receiver IsA ObjoScript.Klass = False) Then
+		    Error("Cannot call a bound constructor on an instance.")
 		  End If
 		  
 		  // Get the correct method. It might be Objo native or foreign.
@@ -459,18 +470,23 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 446566696E6573206120636F6E7374727563746F72206F6E2074686520636C617373206A7573742062656C6F772074686520636F6E7374727563746F72277320626F6479206F6E2074686520737461636B2E
+	#tag Method, Flags = &h21, Description = 446566696E6573206120636F6E7374727563746F72206F6E2074686520636C617373206A7573742062656C6F772074686520636F6E7374727563746F72277320626F6479206F6E2074686520737461636B2E20506F70732074686520636F6E7374727563746F72206F66662074686520737461636B20627574206C65617665732074686520636C61737320696E20706C6163652E
 		Private Sub DefineConstructor(argCount As Integer)
 		  /// Defines a constructor on the class just below the constructor's body on the stack.
+		  /// Pops the constructor off the stack but leaves the class in place.
 		  ///
-		  /// The constructor's body should be on the top of the stack with its class just beneath it.
+		  /// The constructor's body should be on the top of the stack with its class just beneath it:
+		  ///
+		  ///                   <---- stack top
+		  /// constructor body
+		  /// class
 		  
 		  #Pragma DisableBoundsChecking
 		  #Pragma NilObjectChecking False
 		  #Pragma StackOverflowChecking False
 		  
-		  Var constructor As ObjoScript.Func = Peek(0)
-		  Var klass As ObjoScript.Klass = Peek(1)
+		  Var constructor As ObjoScript.Func = Pop
+		  Var klass As ObjoScript.Klass = Peek(0)
 		  
 		  // Constructors are stored on the class by arity.
 		  If argCount > klass.Constructors.LastIndex Then
@@ -478,8 +494,6 @@ Protected Class VM
 		  End If
 		  klass.Constructors(argCount) = constructor
 		  
-		  // Pop the constructor's body off the stack.
-		  Call Pop
 		  
 		End Sub
 	#tag EndMethod
@@ -566,18 +580,22 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 446566696E65732061206D6574686F64206E616D656420606E616D6560206F6E2074686520636C617373206A7573742062656C6F7720746865206D6574686F64277320626F6479206F6E2074686520737461636B2E
+	#tag Method, Flags = &h21, Description = 446566696E65732061206D6574686F64207769746820607369676E617475726560206F6E2074686520636C617373206A7573742062656C6F7720746865206D6574686F64277320626F6479206F6E2074686520737461636B2E20506F707320746865206D6574686F64206F66662074686520737461636B20627574206C65617665732074686520636C61737320696E20706C6163652E
 		Private Sub DefineMethod(signature As String, isStatic As Boolean)
 		  /// Defines a method with `signature` on the class just below the method's body on the stack.
+		  /// Pops the method off the stack but leaves the class in place.
 		  ///
-		  /// The method's body should be on the top of the stack with its class just beneath it.
+		  /// The method's body should be on the top of the stack with its class just beneath it:
+		  ///
+		  /// method
+		  /// class
 		  
 		  #Pragma DisableBoundsChecking
 		  #Pragma NilObjectChecking False
 		  #Pragma StackOverflowChecking False
 		  
-		  Var method As ObjoScript.Func = Peek(0)
-		  Var klass As ObjoScript.Klass = Peek(1)
+		  Var method As ObjoScript.Func = Pop
+		  Var klass As ObjoScript.Klass = Peek(0)
 		  
 		  If isStatic Then
 		    // Static method.
@@ -586,9 +604,6 @@ Protected Class VM
 		    // Instance method.
 		    klass.Methods.Value(signature) = method
 		  End If
-		  
-		  // Pop the method's body off the stack.
-		  Call Pop
 		  
 		End Sub
 	#tag EndMethod
@@ -628,15 +643,6 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 52657475726E73207468652063757272656E742063616C6C206672616D652E20546869732073686F756C6420626520636F6E7369646572656420726561642D6F6E6C792E
-		Function GetCurrentFrame() As CallFrame
-		  /// Returns the current call frame. This should be considered read-only.
-		  
-		  Return CurrentFrame
-		  
-		End Function
-	#tag EndMethod
-
 	#tag Method, Flags = &h21, Description = 526574726965766573207468652076616C7565206F6620616E20696E7374616E6365206669656C6420617420606669656C64496E646578602066726F6D2074686520696E7374616E63652063757272656E746C79206F6E2074686520746F70206F662074686520737461636B20616E64207468656E20707573686573206974206F6E20746F2074686520746F70206F662074686520737461636B2E
 		Private Sub GetField(fieldIndex As Integer)
 		  /// Retrieves the value of an instance field at `fieldIndex` from the instance currently on the top of the 
@@ -660,12 +666,23 @@ Protected Class VM
 		    End If
 		  End If
 		  
-		  // Get the value of the field from the instance.
-		  Var value As Variant = instance.Fields(fieldIndex)
+		  // Get the value of the field from the instance and push it on to the stack.
+		  Push(instance.Fields(fieldIndex))
 		  
-		  // Push the value on to the stack.
-		  Push(value)
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21, Description = 5265616473207468652076616C7565206F66206120676C6F62616C207661726961626C6564206E616D656420606E616D656020616E6420707573686573206974206F6E20746F2074686520737461636B2E2052616973657320612072756E74696D65206572726F722069662074686520676C6F62616C207661726961626C6520646F65736E27742065786973742E
+		Private Sub GetGlobal(name As String)
+		  /// Reads the value of a global variabled named `name` and pushes it on to the stack.
+		  /// Raises a runtime error if the global variable doesn't exist.
 		  
+		  Var value As Variant = Self.Globals.Lookup(name, Nil)
+		  If value = Nil Then
+		    Error("Undefined variable `" + name + "`.")
+		  Else
+		    Push(value)
+		  End If
 		End Sub
 	#tag EndMethod
 
@@ -922,34 +939,40 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 496E766F6B657320612062696E617279206F70657261746F72206F7665726C6F6164206D6574686F64207769746820607369676E617475726560206F6E2074686520696E7374616E63652F636C61737320616E64206F706572616E64206F6E2074686520737461636B2E
+	#tag Method, Flags = &h21, Description = 496E766F6B657320616E206F7665726C6F616465642062696E617279206F70657261746F72206D6574686F64207769746820607369676E617475726560206F6E2074686520696E7374616E63652F636C61737320616E64206F706572616E64206F6E2074686520737461636B2E
 		Private Sub InvokeBinaryOperator(signature As String)
-		  /// Invokes a binary operator overload method with `signature` on the instance/class and operand on the stack.
+		  /// Invokes an overloaded binary operator method with `signature` on the 
+		  /// instance/class and operand on the stack.
 		  ///
-		  /// Raises a VM runtime error if the value doesn't implement the operator overload.
-		  /// operand             <---- top of the stack
-		  /// value to invoke on  <---- should be class/instance
+		  /// Raises a VM runtime error if the callee doesn't implement the overloaded operator.
+		  /// operand              <---- top of the stack
+		  /// callee to invoke on  <---- should be class/instance
 		  
-		  Var value As Variant = Peek(1)
+		  Var callee As Variant = Peek(1)
 		  
-		  If value.Type = Variant.TypeDouble Then
-		    InvokeFromClass(NumberClass, signature, 1, False)
-		    
-		  ElseIf value.Type = Variant.TypeString Then
+		  Select Case callee.Type
+		  Case Variant.TypeString
 		    InvokeFromClass(StringClass, signature, 1, False)
 		    
-		  ElseIf value.Type = Variant.TypeBoolean Then
+		  Case Variant.TypeDouble
+		    InvokeFromClass(NumberClass, signature, 1, False)
+		    
+		  Case Variant.TypeBoolean
 		    InvokeFromClass(BooleanClass, signature, 1, False)
 		    
-		  ElseIf value IsA ObjoScript.Instance Then
-		    InvokeFromClass(ObjoScript.Instance(value).Klass, signature, 1, False)
-		    
-		  ElseIf value IsA ObjoScript.Klass Then
-		    InvokeFromClass(ObjoScript.Klass(value), signature, 1, True)
-		    
 		  Else
-		    Error(ValueToString(value) + " does not implement `" + signature + "`.")
-		  End If
+		    If callee IsA ObjoScript.Instance Then
+		      InvokeFromClass(ObjoScript.Instance(callee).Klass, signature, 1, False)
+		      
+		    ElseIf callee IsA ObjoScript.Klass Then
+		      InvokeFromClass(ObjoScript.Klass(callee), signature, 1, True)
+		      
+		    ElseIf callee IsA ObjoScript.Value Then
+		      Error(ObjoScript.Value(callee).ToString + " does not implement `" + signature + "`.")
+		    Else
+		      Error("Expected a Value.")
+		    End If
+		  End Select
 		  
 		End Sub
 	#tag EndMethod
@@ -972,7 +995,7 @@ Protected Class VM
 		  If isStatic Then
 		    method = klass.StaticMethods.Lookup(signature, Nil)
 		    If method = Nil Then
-		      Error("There is no static method with signature `" +signature + "` on `" + klass.ToString + "`.")
+		      Error("There is no static method with signature `" + signature + "` on `" + klass.ToString + "`.")
 		    End If
 		  Else
 		    method = klass.Methods.Lookup(signature, Nil)
@@ -1011,11 +1034,11 @@ Protected Class VM
 		  Next i
 		  
 		  If handle.IsConstructor Then
-		    CallClass(bound.Receiver, handle.ArgCount)
+		    CallClass(ObjoScript.Klass(bound.Receiver), handle.ArgCount)
 		    // Update the current call frame (since CallClass doesn't do this for us).
 		    CurrentFrame = Frames(FrameCount - 1)
 		  Else
-		    InvokeFromClass(bound.Receiver, bound.Method.Signature, handle.ArgCount, bound.IsStatic)
+		    InvokeFromClass(ObjoScript.Klass(bound.Receiver), bound.Method.Signature, handle.ArgCount, bound.IsStatic)
 		  End If
 		  
 		  Run
@@ -1110,8 +1133,11 @@ Protected Class VM
 		  #Pragma NilObjectChecking False
 		  #Pragma StackOverflowChecking False
 		  
-		  Return Not IsFalsey(v)
-		  
+		  If (v.Type = Variant.TypeBoolean And v = False) Or v IsA ObjoScript.Nothing Then
+		    Return False
+		  Else
+		    Return True
+		  End If
 		End Function
 	#tag EndMethod
 
@@ -1121,7 +1147,7 @@ Protected Class VM
 		  
 		  Var klass As New ObjoScript.Klass(className, isForeign, fieldCount, firstFieldIndex)
 		  
-		  // All classes (except `Object`, obviously) always inherit Object's static methods.
+		  // All classes (except `Object`, obviously) inherit Object's static methods.
 		  If Not klass.Name.CompareCase("Object") Then
 		    klass.StaticMethods = ObjoScript.Klass(Globals.Value("Object")).StaticMethods.Clone
 		  End If
@@ -1197,7 +1223,7 @@ Protected Class VM
 		  /// Pops the top value off the stack and replaces the value underneath with `v`.
 		  /// The effect is to reduce the stack height by 1.
 		  ///
-		  /// This method exists but several operations require us to pop two values off the stack
+		  /// This method exists as several operations require us to pop two values off the stack
 		  /// and then immediately push one back. This method saves a few method calls.
 		  
 		  Stack(StackTop - 2) = v
@@ -1346,7 +1372,8 @@ Protected Class VM
 
 	#tag Method, Flags = &h0, Description = 52756E732074686520696E7465727072657465722E20417373756D657320697420686173206265656E20696E697469616C69736564207072696F7220746F207468697320616E642068617320612076616C69642063616C6C206672616D6520746F20657865637574652E
 		Sub Run(stepMode As ObjoScript.VM.StepModes = ObjoScript.VM.StepModes.None)
-		  /// Runs the interpreter. Assumes it has been initialised prior to this and has a valid call frame to execute.
+		  /// Runs the interpreter. 
+		  /// Assumes it has been initialised prior to this and has a valid call frame to execute.
 		  
 		  #Pragma DisableBoundsChecking
 		  #Pragma NilObjectChecking False
@@ -1380,7 +1407,6 @@ Protected Class VM
 		      
 		      If FrameCount = 0 Then
 		        // Exit the VM.
-		        Call Pop
 		        StackTop = 0
 		        RaiseEvent Finished
 		        Return
@@ -1395,13 +1421,12 @@ Protected Class VM
 		      // Drop the frame.
 		      CurrentFrame = Frames(FrameCount - 1)
 		      
+		      
 		    Case OP_CONSTANT
-		      Var constant As Variant = ReadConstant
-		      Push(constant)
+		      Push(ReadConstant)
 		      
 		    Case OP_CONSTANT_LONG
-		      Var constant As Variant = ReadConstantLong
-		      Push(constant)
+		      Push(ReadConstantLong)
 		      
 		    Case OP_LOAD_0
 		      Push(CType(0, Double))
@@ -1409,18 +1434,20 @@ Protected Class VM
 		    Case OP_LOAD_1
 		      Push(CType(1, Double))
 		      
+		    Case OP_LOAD_2
+		      Push(CType(2, Double))
+		      
 		    Case OP_LOAD_MINUS1
 		      Push(CType(-1, Double))
+		      
+		    Case OP_LOAD_MINUS2
+		      Push(CType(-2, Double))
 		      
 		    Case OP_NEGATE
 		      If Peek(0).Type = Variant.TypeDouble Then
 		        Stack(StackTop - 1) = -Stack(StackTop - 1).DoubleValue
-		      ElseIf Peek(0) IsA ObjoScript.Instance Then
-		        InvokeFromClass(ObjoScript.Instance(Peek(0)).Klass, "-()", 0, False)
-		      ElseIf Peek(0) IsA ObjoScript.Klass Then
-		        InvokeFromClass(ObjoScript.Klass(Peek(0)), "-()", 0, True)
 		      Else
-		        Error(ValueToString(Peek(0)) + " does not implement `+(_)`.")
+		        Invoke("-()", 0)
 		      End If
 		      
 		    Case OP_ADD
@@ -1430,10 +1457,26 @@ Protected Class VM
 		        InvokeBinaryOperator("+(_)")
 		      End If
 		      
+		    Case OP_ADD1
+		      If Peek(0).Type = Variant.TypeDouble Then
+		        Push(CType(Pop, Double) + 1.0)
+		      Else
+		        Push(1.0)
+		        InvokeBinaryOperator("+(_)")
+		      End If
+		      
 		    Case OP_SUBTRACT
 		      If TopOfStackAreNumbers Then
 		        PopAndReplaceTop(CType(Peek(1) - Peek(0), Double))
 		      Else
+		        InvokeBinaryOperator("-(_)")
+		      End If
+		      
+		    Case OP_SUBTRACT1
+		      If Peek(0).Type = Variant.TypeDouble Then
+		        Push(CType(Pop, Double) - 1.0)
+		      Else
+		        Push(1.0)
 		        InvokeBinaryOperator("-(_)")
 		      End If
 		      
@@ -1467,10 +1510,18 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_EQUAL
-		      InvokeBinaryOperator("==(_)")
+		      If TopOfStackAreNumbers Then
+		        PopAndReplaceTop(Peek(1).DoubleValue = Peek(0).DoubleValue)
+		      Else
+		        InvokeBinaryOperator("==(_)")
+		      End If
 		      
 		    Case OP_NOT_EQUAL
-		      InvokeBinaryOperator("<>(_)")
+		      If TopOfStackAreNumbers Then
+		        PopAndReplaceTop(Peek(1).DoubleValue <> Peek(0).DoubleValue)
+		      Else
+		        InvokeBinaryOperator("<>(_)")
+		      End If
 		      
 		    Case OP_GREATER
 		      If TopOfStackAreNumbers Then
@@ -1510,7 +1561,7 @@ Protected Class VM
 		      Push(Nothing)
 		      
 		    Case OP_POP
-		      Call Pop
+		      StackTop = StackTop - 1
 		      
 		    Case OP_POP_N
 		      // Pop N values off the stack. N is the operand.
@@ -1570,74 +1621,30 @@ Protected Class VM
 		      If IsFalsey(Pop) Then Error("Failed assertion: " + message)
 		      
 		    Case OP_DEFINE_GLOBAL
-		      // Define a global variable, the name of which requires a single byte operand to get its index.
-		      Var name As String = ReadConstant
-		      
-		      // Is there a variable with this name already defined in the global scope?
-		      If globals.HasKey(name) Then
-		        Error("Redefined global variable `" + name + "`.")
-		      End If
-		      
-		      // The value of the variable is on the top of the stack.
-		      globals.Value(name) = Pop
+		      // We retrieve the name of the global variable and the value will then be
+		      // beneath that on the stack.
+		      globals.Value(ReadConstant) = Pop
 		      
 		    Case OP_DEFINE_GLOBAL_LONG
-		      // Define a global variable, the name of which requires a two byte operand to get its index.
-		      Var name As String = ReadConstantLong
-		      
-		      // Is there a variable with this name already defined in the global scope?
-		      If globals.HasKey(name) Then
-		        Error("Redefined global variable `" + name + "`.")
-		      End If
-		      
-		      // The value of the variable is on the top of the stack.
-		      globals.Value(name) = Pop
+		      // We retrieve the name of the global variable and the value will then be
+		      // beneath that on the stack.
+		      globals.Value(ReadConstantLong) = Pop
 		      
 		    Case OP_GET_GLOBAL
-		      // Get the name of the variable.
-		      Var name As String = ReadConstant
-		      // Read its value from the globals dictionary, raising a runtime error if it doesn't exist.
-		      Var value As Variant = Self.Globals.Lookup(name, Nil)
-		      If value = Nil Then
-		        Error("Undefined variable `" + name + "`.")
-		      Else
-		        Push(value)
-		      End If
+		      GetGlobal(ReadConstant)
 		      
 		    Case OP_GET_GLOBAL_LONG
-		      // Get the name of the variable.
-		      Var name As String = ReadConstantLong
-		      // Read its value from the globals dictionary, raising a runtime error if it doesn't exist.
-		      Var value As Variant = Self.Globals.Lookup(name, Nil)
-		      If value = Nil Then
-		        Error("Undefined variable `" + name + "`.")
-		      Else
-		        Push(value)
-		      End If
+		      GetGlobal(ReadConstantLong)
 		      
 		    Case OP_SET_GLOBAL
-		      // Get the global variable's name (requires a single byte operand to get its index).
-		      Var name As String = ReadConstant
-		      // Assign the value at the top of the stack to this variable, leaving the value on the stack.
-		      If Self.Globals.HasKey(name) Then
-		        Self.Globals.Value(name) = Peek(0)
-		      Else
-		        Error("Undefined variable `" + name + "`.")
-		      End If
+		      Self.Globals.Value(ReadConstant) = Peek(0)
 		      
 		    Case OP_SET_GLOBAL_LONG
-		      // Get the global variable's name (requires a two byte operand to get its index).
-		      Var name As String = ReadConstantLong
-		      // Assign the value at the top of the stack to this variable, leaving the value on the stack.
-		      If Self.Globals.HasKey(name) Then
-		        Self.Globals.Value(name) = Peek(0)
-		      Else
-		        Error("Undefined variable `" + name + "`.")
-		      End If
+		      Self.Globals.Value(ReadConstantLong) = Peek(0)
 		      
 		    Case OP_GET_LOCAL
 		      // The operand is the stack slot where the local variable lives.
-		      // Load the value at that index and then push it on to the top of the stack.
+		      // Load the value at that slot and then push it on to the top of the stack.
 		      Push(Stack(CurrentFrame.StackBase + ReadByte))
 		      
 		    Case OP_LOCAL_VAR_DEC
@@ -1650,11 +1657,9 @@ Protected Class VM
 		      End If
 		      
 		    Case OP_GET_LOCAL_CLASS
-		      // The operand is the stack slot where the local variable lives.
-		      // This local variable should be an instance. Load it and then push its
-		      // class onto the stack.
+		      // The operand is the stack slot where the local variable lives (should be an instance).
+		      // Load it and then push its class onto the stack.
 		      Var instance As ObjoScript.Instance = Stack(CurrentFrame.StackBase + ReadByte)
-		      // Load the value at that index and then push it on to the top of the stack.
 		      Push(instance.Klass)
 		      
 		    Case OP_SET_LOCAL
@@ -1663,9 +1668,9 @@ Protected Class VM
 		      Stack(CurrentFrame.StackBase + ReadByte) = Peek(0)
 		      
 		    Case OP_JUMP
-		      // Unconditionally jump `offset` bytes from the current instruction pointer.
-		      Var offset As UInt16 = ReadUInt16
-		      CurrentFrame.IP = CurrentFrame.IP + offset
+		      // Unconditionally jump the specified offset from the current instruction pointer.
+		      // +2 accounts for the 2 bytes we read.
+		      CurrentFrame.IP = CurrentFrame.IP + ReadUInt16 + 2
 		      
 		    Case OP_JUMP_IF_FALSE
 		      // Jump `offset` bytes from the current instruction pointer _if_ the value on the top of the stack is falsey.
@@ -1687,9 +1692,9 @@ Protected Class VM
 		      Push(IsTruthy(a) Xor IsTruthy(b))
 		      
 		    Case OP_LOOP
-		      // Unconditionally jump `offset` bytes _back_ from the current instruction pointer.
-		      Var offset AS UInt16 = ReadUInt16
-		      CurrentFrame.IP = CurrentFrame.IP - offset
+		      // Unconditionally jump the specified offset back from the current instruction pointer.
+		      // +2 accounts for the 2 bytes we read.
+		      CurrentFrame.IP = CurrentFrame.IP - ReadUInt16 + 2
 		      
 		    Case OP_RANGE_INCLUSIVE
 		      InvokeBinaryOperator("...(_)")
@@ -2202,8 +2207,8 @@ Protected Class VM
 		64: OP_LIST (1)
 		65: OP_RANGE_EXCLUSIVE (0)
 		66: OP_SUPER_SETTER (4)
-		67: **Unused**
-		68: OP_SUPER_INVOKE (4)
+		67: OP_LOAD_MINUS2 (0)
+		68: OP_SUPER_INVOKE (5)
 		69: **Unused**
 		70: OP_SUPER_CONSTRUCTOR (3)
 		71: **Unused**
@@ -2211,7 +2216,11 @@ Protected Class VM
 		73: OP_GET_STATIC_FIELD_LONG (2)
 		74: OP_SET_STATIC_FIELD (1)
 		75: OP_SET_STATIC_FIELD_LONG (2)
-		76: OP_FOREIGN_METHOD (3)
+		76: OP_FOREIGN_METHOD (4)
+		77: OP_LOAD_2 (0)
+		78: OP_ADD1 (0)
+		79: OP_SUBTRACT1 (0)
+		
 	#tag EndNote
 
 
@@ -2232,8 +2241,8 @@ Protected Class VM
 		Private CallHandles() As ObjoScript.BoundMethod
 	#tag EndProperty
 
-	#tag Property, Flags = &h21, Description = 5468652063757272656E742063616C6C206672616D652E
-		Private CurrentFrame As ObjoScript.CallFrame
+	#tag Property, Flags = &h0, Description = 5468652063757272656E742063616C6C206672616D652E
+		CurrentFrame As ObjoScript.CallFrame
 	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 54686520564D27732064656275676765722E
@@ -2395,12 +2404,12 @@ Protected Class VM
 			  OP_INVOKE_LONG            : 3, _
 			  OP_INHERIT                : 0, _
 			  OP_SUPER_SETTER           : 4, _
-			  OP_SUPER_INVOKE           : 4, _
+			  OP_SUPER_INVOKE           : 5, _
 			  OP_GET_STATIC_FIELD       : 1, _
 			  OP_GET_STATIC_FIELD_LONG  : 2, _
 			  OP_SET_STATIC_FIELD       : 1, _
 			  OP_SET_STATIC_FIELD_LONG  : 2, _
-			  OP_FOREIGN_METHOD         : 3, _
+			  OP_FOREIGN_METHOD         : 4, _
 			  OP_IS                     : 0, _
 			  OP_GET_LOCAL_CLASS        : 1, _
 			  OP_LOCAL_VAR_DEC          : 3, _
@@ -2413,7 +2422,11 @@ Protected Class VM
 			  OP_MAP                    : 1, _
 			  OP_KEYVALUE               : 0, _
 			  OP_BREAKPOINT             : 0, _
-			  OP_RANGE_EXCLUSIVE        : 0 _
+			  OP_RANGE_EXCLUSIVE        : 0, _
+			  OP_LOAD_2                 : 0, _
+			  OP_ADD1                   : 0, _
+			  OP_SUBTRACT1              : 0, _
+			  OP_LOAD_MINUS2            : 0 _
 			  )
 			  
 			  Return d
@@ -2468,6 +2481,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_ADD, Type = Double, Dynamic = False, Default = \"4", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_ADD1, Type = Double, Dynamic = False, Default = \"78", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_ASSERT, Type = Double, Dynamic = False, Default = \"29", Scope = Public
@@ -2596,7 +2612,13 @@ Protected Class VM
 	#tag Constant, Name = OP_LOAD_1, Type = Double, Dynamic = False, Default = \"25", Scope = Public
 	#tag EndConstant
 
+	#tag Constant, Name = OP_LOAD_2, Type = Double, Dynamic = False, Default = \"77", Scope = Public
+	#tag EndConstant
+
 	#tag Constant, Name = OP_LOAD_MINUS1, Type = Double, Dynamic = False, Default = \"27", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_LOAD_MINUS2, Type = Double, Dynamic = False, Default = \"67", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_LOCAL_VAR_DEC, Type = Double, Dynamic = False, Default = \"28", Scope = Public
@@ -2672,6 +2694,9 @@ Protected Class VM
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SUBTRACT, Type = Double, Dynamic = False, Default = \"5", Scope = Public
+	#tag EndConstant
+
+	#tag Constant, Name = OP_SUBTRACT1, Type = Double, Dynamic = False, Default = \"79", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = OP_SUPER_CONSTRUCTOR, Type = Double, Dynamic = False, Default = \"70", Scope = Public

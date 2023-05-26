@@ -14,7 +14,7 @@ Implements ObjoScript.Expr
 		  mSuperKeyword = superKeyword
 		  Self.Identifier = methodIdentifier
 		  Self.ValueToAssign = valueToAssign
-		  mSignature = ObjoScript.Func.ComputeSignature(methodIdentifier.Lexeme, 1, True)
+		  mSignature = ObjoScript.ComputeSignature(methodIdentifier.Lexeme, 1, True)
 		  
 		End Sub
 	#tag EndMethod

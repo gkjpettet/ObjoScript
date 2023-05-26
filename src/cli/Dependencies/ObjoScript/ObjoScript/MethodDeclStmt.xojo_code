@@ -20,9 +20,9 @@ Implements ObjoScript.Stmt
 		  Self.Body = body
 		  
 		  If identifier.Type = ObjoScript.TokenTypes.LSquare Then
-		    mSignature = ObjoScript.Func.ComputeSubscriptSignature(Self.Parameters.Count, isSetter)
+		    mSignature = ObjoScript.ComputeSubscriptSignature(Self.Parameters.Count, isSetter)
 		  Else
-		    mSignature = ObjoScript.Func.ComputeSignature(Self.Name, Self.Parameters.Count, isSetter)
+		    mSignature = ObjoScript.ComputeSignature(Self.Name, Self.Parameters.Count, isSetter)
 		  End If
 		  
 		End Sub

@@ -13,7 +13,7 @@ Implements ObjoScript.Expr
 		Sub Constructor(identifier As ObjoScript.Token, arguments() As ObjoScript.Expr)
 		  Self.Arguments = arguments
 		  mIdentifier = identifier
-		  mSignature = ObjoScript.Func.ComputeSignature(identifier.Lexeme, arguments.Count, False)
+		  mSignature = ObjoScript.ComputeSignature(identifier.Lexeme, arguments.Count, False)
 		End Sub
 	#tag EndMethod
 
