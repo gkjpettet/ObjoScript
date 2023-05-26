@@ -123,9 +123,10 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 2243616C6C7322206120636C6173732E20457373656E7469616C6C79207468697320637265617465732061206E657720696E7374616E63652E
+	#tag Method, Flags = &h21, Description = 2243616C6C7322206120636C6173732E20457373656E7469616C6C79207468697320637265617465732061206E657720696E7374616E63652E20446F6573202A2A6E6F742A2A20757064617465206043757272656E744672616D65602E
 		Private Sub CallClass(klass As ObjoScript.Klass, argCount As Integer)
 		  /// "Calls" a class. Essentially this creates a new instance.
+		  /// Does **not** update `CurrentFrame`. 
 		  ///
 		  /// At the moment this method is called, the stack looks like this:
 		  /// |           <--- StackTop
@@ -243,9 +244,10 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 506572666F726D7320612063616C6C206F6E20607660207768696368206578706563747320746F2066696E642060617267436F756E746020617267756D656E747320696E207468652063616C6C20737461636B2E
+	#tag Method, Flags = &h21, Description = 506572666F726D7320612063616C6C206F6E20607660207768696368206578706563747320746F2066696E642060617267436F756E746020617267756D656E747320696E207468652063616C6C20737461636B2E2055706461746573206043757272656E744672616D65602E
 		Private Sub CallValue(v As Variant, argCount As Integer)
 		  /// Performs a call on `v` which expects to find `argCount` arguments in the call stack.
+		  /// Updates `CurrentFrame`.
 		  
 		  #Pragma DisableBoundsChecking
 		  #Pragma NilObjectChecking False
@@ -280,6 +282,8 @@ Protected Class VM
 		    Error("Can only call functions, classes and methods.")
 		  End Select
 		  
+		  // Update the current call frame.
+		  CurrentFrame = Frames(FrameCount - 1)
 		End Sub
 	#tag EndMethod
 
@@ -393,6 +397,9 @@ Protected Class VM
 		  Var kv As ObjoScript.Instance = Stack(StackTop - 1)
 		  kv.ForeignData = data
 		  
+		  // Update the current call frame (since CallClass doesn't do this for us) and
+		  // we have invoked an actual constructor.
+		  CurrentFrame = Frames(FrameCount - 1)
 		End Sub
 	#tag EndMethod
 
@@ -875,6 +882,9 @@ Protected Class VM
 		  // Call the passed function.
 		  CallFunction(func, 0)
 		  
+		  // The current call frame is the first one.
+		  CurrentFrame = Frames(0)
+		  
 		  Run(stepMode)
 		End Sub
 	#tag EndMethod
@@ -1025,6 +1035,8 @@ Protected Class VM
 		  
 		  If handle.IsConstructor Then
 		    CallClass(ObjoScript.Klass(bound.Receiver), handle.ArgCount)
+		    // Update the current call frame (since CallClass doesn't do this for us).
+		    CurrentFrame = Frames(FrameCount - 1)
 		  Else
 		    InvokeFromClass(ObjoScript.Klass(bound.Receiver), bound.Method.Signature, handle.ArgCount, bound.IsStatic)
 		  End If
@@ -1391,10 +1403,10 @@ Protected Class VM
 		      // We always put the return value in slot 0 of `APISlots` so the host application can access it.
 		      APISlots(0) = result
 		      
-		      // If this is the last frame, exit the VM.
-		      // We check if FrameCount is 1, not 0 here because we haven't actually
-		      // dropped the frame yet.
-		      If FrameCount = 1 Then
+		      FrameCount = FrameCount - 1
+		      
+		      If FrameCount = 0 Then
+		        // Exit the VM.
 		        StackTop = 0
 		        RaiseEvent Finished
 		        Return
@@ -1403,11 +1415,12 @@ Protected Class VM
 		      // Reset the stack top to what it was prior to this call.
 		      StackTop = CurrentFrame.StackBase
 		      
-		      // Drop the frame.
-		      FrameCount = FrameCount - 1
-		      
 		      // Push the result to the top of the stack.
 		      Push(result)
+		      
+		      // Drop the frame.
+		      CurrentFrame = Frames(FrameCount - 1)
+		      
 		      
 		    Case OP_CONSTANT
 		      Push(ReadConstant)
@@ -2228,15 +2241,9 @@ Protected Class VM
 		Private CallHandles() As ObjoScript.BoundMethod
 	#tag EndProperty
 
-	#tag ComputedProperty, Flags = &h0, Description = 5468652063757272656E742063616C6C206672616D652E
-		#tag Getter
-			Get
-			  Return Frames(FrameCount - 1)
-			  
-			End Get
-		#tag EndGetter
+	#tag Property, Flags = &h0, Description = 5468652063757272656E742063616C6C206672616D652E
 		CurrentFrame As ObjoScript.CallFrame
-	#tag EndComputedProperty
+	#tag EndProperty
 
 	#tag Property, Flags = &h21, Description = 54686520564D27732064656275676765722E
 		Private Debugger As ObjoScript.Debugger
