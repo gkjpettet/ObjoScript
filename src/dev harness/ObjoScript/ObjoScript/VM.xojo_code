@@ -904,7 +904,9 @@ Protected Class VM
 		  #Pragma StackOverflowChecking False
 		  
 		  // Grab the receiver from the stack. It should be beneath any arguments to the invocation.
-		  Var receiver As Variant = Peek(argCount)
+		  // We therefore peek argCount distance from the top. We're inlining the call to `Peek()` here for speed.
+		  Var receiver As Variant = Stack(StackTop - argCount - 1)
+		  
 		  Var isStatic As Boolean = False
 		  Var klass As ObjoScript.Klass
 		  If receiver.Type = Variant.TypeDouble Then
@@ -2073,7 +2075,7 @@ Protected Class VM
 		  /// Returns True if the top two values are numbers.
 		  /// Assumes there are at least two values on the stack.
 		  
-		  Return Peek(1).Type = Variant.TypeDouble And Peek(0).Type = Variant.TypeDouble
+		  Return Stack(StackTop - 2).Type = Variant.TypeDouble And Stack(StackTop - 1).Type = Variant.TypeDouble
 		End Function
 	#tag EndMethod
 
