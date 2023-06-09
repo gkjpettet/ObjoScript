@@ -1,2 +1,2 @@
-System.print("  hello  ".trim) // "hello"
-System.print("hello1".trim(1)) // hello
+System.print("  hello  ".trim) # "hello"
+System.print("hello1".trim(1)) # hello

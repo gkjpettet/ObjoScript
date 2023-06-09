@@ -8,4 +8,4 @@ case 2 { System.print("case 2") }
 else { System.print("ok") }
 }
 
-// Expect ok
+# Expect ok

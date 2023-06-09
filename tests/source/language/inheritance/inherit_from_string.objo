@@ -1,2 +1,2 @@
-// Expect parsing error - Classes cannot inherit from built-in types.
+#  Expect parsing error - Classes cannot inherit from built-in types.
 class Foo is String {}

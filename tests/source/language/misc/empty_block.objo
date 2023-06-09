@@ -1,7 +1,7 @@
-{} // By itself.
+{} # By itself.
 
-// In a statement.
+# In a statement.
 if true {}
 if false {} else {}
 
-System.print("ok") // expect: ok
+System.print("ok") # expect: ok

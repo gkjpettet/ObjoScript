@@ -1,2 +1,2 @@
-System.print("ok") if true else System.print("no") // expect: ok
-System.print("no") if false else System.print("ok") // expect: ok
+System.print("ok") if true else System.print("no") # expect: ok
+System.print("no") if false else System.print("ok") # expect: ok

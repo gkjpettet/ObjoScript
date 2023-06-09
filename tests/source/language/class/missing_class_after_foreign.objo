@@ -1,2 +1,2 @@
-// Missing "class".
-foreign Blah A {} // expected class after the foreign keyword.
+# Missing "class".
+foreign Blah A {} # expected class after the foreign keyword.

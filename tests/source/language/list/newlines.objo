@@ -1,4 +1,4 @@
-// Allow after '[' and ',', and before ']'.
+#  Allow after '[' and ',', and before ']'.
 var list = [
 
 "a",
@@ -6,19 +6,19 @@ var list = [
 
 ]
 
-System.print(list[0]) // expect: a
-System.print(list[1]) // expect: b
+System.print(list[0]) #  expect: a
+System.print(list[1]) #  expect: b
 
-// Newline after trailing comma.
+#  Newline after trailing comma.
 list = ["c"
 
 ]
 
-System.print(list[0]) // expect: c
+System.print(list[0]) #  expect: c
 
-// Newline in empty list.
+#  Newline in empty list.
 list = [
 
 ]
 
-System.print(list.count) // expect: 0
+System.print(list.count) #  expect: 0

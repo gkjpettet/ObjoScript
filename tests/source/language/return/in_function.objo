@@ -3,4 +3,4 @@ return "ok"
 System.print("bad")
 }
 
-System.print(test()) // Expect: ok
+System.print(test()) # Expect: ok

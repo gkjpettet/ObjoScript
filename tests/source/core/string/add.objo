@@ -1,5 +1,5 @@
-System.print("abc" + 1) // Expect abc1
-System.print("abc" + true) // Expect abctrue
-System.print("abc" + "d") // Expect abcd
-System.print("abc" + [1, 2]) // Expect abc[1, 2]
-System.print("abc" + {"key" : "value"}) // Expect abcd{key : value}
+System.print("abc" + 1) # Expect abc1
+System.print("abc" + true) # Expect abctrue
+System.print("abc" + "d") # Expect abcd
+System.print("abc" + [1, 2]) # Expect abc[1, 2]
+System.print("abc" + {"key" : "value"}) # Expect abcd{key : value}

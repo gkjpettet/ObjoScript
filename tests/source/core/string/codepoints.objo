@@ -1,6 +1,6 @@
 var s = "(ᵔᴥᵔ)"
-System.print(s.codePoints[0]) // 40 (for "(")
-System.print(s.codePoints[1]) // 7508 (for "ᵔ")
-System.print(s.codePoints[2]) // 7461 (for "ᴥ")
-System.print(s.codePoints[3]) // 7508 (for "ᵔ")
-System.print(s.codePoints[4]) // 41 (for ")")
+System.print(s.codePoints[0]) # 40 (for "(")
+System.print(s.codePoints[1]) # 7508 (for "ᵔ")
+System.print(s.codePoints[2]) # 7461 (for "ᴥ")
+System.print(s.codePoints[3]) # 7508 (for "ᵔ")
+System.print(s.codePoints[4]) # 41 (for ")")

@@ -1,1 +1,1 @@
-System.print(foo) // Expect error: Undefined variable `foo`.
+System.print(foo) # Expect error: Undefined variable `foo`.

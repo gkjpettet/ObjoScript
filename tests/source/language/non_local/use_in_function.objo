@@ -3,4 +3,4 @@ var global = "global"
 function test() {
 System.print(global)
 }
-test() // Expect: global.
+test() # Expect: global.

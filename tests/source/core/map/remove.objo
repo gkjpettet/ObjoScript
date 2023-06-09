@@ -1,8 +1,8 @@
 var map = {"a" : 0, "b" : 1, "c" : 2}
-System.print(map.count) // expect 3
+System.print(map.count) # expect 3
 
-System.print(map.remove("A")) // expect nothing as case-sensitive
-System.print(map.count) // expect 3
+System.print(map.remove("A")) # expect nothing as case-sensitive
+System.print(map.count) # expect 3
 
-System.print(map.remove("a")) // expect 0
-System.print(map.count) // expect 2
+System.print(map.remove("a")) # expect 0
+System.print(map.count) # expect 2

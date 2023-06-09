@@ -21,9 +21,9 @@ super.baz = value
 }
 
 Derived().bar
-// Expect: Derived.bar
-// Expect: Base.foo
+# Expect: Derived.bar
+# Expect: Base.foo
 
 Derived().baz = "Hello"
-// Expect: Derived.baz=Hello
-// Expect: Base.baz=Hello
+# Expect: Derived.baz=Hello
+# Expect: Base.baz=Hello

@@ -1,7 +1,7 @@
 class Foo {
 static type {
-System.print("Foo.type") // Expect: Foo.type
-System.print(super.type) // Expect: Foo
+System.print("Foo.type") # Expect: Foo.type
+System.print(super.type) # Expect: Foo
 }
 }
 

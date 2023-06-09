@@ -4,4 +4,4 @@ class Foo {
 
 class Bar is Foo {}
 
-Bar(10) // expect runtime error: Bar does not inherit Foo's constructor.
+Bar(10) # expect runtime error: Bar does not inherit Foo's constructor.

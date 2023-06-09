@@ -1,2 +1,2 @@
-System.print(String.fromCodepoint(65)) // A
-System.print(String.fromCodepoint(128640)) // 🚀
+System.print(String.fromCodepoint(65)) # A
+System.print(String.fromCodepoint(128640)) # 🚀

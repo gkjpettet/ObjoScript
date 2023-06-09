@@ -1,5 +1,5 @@
 var neg = -10.4
 var pos = 1
 
-System.print(neg.abs) // Expect 10.4
-System.print(pos.abs) // Expect 1
+System.print(neg.abs) # Expect 10.4
+System.print(pos.abs) # Expect 1

@@ -1,5 +1,5 @@
 if true {
-System.print("good") // expect: good
+System.print("good") #  expect: good
 } else {
  System.print("bad")
 }
@@ -7,5 +7,5 @@ System.print("good") // expect: good
 if false {
 System.print("bad") 
 } else {
-System.print("good") // expect: good
+System.print("good") #  expect: good
 }

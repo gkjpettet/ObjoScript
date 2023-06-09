@@ -1,4 +1,4 @@
 class Foo {
 static bar() {}
-static bar() {} // expect error
+static bar() {} # expect error
 }

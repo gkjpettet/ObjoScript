@@ -1,5 +1,5 @@
 class Foo {
-bar(arg, arg) { // expect error
+bar(arg, arg) { # expect error
 return "body"
 }
 }

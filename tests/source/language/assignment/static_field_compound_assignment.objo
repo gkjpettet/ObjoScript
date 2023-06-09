@@ -9,4 +9,4 @@ System.print(__age)
 }
 }
 
-Person.test // Expect -3
+Person.test # Expect -3

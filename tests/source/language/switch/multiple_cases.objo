@@ -6,4 +6,4 @@ case 9 { System.print("case 1") }
 case 10 { System.print("case 2") }
 }
 
-// Expect case 2
+# Expect case 2

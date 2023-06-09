@@ -5,4 +5,4 @@ a -= 4
 a *= 3
 a /= 2
 
-System.print(a) // Expect 9
+System.print(a) # Expect 9

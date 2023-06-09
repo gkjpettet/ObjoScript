@@ -1,4 +1,4 @@
-System.print("hello".middle(2)) // llo
-System.print("hello".middle(0)) // hello
-System.print("hello".middle(4)) // o
-System.print("hello".middle(5)) // ""
+System.print("hello".middle(2)) # llo
+System.print("hello".middle(0)) # hello
+System.print("hello".middle(4)) # o
+System.print("hello".middle(5)) # ""

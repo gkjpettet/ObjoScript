@@ -5,4 +5,4 @@ function f() {
 }
 
 System.print(f())
-// expect: 1
+# expect: 1

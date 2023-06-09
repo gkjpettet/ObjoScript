@@ -1,7 +1,7 @@
-System.print("garry".startsWith("g")) // Expect true
-System.print("garry".startsWith("g", true)) // Expect true
-System.print("garry".startsWith("g", false)) // Expect true
+System.print("garry".startsWith("g")) # Expect true
+System.print("garry".startsWith("g", true)) # Expect true
+System.print("garry".startsWith("g", false)) # Expect true
 
-System.print("garry".startsWith("G")) // Expect false
-System.print("garry".startsWith("G", true)) // Expect false
-System.print("garry".startsWith("G", false)) // Expect true
+System.print("garry".startsWith("G")) # Expect false
+System.print("garry".startsWith("G", true)) # Expect false
+System.print("garry".startsWith("G", false)) # Expect true

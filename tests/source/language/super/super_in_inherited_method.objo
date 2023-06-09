@@ -6,4 +6,4 @@ toString { "A.toString" }
 
 class B is A {}
 
-System.print(B().callSuperToString) // Expect: B instance
+System.print(B().callSuperToString) # Expect: B instance

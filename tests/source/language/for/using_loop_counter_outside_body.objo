@@ -1,4 +1,4 @@
 for (var i = 0; i < 10; i++) {
 System.print(i)
 }
-System.print(i) // Expect: error
+System.print(i) # Expect: error

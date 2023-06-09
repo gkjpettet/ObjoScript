@@ -4,4 +4,4 @@ switch consider {
 case 10 { System.print("ok") }
 }
 
-// Expect ok
+# Expect ok

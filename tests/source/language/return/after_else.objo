@@ -6,4 +6,4 @@ return "ok"
 }
 }
 
-System.print(test()) // Expect: ok
+System.print(test()) # Expect: ok

@@ -1,12 +1,12 @@
-/// The order that classes are instantiated in the runtime core
-/// is critical.
+# The order that classes are instantiated in the runtime core
+# is critical.
 
-/// ----------------------------------------------------
-/// OBJECT
-/// ----------------------------------------------------
-/// This must be the first class defined in the runtime.
+# ----------------------------------------------------
+# OBJECT
+# ----------------------------------------------------
+# This must be the first class defined in the runtime.
 foreign class Object {
-// Overloaded operators.
+# Overloaded operators.
 foreign ==(other)
 foreign <>(other)
 foreign is(other)
@@ -14,11 +14,11 @@ foreign static ==(other)
 foreign static <>(other)
 foreign static is(other)
 
-// -----------------
-// Instance methods.
-// -----------------
+# -----------------
+# Instance methods.
+# -----------------
 not() {
-// Returns false since most objects are considered true.
+# Returns false since most objects are considered true.
 return true
 }
 
@@ -27,48 +27,48 @@ foreign superType()
 foreign toString()
 foreign type()
 
-// -----------------
-// Static methods.
-// -----------------
+# -----------------
+# Static methods.
+# -----------------
 foreign static hasMethod(signature)
 }
 
-/// ----------------------------------------------------
-/// CLASS
-/// ----------------------------------------------------
+# ----------------------------------------------------
+# CLASS
+# ----------------------------------------------------
 class Class {
 constructor(name, superclass) {
 _name = name
 _superclass = superclass
 }
 
-// The name of the class.
+# The name of the class.
 name { return _name }
 
-// The name of the superclass. Will be nothing for `Object`.
+# The name of the superclass. Will be nothing for `Object`.
 superclass { return _superclass }
 }
 
-/// ----------------------------------------------------
-/// NOTHING
-/// ----------------------------------------------------
-/// This must be the second class defined in the runtime.
+# ----------------------------------------------------
+# NOTHING
+# ----------------------------------------------------
+# This must be the second class defined in the runtime.
 foreign class Nothing {
 foreign not()
 foreign toString()
 }
 
-/// ----------------------------------------------------
-/// BOOLEAN
-/// ----------------------------------------------------
+# ----------------------------------------------------
+# BOOLEAN
+# ----------------------------------------------------
 foreign class Boolean {
 foreign not()
 foreign toString()
 }
 
-/// ----------------------------------------------------
-/// NUMBER
-/// ----------------------------------------------------
+# ----------------------------------------------------
+# NUMBER
+# ----------------------------------------------------
 foreign class Number {
 foreign +(other)
 foreign <(other)
@@ -100,9 +100,9 @@ foreign toString()
 foreign static fromString(value)
 }
 
-/// ----------------------------------------------------
-/// KEYVALUE
-/// ----------------------------------------------------
+# ----------------------------------------------------
+# KEYVALUE
+# ----------------------------------------------------
 foreign class KeyValue {
 constructor() {}
 constructor(key, value) {}
@@ -114,17 +114,17 @@ foreign value()
 foreign value=(v)
 }
 
-/// ----------------------------------------------------
-/// SEQUENCE
-/// ----------------------------------------------------
-/// An abstract class for any iterable object.
-/// Any class that implements the `iterator protocol` can 
-/// extend this class to get a number of helpful methods.
+# ----------------------------------------------------
+# SEQUENCE
+# ----------------------------------------------------
+# An abstract class for any iterable object.
+# Any class that implements the `iterator protocol` can 
+# extend this class to get a number of helpful methods.
 class Sequence {
-/// Tests whether all the elements in the sequence pass the predicate.
-/// Iterates over the sequence, passing each element to the function `predicate()`. 
-/// If the function returns something false, it stops iterating and returns false. 
-/// Otherwise, returns true.
+# Tests whether all the elements in the sequence pass the predicate.
+# Iterates over the sequence, passing each element to the function `predicate()`. 
+# If the function returns something false, it stops iterating and returns false. 
+# Otherwise, returns true.
 all(predicate) {
 var result = true
 foreach element in this {
@@ -134,11 +134,11 @@ if result == false then return false
 return true
 }
 
-/// Tests whether any element in the sequence passed the `predicate`.
-///
-/// Iterates over the sequence, passing each element to the function `predicate(_)`.
-/// If the function returns true then the sequence stops iterating and returns true. 
-/// Otherwise it returns false.
+# Tests whether any element in the sequence passed the `predicate`.
+#
+# Iterates over the sequence, passing each element to the function `predicate(_)`.
+# If the function returns true then the sequence stops iterating and returns true. 
+# Otherwise it returns false.
 any(predicate) {
 var result = true
 foreach element in this {
@@ -148,7 +148,7 @@ if result then return true
 return false
 }
 
-/// Returns true if the sequence contains `element`.
+# Returns true if the sequence contains `element`.
 contains(element) {
 foreach item in this {
 if element == item then return true
@@ -156,7 +156,7 @@ if element == item then return true
 return false
 }
 
-/// Returns the number of elements in the sequence.
+# Returns the number of elements in the sequence.
 count {
 var result = 0
 foreach item in this {
@@ -165,9 +165,9 @@ result = result + 1
 return result
 }
 
-/// Returns the number of elements in the sequence that pass the predicate.
-/// Iterates over the sequence, passing each element to the function `predicate(_)` and 
-/// counting the number of times the returned value evaluates to true.
+# Returns the number of elements in the sequence that pass the predicate.
+# Iterates over the sequence, passing each element to the function `predicate(_)` and 
+# counting the number of times the returned value evaluates to true.
 count(predicate) {
 var result = 0
 foreach element in this {
@@ -176,23 +176,23 @@ if predicate(element) then result = result + 1
 return result
 }
 
-/// Iterates over the sequence, passing each element to the given `action(_)` function.
+# Iterates over the sequence, passing each element to the given `action(_)` function.
 each(action) {
 foreach element in this { action(element) }
 }
 
-/// Returns true if the sequence has no elements.
-/// More efficient than `count == 0` as it's doesn't iterate over the entire sequence.
-/// Relies on the fact that calling `iterate(nothing)` on an object that implements
-/// the `iterator protocol` returns the first item or `false` if there are no items.
+# Returns true if the sequence has no elements.
+# More efficient than `count == 0` as it's doesn't iterate over the entire sequence.
+# Relies on the fact that calling `iterate(nothing)` on an object that implements
+# the `iterator protocol` returns the first item or `false` if there are no items.
 isEmpty {
 return false if this.iterate(nothing) else true
 }
 }
 
-/// ----------------------------------------------------
-/// STRING
-/// ----------------------------------------------------
+# ----------------------------------------------------
+# STRING
+# ----------------------------------------------------
 foreign class String is Sequence {
 foreign static fromCodepoint(codePoint)
 
@@ -229,17 +229,17 @@ foreign trimStart(chars)
 foreign uppercase()
 }
 
-/// ----------------------------------------------------
-/// LIST
-/// ----------------------------------------------------
-// The List class represents a single dimension array.
+# ----------------------------------------------------
+# LIST
+# ----------------------------------------------------
+# The List class represents a single dimension array.
 foreign class List is Sequence {
 foreign static filled(size, element)
 
 foreign add(item)
 
-/// Appends each element of `other` in the same order to the end of the list. 
-/// `other` must be an iterable.
+# Appends each element of `other` in the same order to the end of the list. 
+# `other` must be an iterable.
 addAll(other) {
 foreach element in other {
 add(element)
@@ -258,37 +258,37 @@ foreign pop()
 foreign remove(item)
 foreign removeAt(index)
 
-/// Sorts a single dimension list using an iterative quicksort algorithm.
+# Sorts a single dimension list using an iterative quicksort algorithm.
 sort() {
-// Create a stack for storing sublist start and end index.
+# Create a stack for storing sublist start and end index.
 var stack = []
 
-// Get the starting and ending index of a given list.
+# Get the starting and ending index of a given list.
 var start = 0
 var end = this.count - 1
 
-// Push the start and end index of the array into the stack.
+# Push the start and end index of the array into the stack.
 stack.add(start : end)
 
-// Loop until the stack is empty.
+# Loop until the stack is empty.
 while not stack.isEmpty {
-// Remove top pair from the list and get sublist starting and ending indices.
+# Remove top pair from the list and get sublist starting and ending indices.
 var pair = stack.pop()
 start = pair.key
 end = pair.value
 
-// Rearrange elements across pivot.
-// Pick the rightmost element as a pivot from the list.
+# Rearrange elements across pivot.
+# Pick the rightmost element as a pivot from the list.
 var pivot = this[end]
 
-// Elements less than the pivot will go to the left of `pIndex`
-// Elements more than the pivot will go to the right of `pIndex`
-// Equal elements can go either way
+# Elements less than the pivot will go to the left of `pIndex`
+# Elements more than the pivot will go to the right of `pIndex`
+# Equal elements can go either way
 var pIndex = start
 
-// Each time we find an element less than or equal to the pivot,
-// `pIndex` is incremented, and that element would be placed
-// before the pivot.
+# Each time we find an element less than or equal to the pivot,
+# `pIndex` is incremented, and that element would be placed
+# before the pivot.
 foreach i in start..<end {
 if this[i] <= pivot {
 this.swap(i, pIndex)
@@ -296,20 +296,20 @@ pIndex = pIndex + 1
 }
 }
 
-// Swap `pIndex` with pivot
+# Swap `pIndex` with pivot
 this.swap(pIndex, end)
 
-// We now have index of the pivot element.
+# We now have index of the pivot element.
 pivot = pIndex
 
-// Push sublist indices containing elements that are
-// less than the current pivot to stack.
+# Push sublist indices containing elements that are
+# less than the current pivot to stack.
 if pivot - 1 > start {
 stack.add(start : pivot - 1)
 }
 
-// Push sublist indices containing elements that are
-// more than the current pivot to stack.
+# Push sublist indices containing elements that are
+# more than the current pivot to stack.
 if pivot + 1 < end {
 stack.add(pivot + 1 : end)
 }
@@ -319,7 +319,7 @@ stack.add(pivot + 1 : end)
 foreign swap(index0, index1)
 foreign toString()
 
-/// Creates a new list by concatenating this list and `other` (an iterable).
+# Creates a new list by concatenating this list and `other` (an iterable).
 +(other) {
 var result = this.clone
 foreach element in other {
@@ -328,8 +328,8 @@ result.add(element)
 return result
 }
 
-/// Creates a new list by repeating this one count times. 
-/// It is a runtime error if `count` is not a non-negative integer.
+# Creates a new list by repeating this one count times. 
+# It is a runtime error if `count` is not a non-negative integer.
 *(count) {
 assert(count is Number, "`count` must be a number.")
 assert(count.isInteger, "`count` must be an integer.")
@@ -346,10 +346,10 @@ foreign [index]
 foreign [index]=(value)
 }
 
-/// ----------------------------------------------------
-/// MAP
-/// ----------------------------------------------------
-// The Map class represents a key-value dictionary.
+# ----------------------------------------------------
+# MAP
+# ----------------------------------------------------
+# The Map class represents a key-value dictionary.
 foreign class Map is Sequence {
 foreign clear()
 foreign containsKey(key)
@@ -361,26 +361,26 @@ foreign remove(value)
 foreign toString()
 foreign values()
 
-// Operator overloads.
+# Operator overloads.
 foreign [key]
 foreign [key]=(value)
 }
 
-/// ----------------------------------------------------
-/// SYSTEM
-/// ----------------------------------------------------
-/// The System class contains useful functionality for 
-/// the VM.
+# ----------------------------------------------------
+# SYSTEM
+# ----------------------------------------------------
+# The System class contains useful functionality for 
+# the VM.
 foreign class System {
 foreign static clock()
 foreign static print(object)   
 }
 
-/// ----------------------------------------------------
-/// MATHS
-/// ----------------------------------------------------
-/// The Maths class contains useful mathematical 
-/// constants and functions.
+# ----------------------------------------------------
+# MATHS
+# ----------------------------------------------------
+# The Maths class contains useful mathematical 
+# constants and functions.
 foreign class Maths {
 foreign static e()
 foreign static pi()
@@ -388,22 +388,22 @@ foreign static random()
 foreign static tau()
 }
 
-/// ----------------------------------------------------
-/// RANDOM
-/// ----------------------------------------------------
-/// A class used to generate random numbers.
+# ----------------------------------------------------
+# RANDOM
+# ----------------------------------------------------
+# A class used to generate random numbers.
 foreign class Random {
-/// Returns a random integer in the range `min` to `max` inclusive.
+# Returns a random integer in the range `min` to `max` inclusive.
 foreign inRange(min, max)
-/// Returns a random integer (`result`) where: `0 <= result < upper`.
+# Returns a random integer (`result`) where: `0 <= result < upper`.
 foreign lessThan(upper)
 foreign number()
 }
 
-/// ----------------------------------------------------
-/// FSITEM
-/// ----------------------------------------------------
-/// A class used to represent file system items.
+# ----------------------------------------------------
+# FSITEM
+# ----------------------------------------------------
+# A class used to represent file system items.
 foreign class FSItem {
 constructor(path) {}
 

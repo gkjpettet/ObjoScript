@@ -1,2 +1,2 @@
-if true then if true then System.print("ok") // expect: ok.
-if true then if false then System.print("bad") // won't execute.
+if true then if true then System.print("ok") #  expect: ok.
+if true then if false then System.print("bad") #  won't execute.

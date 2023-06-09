@@ -1,1 +1,1 @@
-System.print(10.exp) // Expect 22026.465794807
+System.print(10.exp) # Expect 22026.465794807

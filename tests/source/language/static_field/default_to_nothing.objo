@@ -2,4 +2,4 @@ class Foo {
 static write { System.print(__field) }
 }
 
-Foo.write // Expect: nothing
+Foo.write # Expect: nothing

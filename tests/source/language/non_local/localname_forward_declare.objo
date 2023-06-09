@@ -1,4 +1,4 @@
-// Runtime error.
+# Runtime error.
 if true {
 System.print(a)
 }

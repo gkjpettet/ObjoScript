@@ -8,12 +8,12 @@ foreach i in 0...2 {
   }
 }
 
-// expect: outer 0
-// expect: inner 0
-// expect: inner 1
-// expect: inner 2
-// expect: outer 1
-// expect: inner 0
-// expect: inner 1
-// expect: inner 2
-// expect: outer 2
+# expect: outer 0
+# expect: inner 0
+# expect: inner 1
+# expect: inner 2
+# expect: outer 1
+# expect: inner 0
+# expect: inner 1
+# expect: inner 2
+# expect: outer 2

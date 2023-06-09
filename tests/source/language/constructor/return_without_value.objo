@@ -12,7 +12,7 @@ class Foo {
     return
   }
 }
-System.print(Baz()) // expect: instance of Baz
-System.print(Bar()) // expect: instance of Bar
-System.print(Foo()) // expect: instance of Foo
-System.print(Foo() <> nothing) // expect: true
+System.print(Baz()) # expect: instance of Baz
+System.print(Bar()) # expect: instance of Bar
+System.print(Foo()) # expect: instance of Foo
+System.print(Foo() <> nothing) # expect: true

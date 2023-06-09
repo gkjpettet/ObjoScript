@@ -4,4 +4,4 @@ System.print(value)
 }
 }
 
-Foo.bar = "value" // Expect: value
+Foo.bar = "value" # Expect: value

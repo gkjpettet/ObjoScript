@@ -1,1 +1,1 @@
-System.print("HelLo".uppercase) // HELLO
+System.print("HelLo".uppercase) # HELLO

@@ -1,2 +1,2 @@
-System.print("abc".count) // Expect 3
-System.print("".count) // Expect 0
+System.print("abc".count) # Expect 3
+System.print("".count) # Expect 0

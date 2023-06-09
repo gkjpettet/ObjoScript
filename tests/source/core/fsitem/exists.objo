@@ -1,5 +1,5 @@
 var nope = FSItem("dfhjfhjdhfjdhj.djhdjfhdj")
 var yes = FSItem(FSItem.resources + "/tests/files/exists.txt")
 
-System.print(nope.exists) // Expect false
-System.print(yes.exists) // Expect true
+System.print(nope.exists) # Expect false
+System.print(yes.exists) # Expect true

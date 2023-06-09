@@ -12,5 +12,5 @@ super
 }
 
 Derived().foo
-// Expect: Derived.foo
-// Expect: Base.foo
+# Expect: Derived.foo
+# Expect: Base.foo

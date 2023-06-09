@@ -1,4 +1,4 @@
-// This mostly tests that lists handle growing and shrinking their memory.
+#  This mostly tests that lists handle growing and shrinking their memory.
 var list = []
 foreach i in 0...200 {
 list.add(i)
@@ -8,5 +8,5 @@ foreach i in 0...195 {
 list.removeAt(-1)
 }
 
-// Expect: [0, 1, 2, 3, 4]
+#  Expect: [0, 1, 2, 3, 4]
 System.print(list.toString)

@@ -1,2 +1,2 @@
-while // expect error
+while # expect error
 (true) System.print("bad")

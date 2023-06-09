@@ -6,7 +6,7 @@ function f() {
 foreach i in f() {
  System.print(i)
 }
-// expect: evaluate sequence
-// expect: 1
-// expect: 2
-// expect: 3
+# expect: evaluate sequence
+# expect: 1
+# expect: 2
+# expect: 3

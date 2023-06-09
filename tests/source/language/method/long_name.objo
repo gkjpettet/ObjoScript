@@ -4,5 +4,5 @@ class Foo {
   }
 }
 
- // expect: result
+ # expect: result
 System.print(Foo().thisHasAMethodNameThatIsExactly64CharactersLongWhichIsReallyLong)

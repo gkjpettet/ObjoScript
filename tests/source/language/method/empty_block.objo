@@ -2,4 +2,4 @@ class Foo {
   bar() {}
 }
 
-System.print(Foo().bar) // expect: nothing
+System.print(Foo().bar) # expect: nothing

@@ -12,8 +12,8 @@ var aoife = Person(10)
 var carole = Person(68)
 var fiona = Person(41)
 
-System.print(garry > carole) // Expect false
-System.print(garry < carole) // Expect true
-System.print(garry > aoife) // Expect true
-System.print(garry < aoife) // Expect false
-System.print(garry == fiona) // Expect true
+System.print(garry > carole) # Expect false
+System.print(garry < carole) # Expect true
+System.print(garry > aoife) # Expect true
+System.print(garry < aoife) # Expect false
+System.print(garry == fiona) # Expect true

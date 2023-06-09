@@ -1,10 +1,10 @@
-System.print("".count)   // expect: 0
-System.print("a string") // expect: a string
+System.print("".count)   # expect: 0
+System.print("a string") # expect: a string
 
-// Non-ASCII.
-System.print("A~¶Þॐஃ") // expect: A~¶Þॐஃ
+# Non-ASCII.
+System.print("A~¶Þॐஃ") # expect: A~¶Þॐஃ
 
-// Raw strings.
-System.print("A raw string") // expect: A raw string
-System.print("   A raw string") // expect:    A raw string
-System.print("A raw string   ") // expect: A raw string   
+# Raw strings.
+System.print("A raw string") # expect: A raw string
+System.print("   A raw string") # expect:    A raw string
+System.print("A raw string   ") # expect: A raw string   

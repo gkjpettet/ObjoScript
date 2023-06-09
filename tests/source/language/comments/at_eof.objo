@@ -1,2 +1,2 @@
-System.print("ok") // expect: ok
-// comment
+System.print("ok") # expect: ok
+# comment

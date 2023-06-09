@@ -4,5 +4,5 @@ bar { System.print("get") }
 }
 
 var foo = Foo()
-foo.bar = "value" // Expect: set
-foo.bar // Expect: get
+foo.bar = "value" # Expect: set
+foo.bar # Expect: get

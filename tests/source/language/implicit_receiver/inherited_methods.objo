@@ -18,9 +18,9 @@ class Bar is Foo {
   constructor() {}
 
   test() {
-    getter()          // expect: getter
-    setter = "value"  // expect: setter
-    method("arg")     // expect: method
+    getter()          #  expect: getter
+    setter = "value"  #  expect: setter
+    method("arg")     #  expect: method
   }
 }
 

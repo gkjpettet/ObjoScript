@@ -6,4 +6,4 @@ return i
 }
 
 System.print(test())
-// expect: i
+# expect: i

@@ -1,2 +1,2 @@
-System.print("hello"[0]) // h
-System.print("hello"[4]) // o
+System.print("hello"[0]) # h
+System.print("hello"[4]) # o

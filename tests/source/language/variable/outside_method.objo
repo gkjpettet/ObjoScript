@@ -14,5 +14,5 @@ System.print(foo)
 }
 }
 
-Foo().method // expect: method
-Foo.classMethod  // expect: class method
+Foo().method # expect: method
+Foo.classMethod  # expect: class method

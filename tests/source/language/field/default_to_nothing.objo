@@ -4,4 +4,4 @@ class Foo {
 write() { System.print(_field) }
 }
 
-Foo().write() // expect: nothing.
+Foo().write() # expect: nothing.

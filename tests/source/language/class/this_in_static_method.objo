@@ -8,4 +8,4 @@ System.print(this.foo())
 }
 }
 
-Foo.callFoo() // expect: ok
+Foo.callFoo() # expect: ok

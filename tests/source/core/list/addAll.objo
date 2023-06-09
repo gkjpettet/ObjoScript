@@ -1,10 +1,10 @@
 var list1 = ["a", "b", "c"]
 var list2 = ["d", "e", "f"]
 
-System.print(list1) // expect [a, b, c]
-System.print(list2) // expect [d, e, f]
+System.print(list1) # expect [a, b, c]
+System.print(list2) # expect [d, e, f]
 
 list1.addAll(list2)
 
-System.print(list1) // expect [a, b, c, d, e, f]
-System.print(list2) // expect [d, e, f]
+System.print(list1) # expect [a, b, c, d, e, f]
+System.print(list2) # expect [d, e, f]

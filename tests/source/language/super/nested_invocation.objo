@@ -19,17 +19,17 @@ super.greet(who)
 }
 
 var aoife = Person()
-aoife.greet("stranger") // Expect: Hello stranger from Person
+aoife.greet("stranger") # Expect: Hello stranger from Person
 
 var fi = Doctor()
 fi.greet("stranger")
-// Expect: 
-// Hello stranger from Doctor
-// Hello stranger from Person
+# Expect: 
+# Hello stranger from Doctor
+# Hello stranger from Person
 
 var garry = Radiologist()
 garry.greet("stranger")
-// Expect:
-// Hello stranger from Radiologist
-// Hello stranger from Doctor
-// Hello stranger from Person
+# Expect:
+# Hello stranger from Radiologist
+# Hello stranger from Doctor
+# Hello stranger from Person

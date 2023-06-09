@@ -6,4 +6,4 @@ function test() {
 }
 
 System.print(test())
-// expect: i
+# expect: i

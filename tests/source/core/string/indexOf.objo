@@ -1,10 +1,10 @@
-System.print("Hello World".indexOf("H")) // 0
-System.print("Hello World".indexOf("h")) // -1
-System.print("Hello World".indexOf("h", 0, false)) // 0
-System.print("Hello World".indexOf("h", 0, true)) // -1
+System.print("Hello World".indexOf("H")) # 0
+System.print("Hello World".indexOf("h")) # -1
+System.print("Hello World".indexOf("h", 0, false)) # 0
+System.print("Hello World".indexOf("h", 0, true)) # -1
 
-System.print("Hello World".indexOf("ell")) // 1
-System.print("Hello World".indexOf("ell", 1)) // 1
-System.print("Hello World".indexOf("ell", 2)) // -1
-System.print("Hello World".indexOf("Ell", 1, true)) // -1
-System.print("Hello World".indexOf("Ell", 1, false)) // 1
+System.print("Hello World".indexOf("ell")) # 1
+System.print("Hello World".indexOf("ell", 1)) # 1
+System.print("Hello World".indexOf("ell", 2)) # -1
+System.print("Hello World".indexOf("Ell", 1, true)) # -1
+System.print("Hello World".indexOf("Ell", 1, false)) # 1

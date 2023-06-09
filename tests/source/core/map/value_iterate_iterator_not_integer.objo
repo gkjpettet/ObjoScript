@@ -1,4 +1,4 @@
 var a = {1 : 2, 3 : 4}
 
-// Expect runtime error: Iterator must be an integer.
+# Expect runtime error: Iterator must be an integer.
 a.values.iterate(1.5)

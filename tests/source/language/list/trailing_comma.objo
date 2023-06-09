@@ -1,2 +1,2 @@
-// Expect parsing error due to trailing comma.
+#  Expect parsing error due to trailing comma.
 var list = ["a", "b",]

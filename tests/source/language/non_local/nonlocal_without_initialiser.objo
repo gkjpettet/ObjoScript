@@ -1,2 +1,2 @@
 var a
-System.print(a) // Expect: nothing.
+System.print(a) # Expect: nothing.

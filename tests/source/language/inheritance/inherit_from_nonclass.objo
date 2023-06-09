@@ -1,2 +1,2 @@
-// Expect parsing error: Can't inherit from a non-class object.
+#  Expect parsing error: Can't inherit from a non-class object.
 class Foo is 123 {}

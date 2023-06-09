@@ -1,1 +1,1 @@
-super.foo // Expect error.
+super.foo # Expect error.

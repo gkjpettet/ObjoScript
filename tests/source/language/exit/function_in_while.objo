@@ -2,7 +2,7 @@ function test(i) {
 	System.print(i)
 }
 
-// Expect: "i"
+# Expect: "i"
 while true {
 	var i = "i"
 	test(i)

@@ -2,4 +2,4 @@ var i = 0
 for (i = 0; i < 10; i++) {
 System.print(i)
 }
-System.print(i) // Expect: 10
+System.print(i) # Expect: 10

@@ -1,5 +1,5 @@
 class Person {
  greet() {
-  exit // Expect error.
+  exit # Expect error.
  }
 }

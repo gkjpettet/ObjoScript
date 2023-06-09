@@ -9,4 +9,4 @@ System.print(_age)
 }
 }
 
-var garry = Person() // Expect -3
+var garry = Person() # Expect -3

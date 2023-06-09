@@ -1,6 +1,6 @@
 class Foo {
 bar() {
 var a = "value"
-var a = "other" // Expect error as duplicate variable in same scope.
+var a = "other" # Expect error as duplicate variable in same scope.
 }
 }

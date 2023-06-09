@@ -5,4 +5,4 @@ System.print("bad")
 
 var f = test
 
-System.print(f()) // Expect: nothing
+System.print(f()) # Expect: nothing

@@ -1,3 +1,3 @@
-// Newline after 'if'.
+# Newline after 'if'.
 System.print("yes" if 
-true else "no") // Expect error.
+true else "no") # Expect error.

@@ -1,12 +1,12 @@
 var people = {"garry" : 41, "Aoife" : 10}
-System.print(people.count) // expect 2
-System.print(people["garry"]) // expect 41
+System.print(people.count) # expect 2
+System.print(people["garry"]) # expect 41
 
 people["Maebh"] = 8
-System.print(people.count) // expect 3
+System.print(people.count) # expect 3
 
-System.print(people["Fi"]) // expect nothing
+System.print(people["Fi"]) # expect nothing
 
 var empty = {}
-System.print(empty.count) // expect 0
-System.print(empty.isEmpty) // expect true
+System.print(empty.count) # expect 0
+System.print(empty.isEmpty) # expect true

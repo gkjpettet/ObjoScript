@@ -18,8 +18,8 @@ System.print(__e)
 
 Foo.set(1, 2, 3, 4, 5)
 Foo.write
-// expect: 1
-// expect: 2
-// expect: 3
-// expect: 4
-// expect: 5
+# expect: 1
+# expect: 2
+# expect: 3
+# expect: 4
+# expect: 5

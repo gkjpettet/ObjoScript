@@ -1,1 +1,1 @@
-System.print("hello"[5]) // Expect error
+System.print("hello"[5]) # Expect error

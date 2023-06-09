@@ -26,7 +26,7 @@ b = nothing
 var d = Node(c, "d", nothing)
 c = nothing
 d.write()
-// expect: a
-// expect: c
-// expect: b
-// expect: d
+# expect: a
+# expect: c
+# expect: b
+# expect: d

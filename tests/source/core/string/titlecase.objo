@@ -1,1 +1,1 @@
-System.print("hello world".titlecase) // Hello World
+System.print("hello world".titlecase) # Hello World

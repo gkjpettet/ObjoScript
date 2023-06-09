@@ -1,2 +1,2 @@
-System.print("  hello  ".trimEnd) // "  hello"
-System.print("*hello*".trimEnd("*")) // "*hello"
+System.print("  hello  ".trimEnd) # "  hello"
+System.print("*hello*".trimEnd("*")) # "*hello"

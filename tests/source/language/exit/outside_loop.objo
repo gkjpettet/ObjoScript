@@ -1,1 +1,1 @@
-exit // Expect error.
+exit # Expect error.

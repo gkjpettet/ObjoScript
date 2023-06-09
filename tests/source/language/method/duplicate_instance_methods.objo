@@ -1,4 +1,4 @@
 class Foo {
 foo() {}
-foo() {} // expect error
+foo() {} # expect error
 }

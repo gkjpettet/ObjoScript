@@ -1,2 +1,2 @@
-if // expect error
+if # expect error
 (true) then System.print("bad")

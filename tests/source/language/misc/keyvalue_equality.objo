@@ -4,7 +4,7 @@ var c = KeyValue(5, "10")
 var five = 5
 var d = KeyValue(five, 10)
 
-System.print(a == a) // expect true
-System.print(a == b) // expect true
-System.print(a == c) // expect false
-System.print(a == d) // expect true
+System.print(a == a) # expect true
+System.print(a == b) # expect true
+System.print(a == c) # expect false
+System.print(a == d) # expect true

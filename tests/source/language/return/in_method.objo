@@ -5,4 +5,4 @@ System.print("bad")
 }
 }
 
-System.print(Foo().method) // expect: ok
+System.print(Foo().method) # expect: ok

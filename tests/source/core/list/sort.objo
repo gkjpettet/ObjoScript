@@ -25,5 +25,5 @@ var people = [gaga, garry, fiona, aoife, carole]
 
 people.sort
 
-// Sort by age ascending.
+# Sort by age ascending.
 foreach person in people { System.print(person.toString) }

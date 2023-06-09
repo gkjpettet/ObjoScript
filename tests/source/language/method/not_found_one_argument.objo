@@ -1,5 +1,5 @@
 class Foo {}
 
-// expect runtime error:
-// Foo does not implement 'someUnknownMethod(_)'.
+# expect runtime error:
+# Foo does not implement 'someUnknownMethod(_)'.
 Foo.someUnknownMethod(1)

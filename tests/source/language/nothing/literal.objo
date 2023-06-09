@@ -1,1 +1,1 @@
-System.print(nothing) // nothing.
+System.print(nothing) # nothing.

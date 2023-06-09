@@ -14,5 +14,5 @@ super.foo
 }
 
 C().foo
-// Expect: C.foo
-// Expect: A.foo
+# Expect: C.foo
+# Expect: A.foo

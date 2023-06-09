@@ -1,1 +1,1 @@
-__field = "nope" // Expect error
+__field = "nope" # Expect error

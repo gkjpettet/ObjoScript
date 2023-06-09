@@ -1,9 +1,9 @@
 var num = 10
-System.print(num.hasMethod("doesntExist()")) // expect false
-System.print(num.hasMethod("sqrt()")) // expect true
-System.print(num.hasMethod("type()")) // expect true (inherited from Object).
+System.print(num.hasMethod("doesntExist()")) # expect false
+System.print(num.hasMethod("sqrt()")) # expect true
+System.print(num.hasMethod("type()")) # expect true (inherited from Object).
 
 var list = []
-System.print(list.hasMethod("doesntExist()")) // expect false
-System.print(list.hasMethod("add(_)")) // expect true
-System.print(list.hasMethod("isEmpty()")) // expect true (inherited from Sequence)
+System.print(list.hasMethod("doesntExist()")) # expect false
+System.print(list.hasMethod("add(_)")) # expect true
+System.print(list.hasMethod("isEmpty()")) # expect true (inherited from Sequence)

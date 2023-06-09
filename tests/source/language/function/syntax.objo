@@ -1,23 +1,23 @@
-// Single expression body.
+#  Single expression body.
 function f1() { System.print("ok") }
-f1()// expect: ok
+f1()#  expect: ok
 
-// Curly body.
+#  Curly body.
 function f2() {
   System.print("ok")
 }
-f2() // expect: ok
+f2() #  expect: ok
 
-// Multiple statements.
+#  Multiple statements.
 function f3() {
   System.print("1")
   System.print("2")
 }
-// expect: 1
-// expect: 2
+#  expect: 1
+#  expect: 2
 f3()
 
-// Extra newlines.
+#  Extra newlines.
 function f4() {
 
 
@@ -28,6 +28,6 @@ function f4() {
 
 
 }
-// expect: 1
-// expect: 2
+#  expect: 1
+#  expect: 2
 f4()

@@ -423,8 +423,8 @@ Protected Class Lexer
 		Private Sub ConsumeComment()
 		  /// Consumes all characters until EOL or EOF. Does *not* consume the EOL if one is reached.
 		  ///
-		  /// Assumes we are at the beginning of a comment.
-		  /// In ObjoScript, comments begin with `//`.
+		  /// In ObjoScript, comments begin with `#`.
+		  /// Assumes we are at the beginning of a comment (just after the `#`).
 		  
 		  // Comments go to the end of the line so keep advancing
 		  // until we reach a newline or the source code end.
@@ -887,7 +887,7 @@ Protected Class Lexer
 		      Wend
 		      
 		      // Edge case: Comment after the line continuation marker.
-		      If Match("/") And Match("/") Then
+		      If Match("#") Then
 		        Do
 		          If Peek = EndOfLine.UNIX Then
 		            Exit
@@ -1000,13 +1000,8 @@ Protected Class Lexer
 		    Case " ", &u0009 // Space or horizontal tab.
 		      Call Advance
 		      
-		    Case "/"
-		      // Could this be the start of a "//" comment?
-		      If Peek(1) = "/" Then
-		        ConsumeComment
-		      Else
-		        Exit
-		      End If
+		    Case "#"
+		      ConsumeComment
 		      
 		    Case EndOfLine.UNIX
 		      Var lastToken As ObjoScript.TokenTypes

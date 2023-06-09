@@ -1,6 +1,6 @@
 var consider = 5
 
-// Expect error: At least one case is required.
+# Expect error: At least one case is required.
 switch consider {
 else {}
 }

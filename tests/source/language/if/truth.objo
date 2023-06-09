@@ -1,17 +1,17 @@
-// False and null are false.
+#  False and null are false.
 if false {
  System.print("bad") 
 } else {
-System.print("false") // expect: false
+System.print("false") #  expect: false
 }
 
 if nothing { 
 System.print("bad") 
 } else{
- System.print("nothing") // expect: nothing
+ System.print("nothing") #  expect: nothing
 }
 
-// Everything else is true.
-if true then System.print(true) // expect: true
-if 0 then System.print(0) // expect: 0
-if "" then System.print("empty") // expect: empty
+#  Everything else is true.
+if true then System.print(true) #  expect: true
+if 0 then System.print(0) #  expect: 0
+if "" then System.print("empty") #  expect: empty

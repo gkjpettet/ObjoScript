@@ -14,7 +14,7 @@ super.foo(1, 2)
 }
 
 Derived().foo(1)
-// expect: Derived.bar(a)
-// expect: Base.foo
-// expect: Base.foo(a)
-// expect: Base.foo(a, b)
+# expect: Derived.bar(a)
+# expect: Base.foo
+# expect: Base.foo(a)
+# expect: Base.foo(a, b)

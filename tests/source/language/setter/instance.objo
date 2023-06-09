@@ -5,4 +5,4 @@ System.print(value)
 }
 
 var foo = Foo()
-foo.bar = "value" // Expect: value
+foo.bar = "value" # Expect: value

@@ -1,4 +1,4 @@
 class Foo {
-// expect runtime error: Could not find foreign method 'someUnknownMethod' for class Foo.
+# expect runtime error: Could not find foreign method 'someUnknownMethod' for class Foo.
 foreign someUnknownMethod()
 }

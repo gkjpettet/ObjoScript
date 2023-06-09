@@ -1,7 +1,7 @@
-// Test a nested switch.
-// Expect:
-// ok
-// ok
+# Test a nested switch.
+# Expect:
+# ok
+# ok
 
 switch 10 {
 case 5 {

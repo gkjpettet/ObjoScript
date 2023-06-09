@@ -1,25 +1,25 @@
 var list = ["a", "b", "c"]
 
 list.removeAt(0)
-System.print(list) // expect [b, c]
+System.print(list) # expect [b, c]
 list = ["a", "b", "c"]
 
 list.removeAt(1)
-System.print(list) // expect [a, c]
+System.print(list) # expect [a, c]
 list = ["a", "b", "c"]
 
 list.removeAt(2)
-System.print(list) // expect [a, b]
+System.print(list) # expect [a, b]
 list = ["a", "b", "c"]
 
 list.removeAt(-1)
-System.print(list) // expect [a, b]
+System.print(list) # expect [a, b]
 list = ["a", "b", "c"]
 
 list.removeAt(-2)
-System.print(list) // expect [a, c]
+System.print(list) # expect [a, c]
 list = ["a", "b", "c"]
 
 list.removeAt(-3)
-System.print(list) // expect [b, c]
+System.print(list) # expect [b, c]
 list = ["a", "b", "c"]

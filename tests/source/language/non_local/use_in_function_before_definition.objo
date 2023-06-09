@@ -4,4 +4,4 @@ System.print(global)
 
 var global = "global"
 
-test() // Expect: global
+test() # Expect: global

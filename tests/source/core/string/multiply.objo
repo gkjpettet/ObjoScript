@@ -1,1 +1,1 @@
-System.print("yes!" * 3) // yes!yes!yes!
+System.print("yes!" * 3) # yes!yes!yes!
