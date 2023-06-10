@@ -62,7 +62,7 @@ class Dog {
 }
 
 var terrier = Dog()
-terrier.owner = "Garry" // I'm owned by Garry
+terrier.owner = "Garry" # I'm owned by Garry
 ```
 
 ### Operators
@@ -78,7 +78,7 @@ class Hero {
 }
 
 var ironMan = Hero()
--ironMan // Does negating a hero make them a villain?
+-ironMan # Does negating a hero make them a villain?
 ```
 
 The following _infix_ operators can be implemented by your classes: `&`, `..`, `...`, `==`, `/`, `>`, `>=`, `>>`, `is`, `<`, `<=`, `<<`, `-`, `<>`, `%`, `|`, `+`, `*`.
@@ -93,7 +93,7 @@ class Hero {
 }
 
 var ironMan = Hero()
-ironMan + 10 // 
+ironMan + 10 
 ```
 
 A subscript operator method puts the parameters inside square brackets. At least one and at most 255 parameters are permitted:
@@ -110,8 +110,8 @@ class Hero {
 }
 
 var ironMan = Hero()
-ironMan[1] // index: 1
-ironMan[5, 10] // x: 5, y: 10
+ironMan[1] # index: 1
+ironMan[5, 10] # x: 5, y: 10
 ```
 
 A subscript setter looks like a combination of a subscript operator and a setter:
@@ -124,7 +124,7 @@ class Hero {
 }
 
 var ironMan = Hero()
-ironMan[3] = "something" // You can't stuff something into index 3
+ironMan[3] = "something" # You can't stuff something into index 3
 ```
 
 ## Method scope
@@ -144,7 +144,7 @@ class Hero {
  name() { return "Spider-Man" }
  
  printName() {
-  System.print(this.name) // Spider-Man
+  System.print(this.name) # Spider-Man
  }
 }
 ```
@@ -159,7 +159,7 @@ class Hero {
  name() { return "Spider-Man" }
  
  printName() {
-  System.print(name) // Spider-Man
+  System.print(name) # Spider-Man
  }
 }
 ```
@@ -173,7 +173,7 @@ class Hero {
   name { return "Spider-Man" }
 
   printName() {
-	System.print(name) // ???
+	System.print(name) # ???
   }
 }
 ```
@@ -199,8 +199,8 @@ class Scope {
 
   test() {
     var shadowed = "local"
-    System.print(shadowed) // "local"
-    System.print(variable) // "object"
+    System.print(shadowed) # "local"
+    System.print(variable) # "object"
   }
 }
 ```
@@ -212,7 +212,7 @@ To create a class we simply _call_ it:
 
 ```objo
 class Hero {}
-var myHero = Hero() // Returns an empty instance of Hero
+var myHero = Hero() # Returns an empty instance of Hero
 ```
 
 Notice how we didn't have to define a constructor when we defined the class. ObjoScript provides a zero-parameter constructor for all classes. Of course you will probably want to do some initialisation in your own classes which is what the `constructor` keyword is for:
@@ -228,8 +228,8 @@ class Hero {
   }
 }
 
-var hero1 = Hero("Spider-Man") // I'm Spider-Man
-var hero2 = Hero("Hulk", "good") // I'm Hulk and I'm good
+var hero1 = Hero("Spider-Man") # I'm Spider-Man
+var hero2 = Hero("Hulk", "good") # I'm Hulk and I'm good
 ```
 
 Notice how we can have multiple constructors, each differing in their _arity_ (number of parameters).
@@ -266,7 +266,7 @@ class Rectangle {
 }
 
 var r = Rectangle(5, 10)
-System.print(r.width) // 5
+System.print(r.width) # 5
 ```
 
 To allow outside code to modify a field, **you need to provide setter methods**:
@@ -278,19 +278,19 @@ class Rectangle {
 	_height = height
   }
   
-  // Getters
+  # Getters
   width() { return _width }
   height() { return _height }
   
-  // Setters
+  # Setters
   width=(value) { _width = value }
   height=(value) { _height = value }
 }
 
 var r = Rectangle(5, 10)
-System.print(r.width) // 5
+System.print(r.width) # 5
 r.width = 40
-System.print(r.width) // 40
+System.print(r.width) # 40
 ```
 
 There are two important points we can deduce from the above:
@@ -321,14 +321,14 @@ class Foo {
 Just like instance fields, static fields are initially `nothing`:
 
 ```objo
-Foo.printFromStatic() // nothing
+Foo.printFromStatic() # nothing
 ```
 
 They can be used from static methods:
 
 ```objo
 Foo.setFromStatic("first")
-Foo.printFromStatic() // first
+Foo.printFromStatic() # first
 ```
 
 As well as instance methods. When you do so however there is still only **one** static field shared between all instances of the class:
@@ -338,7 +338,7 @@ var foo1 = Foo()
 var foo2 = Foo()
 
 foo1.setFromInstance("second")
-foo2.printFromInstance() // second
+foo2.printFromInstance() # second
 ```
 
 ## Static methods
@@ -355,8 +355,8 @@ class Foo {
   }
 }
 
-Foo.method()  // This is a static method
-Foo().method() // This is an instance method
+Foo.method()  # This is a static method
+Foo().method() # This is an instance method
 ```
 
 ## Inheritance
@@ -376,12 +376,12 @@ The metaclass hierarchy does not parallel the class hierarchy. This means that s
 
 ```objo
 class Hero {
-  // Not all heroes can fly.
+  # Not all heroes can fly.
   static canFly { return false }
 }
 
 class Avenger is Hero {}
-Avenger.canFly() // Error. Static methods are not inherited.
+Avenger.canFly() # Error. Static methods are not inherited.
 ```
 
 Constructors are also **not** inherited. However you can access them within an instance's constructor(s) with `super`:
@@ -401,8 +401,8 @@ class XMen is Hero {
   }
 }
 
-Avenger("Iron Man") // Error as constructors are not inherited.
-XMen("Cyclops") // My name is Cyclops
+Avenger("Iron Man") # Error as constructors are not inherited.
+XMen("Cyclops") # My name is Cyclops
 ```
 
 ## Super
@@ -421,6 +421,6 @@ class Derived is Base {
   }
 }
 
-Base().method("test") // Base got test
-Derived() // Base got value
+Base().method("test") # Base got test
+Derived() # Base got value
 ```

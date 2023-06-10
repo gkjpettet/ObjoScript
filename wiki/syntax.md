@@ -6,10 +6,10 @@ Currently ObjoScript compiles scripts directly from source code into bytecode. I
 These begin with `\\` and run to the end of the line:
 
 ```objo
-// This is a comment.
-var a = 10 // They can end a line.
+# This is a comment.
+var a = 10 # They can end a line.
 var list = [1, 
-  2, // They can be within a list or map literal.
+  2, # They can be within a list or map literal.
   3
 ]
 ```
@@ -47,13 +47,13 @@ if hungry {
   play()
 }
 
-// A block can occur anywhere in your program to provide additional scope:
+# A block can occur anywhere in your program to provide additional scope:
 var a = 10
 {
   var a = 20
-  System.print(a) // 20
+  System.print(a) # 20
 }
-System.print(a) // 10
+System.print(a) # 10
 ```
 
 [Wren]: https://wren.io

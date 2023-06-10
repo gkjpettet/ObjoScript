@@ -11,36 +11,36 @@ Accessing an element in a list is done by calling the `subscript operator` on th
 
 ```objo
 var heroes = ["Iron Man", "Hulk", "Black Panther"]
-System.print(heroes[0]) // Iron Man
-System.print(heroes[2]) // Black Panther
+System.print(heroes[0]) # Iron Man
+System.print(heroes[2]) # Black Panther
 ```
 
 Negative indices count backwards from the end:
 
 ```objo
-System.print(heroes[-1]) // Black Panther
-System.print(heroes[-2]) // Hulk
+System.print(heroes[-1]) # Black Panther
+System.print(heroes[-2]) # Hulk
 ```
 
 It's a runtime error to pass an index that is out of bounds. You can find the bounds using `count`:
 
 ```objo
-System.print(heroes.count) // 3
+System.print(heroes.count) # 3
 ```
 
 ### Ranges
 A `range` is a list of sequential numeric values. The `Number` class can create them with the inclusive (`...`) and exclusive (`..<`) operators:
 
 ```objo
-1...5  // [1, 2, 3, 4, 5]
-1..<5 // [1, 2, 3, 4]
+1...5  # [1, 2, 3, 4, 5]
+1..<5 # [1, 2, 3, 4]
 ```
 
 ## Slicing a list
 Sometimes you just want to get to a portion or _slice_ of a list. The easiest was to do this is to pass a `range` to the list's subscript operator:
 
 ```objo
-System.print(heroes[1...2]) // [Hulk, Black Panther]
+System.print(heroes[1...2]) # [Hulk, Black Panther]
 ```
 
 This returns a new list comprised of the elements in the original list whose indices were within the range.
@@ -54,24 +54,24 @@ Swapping an element is achieved with the subscript setter:
 
 ```objo
 var heroes = ["Iron Man", "Hulk", "Black Panther"]
-heroes[0] = "Spider-Man" // [Spider-Man, Hulk, Black Panther]
+heroes[0] = "Spider-Man" # [Spider-Man, Hulk, Black Panther]
 ```
 
 It's a runtime error to set an element that is out of bounds. To increase the size of a list, use `add(item)` to append a single item to the end of the list:
 
 ```objo
 var heroes = ["Iron Man", "Hulk", "Black Panther"]
-heroes.add("Spider-Man") // [Iron Man, Hulk, Black Panther, Spider-Man]
+heroes.add("Spider-Man") # [Iron Man, Hulk, Black Panther, Spider-Man]
 ```
 
 You can insert an element at a specific index using `insert(index, item)`:
 
 ```objo
 var letters = ["a", "b", "c"]
-letters.insert(3, "d")   // Inserts at the end.
-System.print(letters)    // [a, b, c, d]
-letters.insert(-2, "e")  // Counts back from size after insert.
-System.print(letters)    // [a, b, c, e, d]
+letters.insert(3, "d")   # Inserts at the end.
+System.print(letters)    # [a, b, c, d]
+letters.insert(-2, "e")  # Counts back from size after insert.
+System.print(letters)    # [a, b, c, e, d]
 ```
 
 The index may be one past the last index in the list to append an element. If `index < 0` it counts backwards from the end of the list. It bases the computation on the length of the list _after_ the inserted the element, so that `-1` will append the element, not insert it before the last element.
@@ -84,7 +84,7 @@ You can concatenate lists together using the `+` operator:
 var letters = ["a", "b", "c"]
 var other = ["d", "e", "f"]
 var combined = letters + other
-System.print(combined)  // [a, b, c, d, e, f]
+System.print(combined)  # [a, b, c, d, e, f]
 ```
 
 ## Removing elements
@@ -97,16 +97,16 @@ In both cases, the list is compacted to ensure there are no empty indices.
 ```objo
 var letters = ["a", "b", "c", "d"]
 letters.removeAt(1)
-System.print(letters) // [a, c, d]
+System.print(letters) # [a, c, d]
 letters.remove("a")
-System.print(letters) // [c, d]
+System.print(letters) # [c, d]
 ```
 
 To remove everything from the list use the `clear()` method:
 
 ```objo
 var list = [1, 2 ,3]
-list.clear() // []
+list.clear() # []
 ```
 
 ## Iterating over a list
@@ -118,7 +118,7 @@ var list = ["a", "b", "c"]
 foreach item in list {
  System.print(item)
 }
-// a
-// b
-// c
+# a
+# b
+# c
 ```

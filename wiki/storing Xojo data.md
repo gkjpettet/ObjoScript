@@ -7,7 +7,7 @@ They are defined like so:
 
 ```objo
 foreign class Point {
-  // ...
+  # ...
 }
 ```
 

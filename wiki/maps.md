@@ -16,15 +16,15 @@ It's worth noting that ObjoScript has built-in support for a `KeyValue` class co
 
 ```objo
 var kv = 1 : 2
-System.print(kv.key) // 1
-System.print(kv.value) // 2
+System.print(kv.key) # 1
+System.print(kv.value) # 2
 ```
 
 ## Adding entries
 You add new key-values entries to the map using the subscript operator:
 
 ```objo
-var heroes = {} // Empty map
+var heroes = {} # Empty map
 heroes["Steve Rogers"] = "Captain America"
 ```
 
@@ -35,18 +35,18 @@ To find the value associated with a particular key we use the subscript operator
 
 ```objo
 var heroes = {"Tony Stark" : nothing}
-System.print(heroes["Tony Stark"]) // nothing (the key exists however)
-System.print(heroes["Batman"]) // nothing
-System.print(heroes.containsKey("Tony Stark")) // true
-System.print(heroes.containsKey("tony stark")) // false as keys are case-sensitive
-System.print(heroes.containsKey("Peter Parker")) // false
+System.print(heroes["Tony Stark"]) # nothing (the key exists however)
+System.print(heroes["Batman"]) # nothing
+System.print(heroes.containsKey("Tony Stark")) # true
+System.print(heroes.containsKey("tony stark")) # false as keys are case-sensitive
+System.print(heroes.containsKey("Peter Parker")) # false
 ```
 
 You can get the number of entries in the map with `count()`:
 
 ```objo
 var heroes = {"Tony Stark" : "Iron Man", "Peter Parker" : "Spider-Man"}
-System.print(heroes.count) // 2
+System.print(heroes.count) # 2
 ```
 
 ## Removing entries
@@ -55,14 +55,14 @@ To remove an entry from a map call `remove(key)`:
 ```objo
 var heroes = {"Tony Stark" : "Iron Man", "Peter Parker" : "Spider-Man"}
 heroes.remove("Tony Stark")
-System.print(heroes.containsKey("Tony Stark")) // false
+System.print(heroes.containsKey("Tony Stark")) # false
 ```
 
 If the key was found then `remove(key)` returns the value that was associated with it:
 
 ```objo
 var heroes = {"Tony Stark" : "Iron Man", "Peter Parker" : "Spider-Man"}
-System.print(heroes.remove("Tony Stark")) // Iron Man
+System.print(heroes.remove("Tony Stark")) # Iron Man
 ```
 
 If the key wasn't found then `nothing` is returned.
@@ -82,9 +82,9 @@ var dogs = {
 foreach dog in dogs {
  System.print("A " + dog.key + " dog: " + dog.value)
 }
-// A small dog: Terrier
-// A medium dog: Beagle
-// A large dog: Great Dane
+# A small dog: Terrier
+# A medium dog: Beagle
+# A large dog: Great Dane
 ```
 
 The loop variable (in this case `dog`) is a `KeyValue` instance. These instances have two properties: `key` and `value`.
@@ -102,9 +102,9 @@ var dogs = {
 foreach size in dogs.keys {
  System.print(size)
 }
-// small
-// medium
-// large
+# small
+# medium
+# large
 ```
 
 ```objo
@@ -116,7 +116,7 @@ var dogs = {
 foreach breed in dogs.values {
  System.print(bread)
 }
-// Terrier
-// Beagle
-// Great Dane
+# Terrier
+# Beagle
+# Great Dane
 ```

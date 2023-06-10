@@ -10,18 +10,18 @@ This creates a new variable `a` in the current scope containing the value `3`. O
 
 ```objo
 var hero = "Hulk"
-System.print(hero) // Hulk
+System.print(hero) # Hulk
 ```
 ## Scope
 ObjoScript has block scope. This means that a variable exists from the point is is defined until the end of the block where that definition appears:
 
 ```objo
 {
-  System.print(a) // Error as `a` doesn't exist yet.
+  System.print(a) # Error as `a` doesn't exist yet.
   var a = 123
-  System.print(a) // 123
+  System.print(a) # 123
 }
-System.print(a) // Error as `a` doesn't exist anymore.
+System.print(a) # Error as `a` doesn't exist anymore.
 ```
 
 Variables defined in the top-level of the script are **global** and are visible to the entire script. All other variables are _local_.
@@ -32,16 +32,16 @@ Declaring a variable in an inner scope with the same name as an outer one is kno
 var a = "outer"
 {
   var a = "inner"
-  System.print(a) // inner
+  System.print(a) # inner
 }
-System.print(a) // outer
+System.print(a) # outer
 ```
 
 Declaring a variable with the same name in the _same_ scope **is** an error:
 
 ```objo
 var a = "hello"
-var a = "Garry" // Error as `a` is already declared.
+var a = "Garry" # Error as `a` is already declared.
 ```
 
 ## Assignment
@@ -55,5 +55,5 @@ a = 234
 It's an error to assign to a variable before it has been defined:
 
 ```objo
-a = 123 // Error
+a = 123 # Error
 ```

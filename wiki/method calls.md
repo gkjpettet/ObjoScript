@@ -1,7 +1,7 @@
 ObjoScript is a true object-oriented language so most code consists of invoking methods on objects:
 
 ```objo
-System.print("Hello") // Hello
+System.print("Hello") # Hello
 ```
 
 You have a _receiver_ (here `System`) followed by a `.` then a method name (`print`) and an optional argument list in parentheses (`"Hello"`). Multiple arguments are separated by commas:
@@ -35,8 +35,8 @@ As an example, the `String` class has two methods to determine if the string end
 
 ```objo
 var s = "Hello World"
-s.endsWith("World") // case-sensitive search.
-s.endsWith("world", false) // case-insensitive search.
+s.endsWith("World") # case-sensitive search.
+s.endsWith("world", false) # case-insensitive search.
 ```
 
 In ObjoScript, the above calls are calls to two completely separate methods, `endsWith(_)` and `endsWith(_,_)`. This makes is easier to define overloads since you don't need optional parameters or wasteful control flow to determine which parameters were passed.
@@ -47,8 +47,8 @@ This is also much faster to execute. Since the compiler knows how many arguments
 Some methods exist to expose a stored or computed property to the outside world. We call these _getters_ and you don't need to include empty parentheses after the method name if you don't want to. Convention is to omit them:
 
 ```objo
-"hello".count // 5
-"hello".count() // Also 5
+"hello".count # 5
+"hello".count() # Also 5
 ```
 
 ## Setters
@@ -64,8 +64,8 @@ Since the `=(_)` is in the setter's signature, an object can have both a getter 
 
 ```objo
 class Rectangle {
-  width() { return _width } // Getter
-  width=(value) { _width = value } // Setter
+  width() { return _width } # Getter
+  width=(value) { _width = value } # Setter
 }
 ```
 
@@ -84,8 +84,8 @@ Note that `-` is both a prefix and an infix operator. Since they have different 
 Another familiar syntax is subscripting using square brackets (`[]`). This is handy for working with collection-like objects, for example:
 
 ```objo
-list[0] // Get the first item in a list.
-map["key"] // Get the value associated with "key".
+list[0] # Get the first item in a list.
+map["key"] # Get the value associated with "key".
 ```
 
 In ObjoScript, these are also method cals. In the above examples, the signature is `[_]`.
