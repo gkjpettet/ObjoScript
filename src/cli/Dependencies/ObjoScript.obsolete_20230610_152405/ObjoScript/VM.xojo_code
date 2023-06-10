@@ -904,9 +904,7 @@ Protected Class VM
 		  #Pragma StackOverflowChecking False
 		  
 		  // Grab the receiver from the stack. It should be beneath any arguments to the invocation.
-		  // We therefore peek argCount distance from the top. We're inlining the call to `Peek()` here for speed.
-		  Var receiver As Variant = Stack(StackTop - argCount - 1)
-		  
+		  Var receiver As Variant = Peek(argCount)
 		  Var isStatic As Boolean = False
 		  Var klass As ObjoScript.Klass
 		  If receiver.Type = Variant.TypeDouble Then
@@ -1220,6 +1218,20 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21, Description = 506F70732074686520746F702076616C7565206F66662074686520737461636B20616E64207265706C61636573207468652076616C756520756E6465726E656174682077697468206076602E205468652065666665637420697320746F207265647563652074686520737461636B2068656967687420627920312E
+		Private Sub PopAndReplaceTop(v As Variant)
+		  /// Pops the top value off the stack and replaces the value underneath with `v`.
+		  /// The effect is to reduce the stack height by 1.
+		  ///
+		  /// This method exists as several operations require us to pop two values off the stack
+		  /// and then immediately push one back. This method saves a few method calls.
+		  
+		  Stack(StackTop - 2) = v
+		  StackTop = StackTop - 1
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 50757368657320612076616C7565206F6E746F2074686520737461636B2E
 		Private Sub Push(value As Variant)
 		  /// Pushes a value onto the stack.
@@ -1440,9 +1452,7 @@ Protected Class VM
 		      
 		    Case OP_ADD
 		      If TopOfStackAreNumbers Then
-		        // Pop the stack and replace the top with the answer.
-		        Stack(StackTop - 2) = CType(Peek(1) + Peek(0), Double)
-		        StackTop = StackTop - 1
+		        PopAndReplaceTop(CType(Peek(1) + Peek(0), Double))
 		      Else
 		        InvokeBinaryOperator("+(_)")
 		      End If
@@ -1457,9 +1467,7 @@ Protected Class VM
 		      
 		    Case OP_SUBTRACT
 		      If TopOfStackAreNumbers Then
-		        // Pop the stack and replace the top with the answer.
-		        Stack(StackTop - 2) = CType(Peek(1) - Peek(0), Double)
-		        StackTop = StackTop - 1
+		        PopAndReplaceTop(CType(Peek(1) - Peek(0), Double))
 		      Else
 		        InvokeBinaryOperator("-(_)")
 		      End If
@@ -1474,27 +1482,21 @@ Protected Class VM
 		      
 		    Case OP_DIVIDE
 		      If TopOfStackAreNumbers Then
-		        // Pop the stack and replace the top with the answer.
-		        Stack(StackTop - 2) = CType(Peek(1) / Peek(0), Double)
-		        StackTop = StackTop - 1
+		        PopAndReplaceTop(CType(Peek(1) / Peek(0), Double))
 		      Else
 		        InvokeBinaryOperator("/(_)")
 		      End If
 		      
 		    Case OP_MULTIPLY
 		      If TopOfStackAreNumbers Then
-		        // Pop the stack and replace the top with the answer.
-		        Stack(StackTop - 2) = CType(Peek(1) * Peek(0), Double)
-		        StackTop = StackTop - 1
+		        PopAndReplaceTop(CType(Peek(1) * Peek(0), Double))
 		      Else
 		        InvokeBinaryOperator("*(_)")
 		      End If
 		      
 		    Case OP_MODULO
 		      If TopOfStackAreNumbers Then
-		        // Pop the stack and replace the top with the answer.
-		        Stack(StackTop - 2) = CType(Peek(1) Mod Peek(0), Double)
-		        StackTop = StackTop - 1
+		        PopAndReplaceTop(CType(Peek(1) Mod Peek(0), Double))
 		      Else
 		        InvokeBinaryOperator("%(_)")
 		      End If
@@ -1509,54 +1511,42 @@ Protected Class VM
 		      
 		    Case OP_EQUAL
 		      If TopOfStackAreNumbers Then
-		        // Pop the stack and replace the top with the answer.
-		        Stack(StackTop - 2) = Peek(1) = Peek(0)
-		        StackTop = StackTop - 1
+		        PopAndReplaceTop(Peek(1).DoubleValue = Peek(0).DoubleValue)
 		      Else
 		        InvokeBinaryOperator("==(_)")
 		      End If
 		      
 		    Case OP_NOT_EQUAL
 		      If TopOfStackAreNumbers Then
-		        // Pop the stack and replace the top with the answer.
-		        Stack(StackTop - 2) = Peek(1) <> Peek(0)
-		        StackTop = StackTop - 1
+		        PopAndReplaceTop(Peek(1).DoubleValue <> Peek(0).DoubleValue)
 		      Else
 		        InvokeBinaryOperator("<>(_)")
 		      End If
 		      
 		    Case OP_GREATER
 		      If TopOfStackAreNumbers Then
-		        // Pop the stack and replace the top with the answer.
-		        Stack(StackTop - 2) = Peek(1) > Peek(0)
-		        StackTop = StackTop - 1
+		        PopAndReplaceTop(Peek(1).DoubleValue > Peek(0).DoubleValue)
 		      Else
 		        InvokeBinaryOperator(">(_)")
 		      End If
 		      
 		    Case OP_GREATER_EQUAL
 		      If TopOfStackAreNumbers Then
-		        // Pop the stack and replace the top with the answer.
-		        Stack(StackTop - 2) = Peek(1) >= Peek(0)
-		        StackTop = StackTop - 1
+		        PopAndReplaceTop(Peek(1).DoubleValue >= Peek(0).DoubleValue)
 		      Else
 		        InvokeBinaryOperator(">=(_)")
 		      End If
 		      
 		    Case OP_LESS
 		      If TopOfStackAreNumbers Then
-		        // Pop the stack and replace the top with the answer.
-		        Stack(StackTop - 2) = Peek(1) < Peek(0)
-		        StackTop = StackTop - 1
+		        PopAndReplaceTop(Peek(1).DoubleValue < Peek(0).DoubleValue)
 		      Else
 		        InvokeBinaryOperator("<(_)")
 		      End If
 		      
 		    Case OP_LESS_EQUAL
 		      If TopOfStackAreNumbers Then
-		        // Pop the stack and replace the top with the answer.
-		        Stack(StackTop - 2) = Peek(1) <= Peek(0)
-		        StackTop = StackTop - 1
+		        PopAndReplaceTop(Peek(1).DoubleValue <= Peek(0).DoubleValue)
 		      Else
 		        InvokeBinaryOperator("<=(_)")
 		      End If
@@ -1579,18 +1569,14 @@ Protected Class VM
 		      
 		    Case OP_SHIFT_LEFT
 		      If TopOfStackAreNumbers Then
-		        // Pop the stack and replace the top with the answer.
-		        Stack(StackTop - 2) = CType(Bitwise.ShiftLeft(Peek(1).IntegerValue, Peek(0).IntegerValue), Double)
-		        StackTop = StackTop - 1
+		        PopAndReplaceTop(Ctype(Bitwise.ShiftLeft(Peek(1).IntegerValue, Peek(0).IntegerValue), Double))
 		      Else
 		        InvokeBinaryOperator("<<(_)")
 		      End If
 		      
 		    Case OP_SHIFT_RIGHT
 		      If TopOfStackAreNumbers Then
-		        // Pop the stack and replace the top with the answer.
-		        Stack(StackTop - 2) = CType(Bitwise.ShiftRight(Peek(1).IntegerValue, Peek(0).IntegerValue), Double)
-		        StackTop = StackTop - 1
+		        PopAndReplaceTop(Ctype(Bitwise.ShiftRight(Peek(1).IntegerValue, Peek(0).IntegerValue), Double))
 		      Else
 		        InvokeBinaryOperator(">>(_)")
 		      End If
@@ -1598,9 +1584,7 @@ Protected Class VM
 		    Case OP_BITWISE_AND
 		      If TopOfStackAreNumbers Then
 		        // Bitwise operators work on 32-bit unsigned integers.
-		        // Pop the stack and replace the top with the answer.
-		        Stack(StackTop - 2) = CType(Peek(1).UInt32Value And Peek(0).UInt32Value, Double)
-		        StackTop = StackTop - 1
+		        PopAndReplaceTop(Ctype(Peek(1).UInt32Value And Peek(0).UInt32Value, Double))
 		      Else
 		        InvokeBinaryOperator("&(_)")
 		      End If
@@ -1608,9 +1592,7 @@ Protected Class VM
 		    Case OP_BITWISE_OR
 		      If TopOfStackAreNumbers Then
 		        // Bitwise operators work on 32-bit unsigned integers.
-		        // Pop the stack and replace the top with the answer.
-		        Stack(StackTop - 2) = CType(Peek(1).UInt32Value Or Peek(0).UInt32Value, Double)
-		        StackTop = StackTop - 1
+		        PopAndReplaceTop(Ctype(Peek(1).UInt32Value Or Peek(0).UInt32Value, Double))
 		      Else
 		        InvokeBinaryOperator("|(_)")
 		      End If
@@ -1618,9 +1600,7 @@ Protected Class VM
 		    Case OP_BITWISE_XOR
 		      If TopOfStackAreNumbers Then
 		        // Bitwise operators work on 32-bit unsigned integers.
-		        // Pop the stack and replace the top with the answer.
-		        Stack(StackTop - 2) = CType(Peek(1).UInt32Value Xor Peek(0).UInt32Value, Double)
-		        StackTop = StackTop - 1
+		        PopAndReplaceTop(Ctype(Peek(1).UInt32Value Xor Peek(0).UInt32Value, Double))
 		      Else
 		        InvokeBinaryOperator("^(_)")
 		      End If
@@ -2075,7 +2055,7 @@ Protected Class VM
 		  /// Returns True if the top two values are numbers.
 		  /// Assumes there are at least two values on the stack.
 		  
-		  Return Stack(StackTop - 2).Type = Variant.TypeDouble And Stack(StackTop - 1).Type = Variant.TypeDouble
+		  Return Peek(1).Type = Variant.TypeDouble And Peek(0).Type = Variant.TypeDouble
 		End Function
 	#tag EndMethod
 
