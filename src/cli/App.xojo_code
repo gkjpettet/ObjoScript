@@ -28,10 +28,14 @@ Inherits ConsoleApplication
 		  /// Compiles `source` into an executable ObjoScript function and returns it.
 		  /// If an error occurs, it is presented to the user and the app quits.
 		  
-		  Var compiler As New ObjoScript.Compiler
+		  Var tin As TextInputStream = TextInputStream.Open(SpecialFolder.Resource("core.objo"))
+		  Var coreSource As String = tin.ReadAll
+		  tin.Close
+		  
+		  Var compiler As New ObjoScript.Compiler(coreSource)
 		  
 		  Try
-		    Return compiler.Compile(source)
+		    Return compiler.Compile(source, False)
 		    
 		  Catch le As ObjoScript.LexerException
 		    // Something went wrong tokenising the source code.
