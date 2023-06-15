@@ -1,5 +1,5 @@
 #tag Class
-Protected Class TreeViewDebugger
+Protected Class CustomDisassembler
 Inherits ObjoScript.Disassembler
 	#tag Method, Flags = &h1, CompatibilityFlags = (TargetConsole and (Target32Bit or Target64Bit)) or  (TargetWeb and (Target32Bit or Target64Bit)) or  (TargetDesktop and (Target32Bit or Target64Bit)), Description = 446973617373656D626C6573207468652062797465636F64652077697468696E20606368756E6B602C2072657475726E696E672069742061732061206054726565566965774E6F6465602E
 		Protected Function BytecodeToNode(chunk As ObjoScript.Chunk, includeStandardLibraryBytecode As Boolean = True) As TreeViewNode

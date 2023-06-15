@@ -1,5 +1,5 @@
 #tag Class
-Protected Class DisassemblyTreeView
+Protected Class DisassemblerTreeView
 Inherits DesktopTreeView
 	#tag Method, Flags = &h0
 		Sub Display(f As ObjoScript.Func, includeStandardLibraryBytecode As Boolean = True)
@@ -10,8 +10,8 @@ Inherits DesktopTreeView
 		  If f = Nil Then Return
 		  If f.Chunk = Nil Then Return
 		  
-		  Var debugger As New TreeViewDebugger
-		  Me.AppendNode(debugger.DisassembleFunction(f, includeStandardLibraryBytecode))
+		  Var disassembler As New CustomDisassembler
+		  Me.AppendNode(disassembler.DisassembleFunction(f, includeStandardLibraryBytecode))
 		  
 		End Sub
 	#tag EndMethod

@@ -3,16 +3,21 @@ Protected Class ASTTreeView
 Inherits DesktopTreeView
 Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag Method, Flags = &h0, Description = 446973706C61797320606173746020696E20746869732054726565566965772E
-		Sub Display(ast() As ObjoScript.Stmt, showStandardLibraryNodes As Boolean)
+		Sub Display(ast() As ObjoScript.Stmt, showCoreLibraryNodes As Boolean)
 		  /// Displays `ast` in this TreeView.
 		  
 		  Me.RemoveAllNodes
 		  
 		  For Each statement As ObjoScript.Stmt In ast
-		    If statement.Location.ScriptID = -1 And Not showStandardLibraryNodes Then Continue
+		    If statement.Location.ScriptID = -1 And Not showCoreLibraryNodes Then Continue
 		    Me.AppendNode(statement.Accept(Self))
 		  Next statement
 		  
+		  // Edge case: Either an empty AST or an AST containing only core library nodes 
+		  // and the user doesn't want to display them.
+		  If RootNodeCount = 0 Then
+		    Me.AppendNode(New TreeViewNode("Empty AST"))
+		  End If
 		End Sub
 	#tag EndMethod
 

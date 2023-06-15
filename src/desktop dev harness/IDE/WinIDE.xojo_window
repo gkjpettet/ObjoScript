@@ -248,7 +248,7 @@ Begin DesktopWindow WinIDE
    Begin DesktopPagePanel Panel
       AllowAutoDeactivate=   True
       Enabled         =   True
-      Height          =   510
+      Height          =   477
       Index           =   -2147483648
       Left            =   707
       LockBottom      =   True
@@ -264,7 +264,7 @@ Begin DesktopWindow WinIDE
       TabPanelIndex   =   0
       TabStop         =   False
       Tooltip         =   ""
-      Top             =   54
+      Top             =   87
       Transparent     =   False
       Value           =   4
       Visible         =   True
@@ -292,7 +292,7 @@ Begin DesktopWindow WinIDE
          HasHorizontalScrollbar=   False
          HasVerticalScrollbar=   True
          HeadingIndex    =   -1
-         Height          =   510
+         Height          =   477
          Index           =   -2147483648
          InitialParent   =   "Panel"
          InitialValue    =   "Type	Line	Abs Pos	Value	Script ID"
@@ -310,7 +310,7 @@ Begin DesktopWindow WinIDE
          TabPanelIndex   =   1
          TabStop         =   True
          Tooltip         =   ""
-         Top             =   54
+         Top             =   87
          Transparent     =   False
          Underline       =   False
          Visible         =   True
@@ -341,7 +341,7 @@ Begin DesktopWindow WinIDE
          HasHorizontalScrollbar=   False
          HasVerticalScrollbar=   True
          HeadingIndex    =   -1
-         Height          =   510
+         Height          =   477
          Index           =   -2147483648
          InitialParent   =   "Panel"
          InitialValue    =   "Message	Line	AbsPos	Script ID"
@@ -359,7 +359,7 @@ Begin DesktopWindow WinIDE
          TabPanelIndex   =   3
          TabStop         =   True
          Tooltip         =   ""
-         Top             =   54
+         Top             =   87
          Transparent     =   False
          Underline       =   False
          Visible         =   True
@@ -387,7 +387,7 @@ Begin DesktopWindow WinIDE
          HasNodeTextColor=   False
          HasSelectionColor=   False
          HasSelectionTextColor=   False
-         Height          =   510
+         Height          =   477
          InactiveSelectionColor=   &cD3D3D300
          Index           =   -2147483648
          InitialParent   =   "Panel"
@@ -418,14 +418,14 @@ Begin DesktopWindow WinIDE
          TabPanelIndex   =   2
          TabStop         =   True
          Tooltip         =   ""
-         Top             =   54
+         Top             =   87
          UseFocusRing    =   False
          Visible         =   True
          Width           =   743
          WinDrawTreeLines=   True
          WinHighlightFullRow=   False
       End
-      Begin DisassemblyTreeView DisassemblyOutput
+      Begin DisassemblerTreeView DisassemblyOutput
          AutoDeactivate  =   True
          BackColor       =   &cFFFFFF00
          ColumnCount     =   1
@@ -445,7 +445,7 @@ Begin DesktopWindow WinIDE
          HasNodeTextColor=   False
          HasSelectionColor=   False
          HasSelectionTextColor=   False
-         Height          =   510
+         Height          =   477
          InactiveSelectionColor=   &cD3D3D300
          Index           =   -2147483648
          InitialParent   =   "Panel"
@@ -476,7 +476,7 @@ Begin DesktopWindow WinIDE
          TabPanelIndex   =   4
          TabStop         =   True
          Tooltip         =   ""
-         Top             =   54
+         Top             =   87
          UseFocusRing    =   True
          Visible         =   True
          Width           =   743
@@ -503,7 +503,7 @@ Begin DesktopWindow WinIDE
          HasNodeTextColor=   False
          HasSelectionColor=   False
          HasSelectionTextColor=   False
-         Height          =   510
+         Height          =   477
          InactiveSelectionColor=   &cD3D3D300
          Index           =   -2147483648
          InitialParent   =   "Panel"
@@ -534,7 +534,7 @@ Begin DesktopWindow WinIDE
          TabPanelIndex   =   5
          TabStop         =   True
          Tooltip         =   ""
-         Top             =   54
+         Top             =   87
          UseFocusRing    =   True
          Visible         =   True
          Width           =   743
@@ -813,6 +813,64 @@ Begin DesktopWindow WinIDE
       Visible         =   True
       Width           =   70
    End
+   Begin DesktopCheckBox CheckBoxShowCoreBytecode
+      AllowAutoDeactivate=   True
+      Bold            =   False
+      Caption         =   "Show Core Bytecode"
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      Height          =   20
+      Index           =   -2147483648
+      Italic          =   False
+      Left            =   1047
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   True
+      Scope           =   2
+      TabIndex        =   15
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   54
+      Transparent     =   False
+      Underline       =   False
+      Visible         =   True
+      VisualState     =   1
+      Width           =   164
+   End
+   Begin DesktopCheckBox CheckBoxShowCoreASTNodes
+      AllowAutoDeactivate=   True
+      Bold            =   False
+      Caption         =   "Show Core AST Nodes"
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      Height          =   20
+      Index           =   -2147483648
+      Italic          =   False
+      Left            =   1214
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   True
+      Scope           =   2
+      TabIndex        =   16
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   54
+      Transparent     =   False
+      Underline       =   False
+      Visible         =   True
+      VisualState     =   1
+      Width           =   164
+   End
 End
 #tag EndDesktopWindow
 
@@ -1058,7 +1116,7 @@ End
 
 
 	#tag Method, Flags = &h21, Description = 436F6D70696C65732074686520736F7572636520636F646520696E2074686520656469746F722C20696E746F20612066756E6374696F6E2077686963682069732072657475726E65642E2052657475726E73204E696C20696620636F6D70696C6174696F6E206661696C732E2052657365747320746865204944452E
-		Private Function Compile(debugMode As Boolean) As ObjoScript.Func
+		Private Function Compile(debugMode As Boolean, showCoreLibraryBytecode As Boolean) As ObjoScript.Func
 		  /// Compiles the source code in the editor, into a function which is returned.
 		  /// Returns Nil if compilation fails. Resets the IDE.
 		  
@@ -1077,10 +1135,10 @@ End
 		    UpdateTokensListbox(Compiler.Tokens, False)
 		    
 		    // Show the AST.
-		    ASTView.Display(Compiler.AST, False)
+		    ASTView.Display(Compiler.AST, CheckBoxShowCoreASTNodes.Value)
 		    
-		    // Disassemble the function. Show the standard library bytecode.
-		    DisassemblyOutput.Display(func, True)
+		    // Disassemble the function.
+		    DisassemblyOutput.Display(func, showCoreLibraryBytecode)
 		    
 		    // Successful compilation.
 		    Return func
@@ -1294,7 +1352,7 @@ End
 		Sub Run()
 		  /// Compiles and runs the code in the source editor.
 		  
-		  Var f As ObjoScript.Func = Compile(False)
+		  Var f As ObjoScript.Func = Compile(False, CheckBoxShowCoreBytecode.Value)
 		  
 		  If f = Nil Then
 		    // Compilation failed.
@@ -1396,6 +1454,7 @@ End
 		    ButtonAST.Value = True
 		    ButtonTokens.Value = False
 		    ButtonErrors.Value = False
+		    ButtonDebugger.Value = False
 		    ButtonDisassembler.Value = False
 		    Panel.SelectedPanelIndex = id
 		    
@@ -1403,6 +1462,7 @@ End
 		    ButtonAST.Value = False
 		    ButtonTokens.Value = True
 		    ButtonErrors.Value = False
+		    ButtonDebugger.Value = False
 		    ButtonDisassembler.Value = False
 		    Panel.SelectedPanelIndex = id
 		    
@@ -1410,6 +1470,7 @@ End
 		    ButtonAST.Value = False
 		    ButtonTokens.Value = False
 		    ButtonErrors.Value = True
+		    ButtonDebugger.Value = False
 		    ButtonDisassembler.Value = False
 		    Panel.SelectedPanelIndex = PANEL_ERRORS
 		    
@@ -1417,6 +1478,7 @@ End
 		    ButtonAST.Value = False
 		    ButtonTokens.Value = False
 		    ButtonErrors.Value = False
+		    ButtonDebugger.Value = False
 		    ButtonDisassembler.Value = True
 		    Panel.SelectedPanelIndex = PANEL_DISASSEMBLER_OUTPUT
 		    
@@ -1682,7 +1744,7 @@ End
 		Sub Pressed()
 		  /// Compiles and runs the code in the source editor in debug mode.
 		  
-		  Var f As ObjoScript.Func = Compile(True)
+		  Var f As ObjoScript.Func = Compile(True, CheckBoxShowCoreBytecode.Value)
 		  
 		  If f = Nil Then
 		    // Compilation failed.
