@@ -36,6 +36,21 @@ Implements ObjoScript.Value,ObjoScript.Method
 		  
 		  HashKit.Combine(hash, Chunk.Length)
 		  
+		  HashKit.Combine(hash, Chunk.Constants.Count)
+		  
+		  // We'll also hash the line numbers and script IDs for a small number of the 
+		  // bytes in the chunk as without this it is possible to get hash collisions 
+		  // with very similar but distinct functions.
+		  If Chunk.Length > 0 Then
+		    Var i As Integer = 0
+		    Const HASH_ITERATIONS = 3
+		    While i < Chunk.Length And i <= HASH_ITERATIONS
+		      HashKit.Combine(hash, CType(Chunk.LineForOffset(i), Integer))
+		      HashKit.Combine(hash, Chunk.ScriptIDForOffset(i))
+		      i = i + 1
+		    Wend
+		  End If
+		  
 		  // If this function has any code, we'll also hash two random bytes and the script ID for the chunk.
 		  If Chunk.Length > 0 Then
 		    Var offset As Integer = System.Random.InRange(0, Chunk.Length - 1)

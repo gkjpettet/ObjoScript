@@ -852,7 +852,7 @@ Protected Module ObjoScript
 	#tag EndComputedProperty
 
 
-	#tag Constant, Name = Version, Type = String, Dynamic = False, Default = \"2.0.0", Scope = Protected, Description = 5468652073656D616E7469632076657273696F6E2E
+	#tag Constant, Name = Version, Type = String, Dynamic = False, Default = \"2.0.1", Scope = Protected, Description = 5468652073656D616E7469632076657273696F6E2E
 	#tag EndConstant
 
 
