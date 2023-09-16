@@ -3,7 +3,7 @@ ObjoScript is designed to be easy to pickup and expressive. It is heavily inspir
 Currently ObjoScript compiles scripts directly from source code into bytecode. It does not compile ahead of time. This _may_ change in the future to allow distribution of precompiled ObjoScript code.
 
 ## Comments
-These begin with `\\` and run to the end of the line:
+These begin with `#` and run to the end of the line:
 
 ```objo
 # This is a comment.
