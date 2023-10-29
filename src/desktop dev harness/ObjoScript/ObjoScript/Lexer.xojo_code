@@ -232,6 +232,8 @@ Protected Class Lexer
 		  // Is there an exponent?
 		  If Peek = "e" Then
 		    Var seenExponentDigit As Boolean = False
+		    // Number literals with an exponent will be integers unless the exponent is negative.
+		    isInteger = True
 		    Var nextChar As String = Peek(1)
 		    If nextChar = "-" Or nextChar = "+" Then
 		      If nextChar = "-" Then isInteger = False

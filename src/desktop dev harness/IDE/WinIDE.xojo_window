@@ -27,6 +27,7 @@ Begin DesktopWindow WinIDE
    Begin XUICodeEditor Editor
       AllowAutocomplete=   True
       AllowAutoCompleteInComments=   True
+      AllowFocusRing  =   False
       AllowInertialScrolling=   True
       AutocloseBrackets=   False
       AutocompleteCombo=   1
@@ -838,6 +839,7 @@ Begin DesktopWindow WinIDE
       Top             =   54
       Transparent     =   False
       Underline       =   False
+      Value           =   False
       Visible         =   True
       VisualState     =   1
       Width           =   164
@@ -867,6 +869,7 @@ Begin DesktopWindow WinIDE
       Top             =   54
       Transparent     =   False
       Underline       =   False
+      Value           =   False
       Visible         =   True
       VisualState     =   1
       Width           =   164
@@ -1903,8 +1906,7 @@ End
 			"6 - Rounded Window"
 			"7 - Global Floating Window"
 			"8 - Sheet Window"
-			"9 - Metal Window"
-			"11 - Modeless Dialog"
+			"9 - Modeless Dialog"
 		#tag EndEnumValues
 	#tag EndViewProperty
 	#tag ViewProperty
