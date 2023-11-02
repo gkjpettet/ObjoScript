@@ -131,9 +131,9 @@ Protected Class Lexer
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 41646473206569746865722061207661726961626C65206964656E7469666965722C206B6579776F72642C20626F6F6C65616E206F7220746865206E756C6C20746F6B656E2E
+	#tag Method, Flags = &h21, Description = 41646473206569746865722061207661726961626C65206964656E7469666965722C206B6579776F72642C20626F6F6C65616E206F7220746865206E6F7468696E6720746F6B656E2E
 		Private Sub AddIdentifierOrReservedWord()
-		  /// Adds either a variable identifier, keyword, boolean or the null token.
+		  /// Adds either a variable identifier, keyword, boolean or the nothing token.
 		  ///
 		  /// Assumes we've already consumed the first character:
 		  ///
@@ -911,7 +911,7 @@ Protected Class Lexer
 		  End If
 		  
 		  // =================================================================
-		  // Identifiers, keywords, booleans and null.
+		  // Identifiers, keywords, booleans and nothing.
 		  // =================================================================
 		  If c.IsASCIILetter Then
 		    AddIdentifierOrReservedWord
