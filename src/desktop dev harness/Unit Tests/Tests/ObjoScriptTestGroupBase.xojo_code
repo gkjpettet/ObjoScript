@@ -240,7 +240,7 @@ Inherits TestGroup
 		  
 		  // Make sure we trim any superfluous end of line character added 
 		  // by `VMPrintDelegate`.
-		  Return mPrintBuffer.TrimRight(EndOfLine.UNIX)
+		  Return mPrintBuffer.TrimRight(EndOfLine.UNIX).DefineEncoding(Encodings.UTF8)
 		End Function
 	#tag EndMethod
 
