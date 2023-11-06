@@ -1209,7 +1209,7 @@ Protected Class Parser
 		    returnValue = New ObjoScript.NothingLiteral(returnKeyword)
 		  Else
 		    returnValue = Expression
-		    If Not Check(ObjoScript.TokenTypes.EOL, ObjoScript.TokenTypes.RCurly) Then
+		    If Not Check(ObjoScript.TokenTypes.RCurly) Then
 		      ConsumeNewLine("Expected a new line or closing brace after the return statement value.")
 		    End If
 		  End If
