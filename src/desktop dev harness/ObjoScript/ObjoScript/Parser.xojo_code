@@ -184,7 +184,8 @@ Protected Class Parser
 		  Var staticMethods As Dictionary = ParseJSON("{}") // HACK: Case sensitive dictonary.
 		  Var foreignInstance As Dictionary = ParseJSON("{}") // HACK: Case sensitive dictonary.
 		  Var foreignStatic As Dictionary = ParseJSON("{}") // HACK: Case sensitive dictonary.
-		  Var constructors(), cdecl As ObjoScript.ConstructorDeclStmt
+		  Var constructors() As ObjoScript.ConstructorDeclStmt
+		  Var cdecl As ObjoScript.ConstructorDeclStmt
 		  Var constructorArities As New Dictionary // Key = arity: Value = Nil
 		  While Not Check(ObjoScript.TokenTypes.RCurly, ObjoScript.TokenTypes.EOF)
 		    // -----------
@@ -197,6 +198,7 @@ Protected Class Parser
 		        Error("A constructor with " + s + " has already been declared.")
 		      Else
 		        constructors.Add(cdecl)
+		        constructorArities.Value(cdecl.Arity) = Nil
 		      End If
 		      
 		    ElseIf Match(ObjoScript.TokenTypes.Foreign) Then
@@ -239,9 +241,6 @@ Protected Class Parser
 		      Var m As ObjoScript.MethodDeclStmt = MethodDeclaration(className, False)
 		      
 		      If methods.HasKey(m.Signature) Then
-		        // ----------------------
-		        // NATIVE INSTANCE METHOD
-		        // ----------------------
 		        Error("Duplicate method definition: " + m.Signature, m.Location)
 		      End If
 		      If foreignInstance.HasKey(m.Signature) And Not ObjoScript.ForeignMethodDeclStmt(foreignInstance.Value(m.Signature)).IsStatic Then
@@ -562,7 +561,7 @@ Protected Class Parser
 		  /// Regular methods may or may not return values and can accept any number of arguments.
 		  /// Setters do not return a value and must have one argument. Format:
 		  /// ```
-		  /// age=(value){} // Note the `=` to denote it's a setter.
+		  /// age=(value) // Note the `=` to denote it's a setter.
 		  /// ```
 		  /// If `isStatic` is True then this is a static method declaration.
 		  
@@ -1210,7 +1209,7 @@ Protected Class Parser
 		    returnValue = New ObjoScript.NothingLiteral(returnKeyword)
 		  Else
 		    returnValue = Expression
-		    If Not Check(ObjoScript.TokenTypes.RParen, ObjoScript.TokenTypes.RCurly) Then
+		    If Not Check(ObjoScript.TokenTypes.EOL, ObjoScript.TokenTypes.RCurly) Then
 		      ConsumeNewLine("Expected a new line or closing brace after the return statement value.")
 		    End If
 		  End If
