@@ -235,12 +235,13 @@ Protected Class ValueSet
 	#tag Note, Name = About
 		A data structure for storing values used by the compiler and VM.
 		
-		It stores Doubles, Strings and Value interfaces as Variants in an array. Their hashes are stored in a 
-		lookup table where the lookup table value is the hash and the value is the index in the Variant array of the 
-		value being stored.
+		It stores Doubles, Strings and Value interfaces as Variants in an array. 
+		Their hashes are stored in a lookup table where the lookup table value is the hash and 
+		the value is the index in the Variant array of the value being stored.
 		
-		We stored Doubles and Strings are native Xojo types rather than Value interfaces for performance reasons. Doing it
-		this way means the VM doesn't have to unwrap them to manipulate them. All other items stored (e.g. Functions, etc) 
+		We store Doubles and Strings as native Xojo types rather than Value interfaces for 
+		performance reasons. Doing it this way means the VM doesn't have to unwrap them to 
+		manipulate them. All other items stored (e.g. Functions, etc) 
 		are stored as classes implementing the Value interface.
 		
 	#tag EndNote

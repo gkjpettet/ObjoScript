@@ -396,7 +396,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320726177204F626A6F53637269707420736F7572636520636F646520696E746F206120746F70206C6576656C2066756E6374696F6E2E2050726570656E64732074686520636F646520776974682074686520636F7265206C69627261727920736F7572636520636F64652070726F7669646520647572696E67207468697320636F6D70696C6572277320696E7374616E74696174696F6E2E20526169736573206120604C65786572457863657074696F6E602C2060506172736572457863657074696F6E60206F722060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
-		Function Compile(source As String, debugMode As Boolean) As ObjoScript.Func
+		Function Compile(source As String, debugMode As Boolean, scriptID As Integer = 0) As ObjoScript.Func
 		  /// Compiles raw ObjoScript source code into a top level function. 
 		  /// Prepends the code with the core library source code provide during this
 		  /// compiler's instantiation.
@@ -411,7 +411,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Tokenise the user's source code. This may raise a LexerException, therefore aborting compilation.
 		  StopWatch.Start
-		  mTokens = Lexer.Tokenise(source)
+		  mTokens = Lexer.Tokenise(source, True, scriptId)
 		  StopWatch.Stop
 		  mTokeniseTime = StopWatch.ElapsedMilliseconds
 		  
@@ -453,8 +453,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320616E642072657475726E7320612066756E6374696F6E2E2052616973657320612060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
 		Function Compile(name As String, parameters() As ObjoScript.Token, body As ObjoScript.BlockStmt, type As FunctionTypes, currentClass As ObjoScript.ClassData, isStaticMethod As Boolean, debugMode As Boolean, shouldReset As Boolean, enclosingCompiler As ObjoScript.Compiler) As ObjoScript.Func
 		  /// Compiles and returns a function. Raises a `CompilerException` if an error occurs.
-		  ///
-		  /// Resets the compiler by default but this can be overridden by setting `shouldReset` to `True`.
 		  
 		  If shouldReset Then Reset
 		  
@@ -1105,9 +1103,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52657475726E732054727565206966206120676C6F62616C206E616D657320606E616D65602068617320616C7265616479206265656E20646566696E6564206279207468697320636F6D70696C657220636861696E2E
+	#tag Method, Flags = &h21, Description = 52657475726E732054727565206966206120676C6F62616C207661726961626C65206E616D656420606E616D65602068617320616C7265616479206265656E20646566696E6564206279207468697320636F6D70696C657220636861696E2E
 		Private Function GlobalExists(name As String) As Boolean
-		  /// Returns True if a global names `name` has already been defined by this compiler chain.
+		  /// Returns True if a global variable named `name` has already been defined by this 
+		  /// compiler chain.
 		  
 		  Return OutermostCompiler.KnownGlobals.HasKey(name)
 		  

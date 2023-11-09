@@ -2,6 +2,7 @@
 Protected Class ClassData
 	#tag Method, Flags = &h0
 		Sub Constructor(declaration As ObjoScript.ClassDeclStmt, superclass As ObjoScript.ClassData)
+		  
 		  Self.Declaration = declaration
 		  
 		  // Stores the names of instance fields used by this class.
@@ -71,7 +72,7 @@ Protected Class ClassData
 		Name As String
 	#tag EndComputedProperty
 
-	#tag Property, Flags = &h0, Description = 4F7074696F6E616C20646174612061626F7574207468697320636C61737327207375706572636C6173732E204D6179206265204E696C2E
+	#tag Property, Flags = &h0, Description = 4F7074696F6E616C20646174612061626F7574207468697320636C6173732773207375706572636C6173732E204D6179206265204E696C2E
 		Superclass As ObjoScript.ClassData
 	#tag EndProperty
 
