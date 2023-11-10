@@ -3020,6 +3020,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
+		  CurrentLocation = expr.Location
+		  
 		  // Evaluate the value to assign, leaving it on the top of the stack.
 		  Call expr.Value.Accept(Self)
 		  
