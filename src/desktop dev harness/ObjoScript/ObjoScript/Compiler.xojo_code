@@ -9,7 +9,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var index As Integer = CurrentChunk.AddConstant(d)
 		  
 		  If index > ObjoScript.Chunk.MAX_CONSTANTS Then
-		    Error("To many constants in the chunk.")
+		    Error("Too many constants in the chunk.")
 		  End If
 		  
 		  Return index
@@ -25,7 +25,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var index As Integer = CurrentChunk.AddConstant(value)
 		  
 		  If index > ObjoScript.Chunk.MAX_CONSTANTS Then
-		    Error("To many constants in the chunk.")
+		    Error("Too many constants in the chunk.")
 		  End If
 		  
 		  Return index
@@ -41,7 +41,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var index As Integer = CurrentChunk.AddConstant(s)
 		  
 		  If index > ObjoScript.Chunk.MAX_CONSTANTS Then
-		    Error("To many constants in the chunk.")
+		    Error("Too many constants in the chunk.")
 		  End If
 		  
 		  Return index
