@@ -982,7 +982,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  Self.CurrentLoop.ExitJump = EmitJump(VM.Opcodes.JumpIfTrue)
 		  
-		  // Pop the condition before executing the body.
+		  // Pop the condition before executing the body. 
 		  EmitOpcode(VM.Opcodes.Pop)
 		  
 		End Sub
@@ -1089,9 +1089,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 54656C6C732074686520564D20746F20726574726965766573206120676C6F62616C207661726961626C65206E616D656420606E616D65602E
+	#tag Method, Flags = &h21, Description = 54656C6C732074686520564D20746F207265747269657665206120676C6F62616C207661726961626C65206E616D656420606E616D656020616E642070757368206974206F6E20746F2074686520737461636B2E
 		Private Sub GetGlobalVariable(name As String)
-		  /// Tells the VM to retrieves a global variable named `name`.
+		  /// Tells the VM to retrieve a global variable named `name` and push it on to the stack.
 		  
 		  // Get the index of the variable in the constant pool (or add it and
 		  // then get its index if not already present).
@@ -1481,7 +1481,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles a call to a superclass constructor.
 		  ///
 		  /// E.g: `super` or `super(argN)`.
-		  /// Assumes the compiler is currenting compiling a constructor and that the 
+		  /// Assumes the compiler is currently compiling a constructor and that the 
 		  /// current class being compiled has a superclass.
 		  
 		  CurrentLocation = location
@@ -1708,7 +1708,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  CurrentLocation = expr.Location
 		  
-		  // Evaluate the value to be assigned.
+		  // Compile the value to be assigned.
 		  Call expr.Value.Accept(Self)
 		  
 		  Assignment(expr.Name)
@@ -1819,9 +1819,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Error("Class `" + CurrentClass.Name + "` does not have a superclass.")
 		  End If
 		  
-		  // Are we calling the superclass' constructor?
+		  // Are we calling the superclass's constructor?
 		  If Self.Type = FunctionTypes.Constructor Then
-		    // Assert that calls to constructors require parentheses (even when there are no arguments).
+		    // Assert that calls to constructors have parentheses (even when there are no arguments).
 		    // This is an ObjoScript language requirement.
 		    If Not expr.HasParentheses Then
 		      Error("A superclass constructor must have an argument list, even if empty.")
@@ -2111,7 +2111,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // The third operand is the total number of fields the class contains (for the entire hierarchy).
 		  // We don't know this yet so we will need to back-patch this with the actual number after we're
 		  // done compiling the methods and constructors.
-		  // For now, we'll emit the maximum number or permitted fields.
+		  // For now, we'll emit the maximum number of permitted fields.
 		  EmitByte(255)
 		  Var numFieldsOffset As Integer = CurrentChunk.Code.LastIndex
 		  
@@ -2182,13 +2182,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // ================================
 		  // Field count.
 		  If CurrentClass.TotalFieldCount > 255 Then
-		    Error("Class `" + stmt.Name + "` has exceed the maximum number of fields (255). This includes inherited ones.")
+		    Error("Class `" + stmt.Name + "` has exceeded the maximum number of fields (255). This includes inherited ones.")
 		  End If
 		  
 		  // Disallow foreign classes from inheriting from classes with fields. 
 		  // I'm doing this because Wren does and Bob Nystrom must have a good reason for this :)
 		  If stmt.IsForeign And CurrentClass.TotalFieldCount > CurrentClass.FieldCount Then
-		    Error("Foreign class `" + CurrentClass.Name + "` may not inherit from a class with fields.")
+		    Error("Foreign class `" + CurrentClass.Name + "` cannot inherit from a class with fields.")
 		  End If
 		  
 		  // ================================
@@ -2372,14 +2372,14 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Assert that field access is valid.
 		  If Not CompilingMethodOrConstructor Then
-		    Error("Instance fields can obly be accessed from within an instance method or constructor.")
+		    Error("Instance fields can only be accessed from within an instance method or constructor.")
 		  End If
 		  If Self.IsStaticMethod Then
 		    Error("Instance fields can only be accessed from within an instance method, not a static method.")
 		  End If
 		  
 		  // Get the index in this class' `Fields` array to access at runtime.
-		  Var fieldIndex As Integer  = FieldIndex(expr.Name)
+		  Var fieldIndex As Integer = FieldIndex(expr.Name)
 		  If fieldIndex > 255 Then
 		    Error("Classes cannot have more than 255 fields, including inherited ones.")
 		  End If
@@ -3567,7 +3567,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 			  VM.Opcodes.ForeignMethod      : 4, _ // constant pool index of the signature (2 bytes), arity (1 byte), isStatic (0 false, 1 true)
 			  VM.Opcodes.GetField           : 1, _ // index in the current class' `Fields` array to access
 			  VM.Opcodes.GetGlobal          : 1, _ // constant pool index of the name of the class (1 byte)
-			  VM.Opcodes.GetGlobalLong      : 1, _ // constant pool index of the name of the class (2 bytes)
+			  VM.Opcodes.GetGlobalLong      : 2, _ // constant pool index of the name of the class (2 bytes)
 			  VM.Opcodes.GetLocal           : 1, _ // stack slot where the local variable is
 			  VM.Opcodes.GetLocalClass      : 1, _ // stack slot where the local variable is. The VM push it's class on to the stack.
 			  VM.Opcodes.GetStaticField     : 1, _ // constant pool index (1 byte) of the name of the static field

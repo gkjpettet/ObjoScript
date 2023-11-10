@@ -24,12 +24,11 @@ Implements ObjoScript.Stmt
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 52657475726E732054727565206966207468697320636C6173732068617320616E20696E7374616E6365206D6574686F64207769746820607369676E6174757265602E
+	#tag Method, Flags = &h0, Description = 52657475726E732054727565206966207468697320636C617373206861732061206D6574686F64207769746820607369676E6174757265602E204966206069735374617469636020697320605472756560207468656E20737461746963206D6574686F6473206172652073656172636865642E204966206046616C736560207468656E206F6E6C7920696E7374616E6365206D6574686F6473206172652073656172636865642E
 		Function HasMethodWithSignature(signature As String, isStatic As Boolean) As Boolean
 		  /// Returns True if this class has a method with `signature`.
-		  /// If `isStatic` is `True` then static methods are search. If `False` then
+		  /// If `isStatic` is `True` then static methods are searched. If `False` then
 		  /// only instance methods are searched.
-		  
 		  
 		  If isStatic Then
 		    // Check static native methods.
