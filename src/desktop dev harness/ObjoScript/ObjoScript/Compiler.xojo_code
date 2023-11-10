@@ -2849,6 +2849,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles a method invocation.
 		  ///
 		  /// E.g: operand.method(arg1, arg2)
+		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
 		  CurrentLocation = expr.Location
@@ -2945,6 +2946,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///  RANGE_OP  
 		  ///  b   ← top of the stack
 		  ///  a
+		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
 		  CurrentLocation = expr.Location
@@ -2996,6 +2998,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles retrieving a static field.
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  CurrentLocation = expr.Location
 		  
 		  If Not CompilingMethodOrConstructor Then
 		    Error("Static fields can only be accessed from within a method or a constructor.")
