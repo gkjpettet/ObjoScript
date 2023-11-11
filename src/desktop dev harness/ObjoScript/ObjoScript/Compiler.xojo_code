@@ -3355,7 +3355,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    
 		    Var localSlot As Integer = ResolveLocal(stmt.Name)
 		    If localSlot < 0 Or localSlot > 255 Then
-		      Error("Invalid local variable stack slot")
+		      Error("Invalid local variable stack slot.")
 		    End If
 		    EmitByte(localSlot) 
 		  End If
