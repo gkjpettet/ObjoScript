@@ -3086,6 +3086,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles a subscript setter call.
 		  ///
 		  /// E.g: a[1] = value
+		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
 		  CurrentLocation = expr.Location
@@ -3145,7 +3146,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  CurrentLocation = expr.Location
 		  
-		  If NOt CompilingMethodOrConstructor Then
+		  If Not CompilingMethodOrConstructor Then
 		    Error("`super` can only be used within a method or constructor.")
 		  End If
 		  
@@ -3168,7 +3169,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Error("The superclass (`" + CurrentClass.Superclass.Name + "`) of `" + CurrentClass.Name + "` does not define a setter `" + expr.Signature + "`.")
 		  End If
 		  
-		  // Load the superclass' name into the constant pool.
+		  // Load the superclass's name into the constant pool.
 		  Var superNameIndex As Integer = AddConstant(CurrentClass.Superclass.Name)
 		  
 		  // Push `this` onto the stack. It's always at slot 0 of the call frame.
@@ -3214,6 +3215,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles a ternary conditional expression.
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  CurrentLocation = expr.Location
 		  
 		  // Compile the condition - this will leave the result on the top of the stack at runtime.
 		  Call expr.Condition.Accept(Self)
