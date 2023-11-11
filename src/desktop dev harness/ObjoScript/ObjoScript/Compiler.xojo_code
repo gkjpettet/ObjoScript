@@ -3198,6 +3198,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the `ObjoScript.StmtVisitor` interface.
 		  
+		  CurrentLocation = stmt.Location
+		  
 		  // Validate the switch statement first.
 		  If stmt.Cases.Count = 0 Then
 		    Error("A switch statement must include at least one case.")
