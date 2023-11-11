@@ -1656,7 +1656,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Wrap these statements in a synthetic block and return.
 		  Var openingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "{", stmt.Location.ScriptID)
-		  Var closingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "}", stmt.Location.ScriptID)
+		  Var closingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.RCurly, 0, 0, "}", stmt.Location.ScriptID)
 		  Return New ObjoScript.BlockStmt(statements, openingBrace, closingBrace)
 		  
 		End Function
