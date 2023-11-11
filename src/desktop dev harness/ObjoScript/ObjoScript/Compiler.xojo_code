@@ -2632,6 +2632,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		Function VisitIfStmt(stmt As ObjoScript.IfStmt) As Variant
 		  /// Compiles an `if` statement.
 		  
+		  CurrentLocation = stmt.Location
+		  
 		  // Compile the condition - this will leave the result on the top of the stack at runtime.
 		  Call stmt.Condition.Accept(Self)
 		  
