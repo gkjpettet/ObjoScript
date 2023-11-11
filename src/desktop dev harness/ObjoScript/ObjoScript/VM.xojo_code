@@ -1135,14 +1135,6 @@ Protected Class VM
 		  // The VM will set this once it has defined the `Nothing` class within the runtime.
 		  Nothing = Nil
 		  
-		  // API slots.
-		  APISlots.ResizeTo(-1)
-		  APISlots.ResizeTo(MAX_SLOTS)
-		  // Set every slot to `nothing`
-		  For i As Integer = 0 To APISlots.LastIndex
-		    APISlots(i) = Nothing
-		  Next i
-		  
 		  Self.Globals = ParseJSON("{}") // HACK: Case sensitive.
 		  
 		  // Reset the API
