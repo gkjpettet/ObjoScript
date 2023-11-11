@@ -3052,6 +3052,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles a subscript method call.
 		  ///
 		  /// E.g: operand[1]
+		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
 		  CurrentLocation = expr.Location
