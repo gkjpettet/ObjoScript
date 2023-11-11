@@ -1059,15 +1059,15 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 436F6D70696C6573207468652073796E74686573697365642060666F72656163686020636F6E646974696F6E3A2060697465722A203D207365712A2E6974657261746528697465722A2960
-		Private Sub ForEachCondition()
+		Private Sub ForEachCondition(scriptID As Integer)
 		  /// Compiles the synthesised `foreach` condition: `iter* = seq*.iterate(iter*)`
 		  ///
 		  /// Internally called from within `VisitForEachStmt()`.
 		  
-		  Var iter As New ObjoScript.VariableExpr(SyntheticIdentifier("iter*"))
-		  Var seq As New ObjoScript.VariableExpr(SyntheticIdentifier("seq*"))
-		  Var invocation As New ObjoScript.MethodInvocationExpr(seq, SyntheticIdentifier("iterate"), Array(iter), False)
-		  Var assign As New AssignmentExpr(SyntheticIdentifier("iter*"), invocation)
+		  Var iter As New ObjoScript.VariableExpr(SyntheticIdentifier("iter*", scriptID))
+		  Var seq As New ObjoScript.VariableExpr(SyntheticIdentifier("seq*", scriptID))
+		  Var invocation As New ObjoScript.MethodInvocationExpr(seq, SyntheticIdentifier("iterate", scriptID), Array(iter), False)
+		  Var assign As New AssignmentExpr(SyntheticIdentifier("iter*", scriptID), invocation)
 		  
 		  Call assign.Accept(Self)
 		End Sub
@@ -1079,10 +1079,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Internally called from within `VisitForEachStmt()`.
 		  
-		  Var iter As New ObjoScript.VariableExpr(SyntheticIdentifier("iter*"))
-		  Var seq As New ObjoScript.VariableExpr(SyntheticIdentifier("seq*"))
-		  Var invocation As New ObjoScript.MethodInvocationExpr(seq, SyntheticIdentifier("iteratorValue"), Array(iter), False)
-		  Var dec As New ObjoScript.VarDeclStmt(SyntheticIdentifier(loopCounter.Lexeme), invocation, CurrentLocation)
+		  Var iter As New ObjoScript.VariableExpr(SyntheticIdentifier("iter*", loopCounter.ScriptID))
+		  Var seq As New ObjoScript.VariableExpr(SyntheticIdentifier("seq*", loopCounter.ScriptID))
+		  Var invocation As New ObjoScript.MethodInvocationExpr(seq, SyntheticIdentifier("iteratorValue", loopCounter.ScriptID), Array(iter), False)
+		  Var dec As New ObjoScript.VarDeclStmt(SyntheticIdentifier(loopCounter.Lexeme, loopCounter.ScriptID), invocation, CurrentLocation)
 		  
 		  Call dec.Accept(Self)
 		  
@@ -1663,7 +1663,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 52657475726E7320612073796E746865746963206964656E74696669657220746F6B656E206174206C696E6520302C20706F732030207769746820606C6578656D656020696E20607363726970744944602E
-		Private Function SyntheticIdentifier(lexeme As String, scriptID As Integer = -1) As ObjoScript.Token
+		Private Function SyntheticIdentifier(lexeme As String, scriptID As Integer) As ObjoScript.Token
 		  /// Returns a synthetic identifier token at line 0, pos 0 with `lexeme` in `scriptID`.
 		  
 		  Return New ObjoScript.Token(ObjoScript.TokenTypes.Identifier, 0, 0, lexeme, scriptID)
@@ -2452,12 +2452,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		        Var b As Double = NumberLiteral(range.Upper).Value
 		        If Not range.Inclusive Then
 		          If a < b Then // E.g: 1..<5
-		            b  = b - 1
+		            b = b - 1
 		          ElseIf a > b Then // E.g: 5..<1
 		            b = b + 1
 		          Else
 		            // E.g: 5..<5. This doesn't make sense.
-		            Error("A numeric literal exclusive range requires that the operands have different values") 
+		            Error("A numeric literal exclusive range requires that the operands have different values.") 
 		          End If
 		        End If
 		        OptimisedForEach(a, b, stmt.LoopCounter, stmt.Body, stmt.Location)
@@ -2472,18 +2472,18 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Declare iter* as nothing.
 		  EmitOpcode(VM.Opcodes.Nothing)
-		  DeclareVariable(SyntheticIdentifier("iter*"), False, False)
+		  DeclareVariable(SyntheticIdentifier("iter*", stmt.Location.ScriptID), False, False)
 		  MarkInitialised
 		  
 		  // Declare seq* equal to `stmt.Range`
 		  Call stmt.Range.Accept(Self)
-		  DeclareVariable(SyntheticIdentifier("seq*"), False, False)
+		  DeclareVariable(SyntheticIdentifier("seq*", stmt.Location.ScriptID), False, False)
 		  MarkInitialised
 		  
 		  StartLoop
 		  
 		  // Compile the condition: iter* = seq*.iterate(iter*)
-		  ForEachCondition
+		  ForEachCondition(stmt.Location.ScriptID)
 		  
 		  ExitLoopIfFalse
 		  
@@ -2537,9 +2537,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C6520612060666F7260206C6F6F702E
+	#tag Method, Flags = &h0, Description = 436F6D70696C657320612060666F7260206C6F6F702E
 		Function VisitForStmt(stmt As ObjoScript.ForStmt) As Variant
-		  /// Compile a `for` loop.
+		  /// Compiles a `for` loop.
 		  ///
 		  /// ```objo
 		  /// for (initialiser? ; condition? ; increment?) {
