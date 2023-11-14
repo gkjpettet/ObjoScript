@@ -510,9 +510,9 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 5265616473207468652076616C7565206F66206120676C6F62616C207661726961626C6564206E616D656420606E616D656020616E6420707573686573206974206F6E20746F2074686520737461636B2E2052616973657320612072756E74696D65206572726F722069662074686520676C6F62616C207661726961626C6520646F65736E27742065786973742E
+	#tag Method, Flags = &h21, Description = 5265616473207468652076616C7565206F66206120676C6F62616C207661726961626C65206E616D656420606E616D656020616E6420707573686573206974206F6E20746F2074686520737461636B2E2052616973657320612072756E74696D65206572726F722069662074686520676C6F62616C207661726961626C6520646F65736E27742065786973742E
 		Private Sub GetGlobal(name As String)
-		  /// Reads the value of a global variabled named `name` and pushes it on to the stack.
+		  /// Reads the value of a global variable named `name` and pushes it on to the stack.
 		  /// Raises a runtime error if the global variable doesn't exist.
 		  
 		  Var value As Variant = Self.Globals.Lookup(name, Nil)
@@ -1513,7 +1513,8 @@ Protected Class VM
 		      End If
 		      
 		    Case Opcodes.NotEqual
-		      If TopOfStackAreNumbers Then
+		      If (Peek(0).Type = Variant.TypeBoolean And Peek(1).Type = Variant.TypeBoolean) _
+		        Or TopOfStackAreNumbers Then
 		        // Pop the stack and replace the top with the answer.
 		        Stack(StackTop - 2) = Peek(1) <> Peek(0)
 		        StackTop = StackTop - 1
