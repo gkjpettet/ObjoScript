@@ -528,7 +528,7 @@ Protected Module String_
 		  /// - Slot 1 is a number
 		  /// - Slot 2 is a number
 		  ///
-		  /// String.middle(start< length) -> string
+		  /// String.middle(start, length) -> string
 		  
 		  #Pragma BreakOnExceptions False
 		  

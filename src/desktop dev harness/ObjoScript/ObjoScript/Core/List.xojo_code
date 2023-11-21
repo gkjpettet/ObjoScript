@@ -137,7 +137,7 @@ Protected Module List
 		  Var size As Variant = vm.GetSlotValue(1)
 		  Var element As Variant = vm.GetSlotValue(2)
 		  
-		  // Assert index is a non-negative integer.
+		  // Assert size is a non-negative integer.
 		  If Not ObjoScript.VariantIsIntegerDouble(size) Then
 		    vm.Error("Size must be an integer.")
 		    If size < 0 Then
