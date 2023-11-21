@@ -115,9 +115,9 @@ Protected Module String_
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h1, Description = 52657475726E732074727565206966207468697320737472696E6720656E647320776974682060737566666978602E20436173652D696E73656E7369746976652E
+	#tag Method, Flags = &h1, Description = 52657475726E732074727565206966207468697320737472696E6720656E647320776974682060737566666978602E20436173652073656E7369746976652E
 		Protected Sub EndsWith(vm As ObjoScript.VM)
-		  /// Returns true if this string ends with `suffix`. Case-insensitive.
+		  /// Returns true if this string ends with `suffix`. Case sensitive.
 		  ///
 		  /// Assumes: 
 		  /// - Slot 0 is a string
