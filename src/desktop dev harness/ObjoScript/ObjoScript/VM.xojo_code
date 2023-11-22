@@ -587,9 +587,9 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 52657475726E73207570206120746F702D6C6576656C207661726961626C65206E616D656420606E616D65602E2052657475726E73204E696C206966206E6F7420666F756E642E
+	#tag Method, Flags = &h0, Description = 52657475726E73206120746F702D6C6576656C207661726961626C65206E616D656420606E616D65602E2052657475726E73204E696C206966206E6F7420666F756E642E
 		Function GetVariable(name As String) As Variant
-		  /// Returns up a top-level variable named `name`.
+		  /// Returns a top-level variable named `name`.
 		  /// Returns Nil if not found.
 		  
 		  #Pragma DisableBoundsChecking
@@ -2198,9 +2198,9 @@ Protected Class VM
 
 
 	#tag Enum, Name = Opcodes, Type = UInt8, Flags = &h0
-		Assert
-		  Add
+		Add
 		  Add1
+		  Assert
 		  BitwiseAnd
 		  BitwiseNot
 		  BitwiseOr

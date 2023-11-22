@@ -153,7 +153,7 @@ Protected Module Map
 		  Else
 		    // If `iter <> nothing` then assert it's an integer.
 		    If Not ObjoScript.VariantIsIntegerDouble(iter) Then
-		      vm.Error("The iterator must must be an integer.")
+		      vm.Error("The iterator must be an integer.")
 		    End If
 		    
 		    // Return the next index unless we've reached the end of the keys array when we return false.
@@ -185,7 +185,7 @@ Protected Module Map
 		  
 		  // `iter` must be an integer.
 		  If Not ObjoScript.VariantIsIntegerDouble(iter) Then
-		    vm.Error("The iterator must must be an integer.")
+		    vm.Error("The iterator must be an integer.")
 		  End If
 		  Var index As Integer = iter
 		  
@@ -342,6 +342,10 @@ Protected Module Map
 		#tag EndGetter
 		Protected StaticMethods As Dictionary
 	#tag EndComputedProperty
+
+
+	#tag Constant, Name = Untitled, Type = , Dynamic = False, Default = \"", Scope = Protected
+	#tag EndConstant
 
 
 	#tag ViewBehavior
