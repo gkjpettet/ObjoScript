@@ -9,7 +9,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var index As Integer = CurrentChunk.AddConstant(d)
 		  
 		  If index > ObjoScript.Chunk.MAX_CONSTANTS Then
-		    Error("To many constants in the chunk.")
+		    Error("Too many constants in the chunk.")
 		  End If
 		  
 		  Return index
@@ -25,7 +25,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var index As Integer = CurrentChunk.AddConstant(value)
 		  
 		  If index > ObjoScript.Chunk.MAX_CONSTANTS Then
-		    Error("To many constants in the chunk.")
+		    Error("Too many constants in the chunk.")
 		  End If
 		  
 		  Return index
@@ -41,7 +41,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  Var index As Integer = CurrentChunk.AddConstant(s)
 		  
 		  If index > ObjoScript.Chunk.MAX_CONSTANTS Then
-		    Error("To many constants in the chunk.")
+		    Error("Too many constants in the chunk.")
 		  End If
 		  
 		  Return index
@@ -396,7 +396,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320726177204F626A6F53637269707420736F7572636520636F646520696E746F206120746F70206C6576656C2066756E6374696F6E2E2050726570656E64732074686520636F646520776974682074686520636F7265206C69627261727920736F7572636520636F64652070726F7669646520647572696E67207468697320636F6D70696C6572277320696E7374616E74696174696F6E2E20526169736573206120604C65786572457863657074696F6E602C2060506172736572457863657074696F6E60206F722060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
-		Function Compile(source As String, debugMode As Boolean) As ObjoScript.Func
+		Function Compile(source As String, debugMode As Boolean, scriptID As Integer = 0) As ObjoScript.Func
 		  /// Compiles raw ObjoScript source code into a top level function. 
 		  /// Prepends the code with the core library source code provide during this
 		  /// compiler's instantiation.
@@ -411,7 +411,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Tokenise the user's source code. This may raise a LexerException, therefore aborting compilation.
 		  StopWatch.Start
-		  mTokens = Lexer.Tokenise(source)
+		  mTokens = Lexer.Tokenise(source, True, scriptId)
 		  StopWatch.Stop
 		  mTokeniseTime = StopWatch.ElapsedMilliseconds
 		  
@@ -453,8 +453,6 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag Method, Flags = &h0, Description = 436F6D70696C657320616E642072657475726E7320612066756E6374696F6E2E2052616973657320612060436F6D70696C6572457863657074696F6E6020696620616E206572726F72206F63637572732E
 		Function Compile(name As String, parameters() As ObjoScript.Token, body As ObjoScript.BlockStmt, type As FunctionTypes, currentClass As ObjoScript.ClassData, isStaticMethod As Boolean, debugMode As Boolean, shouldReset As Boolean, enclosingCompiler As ObjoScript.Compiler) As ObjoScript.Func
 		  /// Compiles and returns a function. Raises a `CompilerException` if an error occurs.
-		  ///
-		  /// Resets the compiler by default but this can be overridden by setting `shouldReset` to `True`.
 		  
 		  If shouldReset Then Reset
 		  
@@ -984,7 +982,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  Self.CurrentLoop.ExitJump = EmitJump(VM.Opcodes.JumpIfTrue)
 		  
-		  // Pop the condition before executing the body.
+		  // Pop the condition before executing the body. 
 		  EmitOpcode(VM.Opcodes.Pop)
 		  
 		End Sub
@@ -1061,15 +1059,15 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 436F6D70696C6573207468652073796E74686573697365642060666F72656163686020636F6E646974696F6E3A2060697465722A203D207365712A2E6974657261746528697465722A2960
-		Private Sub ForEachCondition()
+		Private Sub ForEachCondition(scriptID As Integer)
 		  /// Compiles the synthesised `foreach` condition: `iter* = seq*.iterate(iter*)`
 		  ///
 		  /// Internally called from within `VisitForEachStmt()`.
 		  
-		  Var iter As New ObjoScript.VariableExpr(SyntheticIdentifier("iter*"))
-		  Var seq As New ObjoScript.VariableExpr(SyntheticIdentifier("seq*"))
-		  Var invocation As New ObjoScript.MethodInvocationExpr(seq, SyntheticIdentifier("iterate"), Array(iter), False)
-		  Var assign As New AssignmentExpr(SyntheticIdentifier("iter*"), invocation)
+		  Var iter As New ObjoScript.VariableExpr(SyntheticIdentifier("iter*", scriptID))
+		  Var seq As New ObjoScript.VariableExpr(SyntheticIdentifier("seq*", scriptID))
+		  Var invocation As New ObjoScript.MethodInvocationExpr(seq, SyntheticIdentifier("iterate", scriptID), Array(iter), False)
+		  Var assign As New AssignmentExpr(SyntheticIdentifier("iter*", scriptID), invocation)
 		  
 		  Call assign.Accept(Self)
 		End Sub
@@ -1081,19 +1079,19 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Internally called from within `VisitForEachStmt()`.
 		  
-		  Var iter As New ObjoScript.VariableExpr(SyntheticIdentifier("iter*"))
-		  Var seq As New ObjoScript.VariableExpr(SyntheticIdentifier("seq*"))
-		  Var invocation As New ObjoScript.MethodInvocationExpr(seq, SyntheticIdentifier("iteratorValue"), Array(iter), False)
-		  Var dec As New ObjoScript.VarDeclStmt(SyntheticIdentifier(loopCounter.Lexeme), invocation, CurrentLocation)
+		  Var iter As New ObjoScript.VariableExpr(SyntheticIdentifier("iter*", loopCounter.ScriptID))
+		  Var seq As New ObjoScript.VariableExpr(SyntheticIdentifier("seq*", loopCounter.ScriptID))
+		  Var invocation As New ObjoScript.MethodInvocationExpr(seq, SyntheticIdentifier("iteratorValue", loopCounter.ScriptID), Array(iter), False)
+		  Var dec As New ObjoScript.VarDeclStmt(SyntheticIdentifier(loopCounter.Lexeme, loopCounter.ScriptID), invocation, CurrentLocation)
 		  
 		  Call dec.Accept(Self)
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 54656C6C732074686520564D20746F20726574726965766573206120676C6F62616C207661726961626C65206E616D656420606E616D65602E
+	#tag Method, Flags = &h21, Description = 54656C6C732074686520564D20746F207265747269657665206120676C6F62616C207661726961626C65206E616D656420606E616D656020616E642070757368206974206F6E20746F2074686520737461636B2E
 		Private Sub GetGlobalVariable(name As String)
-		  /// Tells the VM to retrieves a global variable named `name`.
+		  /// Tells the VM to retrieve a global variable named `name` and push it on to the stack.
 		  
 		  // Get the index of the variable in the constant pool (or add it and
 		  // then get its index if not already present).
@@ -1105,9 +1103,10 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52657475726E732054727565206966206120676C6F62616C206E616D657320606E616D65602068617320616C7265616479206265656E20646566696E6564206279207468697320636F6D70696C657220636861696E2E
+	#tag Method, Flags = &h21, Description = 52657475726E732054727565206966206120676C6F62616C207661726961626C65206E616D656420606E616D65602068617320616C7265616479206265656E20646566696E6564206279207468697320636F6D70696C657220636861696E2E
 		Private Function GlobalExists(name As String) As Boolean
-		  /// Returns True if a global names `name` has already been defined by this compiler chain.
+		  /// Returns True if a global variable named `name` has already been defined by this 
+		  /// compiler chain.
 		  
 		  Return OutermostCompiler.KnownGlobals.HasKey(name)
 		  
@@ -1482,7 +1481,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles a call to a superclass constructor.
 		  ///
 		  /// E.g: `super` or `super(argN)`.
-		  /// Assumes the compiler is currenting compiling a constructor and that the 
+		  /// Assumes the compiler is currently compiling a constructor and that the 
 		  /// current class being compiled has a superclass.
 		  
 		  CurrentLocation = location
@@ -1657,14 +1656,14 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Wrap these statements in a synthetic block and return.
 		  Var openingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "{", stmt.Location.ScriptID)
-		  Var closingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.LCurly, 0, 0, "}", stmt.Location.ScriptID)
+		  Var closingBrace As New ObjoScript.Token(ObjoScript.TokenTypes.RCurly, 0, 0, "}", stmt.Location.ScriptID)
 		  Return New ObjoScript.BlockStmt(statements, openingBrace, closingBrace)
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21, Description = 52657475726E7320612073796E746865746963206964656E74696669657220746F6B656E206174206C696E6520302C20706F732030207769746820606C6578656D656020696E20607363726970744944602E
-		Private Function SyntheticIdentifier(lexeme As String, scriptID As Integer = -1) As ObjoScript.Token
+		Private Function SyntheticIdentifier(lexeme As String, scriptID As Integer) As ObjoScript.Token
 		  /// Returns a synthetic identifier token at line 0, pos 0 with `lexeme` in `scriptID`.
 		  
 		  Return New ObjoScript.Token(ObjoScript.TokenTypes.Identifier, 0, 0, lexeme, scriptID)
@@ -1709,7 +1708,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  CurrentLocation = expr.Location
 		  
-		  // Evaluate the value to be assigned.
+		  // Compile the value to be assigned.
 		  Call expr.Value.Accept(Self)
 		  
 		  Assignment(expr.Name)
@@ -1820,9 +1819,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Error("Class `" + CurrentClass.Name + "` does not have a superclass.")
 		  End If
 		  
-		  // Are we calling the superclass' constructor?
+		  // Are we calling the superclass's constructor?
 		  If Self.Type = FunctionTypes.Constructor Then
-		    // Assert that calls to constructors require parentheses (even when there are no arguments).
+		    // Assert that calls to constructors have parentheses (even when there are no arguments).
 		    // This is an ObjoScript language requirement.
 		    If Not expr.HasParentheses Then
 		      Error("A superclass constructor must have an argument list, even if empty.")
@@ -2112,7 +2111,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // The third operand is the total number of fields the class contains (for the entire hierarchy).
 		  // We don't know this yet so we will need to back-patch this with the actual number after we're
 		  // done compiling the methods and constructors.
-		  // For now, we'll emit the maximum number or permitted fields.
+		  // For now, we'll emit the maximum number of permitted fields.
 		  EmitByte(255)
 		  Var numFieldsOffset As Integer = CurrentChunk.Code.LastIndex
 		  
@@ -2183,13 +2182,13 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  // ================================
 		  // Field count.
 		  If CurrentClass.TotalFieldCount > 255 Then
-		    Error("Class `" + stmt.Name + "` has exceed the maximum number of fields (255). This includes inherited ones.")
+		    Error("Class `" + stmt.Name + "` has exceeded the maximum number of fields (255). This includes inherited ones.")
 		  End If
 		  
 		  // Disallow foreign classes from inheriting from classes with fields. 
 		  // I'm doing this because Wren does and Bob Nystrom must have a good reason for this :)
 		  If stmt.IsForeign And CurrentClass.TotalFieldCount > CurrentClass.FieldCount Then
-		    Error("Foreign class `" + CurrentClass.Name + "` may not inherit from a class with fields.")
+		    Error("Foreign class `" + CurrentClass.Name + "` cannot inherit from a class with fields.")
 		  End If
 		  
 		  // ================================
@@ -2373,14 +2372,14 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Assert that field access is valid.
 		  If Not CompilingMethodOrConstructor Then
-		    Error("Instance fields can obly be accessed from within an instance method or constructor.")
+		    Error("Instance fields can only be accessed from within an instance method or constructor.")
 		  End If
 		  If Self.IsStaticMethod Then
 		    Error("Instance fields can only be accessed from within an instance method, not a static method.")
 		  End If
 		  
 		  // Get the index in this class' `Fields` array to access at runtime.
-		  Var fieldIndex As Integer  = FieldIndex(expr.Name)
+		  Var fieldIndex As Integer = FieldIndex(expr.Name)
 		  If fieldIndex > 255 Then
 		    Error("Classes cannot have more than 255 fields, including inherited ones.")
 		  End If
@@ -2453,12 +2452,12 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		        Var b As Double = NumberLiteral(range.Upper).Value
 		        If Not range.Inclusive Then
 		          If a < b Then // E.g: 1..<5
-		            b  = b - 1
+		            b = b - 1
 		          ElseIf a > b Then // E.g: 5..<1
 		            b = b + 1
 		          Else
 		            // E.g: 5..<5. This doesn't make sense.
-		            Error("A numeric literal exclusive range requires that the operands have different values") 
+		            Error("A numeric literal exclusive range requires that the operands have different values.") 
 		          End If
 		        End If
 		        OptimisedForEach(a, b, stmt.LoopCounter, stmt.Body, stmt.Location)
@@ -2473,18 +2472,18 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  // Declare iter* as nothing.
 		  EmitOpcode(VM.Opcodes.Nothing)
-		  DeclareVariable(SyntheticIdentifier("iter*"), False, False)
+		  DeclareVariable(SyntheticIdentifier("iter*", stmt.Location.ScriptID), False, False)
 		  MarkInitialised
 		  
 		  // Declare seq* equal to `stmt.Range`
 		  Call stmt.Range.Accept(Self)
-		  DeclareVariable(SyntheticIdentifier("seq*"), False, False)
+		  DeclareVariable(SyntheticIdentifier("seq*", stmt.Location.ScriptID), False, False)
 		  MarkInitialised
 		  
 		  StartLoop
 		  
 		  // Compile the condition: iter* = seq*.iterate(iter*)
-		  ForEachCondition
+		  ForEachCondition(stmt.Location.ScriptID)
 		  
 		  ExitLoopIfFalse
 		  
@@ -2538,9 +2537,9 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 436F6D70696C6520612060666F7260206C6F6F702E
+	#tag Method, Flags = &h0, Description = 436F6D70696C657320612060666F7260206C6F6F702E
 		Function VisitForStmt(stmt As ObjoScript.ForStmt) As Variant
-		  /// Compile a `for` loop.
+		  /// Compiles a `for` loop.
 		  ///
 		  /// ```objo
 		  /// for (initialiser? ; condition? ; increment?) {
@@ -2632,6 +2631,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 	#tag Method, Flags = &h0
 		Function VisitIfStmt(stmt As ObjoScript.IfStmt) As Variant
 		  /// Compiles an `if` statement.
+		  
+		  CurrentLocation = stmt.Location
 		  
 		  // Compile the condition - this will leave the result on the top of the stack at runtime.
 		  Call stmt.Condition.Accept(Self)
@@ -2850,6 +2851,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles a method invocation.
 		  ///
 		  /// E.g: operand.method(arg1, arg2)
+		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
 		  CurrentLocation = expr.Location
@@ -2946,6 +2948,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///  RANGE_OP  
 		  ///  b   ← top of the stack
 		  ///  a
+		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
 		  CurrentLocation = expr.Location
@@ -2998,6 +3001,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
+		  CurrentLocation = expr.Location
+		  
 		  If Not CompilingMethodOrConstructor Then
 		    Error("Static fields can only be accessed from within a method or a constructor.")
 		  End If
@@ -3016,6 +3021,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles a static field assignment.
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  CurrentLocation = expr.Location
 		  
 		  // Evaluate the value to assign, leaving it on the top of the stack.
 		  Call expr.Value.Accept(Self)
@@ -3047,6 +3054,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles a subscript method call.
 		  ///
 		  /// E.g: operand[1]
+		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
 		  CurrentLocation = expr.Location
@@ -3080,6 +3088,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles a subscript setter call.
 		  ///
 		  /// E.g: a[1] = value
+		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
 		  
 		  CurrentLocation = expr.Location
@@ -3139,7 +3148,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  
 		  CurrentLocation = expr.Location
 		  
-		  If NOt CompilingMethodOrConstructor Then
+		  If Not CompilingMethodOrConstructor Then
 		    Error("`super` can only be used within a method or constructor.")
 		  End If
 		  
@@ -3162,7 +3171,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    Error("The superclass (`" + CurrentClass.Superclass.Name + "`) of `" + CurrentClass.Name + "` does not define a setter `" + expr.Signature + "`.")
 		  End If
 		  
-		  // Load the superclass' name into the constant pool.
+		  // Load the superclass's name into the constant pool.
 		  Var superNameIndex As Integer = AddConstant(CurrentClass.Superclass.Name)
 		  
 		  // Push `this` onto the stack. It's always at slot 0 of the call frame.
@@ -3189,6 +3198,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  ///
 		  /// Part of the `ObjoScript.StmtVisitor` interface.
 		  
+		  CurrentLocation = stmt.Location
+		  
 		  // Validate the switch statement first.
 		  If stmt.Cases.Count = 0 Then
 		    Error("A switch statement must include at least one case.")
@@ -3208,6 +3219,8 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		  /// Compiles a ternary conditional expression.
 		  ///
 		  /// Part of the ObjoScript.ExprVisitor interface.
+		  
+		  CurrentLocation = expr.Location
 		  
 		  // Compile the condition - this will leave the result on the top of the stack at runtime.
 		  Call expr.Condition.Accept(Self)
@@ -3342,7 +3355,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 		    
 		    Var localSlot As Integer = ResolveLocal(stmt.Name)
 		    If localSlot < 0 Or localSlot > 255 Then
-		      Error("Invalid local variable stack slot")
+		      Error("Invalid local variable stack slot.")
 		    End If
 		    EmitByte(localSlot) 
 		  End If
@@ -3568,7 +3581,7 @@ Implements ObjoScript.ExprVisitor,ObjoScript.StmtVisitor
 			  VM.Opcodes.ForeignMethod      : 4, _ // constant pool index of the signature (2 bytes), arity (1 byte), isStatic (0 false, 1 true)
 			  VM.Opcodes.GetField           : 1, _ // index in the current class' `Fields` array to access
 			  VM.Opcodes.GetGlobal          : 1, _ // constant pool index of the name of the class (1 byte)
-			  VM.Opcodes.GetGlobalLong      : 1, _ // constant pool index of the name of the class (2 bytes)
+			  VM.Opcodes.GetGlobalLong      : 2, _ // constant pool index of the name of the class (2 bytes)
 			  VM.Opcodes.GetLocal           : 1, _ // stack slot where the local variable is
 			  VM.Opcodes.GetLocalClass      : 1, _ // stack slot where the local variable is. The VM push it's class on to the stack.
 			  VM.Opcodes.GetStaticField     : 1, _ // constant pool index (1 byte) of the name of the static field

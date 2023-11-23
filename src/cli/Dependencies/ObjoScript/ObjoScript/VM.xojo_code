@@ -510,9 +510,9 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 5265616473207468652076616C7565206F66206120676C6F62616C207661726961626C6564206E616D656420606E616D656020616E6420707573686573206974206F6E20746F2074686520737461636B2E2052616973657320612072756E74696D65206572726F722069662074686520676C6F62616C207661726961626C6520646F65736E27742065786973742E
+	#tag Method, Flags = &h21, Description = 5265616473207468652076616C7565206F66206120676C6F62616C207661726961626C65206E616D656420606E616D656020616E6420707573686573206974206F6E20746F2074686520737461636B2E2052616973657320612072756E74696D65206572726F722069662074686520676C6F62616C207661726961626C6520646F65736E27742065786973742E
 		Private Sub GetGlobal(name As String)
-		  /// Reads the value of a global variabled named `name` and pushes it on to the stack.
+		  /// Reads the value of a global variable named `name` and pushes it on to the stack.
 		  /// Raises a runtime error if the global variable doesn't exist.
 		  
 		  Var value As Variant = Self.Globals.Lookup(name, Nil)
@@ -587,9 +587,9 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 52657475726E73207570206120746F702D6C6576656C207661726961626C65206E616D656420606E616D65602E2052657475726E73204E696C206966206E6F7420666F756E642E
+	#tag Method, Flags = &h0, Description = 52657475726E73206120746F702D6C6576656C207661726961626C65206E616D656420606E616D65602E2052657475726E73204E696C206966206E6F7420666F756E642E
 		Function GetVariable(name As String) As Variant
-		  /// Returns up a top-level variable named `name`.
+		  /// Returns a top-level variable named `name`.
 		  /// Returns Nil if not found.
 		  
 		  #Pragma DisableBoundsChecking
@@ -1097,10 +1097,10 @@ Protected Class VM
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = 52656164732074776F2062797465732066726F6D206043757272656E744368756E6B60206174207468652063757272656E74206049506020616E642072657475726E73207468656D20617320612055496E7431362E
+	#tag Method, Flags = &h21, Description = 52656164732074776F2062797465732066726F6D206043757272656E744368756E6B60206174207468652063757272656E74206049506020616E642072657475726E73207468656D20617320612055496E7431362E20496E6372656D656E74732074686520495020627920322E
 		Private Function ReadUInt16() As UInt16
 		  /// Reads two bytes from `CurrentChunk` at the current `IP` and returns them as a UInt16. 
-		  // Increments the IP by 2.
+		  /// Increments the IP by 2.
 		  
 		  #Pragma DisableBoundsChecking
 		  #Pragma NilObjectChecking False
@@ -1134,14 +1134,6 @@ Protected Class VM
 		  
 		  // The VM will set this once it has defined the `Nothing` class within the runtime.
 		  Nothing = Nil
-		  
-		  // API slots.
-		  APISlots.ResizeTo(-1)
-		  APISlots.ResizeTo(MAX_SLOTS)
-		  // Set every slot to `nothing`
-		  For i As Integer = 0 To APISlots.LastIndex
-		    APISlots(i) = Nothing
-		  Next i
 		  
 		  Self.Globals = ParseJSON("{}") // HACK: Case sensitive.
 		  
@@ -1521,7 +1513,8 @@ Protected Class VM
 		      End If
 		      
 		    Case Opcodes.NotEqual
-		      If TopOfStackAreNumbers Then
+		      If (Peek(0).Type = Variant.TypeBoolean And Peek(1).Type = Variant.TypeBoolean) _
+		        Or TopOfStackAreNumbers Then
 		        // Pop the stack and replace the top with the answer.
 		        Stack(StackTop - 2) = Peek(1) <> Peek(0)
 		        StackTop = StackTop - 1
@@ -2205,9 +2198,9 @@ Protected Class VM
 
 
 	#tag Enum, Name = Opcodes, Type = UInt8, Flags = &h0
-		Assert
-		  Add
+		Add
 		  Add1
+		  Assert
 		  BitwiseAnd
 		  BitwiseNot
 		  BitwiseOr

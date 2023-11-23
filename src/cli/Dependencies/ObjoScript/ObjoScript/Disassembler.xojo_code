@@ -234,9 +234,6 @@ Protected Class Disassembler
 		  Case VM.Opcodes.Load1
 		    Return SimpleInstruction("LOAD 1", offset)
 		    
-		  Case VM.Opcodes.Load2
-		    Return SimpleInstruction("LOAD 2", offset)
-		    
 		  Case VM.Opcodes.LoadMinus1
 		    Return SimpleInstruction("LOAD -1", offset)
 		    
@@ -430,9 +427,9 @@ Protected Class Disassembler
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h1, Description = 52657475726E73207468652064657461696C73206F6620616E20696E766F6B652F73757065725F696E766F6B652F73757065725F636F6E7374727563746F7220696E737472756374696F6E20617420606F66667365746020616E6420696E6372656D656E747320606F66667365746020746F20706F696E7420746F20746865206E65787420696E737472756374696F6E2E
+	#tag Method, Flags = &h1, Description = 52657475726E73207468652064657461696C73206F6620616E20696E766F6B6520696E737472756374696F6E20617420606F66667365746020616E6420696E6372656D656E747320606F66667365746020746F20706F696E7420746F20746865206E65787420696E737472756374696F6E2E
 		Protected Function InvokeInstruction(opcode As ObjoScript.VM.Opcodes, chunk As ObjoScript.Chunk, name As String, ByRef offset As Integer) As String
-		  /// Returns the details of an invoke/super_invoke/super_constructor instruction at `offset` and increments `offset` to point to the next instruction.
+		  /// Returns the details of an invoke instruction at `offset` and increments `offset` to point to the next instruction.
 		  ///
 		  /// Prints the instruction's name, the constant's index in the pool, the method's signature and the argument count.
 		  ///

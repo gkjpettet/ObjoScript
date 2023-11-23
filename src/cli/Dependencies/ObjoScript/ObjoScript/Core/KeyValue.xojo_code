@@ -35,7 +35,7 @@ Protected Module KeyValue
 		Protected Function BindForeignMethod(signature As String, isStatic As Boolean) As ObjoScript.ForeignMethodDelegate
 		  /// Returns the method to invoke for a foreign method with `signature` on the `Boolean` class or Nil if there is no such method.
 		  
-		  // All methods on `Boolean` are instance methods.
+		  // All methods on `KeyValue` are instance methods.
 		  If isStatic Then Return Nil
 		  
 		  If signature.CompareCase("key()") Then
