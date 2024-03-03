@@ -284,13 +284,13 @@ Protected Class Lexer
 		  /// 1. A `\u` followed by four hex digits can be used to specify a Unicode code point:
 		  ///
 		  /// ```objo
-		  /// "\u0041\u0b83\u00DE" // AஃÞ
+		  /// "\u0041\u0b83\u00DE" # AஃÞ
 		  /// ```
 		  ///
 		  /// 2. A capital `\U` followed by eight hex digits allows Unicode code points outside of the basic multilingual plane:
 		  ///
 		  /// ```objo
-		  /// "\U0001F64A\U0001F680" // 🙊🚀
+		  /// "\U0001F64A\U0001F680" # 🙊🚀
 		  /// ```
 		  
 		  Var lexeme() As String
