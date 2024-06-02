@@ -7,7 +7,7 @@
 		MacType=
 		Name=text/script
 		UTI=
-		UTIConformsTo=, public.data
+		UTIConformsTo=public.data
 		Description=
 		MimeType=
 		Imported=True
@@ -20,7 +20,7 @@
 		Extension=.asc;.ascii;.bas;.c;.class;.cp;.cpp;.h;.hp;.hpp;.i3;.java;.m2;.m3;.mak;.text;.txt
 		Flags=&h2
 		MacCreator=????
-		MacType=TEXT
+		MacType=
 		Name=text/plain
 		UTI=
 		UTIConformsTo=, public.data

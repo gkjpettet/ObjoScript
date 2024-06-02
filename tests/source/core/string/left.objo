@@ -1,4 +1,4 @@
 System.print("hello".left(2)) # "he"
 System.print("hello".left(0)) # ""
 System.print("hello".left(5)) # hello
-System.print("😀+☺️".left(1)) # hello
+System.print("😀+☺️".left(1)) # 😀

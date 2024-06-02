@@ -16,9 +16,9 @@ Implements ObjoScript.Expr
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 54686520626F6F6C65616E206C69746572616C20746F6B656E20697473656C662E
+	#tag Method, Flags = &h0, Description = 54686520737472696E67206C69746572616C20746F6B656E20697473656C662E
 		Function Location() As ObjoScript.Token
-		  /// The boolean literal token itself.
+		  /// The string literal token itself.
 		  
 		  Return mLocation
 		End Function
