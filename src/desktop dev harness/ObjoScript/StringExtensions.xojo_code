@@ -785,6 +785,22 @@ Protected Module StringExtensions
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 52657475726E7320746865206C6F6E6765737420737472696E6720696E206073602E
+		Function Longest(Extends s() As String) As String
+		  /// Returns the longest string in `s`.
+		  
+		  Var result As String
+		  For Each item As String In s
+		    If item.Length > result.Length Then
+		      result = item
+		    End If
+		  Next item
+		  
+		  Return result
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 52657475726E7320616C6C206F662074686520636861726163746572732066726F6D206073746172746020746F2074686520656E64206F66206073602E2054686520737461727420706F736974696F6E2069732061207A65726F2D62617365642E
 		Function MiddleCharacters(Extends s As String, start As Integer) As String
 		  /// Returns all of the characters from `start` to the end of `s`. 
@@ -820,6 +836,40 @@ Protected Module StringExtensions
 		    Var t As Text = s.ToText
 		    Return t.Mid(start, count)
 		  #EndIf
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 50616473207468652070617373656420737472696E6720746F20746865206C65667420776974682060636861726020746865207370656369666965642060636F756E7460206E756D626572206F662074696D65732E
+		Function PadLeft(Extends s As String, count As Integer, char As String) As String
+		  /// Pads the passed string to the left with `char` the specified `count` number of times.
+		  
+		  // Quick escape?
+		  If count <= 0 Then Return s
+		  
+		  Var padding() As String
+		  For i As Integer = 1 To count
+		    padding.Add(char)
+		  Next i
+		  
+		  Return String.FromArray(padding, "") + s
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 50616473207468652070617373656420737472696E6720746F20746865206C65667420776974682060636861726020746865207370656369666965642060636F756E7460206E756D626572206F662074696D65732E
+		Function PadLeft(s As String, count As Integer, char As String) As String
+		  /// Pads the passed string to the left with `char` the specified `count` number of times.
+		  
+		  // Quick escape?
+		  If count <= 0 Then Return s
+		  
+		  Var padding() As String
+		  For i As Integer = 1 To count
+		    padding.Add(char)
+		  Next i
+		  
+		  Return String.FromArray(padding, "") + s
 		  
 		End Function
 	#tag EndMethod
