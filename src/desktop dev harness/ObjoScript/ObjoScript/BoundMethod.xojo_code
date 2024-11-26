@@ -2,9 +2,10 @@
 Protected Class BoundMethod
 Implements ObjoScript.Value
 	#tag Method, Flags = &h0
-		Sub Constructor(receiver As ObjoScript.MethodReceiver, method As ObjoScript.Method, isStatic As Boolean, isForeign As Boolean)
+		Sub Constructor(receiver As ObjoScript.MethodReceiver, method As ObjoScript.Method, arity As Integer, isStatic As Boolean, isForeign As Boolean)
 		  Self.Receiver = receiver
 		  Self.Method = method
+		  Self.Arity = arity
 		  Self.IsStatic = isStatic
 		  Self.IsForeign = isForeign
 		  
@@ -54,6 +55,10 @@ Implements ObjoScript.Value
 		End Function
 	#tag EndMethod
 
+
+	#tag Property, Flags = &h0
+		Arity As Integer = 0
+	#tag EndProperty
 
 	#tag Property, Flags = &h0, Description = 547275652069662074686973206973206120666F726569676E206D6574686F64206F722046616C73652069662069742773206E6174697665204F626A6F53637269707420636F64652E
 		IsForeign As Boolean = False
@@ -127,6 +132,14 @@ Implements ObjoScript.Value
 			Group="Behavior"
 			InitialValue="False"
 			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Arity"
+			Visible=false
+			Group="Behavior"
+			InitialValue="0"
+			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior

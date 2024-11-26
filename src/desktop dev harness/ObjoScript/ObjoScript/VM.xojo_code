@@ -283,6 +283,46 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 4372656174657320612063616C6C2068616E646C6520666F722074686520737065636966696564206D6574686F64207369676E617475726520666F722074686520636C61737320696E20736C6F7420302E20417373756D657320736C6F74203020636F6E7461696E7320612076616C696420636C6173732E
+		Function CreateHandle(methodSignature As String) As ObjoScript.CallHandle
+		  /// Creates a call handle for the specified method signature for the class in slot 0.
+		  /// Assumes slot 0 contains a valid class.
+		  
+		  // Assumes the class for this method is in slot 0.
+		  Var receiver As ObjoScript.Klass
+		  Try
+		    receiver = APISlots(0)
+		  Catch e As IllegalCastException
+		    Error("Cannot create call handle as expected a class in slot 0.")
+		  End Try
+		  
+		  // Find the method.
+		  Var bm As ObjoScript.BoundMethod
+		  If receiver.StaticMethods.HasKey(methodSignature) Then
+		    If receiver.StaticMethods.Value(methodSignature) IsA ObjoScript.ForeignMethod Then
+		      Var method As ObjoScript.ForeignMethod = receiver.StaticMethods.Value(methodSignature)
+		      bm = New ObjoScript.BoundMethod(receiver, method, method.Arity, True, True)
+		    Else
+		      Var method As ObjoScript.Func = receiver.StaticMethods.Value(methodSignature)
+		      bm = New ObjoScript.BoundMethod(receiver, method, method.Arity, True, False)
+		    End If
+		  ElseIf receiver.Methods.HasKey(methodSignature) Then
+		    If receiver.Methods.Value(methodSignature) IsA ObjoScript.ForeignMethod Then
+		      Var method As ObjoScript.ForeignMethod = receiver.Methods.Value(methodSignature)
+		      bm = New ObjoScript.BoundMethod(receiver, method, method.Arity, False, True)
+		    Else
+		      Var method As ObjoScript.Func = receiver.Methods.Value(methodSignature)
+		      bm = New ObjoScript.BoundMethod(receiver, method, method.Arity, False, False)
+		    End If
+		  Else
+		    Error("Cannot create handle for `" + methodSignature + "` as " + receiver.ToString + _
+		    " does not have a matching method.")
+		  End If
+		  
+		  Return New ObjoScript.CallHandle(Self, bm)
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21, Description = 446566696E6573206120636F6E7374727563746F72206F6E2074686520636C617373206A7573742062656C6F772074686520636F6E7374727563746F72277320626F6479206F6E2074686520737461636B2E2057696C6C20706F702074686520636F6E7374727563746F72206F66662074686520737461636B20627574206C656176652074686520636C61737320696E20706C6163652E
 		Private Sub DefineConstructor(argCount As Integer)
 		  /// Defines a constructor on the class just below the constructor's body on the stack.
@@ -780,6 +820,36 @@ Protected Class VM
 		  
 		  CallValue(method, argCount)
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub InvokeHandle(handle As ObjoScript.CallHandle)
+		  /// Invokes the passed call handle.
+		  
+		  Var bm As ObjoScript.BoundMethod = handle.BoundMethod
+		  Var argCount As Integer = bm.Arity
+		  
+		  // Push the receiver of the call.
+		  Push(bm.Receiver)
+		  
+		  // Push the arguments from the API slots array. The first argument should be in slot 1.
+		  For i As Integer = 1 To argCount
+		    Push(APISlots(i))
+		  Next i
+		  
+		  // Call the bound method.
+		  If bm.IsForeign Then
+		    CallForeignMethod(ObjoScript.ForeignMethod(bm.Method), argCount)
+		  Else
+		    CallFunction(ObjoScript.Func(bm.Method), argCount)
+		  End If
+		  
+		  // Update the current call frame.
+		  CurrentFrame = Frames(FrameCount - 1)
+		  
+		  // If there is no script running in the VM then fire it up.
+		  If Not mIsRunning Then Run
 		End Sub
 	#tag EndMethod
 
@@ -1693,6 +1763,28 @@ Protected Class VM
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 4120636F6E76656E69656E6365206D6574686F6420666F722070757474696E67206120676C6F62616C207661726961626C65206E616D656420607661726961626C654E616D656020696E746F206120737065636966696320736C6F742E2055736566756C20666F722070757368696E6720676C6F62616C20636C617373657320746F20736C6F7420302E2052657475726E732054727565206966207375636365737366756C206F722046616C7365206966207468657265206973206E6F20676C6F62616C207661726961626C6520776974682074686973206E616D652E
+		Function SetGlobalToSlot(slot As Integer, variableName As String) As Boolean
+		  /// A convenience method for putting a global variable named `variableName` into a specific slot.
+		  /// Useful for pushing global classes to slot 0.
+		  /// Returns True if successful or False if there is no global variable with this name.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
+		  Var globalVariable As Variant = Globals.Lookup(variableName, Nil)
+		  
+		  If globalVariable = Nil Then
+		    Return False
+		  Else
+		    APISlots(slot) = globalVariable
+		    Return True
+		  End If
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 53657473207468652072657475726E2076616C7565206F66206120666F726569676E206D6574686F6420746F20426F6F6C65616E206062602E20496620796F752077616E7420746F2072657475726E206E6F7468696E672066726F6D2061206D6574686F6420796F7520646F6E2774206E65656420746F2063616C6C20746869732E
 		Sub SetReturn(b As Boolean)
 		  /// Sets the return value of a foreign method to Boolean `b`.
@@ -1774,6 +1866,58 @@ Protected Class VM
 		  #Pragma StackOverflowChecking False
 		  
 		  Stack(StackTop - 1) = v
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 53657473207468652076616C7565206F66207468652073706563696669656420564D20736C6F7420746F207468652070617373656420626F6F6C65616E2076616C75652E
+		Sub SetSlot(slot As Integer, value As Boolean)
+		  /// Sets the value of the specified VM slot to the passed boolean value.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
+		  APISlots(slot) = value
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 53657473207468652076616C7565206F66207468652073706563696669656420564D20736C6F7420746F207468652070617373656420646F75626C652076616C75652E
+		Sub SetSlot(slot As Integer, value As Double)
+		  /// Sets the value of the specified VM slot to the passed double value.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
+		  APISlots(slot) = value
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 53657473207468652076616C7565206F66207468652073706563696669656420564D20736C6F7420746F2074686520706173736564204F626A6F5363726970742076616C75652E
+		Sub SetSlot(slot As Integer, value As ObjoScript.Value)
+		  /// Sets the value of the specified VM slot to the passed ObjoScript value.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
+		  APISlots(slot) = value
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 53657473207468652076616C7565206F66207468652073706563696669656420564D20736C6F7420746F207468652070617373656420737472696E672076616C75652E
+		Sub SetSlot(slot As Integer, value As String)
+		  /// Sets the value of the specified VM slot to the passed string value.
+		  
+		  #Pragma DisableBoundsChecking
+		  #Pragma NilObjectChecking False
+		  #Pragma StackOverflowChecking False
+		  
+		  APISlots(slot) = value
 		  
 		End Sub
 	#tag EndMethod
@@ -2028,7 +2172,7 @@ Protected Class VM
 	#tag EndComputedProperty
 
 	#tag Property, Flags = &h21, Description = 436F6E7461696E7320616C6C20626F756E64206D6574686F647320637265617465642061732063616C6C2068616E646C65732062792074686520564D2E
-		Private CallHandles() As ObjoScript.BoundMethod
+		Private CallHandles() As ObjoScript.CallHandle
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h21
