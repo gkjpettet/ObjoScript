@@ -480,7 +480,7 @@ Inherits XUITextLine
 		  lnShape.HorizontalAlignment = TextShape.Alignment.Right
 		  lnShape.X = gutterWidth - editor.BLOCK_GUTTER_MIN_WIDTH
 		  lnShape.Y = y
-		  lnShape.Value = Self.Number.ToString
+		  lnShape.Text = Self.Number.ToString
 		  
 		  // Determine the correct colour to use for the line number.
 		  If editor.CaretLineNumber = Self.Number Then

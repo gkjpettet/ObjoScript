@@ -1691,7 +1691,7 @@ End
 		  
 		  // We allow the user to copy the contents of the error message (column 0).
 		  
-		  If Me.SelectedRowValue = "" Then Return False
+		  If Me.SelectedRowText = "" Then Return False
 		  
 		  base.AddMenu(New DesktopMenuItem("Copy"))
 		  
@@ -1703,7 +1703,7 @@ End
 		  Select Case selectedItem.Text
 		  Case "Copy"
 		    Var c As New Clipboard
-		    c.Text = Me.SelectedRowValue
+		    c.Text = Me.SelectedRowText
 		    c.Close
 		    Return True
 		  End Select
