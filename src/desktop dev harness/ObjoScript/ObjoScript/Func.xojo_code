@@ -28,15 +28,15 @@ Implements ObjoScript.Value,ObjoScript.Method
 		  /// true uniqueness and the time is takes to hash.
 		  /// Part of the ObjoScript.Value interface.
 		  
-		  Var hash As Integer = HashKit.Hash(mSignature)
+		  Var hash As Integer = ObjoScript.Hash(mSignature)
 		  
 		  For Each param As String In Self.Parameters
-		    HashKit.Combine(hash, param)
+		    ObjoScript.Combine(hash, param)
 		  Next param
 		  
-		  HashKit.Combine(hash, Chunk.Length)
+		  ObjoScript.Combine(hash, Chunk.Length)
 		  
-		  HashKit.Combine(hash, Chunk.Constants.Count)
+		  ObjoScript.Combine(hash, Chunk.Constants.Count)
 		  
 		  // We'll also hash the line numbers and script IDs for a small number of the 
 		  // bytes in the chunk as without this it is possible to get hash collisions 
@@ -45,8 +45,8 @@ Implements ObjoScript.Value,ObjoScript.Method
 		    Var i As Integer = 0
 		    Const HASH_ITERATIONS = 3
 		    While i < Chunk.Length And i <= HASH_ITERATIONS
-		      HashKit.Combine(hash, CType(Chunk.LineForOffset(i), Integer))
-		      HashKit.Combine(hash, Chunk.ScriptIDForOffset(i))
+		      ObjoScript.Combine(hash, CType(Chunk.LineForOffset(i), Integer))
+		      ObjoScript.Combine(hash, Chunk.ScriptIDForOffset(i))
 		      i = i + 1
 		    Wend
 		  End If
@@ -55,13 +55,13 @@ Implements ObjoScript.Value,ObjoScript.Method
 		  If Chunk.Length > 0 Then
 		    Var offset As Integer = System.Random.InRange(0, Chunk.Length - 1)
 		    Var randomByte As Integer = Chunk.Code(offset)
-		    HashKit.Combine(hash, randomByte)
+		    ObjoScript.Combine(hash, randomByte)
 		    
 		    offset = System.Random.InRange(0, Chunk.Length - 1)
 		    randomByte = Chunk.Code(offset)
-		    HashKit.Combine(hash, randomByte)
+		    ObjoScript.Combine(hash, randomByte)
 		    
-		    HashKit.Combine(hash, Chunk.ScriptIDForOffset(offset))
+		    ObjoScript.Combine(hash, Chunk.ScriptIDForOffset(offset))
 		  End If
 		  
 		  Return hash

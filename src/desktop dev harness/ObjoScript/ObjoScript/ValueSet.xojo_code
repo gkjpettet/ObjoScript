@@ -5,7 +5,7 @@ Protected Class ValueSet
 		  /// Adds a double `d` to the set. Returns the index in the set that `d` occupies.  
 		  
 		  // The lookup table stores values as hashes.
-		  Var hash As UInteger = HashKit.Hash(d)
+		  Var hash As UInteger = ObjoScript.Hash(d)
 		  
 		  // Is this double already present in the set?
 		  Var index As Integer = mLookupTable.Lookup(hash, -1)
@@ -52,7 +52,7 @@ Protected Class ValueSet
 		  /// Case sensitive.
 		  
 		  // The lookup table stores values as hashes.
-		  Var hash As UInteger = HashKit.Hash(s)
+		  Var hash As UInteger = ObjoScript.Hash(s)
 		  
 		  // Is this string already present in the set?
 		  Var index As Integer = mLookupTable.Lookup(hash, -1)
@@ -82,7 +82,7 @@ Protected Class ValueSet
 		Function Contains(d As Double) As Boolean
 		  /// Returns `True` if `d` is in this set.
 		  
-		  Return mLookupTable.HasKey(HashKit.Hash(d))
+		  Return mLookupTable.HasKey(ObjoScript.Hash(d))
 		  
 		End Function
 	#tag EndMethod
@@ -100,7 +100,7 @@ Protected Class ValueSet
 		Function Contains(s As String) As Boolean
 		  /// Returns `True` if `s` is in this set.
 		  
-		  Return mLookupTable.HasKey(HashKit.Hash(s))
+		  Return mLookupTable.HasKey(ObjoScript.Hash(s))
 		  
 		End Function
 	#tag EndMethod
@@ -117,7 +117,7 @@ Protected Class ValueSet
 		Function IndexOf(d As Double) As Integer
 		  /// Returns the index in the set of double `d` or `-1` if `d` is not in the set.
 		  
-		  Return mLookupTable.Lookup(HashKit.Hash(d), -1)
+		  Return mLookupTable.Lookup(ObjoScript.Hash(d), -1)
 		End Function
 	#tag EndMethod
 
@@ -133,7 +133,7 @@ Protected Class ValueSet
 		Function IndexOf(s As String) As Integer
 		  /// Returns the index in the set of string `s` or `-1` if `s` is not in the set.
 		  
-		  Return mLookupTable.Lookup(HashKit.Hash(s), -1)
+		  Return mLookupTable.Lookup(ObjoScript.Hash(s), -1)
 		End Function
 	#tag EndMethod
 
@@ -172,9 +172,9 @@ Protected Class ValueSet
 		    Var hash As UInteger
 		    Select Case item.Type
 		    Case Variant.TypeDouble, Variant.TypeInt64, Variant.TypeInt32
-		      hash = HashKit.Hash(CType(item, Double))
+		      hash = ObjoScript.Hash(CType(item, Double))
 		    Case Variant.TypeString
-		      hash = HashKit.Hash(CType(item, String))
+		      hash = ObjoScript.Hash(CType(item, String))
 		    Else
 		      If item IsA Value Then
 		        hash = Value(item).Hash
@@ -199,9 +199,9 @@ Protected Class ValueSet
 		  Var hash As UInteger
 		  Select Case v.Type
 		  Case Variant.TypeDouble, Variant.TypeInt64, Variant.TypeInt32
-		    hash = HashKit.Hash(CType(v, Double))
+		    hash = ObjoScript.Hash(CType(v, Double))
 		  Case Variant.TypeString
-		    hash = HashKit.Hash(CType(v, String))
+		    hash = ObjoScript.Hash(CType(v, String))
 		  Else
 		    If v IsA Value Then
 		      hash = Value(v).Hash

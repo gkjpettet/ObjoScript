@@ -170,6 +170,14 @@ Protected Class Token
 			Type="Double"
 			EditorType=""
 		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Type"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="ObjoScript.TokenTypes"
+			EditorType=""
+		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class
 #tag EndClass
