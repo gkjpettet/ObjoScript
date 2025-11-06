@@ -1,6 +1,15 @@
 #tag Module
 Protected Module ObjoScript
 	#tag Method, Flags = &h1, Description = 4861736865732060696E746020776974682074686520464E5631612066756E6374696F6E20616E6420636F6D62696E65732069742077697468206068617368602E204D6F646966696573206068617368602E
+		Protected Sub Combine(ByRef hash As Integer, d As Double)
+		  /// Hashes `d` with the FNV1a function and combines it with `hash`. Modifies `hash`.
+		  
+		  // 31 is the prime number that Java uses.
+		  hash = 31 * hash + Hash(d)
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1, Description = 4861736865732060696E746020776974682074686520464E5631612066756E6374696F6E20616E6420636F6D62696E65732069742077697468206068617368602E204D6F646966696573206068617368602E
 		Protected Sub Combine(ByRef hash As Integer, int As Integer)
 		  /// Hashes `int` with the FNV1a function and combines it with `hash`. Modifies `hash`.
 		  
@@ -158,6 +167,17 @@ Protected Module ObjoScript
 	#tag DelegateDeclaration, Flags = &h1, Description = 416E20696E766F6B61626C6520666F726569676E2028586F6A6F20636F646529206D6574686F642E
 		Protected Delegate Sub ForeignMethodDelegate(vm As ObjoScript . VM)
 	#tag EndDelegateDeclaration
+
+	#tag Method, Flags = &h1, Description = 43616C63756C6174657320464E562D316120686173682066726F6D20616E20696E74656765722E
+		Protected Function Hash(d As Double) As UInteger
+		  /// Calculates FNV-1a hash from a double.
+		  
+		  Var data As New MemoryBlock(8)
+		  data.DoubleValue(0) = d
+		  
+		  Return Hash(data)
+		End Function
+	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 52657475726E73207468652068617368206F66207468697320646F75626C652E
 		Function Hash(Extends d As Double) As Integer
