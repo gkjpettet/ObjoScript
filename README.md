@@ -23,7 +23,11 @@ For detailed instructions on how to use and for further documentation about the 
 3. Comprehensive automated test suite.
 4. 4. A command line tool project to run scripts from the Terminal.
 
+## Dependencies
+For the demo, you'll need the Einhugur [TreeView] plugin and `#CoreClasses`. This is only used in the demo to show the disassembled byte code, the ObjoScript engine itself doesn't require any third paty plugins.
+
 [Wiki]: https://github.com/gkjpettet/ObjoScript/wiki
+[TreeView]: https://www.einhugur.com/Html/TreeView/index.html
 
 ## Credit
 ObjoScript would not be possible without the fantastic previous work of [Bob Nystrom]. ObjoScript is a close approximation to his [Wren] programming language and I have lifted verbatim a lot of his explanations in the documentation. Additional thanks to Bob for his fantastic [Crafting Interpreters book] which I used extensively to get my head around a lot of the fundamentals of language implementation. I can highly recommend purchasing the book even though it is free to read online.
